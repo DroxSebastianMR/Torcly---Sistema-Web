@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+@theme inline {
+  --color-brand-forest: #102c25;
+  --color-brand-accent: oklch(76.5% 0.177 163.223);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--primary);
+}
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  --background: #f7f8fa;
+  --foreground: #1b2925;
+  --card: #ffffff;
+  --primary: #17634c;
+  --primary-foreground: #ffffff;
+  --muted: #eaf0ec;
+  --muted-foreground: #61706a;
+  --border: #dce4df;
+}
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--foreground);
+    min-width: 320px;
+  }
+  button,
+  a,
+  input {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button {
+    cursor: pointer;
+  }
+}
+
+/* Keep every module reachable on short screens without a persistent scrollbar. */
+.sidebar-navigation {
+  scrollbar-width: none;
+}
+.sidebar-navigation::-webkit-scrollbar {
+  display: none;
+}

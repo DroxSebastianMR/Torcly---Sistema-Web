@@ -1,0 +1,1 @@
+Cada dominio agrupa routes, controller, service, schema y types. Añadir repository cuando exista persistencia. No importar código de apps/web. El único módulo operativo inicial es health; auth, users y productos se implementarán después.

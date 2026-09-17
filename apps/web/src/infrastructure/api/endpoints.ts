@@ -1,0 +1,21 @@
+export const endpoints = {
+  auth: {
+    login: '/auth/login',
+    me: '/auth/me',
+    logout: '/auth/logout',
+    forgotPassword: '/auth/forgot-password',
+    resetPassword: '/auth/reset-password',
+  },
+  products: '/products',
+  inventory: '/inventory',
+  purchases: '/purchases',
+  sales: '/sales',
+  customers: '/customers',
+  cash: '/cash',
+  users: '/users',
+  notifications: '/notifications',
+  profile: '/profile',
+  reports: '/reports',
+  barcodes: '/barcodes',
+  dashboard: '/dashboard',
+} as const

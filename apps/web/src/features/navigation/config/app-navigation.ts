@@ -1,0 +1,139 @@
+import {
+  LayoutDashboard,
+  ChartNoAxesCombined,
+  ShoppingCart,
+  Truck,
+  UsersRound,
+  Wallet,
+  Package,
+  Warehouse,
+  Barcode,
+  UserCog,
+  Bell,
+  CircleUserRound,
+} from 'lucide-react'
+import { paths } from '@/app/router/constants/paths'
+import type { NavigationGroup } from '../types/navigation.types'
+
+export const appNavigation: readonly NavigationGroup[] = [
+  {
+    id: 'general',
+    label: 'General',
+    items: [
+      {
+        id: 'dashboard',
+        label: 'Dashboard',
+        icon: LayoutDashboard,
+        path: paths.dashboard,
+        visible: true,
+        permission: 'dashboard:read',
+      },
+      {
+        id: 'reports',
+        label: 'Reportes',
+        icon: ChartNoAxesCombined,
+        path: paths.reports,
+        visible: true,
+        permission: 'reports:read',
+      },
+    ],
+  },
+  {
+    id: 'commercial',
+    label: 'Gestión comercial',
+    items: [
+      {
+        id: 'sales',
+        label: 'Ventas',
+        icon: ShoppingCart,
+        path: paths.sales,
+        visible: true,
+        permission: 'sales:read',
+      },
+      {
+        id: 'purchases',
+        label: 'Compras',
+        icon: Truck,
+        path: paths.purchases,
+        visible: true,
+        permission: 'purchases:read',
+      },
+      {
+        id: 'customers',
+        label: 'Clientes',
+        icon: UsersRound,
+        path: paths.customers,
+        visible: true,
+        permission: 'customers:read',
+      },
+      {
+        id: 'cash',
+        label: 'Caja',
+        icon: Wallet,
+        path: paths.cash,
+        visible: true,
+        permission: 'cash:read',
+      },
+    ],
+  },
+  {
+    id: 'catalog',
+    label: 'Catálogo y stock',
+    items: [
+      {
+        id: 'products',
+        label: 'Productos',
+        icon: Package,
+        path: paths.products,
+        visible: true,
+        permission: 'products:read',
+      },
+      {
+        id: 'inventory',
+        label: 'Inventario',
+        icon: Warehouse,
+        path: paths.inventory,
+        visible: true,
+        permission: 'inventory:read',
+      },
+      {
+        id: 'barcodes',
+        label: 'Códigos de barras',
+        icon: Barcode,
+        path: paths.barcodes,
+        visible: true,
+        permission: 'barcodes:read',
+      },
+    ],
+  },
+  {
+    id: 'administration',
+    label: 'Administración',
+    items: [
+      {
+        id: 'users',
+        label: 'Usuarios y permisos',
+        icon: UserCog,
+        path: paths.users,
+        visible: true,
+        permission: 'users:read',
+      },
+      {
+        id: 'notifications',
+        label: 'Notificaciones',
+        icon: Bell,
+        path: paths.notifications,
+        visible: true,
+        permission: 'notifications:read',
+      },
+      {
+        id: 'profile',
+        label: 'Mi perfil',
+        icon: CircleUserRound,
+        path: paths.profile,
+        visible: true,
+        permission: 'profile:read',
+      },
+    ],
+  },
+]

@@ -1,0 +1,17 @@
+export const paths = {
+  login: '/login',
+  forgotPassword: '/recuperar-contrasena',
+  resetPassword: '/restablecer-contrasena',
+  dashboard: '/dashboard',
+  products: '/productos',
+  barcodes: '/codigos-de-barras',
+  inventory: '/inventario',
+  purchases: '/compras',
+  sales: '/ventas',
+  customers: '/clientes',
+  cash: '/caja',
+  users: '/usuarios',
+  notifications: '/notificaciones',
+  profile: '/perfil',
+  reports: '/reportes',
+} as const
