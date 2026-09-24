@@ -1,5 +1,4 @@
-import { useState, type FormEvent } from 'react'
-import { env } from '@/app/config/env'
+import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -12,7 +11,7 @@ import type { LoginInput } from '@/features/auth/types/auth.types'
 export function useLoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const togglePassword = () => setShowPassword((visible) => !visible)
-  const { login, enterDemo } = useAuth()
+  const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const {
@@ -21,7 +20,7 @@ export function useLoginForm() {
     formState: { errors, isSubmitting },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { identifier: '', password: '' },
   })
 
   const submitCredentials = handleSubmit(async (values) => {
@@ -43,21 +42,9 @@ export function useLoginForm() {
     await navigate(destination, { replace: true })
   })
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    // Acceso temporal de desarrollo; env.demo siempre es false en producción.
-    if (env.demo) {
-      event.preventDefault()
-      enterDemo()
-      void navigate(paths.dashboard, { replace: true })
-      return
-    }
-
-    return submitCredentials(event)
-  }
-
   return {
     register,
-    onSubmit,
+    onSubmit: submitCredentials,
     errors,
     isSubmitting,
     showPassword,

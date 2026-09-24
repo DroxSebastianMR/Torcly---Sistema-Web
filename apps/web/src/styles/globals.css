@@ -24,6 +24,22 @@
   --muted-foreground: #61706a;
   --border: #dce4df;
 }
+@keyframes torcly-loader-breathe {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+@keyframes torcly-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 @layer base {
   * {
     border-color: var(--border);

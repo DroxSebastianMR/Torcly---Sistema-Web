@@ -23,11 +23,19 @@ describe('Base HTTP', () => {
     expect(response.status).toBe(400)
     expect(response.body.error.code).toBe('INVALID_JSON')
   })
-  it('responde validación uniforme en productos', async () => {
-    const response = await request(app).post('/api/v1/products').send({})
+  it('responde validación uniforme en autenticación', async () => {
+    const response = await request(app).post('/api/v1/auth/login').send({})
     expect(response.status).toBe(400)
     expect(response.body.error.code).toBe('VALIDATION_ERROR')
     expect(response.body.error.fields.length).toBeGreaterThan(0)
+  })
+  it('protege sesión y módulos de negocio', async () => {
+    const session = await request(app).get('/api/v1/auth/me')
+    const products = await request(app).get('/api/v1/products')
+    expect(session.status).toBe(401)
+    expect(session.body.error.code).toBe('AUTH_REQUIRED')
+    expect(products.status).toBe(401)
+    expect(products.body.error.code).toBe('AUTH_REQUIRED')
   })
   it('permite el origen de desarrollo', async () => {
     const response = await request(app)

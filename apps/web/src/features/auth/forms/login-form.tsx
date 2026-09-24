@@ -4,7 +4,7 @@ import {
   EyeOff,
   LoaderCircle,
   LockKeyhole,
-  Mail,
+  UserRound,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { paths } from '@/app/router/constants/paths'
@@ -30,18 +30,17 @@ export function LoginForm() {
       className="space-y-5 2xl:space-y-6"
     >
       <AuthInput
-        id="email"
-        label="Correo electrónico"
-        type="email"
-        inputMode="email"
+        id="identifier"
+        label="Usuario o correo electrónico"
+        type="text"
         autoComplete="username"
         autoCapitalize="none"
         spellCheck={false}
-        placeholder="nombre@empresa.com"
-        icon={Mail}
+        placeholder="usuario o nombre@empresa.com"
+        icon={UserRound}
         readOnly={isSubmitting}
-        error={errors.email?.message}
-        {...register('email')}
+        error={errors.identifier?.message}
+        {...register('identifier')}
       />
       <AuthInput
         id="password"

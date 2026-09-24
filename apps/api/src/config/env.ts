@@ -26,6 +26,10 @@ const schema = z.object({
   DATABASE_POOL_SIZE: z.coerce.number().int().min(1).max(20).default(5),
   DATABASE_CONNECT_TIMEOUT_MS: z.coerce.number().int().min(1000).default(10000),
   DATABASE_IDLE_TIMEOUT_MS: z.coerce.number().int().min(1000).default(30000),
+  SESSION_COOKIE_NAME: z.string().min(1).default('torcly_session'),
+  SESSION_IDLE_MINUTES: z.coerce.number().int().min(5).max(1440).default(30),
+  LOGIN_MAX_ATTEMPTS: z.coerce.number().int().min(1).max(20).default(5),
+  LOGIN_LOCK_MINUTES: z.coerce.number().int().min(1).max(1440).default(15),
 })
 
 const isTest = process.env.NODE_ENV === 'test'
