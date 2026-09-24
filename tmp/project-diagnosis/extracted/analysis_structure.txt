@@ -1,0 +1,202 @@
+=== PAGE 1 ===
+Dr. Ing. José A. Gómez Avila
+UNIVERSIDAD PRIVADA DEL NORTE
+Facultad, Ingeniería de Sistemas Computacionales
+ESTRUCTURA DE ANÁLISIS
+Autores: BAUTISTA QUEZADA, ARIAN ARMANDO
+MERCADO ROJAS, JOSE MANUEL SEBASTIAN
+ORMEÑO BOCANEGRA, BRENDA GABRIELA
+RAMIREZ ALVA PIERO
+VEGA MEZA CARMEN KATERIN
+Asignatura: CAPSTONE PROJECT SISTEMAS
+Docente: JOSE ALBERTO GOMEZ AVILA
+TRUJILLO, PERÚ
+2026 – 2
+
+=== PAGE 2 ===
+Dr. Ing. José A. Gómez Avila
+INFORME
+VARIABLES DE ESTUDIO
+VI: Sistema Web Torcly V1.0, integrado por diez componentes funcionales para la
+operación de tienda y taller, incluidos BI y la IA de apoyo a la reposición de inventario.
+VD: Gestión operativa del GRUPO MECATRONIC MC PERU S.A.C., comprendida como el
+registro, control, consulta y seguimiento de clientes, vehículos, inventario, servicios,
+citas, operaciones del taller, ventas y pagos, junto con el uso de información para la
+toma de decisiones.
+POBLACIÓN
+Personal del GRUPO MECATRONIC MC PERU S.A.C. que participa en los procesos de
+tienda y taller comprendidos en el alcance de Torcly:
+➢ Propietario del taller.
+➢ Administradora de tienda.
+➢ Técnicos mecánicos.
+➢ Ayudante de taller.
+MUESTRA
+➢ 1 propietario.
+➢ 1 administradora de tienda.
+➢ 2 técnicos mecánicos.
+➢ 1 ayudante de taller.
+OBJETIVO GENERAL Y ESPECÍFICOS
+Objetivo General:
+Desarrollar e implementar el Sistema Web Torcly V1.0 para mejorar la gestión operativa
+del GRUPO MECATRONIC MC PERU S.A.C., mediante la centralización de los procesos de
+tienda y taller, la trazabilidad de sus registros, la consulta de indicadores de Inteligencia
+de Negocios (BI) y el apoyo de Inteligencia Artificial (IA) a la planificación de reposiciones
+de inventario.
+
+=== PAGE 3 ===
+Dr. Ing. José A. Gómez Avila
+Objetivos Específicos
+1. Analizar los procesos actuales de la tienda y el taller, así como los registros
+disponibles, para identificar necesidades de gestión de clientes y vehículos,
+productos e inventario, servicios automotrices, citas y atenciones, operaciones del
+taller, ventas y pagos.
+2. Definir y validar los requerimientos, flujos y permisos de Torcly V1.0 para sus diez
+componentes funcionales, de acuerdo con los procesos de Mecatronic y el alcance
+aprobado para el proyecto.
+3. Implementar e integrar los componentes de seguridad y control de acceso, clientes
+y vehículos, productos e inventario, servicios automotrices, citas y atenciones,
+operaciones del taller, ventas y pagos, y consulta y control operativo.
+4. Implementar BI y analítica operativa para presentar indicadores, reportes y
+tendencias de inventario, ventas, pagos, servicios, citas y taller, calculados a partir
+de registros válidos y disponibles para los usuarios autorizados.
+5. Implementar IA de apoyo a la gestión de inventario para analizar movimientos,
+ventas y consumo de productos en servicios, y presentar estimaciones o
+recomendaciones de reposición cuando existan datos suficientes. Cuando no los
+haya, informar la insuficiencia; ninguna recomendación ejecutará compras ni
+modificará existencias automáticamente.
+6. Verificar el funcionamiento e integración de los diez componentes y evaluar el
+cambio en la gestión operativa mediante registros y tiempos de consulta
+comparables, exactitud de existencias, trazabilidad de atenciones, validación de
+indicadores BI y tratamiento de productos elegibles o con datos insuficientes para
+IA, conforme a los criterios aprobados para Torcly V1.0.
+ANTECEDENTES
+Antecedentes internacionales
+1. Lau y Darman (2025) — Malasia
+Lau y Darman (2025), en su investigación The Development of Car Workshop
+Inventory Management System for Thompson Auto Service Centre, desarrollaron un
+sistema web para gestionar el inventario de un taller automotriz en Sungai Petani,
+Malasia. El establecimiento utilizaba registros en papel y hojas de Excel, lo que
+ocasionaba inconsistencias en las existencias y dificultades para localizar productos.
+El sistema se desarrolló mediante la metodología Cascada e incorporó el registro de
+productos, solicitudes de reposición, búsquedas, reportes y alertas de stock. La
+evaluación contó con 30 participantes: el 53,3 % calificó su satisfacción con 5 de 5 y
+
+=== PAGE 4 ===
+Dr. Ing. José A. Gómez Avila
+el 40 % con 4 de 5. Asimismo, el 93,3 % recomendaría el sistema a otros talleres.
+Estos resultados reflejan una aceptación favorable de la solución. Este antecedente
+resulta pertinente para Torcly porque aborda la sustitución de registros manuales y
+la centralización de información para controlar las existencias.
+2. Hairol Rizal y Omar (2026) — Malasia
+Hairol Rizal y Omar (2026), en su investigación Car Service Record System,
+desarrollaron un sistema web orientado a organizar los registros y servicios de
+talleres vehiculares en Malasia. El estudio abordó problemas relacionados con la
+pérdida de documentos, los conflictos de programación y las dificultades para
+consultar el historial de mantenimiento. Se utilizó la metodología Cascada y se
+implementaron 9 módulos funcionales, entre ellos gestión de vehículos, historial de
+servicios, reservas y reportes. La evaluación de aceptación incluyó 14 participantes:
+10 clientes, 1 administrador y 3 mecánicos, mediante cuestionarios de 5 preguntas
+para cada grupo. Los autores reportaron una valoración favorable respecto a la
+facilidad de uso, la precisión de los datos y la organización de las actividades. Este
+antecedente aporta una referencia para Torcly al mostrar cómo estructurar el
+registro vehicular y conservar el historial de atención, además de evaluar el sistema
+con los distintos usuarios involucrados.
+Antecedentes nacionales
+1. Adama Zevallos (2023) — Tarma, Perú
+Adama Zevallos (2023), en su tesis Implementación del sistema web para mejorar la
+calidad del servicio automotriz en el taller mecánico Multiservicios ADAMA de
+Tarma, presentada en la Universidad Peruana Los Andes, tuvo como objetivo
+mejorar la atención al cliente mediante un sistema web. La investigación fue
+cuantitativa, de nivel explicativo y diseño experimental; consideró una población de
+178 usuarios y una muestra de 122 participantes. Para desarrollar el sistema se
+empleó la metodología RUP y se recolectaron datos mediante encuestas y fichas de
+observación. Según los resultados reportados, la calidad del servicio automotriz
+mejoró en un 46 %, la capacidad de respuesta de las atenciones en un 69 % y la
+satisfacción del cliente en un 22,2 %. Este antecedente resulta relevante para Torcly
+porque muestra cómo la implementación de un sistema web puede contribuir a
+mejorar la atención y permite considerar la capacidad de respuesta como un
+indicador para evaluar los procesos del taller.
+
+=== PAGE 5 ===
+Dr. Ing. José A. Gómez Avila
+2. Chavez Mijahuanca y Espinoza Alburquerque (2024) — Piura, Perú
+Chavez Mijahuanca y Espinoza Alburquerque (2024), en su tesis Sistema con
+reconocimiento de patrones de matrícula para la gestión de mantenimiento
+vehicular en un taller automotriz Piura 2024, presentada en la Universidad César
+Vallejo, buscaron mejorar el registro de historiales de mantenimiento y reducir los
+errores mediante la identificación automatizada de vehículos. La investigación fue
+aplicada y experimental, y utilizó encuestas y hojas de observación para evaluar los
+resultados. Los autores reportaron una mejora del 20 % en la eficiencia operativa,
+una precisión del 81 % en el reconocimiento de matrículas y una valoración positiva
+de la usabilidad por parte del 82 % de los usuarios. Este antecedente se relaciona
+con Torcly por su enfoque en el registro vehicular y la organización del historial de
+mantenimiento. Su aporte permite sustentar la importancia de mantener
+información confiable y accesible para el seguimiento de los vehículos, aunque
+emplea una tecnología de identificación adicional al alcance previsto para Torcly.
+Antecedentes locales
+1. Castillo Sánchez (2022) — Trujillo
+Castillo Sánchez (2022), en su tesis Sistema de información vía web para mejorar el
+control de inventario en la empresa Farmoto E.I.R.L. de Trujillo, presentada en la
+Universidad César Vallejo, tuvo como objetivo mejorar el manejo del inventario
+mediante una herramienta informática. La investigación consideró una población de
+8 trabajadores y empleó la metodología ICONIX para desarrollar el sistema,
+utilizando PHP y MySQL. Los resultados mostraron que el tiempo promedio de
+registro de información de los productos disminuyó de 444,51 segundos a 223,48
+segundos, lo que representó una reducción del 49,72 %. Este antecedente resulta
+pertinente para Torcly porque aborda el control de inventario en una empresa que
+comercializa repuestos de motocicletas y aporta una referencia concreta para
+evaluar la reducción de tiempos de registro mediante un sistema web.
+
+=== PAGE 6 ===
+Dr. Ing. José A. Gómez Avila
+2. Rodríguez Loyola y Neyra Crispin (2023) — Trujillo
+Rodríguez Loyola y Neyra Crispin (2023), en su tesis Sistema web para mejorar el
+control de inventario de la empresa SEPROES–Trujillo, presentada en la Universidad
+César Vallejo, buscaron mejorar el control de existencias mediante la
+implementación de un sistema web. La investigación fue aplicada, con enfoque
+cuantitativo y diseño preexperimental. La población y la muestra estuvieron
+conformadas por 28 artículos del inventario, y los datos se recopilaron mediante
+observación y fichas de registro. Según el resumen de la investigación, se reportaron
+aumentos del 27,32 % en el indicador de entregas a tiempo, del 37,08 % en entregas
+perfectas y del 32,92 % en exactitud del inventario. Este antecedente aporta a Torcly
+una referencia para evaluar la precisión de las existencias registradas y comparar el
+desempeño del control de inventario antes y después de implementar el sistema.
+En conjunto, estos antecedentes sustentan la digitalización de registros, el control
+de inventario, la organización de atenciones y la evaluación de procesos en entornos
+afines. Torcly integra esas funciones con ventas, pagos, consultas operativas y
+seguridad. También incorpora BI sobre sus registros y una IA limitada al apoyo de
+reposición de inventario; estas dos capacidades corresponden al alcance aprobado
+del proyecto y no se atribuyen a los estudios citados.
+DEFINICIÓN DEL PROBLEMA
+¿De qué manera la implementación del Sistema Web Torcly V1.0 contribuye a mejorar
+la gestión operativa de la tienda y el taller del GRUPO MECATRONIC MC PERU S.A.C.,
+ante el uso de registros manuales y la información dispersa sobre clientes, vehículos,
+inventario, servicios, citas, ventas, pagos y operaciones del taller, así como la limitada
+disponibilidad de indicadores y análisis para apoyar las decisiones de reposición?
+REFERENCIAS
+Adama Zevallos, C. B. (2023). Implementación del sistema web para mejorar la calidad
+del servicio automotriz en el taller mecánico Multiservicios ADAMA de Tarma [Tesis de
+grado, Universidad Peruana Los Andes]. Repositorio Institucional UPLA.
+https://repositorio.upla.edu.pe/item/b112e7b3-3f86-4d43-8b8b-5dd3b21bade6
+Castillo Sánchez, J. L. (2022). Sistema de información vía web para mejorar el control de
+inventario en la empresa Farmoto E.I.R.L. de Trujillo [Tesis de grado, Universidad César
+Vallejo]. Repositorio Institucional UCV.
+https://repositorio.ucv.edu.pe/handle/20.500.12692/108765
+
+=== PAGE 7 ===
+Dr. Ing. José A. Gómez Avila
+Chavez Mijahuanca, J. H., & Espinoza Alburquerque, C. F. (2024). Sistema con
+reconocimiento de patrones de matrícula para la gestión de mantenimiento vehicular en
+un taller automotriz Piura 2024 [Tesis de grado, Universidad César Vallejo]. Repositorio
+Institucional UCV. https://repositorio.ucv.edu.pe/handle/20.500.12692/164851
+Hairol Rizal, M. I., & Omar, N. A. (2026). Car service record system. Applied Information
+Technology and Computer Science, 7(1), 352–370.
+https://periodical.uthm.edu.my/index.php/aitcs/article/view/20506/7433
+Lau, W. X., & Darman, R. (2025). The development of car workshop inventory
+management system for Thompson Auto Service Centre. Applied Information
+Technology and Computer Science, 6(1), 82–99.
+http://periodical.uthm.edu.my/index.php/aitcs/article/view/16445/6289
+Rodríguez Loyola, J. A., & Neyra Crispin, N. A. O. (2023). Sistema web para mejorar el
+control de inventario de la empresa SEPROES-Trujillo [Tesis de grado, Universidad César
+Vallejo]. Repositorio Institucional UCV.
+https://repositorio.ucv.edu.pe/handle/20.500.12692/125993

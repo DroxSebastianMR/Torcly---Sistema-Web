@@ -16,16 +16,36 @@ apps/api/src/
   config/env.ts             Lectura y validación del entorno
   modules/<dominio>/        routes, controller, service, schema, types
   middlewares/              Errores y contexto de solicitudes
-  infrastructure/database/  Cliente de persistencia (pendiente)
+  infrastructure/database/  Prisma singleton, pool PostgreSQL y transacciones
   infrastructure/mail/      Adaptador de correo (pendiente)
   shared/errors/            Errores de aplicación
 ```
 
-Flujo: ruta → validación → controlador → servicio → repository cuando exista base de datos. Los controladores resuelven HTTP; los servicios contienen reglas de negocio. La infraestructura no depende de las vistas. Añadir carpetas y contratos cuando tengan una responsabilidad concreta.
+Flujo: ruta → validación → controlador → servicio → repository → Prisma. Los
+controladores resuelven HTTP, los servicios contienen reglas de negocio y los
+repositorios concentran las consultas. La infraestructura no depende de las
+vistas.
+
+### Productos
+
+El módulo `modules/products` implementa catálogo, categorías, marcas y unidades.
+El código y el código de barras son únicos; los productos se desactivan sin
+eliminar su historial. La existencia se deriva exclusivamente de movimientos de
+inventario confirmados y nunca se modifica desde el catálogo.
+
+Endpoints principales:
+
+- `GET /api/v1/products`: búsqueda, filtros y paginación.
+- `POST /api/v1/products`: registro validado.
+- `PUT /api/v1/products/:id`: actualización del catálogo.
+- `PATCH /api/v1/products/:id/status`: activación o desactivación.
+- `GET /api/v1/products/options`: categorías, marcas y unidades activas.
+- `POST /api/v1/products/categories|brands|units`: datos maestros.
 
 ## Contratos iniciales
 
-GET `/api/v1/health` devuelve `{ status, service, timestamp }`. Es salud del proceso, no certifica disponibilidad de base de datos.
+GET `/api/v1/health` devuelve `{ status, service, timestamp }`. GET
+`/api/v1/health/database` comprueba la disponibilidad de PostgreSQL.
 
 Errores: `{ error: { code, message, requestId } }`. La cabecera X-Request-Id permite correlacionar la respuesta. No se devuelven trazas internas.
 

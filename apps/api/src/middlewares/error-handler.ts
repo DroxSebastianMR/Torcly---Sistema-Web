@@ -1,4 +1,5 @@
 import type { ErrorRequestHandler } from 'express'
+import { ZodError } from 'zod'
 import { AppError } from '../shared/errors/app-error.js'
 
 export const errorHandler: ErrorRequestHandler = (
@@ -20,30 +21,37 @@ export const errorHandler: ErrorRequestHandler = (
     error !== null &&
     'type' in error &&
     error.type === 'entity.too.large'
+  const validationError = error instanceof ZodError
   const status =
     error instanceof AppError
       ? error.status
-      : parseError
+      : validationError
         ? 400
-        : tooLarge
-          ? 413
-          : 500
+        : parseError
+          ? 400
+          : tooLarge
+            ? 413
+            : 500
   const code =
     error instanceof AppError
       ? error.code
-      : parseError
-        ? 'INVALID_JSON'
-        : tooLarge
-          ? 'PAYLOAD_TOO_LARGE'
-          : 'INTERNAL_ERROR'
+      : validationError
+        ? 'VALIDATION_ERROR'
+        : parseError
+          ? 'INVALID_JSON'
+          : tooLarge
+            ? 'PAYLOAD_TOO_LARGE'
+            : 'INTERNAL_ERROR'
   const message =
     error instanceof AppError
       ? error.message
-      : parseError
-        ? 'El cuerpo JSON no es válido.'
-        : tooLarge
-          ? 'La solicitud supera el tamaño permitido.'
-          : 'No se pudo procesar la solicitud.'
+      : validationError
+        ? 'Revisa los datos ingresados.'
+        : parseError
+          ? 'El cuerpo JSON no es válido.'
+          : tooLarge
+            ? 'La solicitud supera el tamaño permitido.'
+            : 'No se pudo procesar la solicitud.'
   if (status >= 500)
     console.error(
       JSON.stringify({
@@ -52,7 +60,19 @@ export const errorHandler: ErrorRequestHandler = (
         code,
       }),
     )
-  response
-    .status(status)
-    .json({ error: { code, message, requestId: response.locals.requestId } })
+  response.status(status).json({
+    error: {
+      code,
+      message,
+      requestId: response.locals.requestId,
+      ...(validationError
+        ? {
+            fields: error.issues.map((issue) => ({
+              field: issue.path.join('.'),
+              message: issue.message,
+            })),
+          }
+        : {}),
+    },
+  })
 }

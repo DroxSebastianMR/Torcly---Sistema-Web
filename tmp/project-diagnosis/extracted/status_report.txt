@@ -1,0 +1,91 @@
+P: INFORME DE ESTADO DEL PROYECTO
+P: [NOMBRE DEL PROYECTO]
+P: Registro de Revisión
+P: Tabla de contenido
+P: 1.	Resumen del Estado del Proyecto	3
+P: 2.	Trabajo planificado para la siguiente semana	4
+P: 3.	Mejoras o cambios pendientes	4
+P: 4.	Hitos y entregables del proyecto:	4
+P: 5.	Indicadores Clave de Desempeño (KPI's)	4
+P: DESCRIPCIÓN DEL PROYECTO:
+P: [Colocar acá una breve descripción del proyecto]
+P: Resumen del Estado del Proyecto
+P: Estado Global
+P: Explicaciones:
+P: Respecto al Alcance: El indicador de alcance del proyecto está en verde debido a que el promedio de culminación de entregables ha logrado el 75% (ver Anexo 1 para mayor detalle).
+P: Respecto al Tiempo: El indicador de tiempo del proyecto está en amarillo debido a que las actividades previstas se realizar dentro del periodo de evaluación, se han completado dentro del plazo establecido en un 66% (ver Anexo 1 para mayor detalle).
+P: Respecto al Costo: El indicador de costo del proyecto está en amarillo, debido a que el costo real de las actividades ejecutadas, ha llegado hasta 108% del costo presupuestado (ver Anexo 1 para mayor detalle).
+P: Sustento del Estado del Proyecto
+P: [Indicar acá, porqué es que se han llegado a obtener los indicadores mostrados en la sección anterior]
+P: Cambios principales ocurridos desde el último reporte emitido:
+P: [Describir acá todas las modificaciones o cambios hechos al proyecto desde que se envió el reporte anterior]
+P: Hitos y entregables del proyecto (Semana/Mes Actual y Siguiente):
+P: Indicadores Clave de Desempeño (KPI's)
+P: Tiempo – El Proyecto está (adelantado / retrasado) con respecto al cronograma
+P: Schedule Variance (SV):	$xxxx
+P: Schedule Performance Index (SPI):	x.xx
+P: Costo – El Proyecto está por (encima / debajo) de lo presupuestado
+P: Cost Variance (CV):	$xxx
+P: Cost Performance Index (CPI):	x.xx
+P: ANEXO 1
+P: DETALLE DE VALIDACIÓN DEL ALCANCE
+P: DETALLE DE VALIDACIÓN DEL TIEMPO
+P: DETALLE DE VALIDACIÓN DE COSTOS
+P: ANEXO 2
+P: Leyenda del Alcance:
+P: Leyenda del Tiempo:
+P: Leyenda del Costo:
+
+=== TABLE 1 ===
+Revisión | Fecha | Modificaciones | Autor
+ |  |  | 
+
+=== TABLE 2 ===
+Alcance | Tiempo | Costo
+
+=== TABLE 3 ===
+Código EDT | ACTIVIDAD | Entregable | Fecha Planeada Culminación | Fecha Real de Entrega | Estado
+ |  |  |  |  | 
+ |  |  |  |  | 
+ |  |  |  |  | 
+ |  |  |  |  | 
+
+=== TABLE 4 ===
+ACTIVIDAD | ENTREGABLE | % CUMPLIMIENTO
+ |  | 
+ |  | 
+ |  | 
+Cumplimiento Promedio | Cumplimiento Promedio | 75%
+
+=== TABLE 5 ===
+ACTIVIDAD | DURACIÓN ESTIMADA | DURACIÓN REAL | % CUMPLIMIENTO
+ |  |  | 
+ |  |  | 
+ |  |  | 
+Cumplimiento promedio | Cumplimiento promedio | Cumplimiento promedio | 66%
+
+=== TABLE 6 ===
+ACTIVIDAD | VALOR PLANIFICADO | COSTO REAL
+ |  | 
+ |  | 
+ |  | 
+TOTAL | 12800 | 13870
+Porcentaje de Variación |  | 108%
+
+=== TABLE 7 ===
+Código de color | Significado
+Verde | Los entregables correspondientes al periodo de evaluación se han completado en un porcentaje mayor o igual a 75
+Amarillo | Los entregables correspondientes al periodo de evaluación se han completado en un porcentaje menor a 75%, pero mayor o igual a 50%
+Rojo | Los entregables correspondientes al periodo de evaluación se han completado en un porcentaje menor a 50%
+
+=== TABLE 8 ===
+Código de color | Significado
+Verde | Las actividades correspondientes al periodo de evaluación se han completado dentro del plazo previsto en un porcentaje mayor o igual a 75
+Amarillo | Las actividades correspondientes al periodo de evaluación se han completado dentro del plazo previsto en un porcentaje menor a 75, pero mayor o igual a 50
+Rojo | Las actividades correspondientes al periodo de evaluación se han completado dentro del plazo previsto en un porcentaje menor a 50
+
+=== TABLE 9 ===
+Código de color | Significado
+Verde | El costo real de las actividades correspondientes al periodo de evaluación es menor o igual al 100% del costo presupuestado.
+Amarillo | El costo real de las actividades correspondientes al periodo de evaluación es mayor al 100% del costo presupuestado, pero menor o igual al 110%.
+Rojo | El costo real de las actividades correspondientes al periodo de evaluación es mayor al 110% del costo presupuestado.

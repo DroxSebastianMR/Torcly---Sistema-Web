@@ -3,3 +3,10 @@ export interface HealthResponse {
   service: 'torcly-api'
   timestamp: string
 }
+
+export interface DatabaseHealthResponse {
+  status: 'ok'
+  service: 'postgresql'
+  latencyMs: number
+  timestamp: string
+}

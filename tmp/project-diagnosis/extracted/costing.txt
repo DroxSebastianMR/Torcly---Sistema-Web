@@ -1,0 +1,490 @@
+
+=== SHEET Resumen (45x16) ===
+A1=RESUMEN DE COSTEO POR PAQUETE DE TRABAJO - SISTEMA WEB TORCLY
+A3=Código | B3=Paquete de trabajo | C3=Horas RR.HH. | D3=Costo RR.HH. (S/) | E3=Equipos / Infraestructura (S/) | F3=Consumibles / Servicios (S/) | G3=Costo del paquete (S/) | H3=% del total | J3=Categoría | K3=Monto (S/)
+A4=1.1 | B4=Formalización del Proyecto | C4=8 | D4=68 | E4=0 | F4=0 | G4=68 | H4==G4/$G$32 | J4=Recursos humanos | K4=5000
+A5=1.2 | B5=Planificación del Proyecto | C5=36 | D5=306 | E5=0 | F5=200 | G5=506 | H5==G5/$G$32 | J5=Infraestructura tecnológica | K5=1200
+A6=2.1 | B6=Especificación Funcional | C6=12 | D6=84 | E6=0 | F6=0 | G6=84 | H6==G6/$G$32 | J6=Hardware y equipamiento | K6=1000
+A7=2.2 | B7=Modelamiento Funcional | C7=24 | D7=168 | E7=0 | F7=0 | G7=168 | H7==G7/$G$32 | J7=Software y herramientas | K7=800
+A8=2.3 | B8=Diseño de Arquitectura | C8=32 | D8=217.04 | E8=0 | F8=0 | G8=217.04 | H8==G8/$G$32 | J8=Pruebas e implementación | K8=1000
+A9=2.4 | B9=Diseño de Datos | C9=28 | D9=206.08 | E9=0 | F9=0 | G9=206.08 | H9==G9/$G$32 | J9=Contingencia | K9=1000
+A10=2.5 | B10=Diseño UI/UX | C10=20 | D10=131.8 | E10=0 | F10=200 | G10=331.8 | H10==G10/$G$32
+A11=3.1 | B11=Control de Acceso a Torcly | C11=52 | D11=342.67999999999995 | E11=0 | F11=0 | G11=342.67999999999995 | H11==G11/$G$32
+A12=4.1 | B12=Gestión de Clientes | C12=24 | D12=159.8 | E12=0 | F12=0 | G12=159.8 | H12==G12/$G$32
+A13=4.2 | B13=Gestión de Vehículos | C13=24 | D13=158.16 | E13=0 | F13=0 | G13=158.16 | H13==G13/$G$32
+A14=5.1 | B14=Catálogo de Productos | C14=24 | D14=176.64000000000001 | E14=0 | F14=0 | G14=176.64000000000001 | H14==G14/$G$32
+A15=5.2 | B15=Control de Inventario | C15=40 | D15=294.40000000000003 | E15=1000 | F15=0 | G15=1294.4 | H15==G15/$G$32
+A16=6.1 | B16=Catálogo de Servicios | C16=24 | D16=158.16 | E16=0 | F16=0 | G16=158.16 | H16==G16/$G$32
+A17=7.1 | B17=Agenda del Taller | C17=36 | D17=245.44 | E17=0 | F17=0 | G17=245.44 | H17==G17/$G$32
+A18=8.1 | B18=Orden de Trabajo | C18=56 | D18=380.52 | E18=0 | F18=0 | G18=380.52 | H18==G18/$G$32
+A19=8.2 | B19=Seguimiento del Taller | C19=16 | D19=105.44 | E19=0 | F19=0 | G19=105.44 | H19==G19/$G$32
+A20=9.1 | B20=Gestión de Ventas | C20=16 | D20=105.44 | E20=0 | F20=0 | G20=105.44 | H20==G20/$G$32
+A21=9.2 | B21=Gestión de Pagos | C21=28 | D21=206.08 | E21=0 | F21=0 | G21=206.08 | H21==G21/$G$32
+A22=10.1 | B22=Consulta Centralizada | C22=20 | D22=140 | E22=0 | F22=0 | G22=140 | H22==G22/$G$32
+A23=11.1 | B23=Panel Analítico de Torcly | C23=36 | D23=250.16 | E23=0 | F23=200 | G23=450.15999999999997 | H23==G23/$G$32
+A24=12.1 | B24=Motor de Apoyo a Reposición | C24=44 | D24=302.28 | E24=0 | F24=200 | G24=502.28 | H24==G24/$G$32
+A25=13.1 | B25=Aseguramiento de Calidad | C25=48 | D25=329.03999999999996 | E25=0 | F25=600 | G25=929.04 | H25==G25/$G$32
+A26=13.2 | B26=Implementación | C26=16 | D26=108.52 | E26=1200 | F26=400 | G26=1708.52 | H26==G26/$G$32
+A27=13.3 | B27=Transferencia de Conocimiento | C27=32 | D27=220.32 | E27=0 | F27=0 | G27=220.32 | H27==G27/$G$32
+A28=13.4 | B28=Cierre del Proyecto | C28=16 | D28=136 | E28=0 | F28=0 | G28=136 | H28==G28/$G$32
+A30=SUBTOTAL PAQUETES DE TRABAJO | G30==SUM(G4:G28)
+A31=RESERVA DE CONTINGENCIA | G31=1000
+A32=TOTAL PRESUPUESTO DEL PROYECTO | G32==G30+G31 | H32==1
+A35=VALORIZACIÓN DE RECURSOS HUMANOS
+A36=Recurso | B36=Horas | C36=Tarifa/hora (S/) | D36=Costo total (S/)
+A37=José Manuel Sebastián Mercado Rojas | B37=60 | C37=8.5 | D37==B37*C37
+A38=Arian Armando Bautista Quezada | B38=156 | C38=7 | D38==B38*C38
+A39=Brenda Gabriela Ormeño Bocanegra | B39=152 | C39=6.59 | D39==B39*C39
+A40=Piero Ramírez Alva | B40=168 | C40=7.36 | D40==B40*C40
+A41=Carmen Katerin Vega Meza | B41=176 | C41=6.59 | D41==B41*C41
+A42=TOTAL RECURSOS HUMANOS | D42==SUM(D37:D41)
+
+=== SHEET Supuestos (22x6) ===
+A1=SUPUESTOS Y TARIFAS DE COSTEO - TORCLY
+A3=Recurso | B3=Rol | C3=Tarifa por hora (S/) | D3=Fuente / criterio
+A4=José Manuel Sebastián Mercado Rojas | B4=Líder del Proyecto | C4=8.5 | D4=Valorización referencial alineada al presupuesto de RR.HH. del proyecto
+A5=Arian Armando Bautista Quezada | B5=Analista de Sistemas | C5=7 | D5=Valorización referencial alineada al presupuesto de RR.HH. del proyecto
+A6=Brenda Gabriela Ormeño Bocanegra | B6=Programadora Full-Stack | C6=6.59 | D6=Valorización referencial alineada al presupuesto de RR.HH. del proyecto
+A7=Piero Ramírez Alva | B7=Administrador de Base de Datos | C7=7.36 | D7=Valorización referencial alineada al presupuesto de RR.HH. del proyecto
+A8=Carmen Katerin Vega Meza | B8=Programadora Full-Stack | C8=6.59 | D8=Valorización referencial alineada al presupuesto de RR.HH. del proyecto
+A10=Categoría no laboral | B10=Monto (S/) | C10=Asignación | D10=Fuente / criterio
+A11=Infraestructura tecnológica | B11=1200 | C11=13.2 Implementación | D11=Presupuesto referencial aprobado
+A12=Hardware y equipamiento | B12=1000 | C12=5.2 Control de Inventario | D12=Presupuesto referencial aprobado
+A13=Software y herramientas | B13=800 | C13=1.2 / 2.5 / 11.1 / 12.1 | D13=Presupuesto referencial aprobado
+A14=Pruebas e implementación | B14=1000 | C14=13.1 / 13.2 | D14=Presupuesto referencial aprobado
+A15=Contingencia | B15=1000 | C15=Reserva general (Resumen) | D15=Presupuesto referencial aprobado
+A17=Conversión de duración | B17=Valor | C17=Aplicación | D17=Observación
+A18=1 día de trabajo | B18=8 | C18=Cronograma | D18=Se convierte a 8 horas para el costeo
+A19=4 horas | B19=4 | C19=Cronograma | D19=Se mantiene como 4 horas
+A20=Hito | B20=0 | C20=Cronograma | D20=No agrega horas de ejecución; su trabajo está contenido en actividades previas
+A22=Base de estimación: Cronograma Torcly V3.0 (horas y duraciones), Matriz RACI Torcly V2.5 (responsables) y presupuesto referencial de S/ 10,000 del proyecto.
+
+=== SHEET 1.1 Formalización del Proyecto (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=1.1 Formalización del Proyecto
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=1.1.1 | C6=Documentación Fundacional | D6=José Manuel Sebastián Mercado Rojas | E6=8 | F6=8.5 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 1.2 Planificación del Proyecto (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=1.2 Planificación del Proyecto
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=1.2.1 | C6=Línea Base de Planificación | D6=José Manuel Sebastián Mercado Rojas | E6=16 | F6=8.5 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=1.2.2 | C13=Gestión Organizacional | D13=José Manuel Sebastián Mercado Rojas | E13=12 | F13=8.5 | G13==E13*F13 | M13=Herramienta de gestión y colaboración | N13=1 | O13=200 | P13==N13*O13
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+B20=1.2.3 | C20=Gestión de Riesgos | D20=José Manuel Sebastián Mercado Rojas | E20=8 | F20=8.5 | G20==E20*F20
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 2.1 Especificación Funcional (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=2.1 Especificación Funcional
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=2.1.1 | C6=Requerimientos del Sistema | D6=Arian Armando Bautista Quezada | E6=12 | F6=7 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 2.2 Modelamiento Funcional (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=2.2 Modelamiento Funcional
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=2.2.1 | C6=Procesos de Negocio | D6=Arian Armando Bautista Quezada | E6=24 | F6=7 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 2.3 Diseño de Arquitectura (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=2.3 Diseño de Arquitectura
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=2.3.1 | C6=Arquitectura de Software | D6=Brenda Gabriela Ormeño Bocanegra | E6=8 | F6=6.59 | G6==E6*F6
+D7=Carmen Katerin Vega Meza | E7=16 | F7=6.59 | G7==E7*F7
+D8=Piero Ramírez Alva | E8=8 | F8=7.36 | G8==E8*F8
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 2.4 Diseño de Datos (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=2.4 Diseño de Datos
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=2.4.1 | C6=Modelo de Información | D6=Piero Ramírez Alva | E6=28 | F6=7.36 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 2.5 Diseño UI-UX (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=2.5 Diseño UI/UX
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=2.5.1 | C6=Prototipo del Sistema | D6=Brenda Gabriela Ormeño Bocanegra | E6=20 | F6=6.59 | G6==E6*F6 | M6=Herramienta de prototipado UI/UX | N6=1 | O6=200 | P6==N6*O6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 3.1 Control de Acceso a Torcly (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=3.1 Control de Acceso a Torcly
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=3.1.1 | C6=Frontend de Seguridad | D6=Brenda Gabriela Ormeño Bocanegra | E6=12 | F6=6.59 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=3.1.2 | C13=Backend de Seguridad | D13=Carmen Katerin Vega Meza | E13=28 | F13=6.59 | G13==E13*F13
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+B20=3.1.3 | C20=Administración de Usuarios | D20=Brenda Gabriela Ormeño Bocanegra | E20=12 | F20=6.59 | G20==E20*F20
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 4.1 Gestión de Clientes (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=4.1 Gestión de Clientes
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=4.1.1 | C6=Frontend de Clientes | D6=Brenda Gabriela Ormeño Bocanegra | E6=12 | F6=6.59 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=4.1.2 | C13=Backend de Clientes | D13=Carmen Katerin Vega Meza | E13=8 | F13=6.59 | G13==E13*F13
+D14=Arian Armando Bautista Quezada | E14=4 | F14=7 | G14==E14*F14
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 4.2 Gestión de Vehículos (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=4.2 Gestión de Vehículos
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=4.2.1 | C6=Frontend de Vehículos | D6=Brenda Gabriela Ormeño Bocanegra | E6=12 | F6=6.59 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=4.2.2 | C13=Backend de Vehículos | D13=Carmen Katerin Vega Meza | E13=12 | F13=6.59 | G13==E13*F13
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 5.1 Catálogo de Productos (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=5.1 Catálogo de Productos
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=5.1.1 | C6=Frontend de Productos | D6=Piero Ramírez Alva | E6=12 | F6=7.36 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=5.1.2 | C13=Backend de Productos | D13=Piero Ramírez Alva | E13=12 | F13=7.36 | G13==E13*F13
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 5.2 Control de Inventario (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=5.2 Control de Inventario
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=5.2.1 | C6=Frontend de Inventario | D6=Piero Ramírez Alva | E6=16 | F6=7.36 | G6==E6*F6 | H6=Lector de código de barras | I6=1 | J6=1000 | K6=1 | L6==I6*J6*K6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=5.2.2 | C13=Backend de Inventario | D13=Piero Ramírez Alva | E13=24 | F13=7.36 | G13==E13*F13
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 6.1 Catálogo de Servicios (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=6.1 Catálogo de Servicios
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=6.1.1 | C6=Frontend de Servicios | D6=Brenda Gabriela Ormeño Bocanegra | E6=12 | F6=6.59 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=6.1.2 | C13=Backend de Servicios | D13=Carmen Katerin Vega Meza | E13=12 | F13=6.59 | G13==E13*F13
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 7.1 Agenda del Taller (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=7.1 Agenda del Taller
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=7.1.1 | C6=Frontend de Citas | D6=Brenda Gabriela Ormeño Bocanegra | E6=16 | F6=6.59 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=7.1.2 | C13=Backend de Citas | D13=Arian Armando Bautista Quezada | E13=20 | F13=7 | G13==E13*F13
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 8.1 Orden de Trabajo (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=8.1 Orden de Trabajo
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=8.1.1 | C6=Registro de Atención | D6=Arian Armando Bautista Quezada | E6=24 | F6=7 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=8.1.2 | C13=Ejecución del Servicio | D13=Carmen Katerin Vega Meza | E13=20 | F13=6.59 | G13==E13*F13
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+B20=8.1.3 | C20=Finalización de Atención | D20=Brenda Gabriela Ormeño Bocanegra | E20=8 | F20=6.59 | G20==E20*F20
+D21=Arian Armando Bautista Quezada | E21=4 | F21=7 | G21==E21*F21
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 8.2 Seguimiento del Taller (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=8.2 Seguimiento del Taller
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=8.2.1 | C6=Control de Estados | D6=Carmen Katerin Vega Meza | E6=16 | F6=6.59 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 9.1 Gestión de Ventas (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=9.1 Gestión de Ventas
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=9.1.1 | C6=Registro Comercial | D6=Brenda Gabriela Ormeño Bocanegra | E6=16 | F6=6.59 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 9.2 Gestión de Pagos (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=9.2 Gestión de Pagos
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=9.2.1 | C6=Registro de Pagos | D6=Piero Ramírez Alva | E6=28 | F6=7.36 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 10.1 Consulta Centralizada (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=10.1 Consulta Centralizada
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=10.1.1 | C6=Panel Operativo | D6=Arian Armando Bautista Quezada | E6=20 | F6=7 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 11.1 Panel Analítico de Torcly (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=11.1 Panel Analítico de Torcly
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=11.1.1 | C6=Preparación Analítica | D6=Piero Ramírez Alva | E6=4 | F6=7.36 | G6==E6*F6
+D7=Arian Armando Bautista Quezada | E7=8 | F7=7 | G7==E7*F7
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=11.1.2 | C13=Dashboard BI | D13=Arian Armando Bautista Quezada | E13=16 | F13=7 | G13==E13*F13 | M13=Herramienta / servicio BI | N13=1 | O13=200 | P13==N13*O13
+D14=Brenda Gabriela Ormeño Bocanegra | E14=8 | F14=6.59 | G14==E14*F14
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 12.1 Motor de Apoyo a Reposició (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=12.1 Motor de Apoyo a Reposición
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=12.1.1 | C6=Preparación de Datos | D6=Piero Ramírez Alva | E6=16 | F6=7.36 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=12.1.2 | C13=Recomendaciones de Reposición | D13=Carmen Katerin Vega Meza | E13=28 | F13=6.59 | G13==E13*F13 | M13=Servicio de cómputo para IA | N13=1 | O13=200 | P13==N13*O13
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 13.1 Aseguramiento de Calidad (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=13.1 Aseguramiento de Calidad
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=13.1.1 | C6=Pruebas del Sistema | D6=Arian Armando Bautista Quezada | E6=16 | F6=7 | G6==E6*F6 | M6=Recursos y servicios de pruebas | N6=1 | O6=600 | P6==N6*O6
+D7=Carmen Katerin Vega Meza | E7=16 | F7=6.59 | G7==E7*F7
+D8=Piero Ramírez Alva | E8=8 | F8=7.36 | G8==E8*F8
+D9=Brenda Gabriela Ormeño Bocanegra | E9=8 | F9=6.59 | G9==E9*F9
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 13.2 Implementación (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=13.2 Implementación
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=13.2.1 | C6=Entorno de Producción | D6=Brenda Gabriela Ormeño Bocanegra | E6=4 | F6=6.59 | G6==E6*F6 | H6=Infraestructura de hosting | I6=1 | J6=1200 | K6=1 | L6==I6*J6*K6 | M6=Configuración y despliegue | N6=1 | O6=400 | P6==N6*O6
+D7=Carmen Katerin Vega Meza | E7=8 | F7=6.59 | G7==E7*F7
+D8=Piero Ramírez Alva | E8=4 | F8=7.36 | G8==E8*F8
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 13.3 Transferencia de Conocimie (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=13.3 Transferencia de Conocimiento
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=13.3.1 | C6=Documentación | D6=Arian Armando Bautista Quezada | E6=8 | F6=7 | G6==E6*F6
+D7=Carmen Katerin Vega Meza | E7=8 | F7=6.59 | G7==E7*F7
+D8=Piero Ramírez Alva | E8=8 | F8=7.36 | G8==E8*F8
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=13.3.2 | C13=Capacitación | D13=Brenda Gabriela Ormeño Bocanegra | E13=4 | F13=6.59 | G13==E13*F13
+D14=Carmen Katerin Vega Meza | E14=4 | F14=6.59 | G14==E14*F14
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.
+
+=== SHEET 13.4 Cierre del Proyecto (32x16) ===
+B2=PAQUETE DE TRABAJO / ENTREGABLE | D2=13.4 Cierre del Proyecto
+B3=ACTIVIDAD | D3=COSTOS
+B4=CÓDIGO | C4=DESCRIPCIÓN | D4=RECURSOS HUMANOS | H4=MAQUINARIA / EQUIPOS / INFRAESTRUCTURA | M4=CONSUMIBLES / SERVICIOS
+D5=Nombre del Recurso | E5=Número de Horas | F5=Costo x Hora (S/) | G5=Costo Total | H5=Nombre del Recurso | I5=Cantidad | J5=Costo x día (S/) | K5=Nro. de días | L5=Total | M5=Nombre del Recurso | N5=Cantidad | O5=Costo Unitario (S/) | P5=IMPORTE
+B6=13.4.1 | C6=Aceptación Final | D6=José Manuel Sebastián Mercado Rojas | E6=4 | F6=8.5 | G6==E6*F6
+C11=SUB TOTAL ACTIVIDAD | G11==SUM(G6:G10) | L11==SUM(L6:L10) | P11==SUM(P6:P10)
+C12=TOTAL ACTIVIDAD | P12==G11+L11+P11
+B13=13.4.2 | C13=Cierre Documental | D13=José Manuel Sebastián Mercado Rojas | E13=12 | F13=8.5 | G13==E13*F13
+C18=SUB TOTAL ACTIVIDAD | G18==SUM(G13:G17) | L18==SUM(L13:L17) | P18==SUM(P13:P17)
+C19=TOTAL ACTIVIDAD | P19==G18+L18+P18
+C25=SUB TOTAL ACTIVIDAD | G25==SUM(G20:G24) | L25==SUM(L20:L24) | P25==SUM(P20:P24)
+C26=TOTAL ACTIVIDAD | P26==G25+L25+P25
+B27=SUB TOTAL PAQUETE | D27==SUM(G11,G18,G25) | H27==SUM(L11,L18,L25) | M27==SUM(P11,P18,P25)
+B28=TOTAL PAQUETE | P28==D27+H27+M27
+B30=Base de costeo: horas del cronograma, responsables R/R-A de la Matriz RACI y tarifas referenciales indicadas en la hoja Supuestos.

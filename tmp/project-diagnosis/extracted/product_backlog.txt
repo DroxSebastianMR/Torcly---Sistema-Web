@@ -1,0 +1,401 @@
+=== PAGE 1 ===
+PRODUCT BACKLOG (KANBAN)
+Ysabel Quiteros Montoya
+Sistema Web Torcly para la Gestión Operativa del
+Título de Proyecto: Product Owner: (Administradora de Tienda / Actualizado: 17/09/2026
+GRUPO MECATRONIC MC PERU S.A.C.
+Representante de Mecatronic)
+Lista priorizada de historias de usuario
+ID Historia de Usuario (Como… quiero… para…) Prioridad Clase de Servicio Valor (1-5) Tamaño (S/M/L) Estado Fecha ingreso
+Como usuario del sistema, quiero iniciar sesión con mis
+HU-01 credenciales y acceder a las funcionalidades habilitadas según M Estándar 5 M En proceso 16/09/2026
+mi rol, para utilizar Torcly de forma segura.
+Como usuario del sistema, quiero cerrar mi sesión y que se
+solicite nuevamente el inicio de sesión para volver a ingresar,
+HU-02 M Estándar 4 S En proceso 16/09/2026
+para evitar accesos no autorizados después de terminar mi
+trabajo.
+Como Administrador del sistema / Propietario, quiero registrar
+HU-03 cuentas de usuario y asignarles un rol, para controlar el acceso M Estándar 5 M En proceso 16/09/2026
+de cada colaborador a las funcionalidades de Torcly.
+Como Administrador del sistema / Propietario, quiero buscar
+usuarios registrados y consultar su información y rol asignado, Backlog / Por
+HU-04 S Estándar 3 S 16/09/2026
+para verificar rápidamente quién tiene acceso al sistema y con hacer
+qué nivel de permisos.
+Como Administrador del sistema / Propietario, quiero
+Backlog / Por
+HU-05 actualizar los datos y el rol de un usuario, para mantener sus M Estándar 4 S 16/09/2026
+hacer
+accesos acordes con las funciones que desempeña.
+Como Administrador del sistema / Propietario, quiero activar
+o desactivar cuentas sin eliminar su historial, para controlar el Backlog / Por
+HU-06 M Estándar 4 S 16/09/2026
+acceso de los usuarios conservando sus operaciones hacer
+anteriores.
+Como Administrador de tienda, quiero registrar a cada cliente
+como persona natural o jurídica, ingresando su DNI/RUC,
+Backlog / Por
+HU-07 nombre o razón social y teléfono de contacto, para disponer de M Estándar 5 M 16/09/2026
+hacer
+información validada para asociarle vehículos, citas, ventas y
+atenciones.
+Como Administrador de tienda, quiero localizar clientes
+mediante DNI/RUC, nombre, razón social o número de Backlog / Por
+HU-08 M Estándar 4 S 16/09/2026
+teléfono, para recuperar rápidamente su ficha antes de registrar hacer
+una venta, cita o atención.
+
+=== PAGE 2 ===
+ID Historia de Usuario (Como… quiero… para…) Prioridad Clase de Servicio Valor (1-5) Tamaño (S/M/L) Estado Fecha ingreso
+Como Administrador de tienda, quiero consultar y actualizar
+Backlog / Por
+HU-09 los datos de un cliente, para mantener su información correcta S Estándar 3 S 16/09/2026
+hacer
+para futuras atenciones.
+Como Administrador de tienda, quiero consultar los vehículos
+asociados a un cliente y revisar su historial de atenciones Backlog / Por
+HU-10 M Estándar 4 S 16/09/2026
+registradas, para conocer sus antecedentes antes de programar hacer
+o iniciar una nueva atención.
+HU-11 Como Administrador de tienda, quiero registrar un vehículo M Estándar 5 M Backlog / Por 16/09/2026
+mediante placa única, marca, modelo y año, vinculándolo a un hacer
+cliente existente, para identificar correctamente la unidad y
+conservar su relación con futuras citas, operaciones e historial
+de servicios.
+HU-12 Como Administrador de tienda, quiero buscar un vehículo por S Estándar 4 S Backlog / Por 16/09/2026
+su placa o por el cliente propietario y recibir aviso cuando no hacer
+existan coincidencias, para ubicar la unidad correcta antes de
+registrar una cita o atención de taller.
+HU-13 Como Administrador de tienda, quiero consultar la ficha S Estándar 3 S Backlog / Por 16/09/2026
+completa de un vehículo y actualizar sus datos registrados, para hacer
+mantener correcta la información utilizada en las atenciones y
+servicios posteriores.
+HU-14 Como Administrador de tienda, quiero consultar los servicios y M Estándar 4 S Backlog / Por 16/09/2026
+operaciones previamente asociados a un vehículo, para conocer hacer
+su historial antes de recibirlo para una nueva atención.
+HU-15 Como Administrador de tienda, quiero registrar productos con M Estándar 5 M Backlog / Por 16/09/2026
+código único, nombre, categoría, marca cuando corresponda y hacer
+precio válido, para mantener un catálogo organizado que pueda
+utilizarse en inventario, ventas y operaciones del taller.
+HU-16 Como Administrador de tienda, quiero buscar productos por M Estándar 4 S Backlog / Por 16/09/2026
+código, nombre o categoría, para localizar rápidamente el hacer
+producto correcto durante una venta, consulta de stock o
+atención.
+HU-17 Como Administrador de tienda, quiero consultar la información S Estándar 3 S Backlog / Por 16/09/2026
+de un producto y actualizar sus datos de catálogo, para mantener hacer
+vigentes los datos comerciales utilizados en ventas e inventario.
+HU-18 Como Administrador de tienda, quiero desactivar un producto S Estándar 3 S Backlog / Por 16/09/2026
+que ya no se comercializa sin eliminar sus movimientos hacer
+históricos, para retirarlo de nuevas operaciones conservando la
+trazabilidad del inventario.
+HU-19 Como Administrador de tienda, quiero consultar el stock M Estándar 5 S Backlog / Por 16/09/2026
+disponible de cada producto, para verificar si puede utilizarse en hacer
+una venta o servicio del taller.
+HU-20 Como Administrador de tienda, quiero registrar las existencias M Estándar 4 S Backlog / Por 16/09/2026
+iniciales de cada producto validando que la cantidad no sea hacer
+negativa, para establecer una base confiable para comenzar el
+control de inventario en Torcly.
+
+=== PAGE 3 ===
+ID Historia de Usuario (Como… quiero… para…) Prioridad Clase de Servicio Valor (1-5) Tamaño (S/M/L) Estado Fecha ingreso
+HU-21 Como Administrador de tienda, quiero registrar una entrada de M Estándar 5 M Backlog / Por 16/09/2026
+inventario indicando el producto y una cantidad mayor que cero, hacer
+para incrementar automáticamente sus existencias y reflejar el
+ingreso real de mercadería.
+HU-22 Como Administrador de tienda, quiero registrar salidas de M Estandar 5 M Backlog / Por 16/09/2026
+inventario validando el stock disponible, para descontar hacer
+correctamente las existencias de los productos.
+HU-23 Como Administrador de tienda, quiero configurar un stock S Estandar 4 S Backlog / Por 16/09/2026
+mínimo por producto y recibir una alerta cuando las existencias hacer
+sean iguales o inferiores a ese nivel, para identificar
+oportunamente productos que requieren reposición.
+HU-24 Como Administrador de tienda, quiero consultar el historial de S Estandar 3 S Backlog / Por 16/09/2026
+entradas y salidas mostrando fecha, tipo de movimiento, hacer
+cantidad y usuario responsable, para auditar cómo y cuándo
+cambió el stock de cada producto.
+HU-25 Como Administrador de tienda, quiero crear una venta y M Estandar 5 M Backlog / Por 16/09/2026
+asociarla a un cliente cuando corresponda, para registrar los hacer
+productos y servicios adquiridos.
+HU-26 Como Administrador de tienda, quiero agregar productos a una M Estandar 5 M Backlog / Por 16/09/2026
+venta indicando cantidades válidas y verificando su stock hacer
+disponible, para evitar ofrecer cantidades superiores a las
+existencias reales y calcular correctamente el detalle de la venta.
+HU-27 Como Administrador de tienda, quiero agregar servicios activos S Estandar 4 S Backlog / Por 16/09/2026
+del catálogo al detalle de una venta, para cobrar en una misma hacer
+transacción los servicios realizados junto con los productos
+utilizados o vendidos.
+HU-28 Como Administrador de tienda, quiero modificar cantidades o S Estandar 3 S Backlog / Por 16/09/2026
+retirar productos del detalle antes de confirmar una venta y hacer
+recalcular sus importes, para corregir el contenido de la
+transacción antes de registrarla definitivamente.
+HU-29 Como Administrador de tienda, quiero confirmar una venta y M Estandar 5 M Backlog / Por 16/09/2026
+actualizar automáticamente el inventario de los productos hacer
+vendidos, para mantener correctas las existencias registradas.
+HU-30 Como Administrador de tienda, quiero consultar las ventas S Estandar 3 S Backlog / Por 16/09/2026
+registradas y revisar el detalle de productos, servicios e importes hacer
+de una operación seleccionada, para dar seguimiento a las
+transacciones comerciales realizadas.
+HU-31 Como Administrador de tienda, quiero programar una cita M Estandar 5 M Backlog / Por 16/09/2026
+seleccionando un cliente y uno de sus vehículos e indicando hacer
+fecha, hora y motivo de atención, para reservar correctamente
+su atención dentro de la agenda del taller.
+HU-32 Como Administrador de tienda, quiero validar la disponibilidad S Estandar 4 S Backlog / Por 16/09/2026
+del horario antes de registrar una cita y recibir una advertencia hacer
+cuando exista un conflicto, para evitar programaciones
+superpuestas para el mismo periodo de atención.
+
+=== PAGE 4 ===
+ID Historia de Usuario (Como… quiero… para…) Prioridad Clase de Servicio Valor (1-5) Tamaño (S/M/L) Estado Fecha ingreso
+HU-33 Como Administrador de tienda, quiero buscar y consultar citas S Estandar 3 S Backlog / Por 16/09/2026
+por fecha, cliente o estado, para organizar la agenda y ubicar hacer
+rápidamente las atenciones programadas.
+HU-34 Como Administrador de tienda, quiero reprogramar la fecha u S Estandar 3 S Backlog / Por 16/09/2026
+hora de una cita y volver a validar la disponibilidad del nuevo hacer
+horario, para ajustar la atención sin generar conflictos en la
+agenda.
+HU-35 Como Administrador de tienda, quiero cancelar una cita S Estandar 2 S Backlog / Por 16/09/2026
+conservando el registro y su estado histórico, para mantener hacer
+trazabilidad de las atenciones que fueron programadas, pero no
+se realizarán.
+HU-36 Como Administrador de tienda, quiero generar una operación de S Estandar 4 S Backlog / Por 16/09/2026
+taller a partir de una cita atendida, para continuar el proceso de hacer
+atención del vehículo.
+HU-37 Como Administrador de tienda, quiero registrar un pago M Estandar 5 M Backlog / Por 16/09/2026
+asociado a una venta o servicio indicando importe y medio de hacer
+pago, para dejar constancia de cuánto se pagó y mediante qué
+forma de pago en cada operación.
+HU-38 Como Administrador de tienda, quiero que el sistema calcule el M Estandar 5 S Backlog / Por 16/09/2026
+saldo pendiente después de cada pago, para conocer hacer
+correctamente cuánto falta pagar.
+HU-39 Como Administrador de tienda, quiero identificar las S Estandar 4 S Backlog / Por 16/09/2026
+operaciones cuyo pago está pendiente o completado, para dar hacer
+seguimiento a las cuentas por cobrar y priorizar las pendientes.
+HU-40 Como Administrador de tienda, quiero consultar los pagos S Estandar 3 S Backlog / Por 16/09/2026
+registrados y filtrar los asociados a una venta o servicio hacer
+específico, para verificar el historial de abonos realizado sobre
+cada operación.
+HU-41 Como Administrador de tienda, quiero conservar los pagos M Estandar 4 S Backlog / Por 16/09/2026
+confirmados en el historial, para mantener un registro confiable hacer
+de las transacciones realizadas.
+HU-42 Como responsable del área técnica / Taller, quiero crear una M Estandar 5 M Backlog / Por 16/09/2026
+operación de taller vinculando un cliente con uno de sus hacer
+vehículos e identificando el ingreso, para iniciar formalmente el
+seguimiento de la atención técnica desde la recepción del
+vehículo.
+HU-43 Como Personal técnico del taller, quiero registrar el diagnóstico M Estandar 4 S Backlog / Por 16/09/2026
+inicial del vehículo atendido, para documentar su condición y hacer
+los hallazgos técnicos antes de ejecutar trabajos.
+HU-44 Como responsable del área técnica / Taller, quiero registrar los M Estandar 4 S Backlog / Por 16/09/2026
+trabajos recomendados y su presupuesto estimado, para hacer
+presentar al cliente una propuesta clara antes de autorizar la
+reparación.
+HU-45 Como responsable del área técnica / Taller, quiero registrar si el M Estandar 5 S Backlog / Por 16/09/2026
+cliente aprueba o rechaza el presupuesto de la operación, para hacer
+impedir que se inicien trabajos que no cuenten con autorización.
+
+=== PAGE 5 ===
+ID Historia de Usuario (Como… quiero… para…) Prioridad Clase de Servicio Valor (1-5) Tamaño (S/M/L) Estado Fecha ingreso
+HU-46 Como responsable del área técnica / Taller, quiero asignar a una M Estandar 4 S Backlog / Por 16/09/2026
+operación un técnico activo como responsable, para dejar hacer
+definido quién ejecutará y actualizará el trabajo técnico.
+HU-47 Como Personal técnico del taller, quiero registrar los trabajos M Estandar 5 M Backlog / Por 16/09/2026
+ejecutados y los repuestos utilizados, validando que cada hacer
+repuesto tenga stock disponible, para documentar el servicio y
+descontar correctamente del inventario los materiales
+consumidos.
+HU-48 Como Personal técnico del taller, quiero registrar observaciones S Estandar 3 S Backlog / Por 16/09/2026
+técnicas del trabajo y la fecha en que finaliza la intervención, hacer
+para dejar evidencia de lo realizado y del cierre técnico de la
+atención.
+HU-49 Como responsable del área técnica / Taller, quiero vincular el M Estandar 4 S Backlog / Por 16/09/2026
+costo del servicio con la venta correspondiente, para evitar hacer
+diferencias entre los trabajos realizados y los cobros registrados.
+HU-50 Como responsable del área técnica / Taller, quiero consultar las M Estandar 4 S Backlog / Por 16/09/2026
+operaciones activas junto con su estado actual, para supervisar hacer
+qué vehículos están en atención y en qué etapa se encuentra cada
+trabajo.
+HU-51 Como responsable del área técnica / Taller, quiero actualizar el M Estandar 4 S Backlog / Por 16/09/2026
+estado de una operación siguiendo el flujo definido, para hacer
+mantener ordenado el avance de cada atención.
+HU-52 Como responsable del área técnica / Taller, quiero conservar un M Estandar 4 S Backlog / Por 16/09/2026
+registro de cada cambio de estado con su fecha y responsable, hacer
+para consultar el historial de avance de una atención.
+HU-53 Como responsable del área técnica / Taller, quiero buscar S Estandar 3 S Backlog / Por 16/09/2026
+operaciones por código, placa, cliente, estado o fecha, para hacer
+localizar rápidamente una atención específica dentro del trabajo
+diario.
+HU-54 Como responsable del área técnica / Taller, quiero consultar el S Estandar 3 S Backlog / Por 16/09/2026
+detalle de una operación mostrando diagnóstico, trabajos, hacer
+técnico asignado y repuestos utilizados, para revisar en una sola
+vista la información necesaria para supervisar la atención.
+HU-55 Como responsable del área técnica / Taller, quiero finalizar una M Estandar 4 S Backlog / Por 16/09/2026
+operación únicamente cuando la información obligatoria de la hacer
+atención esté completa, para evitar cerrar trabajos con datos
+técnicos o administrativos pendientes.
+HU-56 Como Administrador de tienda, quiero registrar la entrega del M Estandar 4 S Backlog / Por 16/09/2026
+vehículo al cliente indicando la fecha correspondiente, para hacer
+cerrar formalmente el ciclo de atención después de finalizar la
+operación.
+HU-57 Como Administrador de tienda, quiero conservar cada M Estandar 4 S Backlog / Por 16/09/2026
+operación finalizada dentro del historial del vehículo y del hacer
+cliente, para consultar posteriormente qué trabajos se realizaron
+en atenciones anteriores.
+
+=== PAGE 6 ===
+ID Historia de Usuario (Como… quiero… para…) Prioridad Clase de Servicio Valor (1-5) Tamaño (S/M/L) Estado Fecha ingreso
+HU-58 Como Administrador del sistema / Propietario, quiero registrar M Estandar 4 S Backlog / Por 16/09/2026
+servicios automotrices con su código, descripción y precio de hacer
+referencia, para utilizarlos en citas, operaciones y ventas.
+HU-59 Como Administrador de tienda, quiero buscar y consultar los S Estandar 3 S Backlog / Por 16/09/2026
+servicios activos disponibles en el catálogo, para seleccionar hacer
+rápidamente el servicio correcto durante una cita, operación o
+venta.
+HU-60 Como Administrador del sistema / Propietario, quiero actualizar S Estandar 3 S Backlog / Por 16/09/2026
+los datos y precios de los servicios del catálogo sin modificar hacer
+operaciones anteriores, para mantener vigente la información de
+los servicios.
+HU-61 Como Administrador del sistema / Propietario, quiero desactivar S Estandar 2 S Backlog / Por 16/09/2026
+un servicio que ya no debe ofrecerse y conservar las citas, hacer
+operaciones y ventas históricas relacionadas, para retirarlo de
+nuevas selecciones sin perder la trazabilidad de su uso anterior.
+HU-62 Como Administrador de tienda, quiero seleccionar únicamente M Estandar 3 S Backlog / Por 16/09/2026
+servicios que se encuentren activos al registrar citas u hacer
+operaciones, para evitar asociar servicios discontinuados a
+nuevas atenciones.
+HU-63 Como usuario autorizado, quiero visualizar un resumen de citas, M Estandar 5 M Backlog / Por 16/09/2026
+operaciones, ventas, pagos y alertas de stock según mis hacer
+permisos, para supervisar la operación diaria desde una sola
+vista.
+HU-64 Como usuario autorizado, quiero filtrar la vista operativa por S Estandar 3 S Backlog / Por 16/09/2026
+fecha, estado, cliente o vehículo cuando esos datos estén hacer
+disponibles, para reducir el conjunto de resultados y encontrar
+rápidamente los registros relevantes.
+HU-65 Como usuario autorizado, quiero acceder al detalle de un S Estandar 3 S Backlog / Por 16/09/2026
+registro desde la vista operativa, para revisar su información hacer
+completa respetando mis permisos de acceso.
+HU-66 Como Administrador del sistema / Propietario, quiero visualizar M Estandar 5 L Backlog / Por 16/09/2026
+un panel con indicadores aprobados de inventario, ventas, hacer
+pagos, servicios, citas y operaciones del taller, para supervisar
+el desempeño general del negocio con información consolidada.
+HU-67 Como equipo del proyecto, quiero definir la fuente y fórmula de M Intangible 4 M Backlog / Por 16/09/2026
+cada indicador, para asegurar que los KPI puedan comprobarse hacer
+durante la validación.
+HU-68 Como Administrador del sistema / Propietario, quiero consultar S Estandar 5 M Backlog / Por 16/09/2026
+por periodo las existencias, movimientos, productos bajo hacer
+mínimo y productos de mayor rotación, para identificar
+necesidades de reposición a partir del comportamiento real del
+inventario.
+HU-69 Como Administrador del sistema / Propietario, quiero consultar S Estandar 5 M Backlog / Por 16/09/2026
+los importes de ventas y pagos confirmados junto con los saldos hacer
+pendientes, evitando duplicidades, para conocer la situación
+financiera operativa del negocio con datos consistentes.
+
+=== PAGE 7 ===
+ID Historia de Usuario (Como… quiero… para…) Prioridad Clase de Servicio Valor (1-5) Tamaño (S/M/L) Estado Fecha ingreso
+HU-70 Como Responsable del área técnica / Taller, quiero consultar por S Estandar 4 M Backlog / Por 16/09/2026
+periodo la cantidad de servicios realizados y las operaciones hacer
+agrupadas por estado, para evaluar la carga de trabajo y el
+avance operativo del taller.
+HU-71 Como Administrador del sistema / Propietario, quiero filtrar los S Estandar 3 S Backlog / Por 16/09/2026
+indicadores por un rango de fechas y visualizar su evolución en hacer
+el tiempo, para identificar tendencias y cambios en el
+comportamiento de la operación.
+HU-72 Como Administrador del sistema / Propietario, quiero consultar S Estandar 3 S Backlog / Por 16/09/2026
+los registros de origen que sustentan un indicador y permitir su hacer
+recálculo cuando cambien los datos válidos, para verificar que
+los reportes reflejen información trazable y actualizada.
+HU-73 Como Administrador del sistema / Propietario, quiero recibir M Estandar 4 S Backlog / Por 16/09/2026
+una indicación explícita cuando no existan registros suficientes hacer
+para calcular un indicador, para evitar interpretar como real una
+cifra que no cuenta con datos válidos de respaldo.
+HU-74 Como equipo del proyecto, quiero preparar datos históricos M Intangible 4 M Backlog / Por 16/09/2026
+confiables de inventario, ventas y consumo de productos, para hacer
+utilizarlos como base del análisis de IA.
+HU-75 Como Administrador del sistema / Propietario, quiero verificar S Estandar 4 S Backlog / Por 16/09/2026
+antes del análisis si cada producto cumple el criterio mínimo de hacer
+información y mostrar “datos insuficientes” cuando no lo
+cumpla, para evitar recibir recomendaciones basadas en
+historiales que no permiten una estimación confiable.
+HU-76 Como Administrador del sistema / Propietario, quiero recibir S Estandar 5 M Backlog / Por 16/09/2026
+una recomendación de reposición calculada a partir del consumo hacer
+histórico de cada producto que tenga datos suficientes, para
+apoyar la decisión de compra con evidencia del comportamiento
+real del inventario.
+HU-77 Como Administrador del sistema / Propietario, quiero consultar S Estandar 3 S Backlog / Por 16/09/2026
+resultados anteriores del análisis de IA y ejecutar un nuevo hacer
+análisis conservando cada resultado con su referencia histórica,
+para comparar cómo cambian las recomendaciones a lo largo del
+tiempo sin perder versiones previas.
+HU-78 Como equipo del proyecto, quiero comparar las estimaciones de S Intangible 3 S Backlog / Por 16/09/2026
+IA con datos históricos de validación, para medir la precisión de hacer
+sus resultados antes de su puesta en producción.
+HU-79 Como Administrador del sistema / Propietario, quiero mantener M Estandar 5 S Backlog / Por 16/09/2026
+las recomendaciones de IA únicamente como información de hacer
+apoyo, sin permitir que creen compras, pedidos o movimientos
+de stock automáticamente, para conservar en el personal
+autorizado la decisión final sobre reposición e inventario.
+HU-80 Como Administrador del sistema / Propietario, quiero restringir M Estandar 4 S Backlog / Por 16/09/2026
+la ejecución del análisis de IA y la consulta de recomendaciones hacer
+a los perfiles autorizados, para proteger la información analítica
+y evitar accesos fuera de las responsabilidades asignadas.
+
+=== PAGE 8 ===
+ID Historia de Usuario (Como… quiero… para…) Prioridad Clase de Servicio Valor (1-5) Tamaño (S/M/L) Estado Fecha ingreso
+HU-81 Como usuario del sistema, quiero que las operaciones habituales M Intangible 4 M Backlog / Por 16/09/2026
+respondan en un máximo de tres segundos, para utilizar Torcly hacer
+sin demoras durante la atención.
+HU-82 Como Administrador del sistema / Propietario, quiero visualizar S Intangible 3 S Backlog / Por 16/09/2026
+los reportes e indicadores BI aprobados en un máximo de cinco hacer
+segundos dentro de las condiciones de aceptación definidas,
+para consultar información para la toma de decisiones sin
+esperas excesivas.
+HU-83 Como Administrador del sistema / Propietario, quiero que M Intangible 5 M Backlog / Por 16/09/2026
+Torcly mantenga una disponibilidad mensual mínima del 98 % hacer
+y avise los mantenimientos programados, para reducir
+interrupciones en la operación del negocio.
+HU-84 Como Administrador del sistema / Propietario, quiero que las M Intangible 5 M Backlog / Por 16/09/2026
+contraseñas y comunicaciones de Torcly estén protegidas, para hacer
+evitar la exposición de credenciales e información de la
+empresa.
+HU-85 Como Administrador del sistema / Propietario, quiero bloquear M Intangible 4 S Backlog / Por 16/09/2026
+temporalmente una cuenta después de varios intentos fallidos y hacer
+cerrar automáticamente sesiones inactivas, para reducir el riesgo
+de accesos no autorizados por fuerza bruta o sesiones
+abandonadas.
+HU-86 Como usuario del sistema, quiero que Torcly valide los datos M Intangible 4 M Backlog / Por 16/09/2026
+que ingreso antes de guardarlos, para evitar registros incorrectos hacer
+o inválidos.
+HU-87 Como Administrador del sistema / Propietario, quiero restringir M Intangible 5 M Backlog / Por 16/09/2026
+el acceso a información personal o sensible según permisos y hacer
+registrar quién accede, cuándo y qué acción realiza, para
+mantener trazabilidad sobre el tratamiento de datos personales.
+HU-88 Como Administrador del sistema / Propietario, quiero disponer M Intangible 5 M Backlog / Por 16/09/2026
+de copias de respaldo recuperables de la base de datos al menos hacer
+cada 24 horas, para restaurar la información ante una pérdida o
+corrupción de datos.
+HU-89 Como usuario del sistema, quiero utilizar una interfaz con S Intangible 3 S Backlog / Por 16/09/2026
+nombres y mensajes comprensibles, estructura visual uniforme hacer
+y confirmación antes de acciones críticas, para reducir errores
+de operación y entender claramente las consecuencias de cada
+acción.
+HU-90 Como usuario del sistema, quiero acceder a Torcly desde laptop M Intangible 4 S Backlog / Por 16/09/2026
+o tablet mediante navegadores modernos compatibles, para hacer
+utilizar el sistema desde los equipos disponibles en las áreas
+administrativas y operativas.
+HU-91 Como equipo del proyecto, quiero que las operaciones críticas M Intangible 4 M Backlog / Por 16/09/2026
+mantengan la consistencia de los datos y que el sistema tenga hacer
+una estructura modular, para facilitar su mantenimiento y
+reducir errores ante fallos.
+
+=== PAGE 9 ===
+ID Historia de Usuario (Como… quiero… para…) Prioridad Clase de Servicio Valor (1-5) Tamaño (S/M/L) Estado Fecha ingreso
+HU-92 Como equipo del proyecto, quiero conservar la información M Intangible 4 M Backlog / Por 16/09/2026
+necesaria para comprobar los resultados de BI e IA, para validar hacer
+posteriormente su confiabilidad.
+Leyenda
+Prioridad Clase de Servicio Estado (columnas del tablero)
+M — Must have (imprescindible) Estándar — flujo normal Backlog / Por hacer
+S — Should have (importante) Expedite — urgente, entra de inmediato En desarrollo
+C — Could have (deseable) Fecha fija — vence en fecha determinada En revisión / QA
+W — Won't have (no en este alcance) Intangible — mejora interna/técnica Listo para desplegar / Hecho

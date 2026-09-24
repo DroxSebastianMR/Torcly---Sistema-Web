@@ -1,0 +1,57 @@
+=== PAGE 1 ===
+DAILY KANBAN MEETING
+Equipo de Desarrollo de Software — Capstone Project
+Sistema Web Torcly para la Gestión Operativa
+Título de Proyecto: Sprint N°: 1
+del GRUPO MECATRONIC MC PERU S.A.C.
+José Manuel Sebastián Mercado Rojas
+Arian Armando Bautista Quezada
+Fecha: 17/09/2026 Integrantes: Brenda Gabriela Ormeño Bocanegra
+Piero Ramírez Alva
+Carmen Katerin Vega Meza
+Hora inicio: 09:00 a. m. Hora fin: 09:30 a. m.
+1. Estado del tablero por columna
+Columna WIP límite WIP actual ¿Excedido? Observación
+Historias priorizadas pendientes de
+Backlog / Por hacer — 89 No aplica
+iniciar.
+HU-01, HU-02 y HU-03 se encuentran
+En desarrollo 3 3 No
+en proceso.
+Aún no existen historias listas para
+En revisión / QA 2 0 No
+revisión.
+No existen historias preparadas para
+Listo para desplegar 1 0 No
+despliegue.
+Hecho — 0 No aplica Aún no se han completado historias.
+2. Tarjetas más cercanas a completarse (prioridad de hoy)
+ID / Historia Responsable ¿Qué falta para pasar de columna? Acción de hoy
+Completar autenticación y validar acceso según Continuar el flujo de login y probar
+HU-01 – Inicio de sesión Carmen Katerin Vega Meza
+rol. credenciales válidas/no válidas.
+José Manuel Sebastián Revisar el flujo de logout y comprobar que
+HU-02 – Cierre de sesión Verificar cierre de sesión y restricción posterior.
+Mercado Rojas solicite nueva autenticación.
+HU-03 – Registro de Preparar estructura de usuarios, roles y Configurar datos de prueba y validar
+Piero Ramírez Alva
+usuarios validaciones mínimas. registro y asignación de rol.
+3. Bloqueos e impedimentos
+Tarjeta / Historia Bloqueo / Impedimento Responsable de resolver Fecha límite
+Faltan cuentas de prueba con roles distintos para validar
+HU-01 Piero Ramírez Alva 17/09/2026
+permisos.
+Depende de disponer del flujo básico de autenticación de José Manuel Sebastián Mercado
+HU-02 17/09/2026
+HU-01. Rojas
+Se debe confirmar la estructura mínima de roles y evitar
+HU-03 Piero Ramírez Alva 17/09/2026
+identificadores duplicados.
+4. Compromisos del día
+Responsable Compromiso Para cuándo
+Carmen Katerin Vega Meza Avanzar HU-01 y realizar una primera validación funcional del inicio de sesión. 17/09/2026 – fin de jornada
+Piero Ramírez Alva Preparar usuarios y roles de prueba y avanzar la base necesaria para HU-03. 17/09/2026 – fin de jornada
+José Manuel Sebastián Mercado Revisar HU-01/HU-02, coordinar dependencias y validar alineación con
+17/09/2026 – fin de jornada
+Rojas requerimientos.
+Glosario: WIP = Work In Progress (Trabajo en Curso o Trabajo en Progreso)

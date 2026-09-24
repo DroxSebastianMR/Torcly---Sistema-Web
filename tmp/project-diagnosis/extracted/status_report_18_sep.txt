@@ -1,0 +1,109 @@
+P: INFORME DE ESTADO DEL PROYECTO
+P: SISTEMA WEB TORCLY
+P: Corte documental: 17/09/2026   ·   Emisión: 18/09/2026
+P: Control de revisión
+P: Tabla de contenido
+P: 1. Descripción del proyecto	3
+P: 2. Resumen del estado	3
+P: 3. Sustento y fuentes	3
+P: Trabajo planificado · semana 5	4
+P: 4. Cambios principales	4
+P: 5. Hitos y entregables	4
+P: 6. Indicadores de desempeño	5
+P: Anexo 1 · Base de verificación	6
+P: Anexo 2 · Criterios del estado	7
+P: DESCRIPCIÓN DEL PROYECTO:
+P: Torcly V1.0 es el sistema web previsto para centralizar la gestión de la tienda y el taller del GRUPO MECATRONIC MC PERU S.A.C. Comprende diez componentes: clientes y vehículos; productos e inventario; servicios automotrices; citas y atenciones; operaciones del taller; ventas y pagos; consulta y control operativo; seguridad y control de acceso; BI y analítica operativa; e IA de apoyo a la reposición de inventario. La IA no realizará compras ni movimientos de stock automáticamente. La línea base del Acta establece 16 semanas, del 22/08 al 11/12/2026.
+P: Resumen del estado del proyecto
+P: Estado al corte documental: semana 4 de 16 (12–18/09/2026)
+P: Evaluación de alcance, plazo y costo:
+P: Alcance: El Business Case, el Acta y la Estructura de Análisis adjuntos describen el alcance, pero no acreditan aprobación formal ni porcentaje de entregables aceptados. El backlog con corte 17/09 registra 92 historias en «Backlog / Por hacer» y ninguna marcada «Hecho»; ello no equivale al avance total del proyecto.
+P: Tiempo: El proyecto está en la semana 4 de la línea base de 16 semanas. Se prevé validar alcance y requerimientos preliminares hasta el 18/09 e iniciar la elaboración o validación del SRS en la semana 5. Sin fechas reales de terminación y actas de conformidad no puede declararse adelanto, retraso ni un porcentaje de cumplimiento.
+P: Costo: El Acta fija un presupuesto referencial total de S/ 10 000. No se adjuntan desembolsos reales, curva de valor planificado por fecha ni valor ganado; la variación de costos y el consumo presupuestario no son calculables.
+P: Sustento del estado y fuentes consultadas
+P: El Acta y el Business Case fijan cinco fases y dieciséis semanas consecutivas. En este corte corresponde la fase de inicio y planificación (22/08–18/09); la fase de análisis y diseño está prevista desde el 19/09. El Product Backlog Kanban recibido, actualizado al 17/09, contiene 92 historias identificadas de HU-01 a HU-92 en «Backlog / Por hacer». No se aportaron actas de aceptación, una medición del trabajo efectivamente concluido, tiempos reales ni registro de gastos. Por ello este informe presenta evidencia documental y próximos controles, sin convertir la existencia de un archivo en un entregable aprobado.
+P: Fuente del corte: Acta de Constitución V2, Business Case V2.6, Estructura de Análisis V2.2 y Product Backlog Kanban actualizado el 17/09/2026. Emisión del informe: 18/09/2026. Los estados de las historias son los del PDF adjunto; cambios posteriores requieren actualizar el tablero y el siguiente reporte.
+P: Atención prioritaria: obtener constancia de validación del alcance y de los documentos fundacionales; mantener las fechas de aprobación separadas de las fechas de entrega de archivos; establecer el registro semanal de tiempo y costo reales.
+P: Trabajo planificado para la semana 5 (19–25/09/2026)
+P: Consolidar y validar el SRS para los diez componentes y sus reglas de negocio; precisar los indicadores de BI y los criterios de suficiencia de datos para IA. Registrar responsables, evidencia de revisión, observaciones y conformidad empresarial según el Acta y el Business Case.
+P: Actualizar el Product Backlog con los acuerdos de priorización y las transiciones efectivamente verificadas. Definir línea de seguimiento semanal por entregable: fecha prevista, fecha real, responsable, aprobación y evidencia; iniciar el control de costo real por categoría del presupuesto.
+P: Cambios principales desde el último reporte
+P: Primer reporte sobre el material recibido: no se dispone de un informe anterior para comparar modificaciones. Las versiones adjuntas delimitan el alcance de diez componentes y la línea base de 16 semanas; este hecho es una referencia documental y no demuestra que un cambio de alcance haya sido solicitado o aprobado durante el periodo. Registrar cualquier cambio futuro mediante su solicitud, evaluación y autorización.
+P: Hitos y entregables: semanas actual y siguiente
+P: Indicadores clave de desempeño y datos requeridos
+P: Plazo: No evaluable como adelantado o retrasado. El intervalo 12–18/09 es la semana 4; la validación de alcance prevista para el 18/09 necesita evidencia de conformidad.
+P: SV = EV − PV: no calculable; faltan valor ganado (EV) y valor planificado acumulado (PV) al corte.
+P: SPI = EV ÷ PV: no calculable; la línea base de 16 semanas no proporciona por sí sola EV ni PV.
+P: Costo: Presupuesto total referencial (BAC): S/ 10 000; ejecución real (AC): sin reporte verificable.
+P: CV = EV − AC: no calculable; faltan EV y gasto real acumulado (AC).
+P: CPI = EV ÷ AC: no calculable; no corresponde sustituir AC por el presupuesto total.
+P: ANEXO 1 · BASE DE VERIFICACIÓN
+P: ALCANCE · ESTADO DE LOS ENTREGABLES
+P: TIEMPO · CONTRASTE CON LA LÍNEA BASE
+P: COSTO · PRESUPUESTO Y GASTO REAL
+P: ANEXO 2 · CRITERIOS DEL ESTADO
+P: Leyenda del alcance (aplicar solo con entregables aceptados):
+P: Leyenda del tiempo (aplicar solo con fechas reales):
+P: Leyenda del costo (aplicar solo con gasto real):
+
+=== TABLE 1 ===
+Revisión | Fecha | Modificaciones | Autor
+01 | 18/09/2026 | Adaptación del informe al alcance y a la evidencia documental; estado inicial sin métricas de ejecución verificadas. | Equipo Capstone · coordinación del proyecto
+
+=== TABLE 2 ===
+Alcance | Tiempo | Costo
+Validación pendiente | Semana 4/16 · sin medición | Gasto real no informado
+
+=== TABLE 3 ===
+Código EDT | ACTIVIDAD | Entregable | Fecha Planeada Culminación | Fecha Real de Entrega | Estado
+1.1.1.1 | Revisar Business Case | Business Case V2.6 | 04/09/2026 | No consta | Archivo disponible; aprobación no acreditada
+1.1.1.2 | Revisar Acta | Acta de Constitución V2 | 11/09/2026 | No consta | Archivo disponible; aprobación no acreditada
+1.1.1.4 | Validar línea base | Alcance y requerimientos preliminares | 18/09/2026 | Pendiente de evidencia | Semana 4; conformidad no acreditada
+2.1.1.1 | Consolidar requisitos | SRS de los diez componentes | 25/09/2026 | Aún no aplica | Previsto en semana 5
+2.2.1.1 | Modelar tienda | Procesos y diseño funcional | 02/10/2026 | Aún no aplica | Previsto en semana 6
+
+=== TABLE 4 ===
+DOCUMENTO / ACTIVIDAD | EVIDENCIA DISPONIBLE | ACEPTACIÓN / ESTADO
+Business Case V2.6 | Archivo recibido; conformidad no acreditada | N/D
+Acta de Constitución V2 | Archivo recibido; conformidad no acreditada | N/D
+Estructura de Análisis V2.2 | Archivo recibido; validación no acreditada | N/D
+Backlog HU-01 a HU-92 | 92/92 en «Por hacer» al 17/09; 0 en «Hecho» | 0/92 Hecho
+
+=== TABLE 5 ===
+HITO / ACTIVIDAD | VENTANA PREVISTA | FECHA REAL | CUMPLIMIENTO
+Semana 2 · Business Case | 29/08–04/09 | No consta | N/D
+Semana 3 · Acta | 05/09–11/09 | No consta | N/D
+Semana 4 · validación de alcance | 12/09–18/09 | Pendiente de cierre | N/D
+Total del periodo | 3 hitos previstos; sin cierre comprobado | Sin fecha real | N/D
+
+=== TABLE 6 ===
+ACTIVIDAD | VALOR PLANIFICADO | COSTO REAL
+Recursos humanos | S/ 5 000 | Sin reporte
+Infraestructura tecnológica | S/ 1 200 | Sin reporte
+Hardware y equipamiento | S/ 1 000 | Sin reporte
+Software y herramientas | S/ 800 | Sin reporte
+Pruebas e implementación | S/ 1 000 | Sin reporte
+Contingencia | S/ 1 000 | Sin reporte
+TOTAL REFERENCIAL | S/ 10 000 | Sin consolidar
+Desempeño del costo | No calculable | Faltan gastos reales
+
+=== TABLE 7 ===
+Código de color | Significado
+Verde | Los entregables correspondientes al periodo de evaluación se han completado en un porcentaje mayor o igual a 75
+Amarillo | Los entregables correspondientes al periodo de evaluación se han completado en un porcentaje menor a 75 %, pero mayor o igual a 50 %
+Rojo | Los entregables correspondientes al periodo de evaluación se han completado en un porcentaje menor a 50 %
+Gris / sin dato | No se puede calificar el avance sin validaciones documentadas.
+
+=== TABLE 8 ===
+Código de color | Significado
+Verde | Las actividades correspondientes al periodo de evaluación se han completado dentro del plazo previsto en un porcentaje mayor o igual a 75
+Amarillo | Las actividades correspondientes al periodo de evaluación se han completado dentro del plazo previsto en un porcentaje menor a 75, pero mayor o igual a 50
+Rojo | Las actividades correspondientes al periodo de evaluación se han completado dentro del plazo previsto en un porcentaje menor a 50
+Gris / sin dato | No se puede calificar el plazo sin fechas reales.
+
+=== TABLE 9 ===
+Código de color | Significado
+Verde | El costo real de las actividades correspondientes al periodo de evaluación es menor o igual al 100 % del costo presupuestado.
+Amarillo | El costo real de las actividades correspondientes al periodo de evaluación es mayor al 100 % del costo presupuestado, pero menor o igual al 110 %.
+Rojo | El costo real de las actividades correspondientes al periodo de evaluación es mayor al 110 % del costo presupuestado.
+Gris / sin dato | No se puede calificar el costo sin registro de gastos reales.

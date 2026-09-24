@@ -1,6 +1,15 @@
 import 'dotenv/config'
 import { z } from 'zod'
 
+const testDatabaseUrl = 'postgresql://test:test@127.0.0.1:5432/torcly_test'
+const databaseUrl = z
+  .string()
+  .refine(
+    (value) =>
+      value.startsWith('postgresql://') || value.startsWith('postgres://'),
+    'Debe ser una URL de PostgreSQL',
+  )
+
 const schema = z.object({
   NODE_ENV: z
     .enum(['development', 'test', 'production'])
@@ -12,5 +21,18 @@ const schema = z.object({
     .default('http://localhost:5173,http://127.0.0.1:5173')
     .transform((value) => value.split(',').map((origin) => origin.trim()))
     .pipe(z.array(z.url()).min(1)),
+  DATABASE_URL: databaseUrl,
+  DIRECT_URL: databaseUrl,
+  DATABASE_POOL_SIZE: z.coerce.number().int().min(1).max(20).default(5),
+  DATABASE_CONNECT_TIMEOUT_MS: z.coerce.number().int().min(1000).default(10000),
+  DATABASE_IDLE_TIMEOUT_MS: z.coerce.number().int().min(1000).default(30000),
 })
-export const env = schema.parse(process.env)
+
+const isTest = process.env.NODE_ENV === 'test'
+
+export const env = schema.parse({
+  ...process.env,
+  DATABASE_URL:
+    process.env.DATABASE_URL ?? (isTest ? testDatabaseUrl : undefined),
+  DIRECT_URL: process.env.DIRECT_URL ?? (isTest ? testDatabaseUrl : undefined),
+})

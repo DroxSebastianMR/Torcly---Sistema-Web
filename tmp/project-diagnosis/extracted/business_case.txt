@@ -1,0 +1,1280 @@
+=== PAGE 1 ===
+BUSINESS CASE
+“Sistema web Torcly para la gestión operativa en el GRUPO MECATRONIC MC PERU S.A.C.”
+GRUPO MECATRONIC MC PERU S.A.C.
+Campo Detalle
+Versión 2.5
+Fecha de revisión 17/09/2026
+Bautista Quezada, Arian Armando - N00347597
+Mercado Rojas José, Manuel Sebastian – N00344955
+Integrantes del equipo Ormeño Bocanegra, Brenda Gabriela - N00353616
+Ramírez Alva, Piero - N00348192
+Vega Meza, Carmen Katerin - N00355575
+Empresa / Organización cliente GRUPO MECATRONIC MC PERU S.A.C. — 20611339527
+Nombre: Jhon Medina
+Contacto en la empresa Rol: Dueño de la Empresa
+Número de Teléfono: +51 960 791 290
+
+=== PAGE 2 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Tabla de Contenido
+Tabla de Contenido ................................................................................................................................................. 2
+Sección 1 Datos Generales del Proyecto y de la Empresa ........................................................................................ 4
+1.1 Ficha de la Empresa ....................................................................................................................................... 4
+1.2 Equipo del Proyecto (Capstone) ..................................................................................................................... 4
+1.3 Condiciones de Acceso a la Información ......................................................................................................... 5
+Sección 2 Resumen Ejecutivo ................................................................................................................................. 6
+2.1 Situación Actual ............................................................................................................................................ 6
+2.2 Resultados Esperados .................................................................................................................................... 6
+2.3 Recomendación ............................................................................................................................................. 7
+2.4 Justificación .................................................................................................................................................. 7
+2.5 Suposiciones ................................................................................................................................................. 8
+2.6 Limitaciones .................................................................................................................................................. 9
+Sección 3 Gobierno y Equipo de Análisis del Business Case ................................................................................... 11
+3.1 Gobierno ..................................................................................................................................................... 11
+3.2 Equipo de Análisis del Business Case ............................................................................................................ 11
+Sección 4 Definición del Problema ........................................................................................................................ 12
+4.1 Enunciado del Problema .............................................................................................................................. 12
+4.2 Metodología de Levantamiento de Información........................................................................................... 12
+4.3 Organización Cliente y Componentes de su Entorno..................................................................................... 12
+4.4 Entorno Tecnológico Actual ......................................................................................................................... 13
+4.4.1 Software Actual .................................................................................................................................... 13
+4.4.2 Hardware e Infraestructura Actual ........................................................................................................ 14
+Sección 5 Visión del Proyecto ............................................................................................................................... 15
+5.1 Descripción del Proyecto ............................................................................................................................. 15
+5.2 Metas y Objetivos ....................................................................................................................................... 15
+5.3 Medidas de Desempeño (KPI) ...................................................................................................................... 16
+5.4 Suposiciones ............................................................................................................................................... 17
+5.5 Restricciones ............................................................................................................................................... 18
+5.6 Entorno Tecnológico Propuesto ................................................................................................................... 18
+5.6.1 Software Propuesto .............................................................................................................................. 18
+5.6.2 Hardware Propuesto ............................................................................................................................. 19
+5.7 Hitos Principales del Proyecto...................................................................................................................... 20
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 2
+
+=== PAGE 3 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Sección 6 Evaluación del Proyecto ........................................................................................................................ 20
+6.1 Cumplimiento de Regulaciones .................................................................................................................... 20
+6.2 Alineamiento Estratégico............................................................................................................................. 21
+6.3 Análisis de Impacto ..................................................................................................................................... 22
+6.4 Consideración de Riesgos ............................................................................................................................ 22
+6.6 Análisis de Alternativas ............................................................................................................................... 23
+Sección 7 Selección del Proyecto .......................................................................................................................... 26
+7.1 Metodología ............................................................................................................................................... 26
+7.2 Resultados .................................................................................................................................................. 26
+Sección 8 Cronograma del Proyecto ..................................................................................................................... 29
+Sección 9 Glosario ................................................................................................................................................ 29
+Sección 10 Control de Cambios............................................................................................................................. 33
+Sección 11 Anexos ............................................................................................................................................... 34
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 3
+
+=== PAGE 4 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Sección 1 Datos Generales del Proyecto y de la Empresa
+1.1 Ficha de la Empresa
+Campo Detalle
+Razón social GRUPO MECATRONIC MC PERU S.A.C.
+RUC (si aplica) 20611339527
+Servicios automotrices – mantenimiento y reparación de vehículos
+Sector / rubro
+automotores
+Tamaño (micro, pequeña, mediana,
+MYPE
+grande)
+Ubicación / sede(s) Víctor Larco Herrera, La Libertad - 814 Av. Perú - Trujillo
+Procesos operativos del taller mecánico relacionados con la gestión de
+Área o proceso donde se desarrolla
+inventarios, control de ingreso y salida de vehículos y control de aceites
+el proyecto
+y lubricantes.
+Nombre: Jhon Medina
+Persona de contacto (sponsor en la
+Rol: Dueño de la Empresa
+empresa)
+Numero de Teléfono: +51 960 791 290
+1.2 Equipo del Proyecto
+Integrante Código Rol en el equipo Correo
+Bautista Quezada, Arian
+N00347597 Analista de Sistemas N00347597@upn.pe
+Armando
+Mercado Rojas José, Manuel
+N00344955 Líder del Proyecto N00344955@upn.pe
+Sebastian
+Ormeño Bocanegra, Brenda
+N00353616 Programador Full-Stack N00353616@upn.pe
+Gabriela
+Administrador de Base de
+Ramírez Alva, Piero N00348192 N00348192@upn.pe
+Datos
+Vega Meza, Carmen Katerin N00355575 Programador Full-Stack N00355575@upn.pe
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 4
+
+=== PAGE 5 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+1.3 Condiciones de Acceso a la Información
+Para el desarrollo del proyecto se contará con el apoyo del GRUPO MECATRONIC MC PERU S.A.C., permitiendo al
+equipo obtener información relacionada con sus procesos operativos y administrativos necesarios para el análisis,
+diseño y desarrollo de la solución tecnológica propuesta.
+La recopilación de información se realizará mediante reuniones coordinadas con los responsables de la empresa,
+principalmente con el propietario y personal encargado de los procesos del taller y tienda, con la finalidad de
+comprender el flujo actual de trabajo, identificar necesidades, validar requerimientos y determinar oportunidades de
+mejora.
+Mecanismos de recolección de información previstos
+➢ Entrevistas con el propietario y responsables de las áreas involucradas.
+➢ Observación directa de los procesos operativos del taller y tienda.
+➢ Revisión de formatos, registros manuales y documentos utilizados actualmente por la empresa.
+➢ Validación continua de requerimientos funcionales con los usuarios involucrados durante el desarrollo del
+proyecto.
+Nivel de confidencialidad acordado con la empresa
+No se contempla inicialmente la firma de un acuerdo formal de confidencialidad (NDA); sin embargo, el equipo
+mantendrá un compromiso ético y profesional respecto al tratamiento adecuado de la información entregada por la
+empresa.
+La información obtenida será utilizada únicamente para el análisis, diseño y construcción del sistema web propuesto,
+evitando la divulgación de información estratégica o datos internos que puedan afectar los intereses comerciales de la
+empresa.
+Información que se anonimizará o presentará en rangos/aproximaciones
+Para proteger la privacidad y seguridad de la empresa, no se incluirán en el informe final datos sensibles como:
+➢ Información personal de clientes.
+➢ Datos de proveedores y contactos comerciales.
+➢ Contraseñas, accesos o credenciales de sistemas internos.
+➢ Información financiera exacta, como ingresos diarios, ventas mensuales o márgenes comerciales.
+➢ Datos comerciales considerados estratégicos por la empresa.
+➢ En caso sea necesario presentar indicadores o ejemplos para explicar el funcionamiento del sistema, estos serán
+mostrados mediante datos ficticios, valores aproximados o información anonimizada.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 5
+
+=== PAGE 6 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Sección 2 Resumen Ejecutivo
+2.1 Situación Actual
+Actualmente, el GRUPO MECATRONIC MC PERU S.A.C. desarrolla sus actividades de mantenimiento y reparación de
+vehículos, comercialización de productos automotrices y atención al cliente mediante procesos que dependen
+principalmente de registros manuales y medios de comunicación independientes. La empresa no dispone de un sistema
+de gestión integrado que permita mantener organizada y centralizada la información generada durante sus
+operaciones.
+Esta situación dificulta mantener un control actualizado del inventario de productos, repuestos, aceites y lubricantes,
+así como consultar oportunamente sus existencias. Asimismo, la información de clientes y vehículos se encuentra
+dispersa, lo que limita el acceso rápido a datos del propietario, antecedentes e historial de servicios realizados. En
+las actividades del taller, la gestión manual también dificulta mantener un seguimiento organizado del ingreso de los
+vehículos, los trabajos efectuados y el estado de las atenciones.
+Como consecuencia, la empresa presenta una mayor dependencia de la búsqueda y actualización manual de
+información, con riesgo de errores, duplicidad, pérdida de registros y limitada trazabilidad de sus operaciones,
+afectando la eficiencia administrativa y operativa de la tienda y el taller. Además, debido al manejo de información
+personal de clientes, como nombres, documentos de identidad, teléfonos y datos asociados a vehículos, su tratamiento
+debe considerar las disposiciones aplicables en materia de protección de datos personales establecidas en el proyecto.
+2.2 Resultados Esperados
+Con la implementación del Sistema Web Torcly, se espera que el GRUPO MECATRONIC MC PERU S.A.C. disponga de
+una plataforma centralizada para gestionar los principales procesos administrativos y operativos de la tienda y el taller.
+La solución permitirá reemplazar progresivamente los registros manuales por información digital organizada, accesible
+y relacionada, facilitando el control y seguimiento de las operaciones realizadas por la empresa.
+Como resultado principal, se espera contar con una gestión centralizada de clientes y vehículos, permitiendo registrar,
+actualizar y consultar información del cliente, identificar sus vehículos mediante la placa, relacionar cada unidad con su
+propietario y mantener disponible el historial de los servicios realizados. Esto permitirá reducir la dispersión actual de
+información y facilitar su consulta durante futuras atenciones.
+En la gestión del inventario, Torcly permitirá registrar productos, repuestos, aceites y lubricantes, así como controlar
+sus entradas y salidas y consultar las existencias disponibles. Con ello se espera mejorar la confiabilidad de la
+información del stock y disponer de información oportuna para identificar productos con existencias reducidas y apoyar
+la planificación de reposiciones.
+Respecto al control vehicular y las operaciones del taller, se espera disponer de un seguimiento organizado desde el
+ingreso del vehículo hasta la finalización de su atención, registrando información relacionada con el diagnóstico,
+trabajos requeridos, servicios realizados, técnico responsable, productos o repuestos utilizados, estado de atención y
+entrega del vehículo. De esta manera, la empresa podrá conservar una mayor trazabilidad sobre las actividades
+realizadas durante cada servicio.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 6
+
+=== PAGE 7 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Asimismo, el sistema permitirá organizar el registro de ventas y pagos, considerando los importes de las operaciones y
+los medios de pago utilizados actualmente por la empresa, tales como efectivo, Yape, Plin, transferencia y tarjeta,
+incluyendo la posibilidad de registrar pagos realizados mediante más de un medio.
+En relación con las citas y atenciones, se espera mejorar la organización de las fechas de atención y disponer de
+información sobre los vehículos programados o que se encuentren actualmente en proceso de servicio o reparación,
+apoyando la coordinación de la disponibilidad operativa del taller.
+Finalmente, se espera que Torcly proporcione una base tecnológica para mejorar progresivamente la gestión de la
+empresa, aprovechando principalmente la laptop y tablet actualmente disponibles e incorporando controles de acceso
+para los usuarios autorizados. Los resultados serán evaluados mediante los KPI establecidos para el proyecto, partiendo
+de una situación actual de 0 % de gestión centralizada mediante un sistema integrado, con el objetivo de alcanzar la
+digitalización de los procesos definidos dentro del alcance del proyecto. Los indicadores de BI y las recomendaciones
+de reposición se obtendrán de registros válidos; estas últimas requerirán evaluación humana.
+2.3 Recomendación
+Se recomienda la implementación del Sistema Web Torcly como solución tecnológica para centralizar y gestionar los
+principales procesos administrativos y operativos del GRUPO MECATRONIC MC PERU S.A.C. La plataforma integrará la
+gestión de clientes, vehículos, productos, inventario, servicios automotrices, citas, ventas, pagos y seguimiento de las
+operaciones del taller, permitiendo sustituir progresivamente los registros manuales por información digital organizada
+y disponible para los usuarios autorizados.
+La solución permitirá fortalecer el control del inventario, mantener centralizada la información de clientes y vehículos,
+conservar el historial de los servicios realizados y mejorar la trazabilidad de las operaciones de la tienda y el taller.
+Asimismo, su implementación aprovechará los recursos tecnológicos disponibles en la empresa y permitirá acceder a
+las funcionalidades mediante una plataforma web, de acuerdo con el alcance establecido para el proyecto.
+El logro de los resultados será verificado mediante los KPI definidos para el proyecto: porcentaje de procesos principales
+gestionados mediante el sistema web, porcentaje de movimientos de inventario registrados digitalmente, porcentaje
+de clientes con registro digital completo, porcentaje de vehículos registrados y asociados a un cliente, y porcentaje de
+ventas y servicios del taller con seguimiento registrado en el sistema. Estos indicadores permitirán evaluar el nivel de
+digitalización, centralización y trazabilidad alcanzado con la implementación de Torcly.
+2.4 Justificación
+La implementación del Sistema Web Torcly se justifica por la necesidad de mejorar la gestión de información y el control
+de los procesos operativos del GRUPO MECATRONIC MC PERU S.A.C. Actualmente, la empresa no dispone de un ERP,
+SaaS u otro sistema integrado de gestión y desarrolla gran parte de sus actividades mediante registros manuales y
+herramientas de comunicación independientes. Esta situación genera dependencia de cuadernos y conocimiento del
+personal, dispersión de información y dificultades para consultar oportunamente inventario, clientes, vehículos,
+servicios y operaciones del taller.
+Desde una perspectiva cuantitativa, los indicadores establecidos en el proyecto presentan una línea base de 0 % de
+gestión digital centralizada. Actualmente no existen procesos principales gestionados mediante un sistema integrado,
+los movimientos de inventario no se administran de manera centralizada, los clientes y vehículos no cuentan con
+registros digitales integrados y las ventas y servicios del taller no disponen de un seguimiento digital consolidado. Frente
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 7
+
+=== PAGE 8 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+a esta situación, el proyecto establece como meta que los procesos definidos dentro de su alcance se encuentren
+disponibles y operativos mediante Torcly.
+Desde una perspectiva operativa, la implementación permitirá centralizar información de clientes, vehículos,
+productos, inventario, servicios automotrices, citas, ventas, pagos y operaciones del taller. Esta integración permitirá
+mejorar la disponibilidad de la información, fortalecer el control de existencias y proporcionar trazabilidad sobre los
+vehículos atendidos y los trabajos realizados. Asimismo, facilitará la consulta de antecedentes e historiales de servicio
+y reducirá la dependencia de registros físicos dispersos.
+El proyecto presenta también una ventaja tecnológica para la empresa, debido a que puede aprovechar parte de la
+infraestructura existente. La laptop administrativa y la tablet actualmente disponibles podrán utilizarse para acceder al
+sistema mediante navegador web, sin requerir inicialmente la instalación de servidores físicos dentro de las
+instalaciones. La solución propuesta estará soportada por una aplicación web, un backend, un sistema gestor de base
+de datos y un servicio de alojamiento web, constituyendo una base tecnológica inicial para la digitalización de los
+procesos de la organización.
+2.5 Suposiciones
+Para el análisis, desarrollo e implementación del Sistema Web Torcly se consideran las siguientes suposiciones:
+➢ Disponibilidad de información operativa: se asume que el GRUPO MECATRONIC MC PERU S.A.C. continuará
+proporcionando al equipo información suficiente sobre los procesos de inventario, clientes, vehículos, servicios
+del taller, ventas, pagos y citas necesaria para definir y validar los requerimientos del sistema.
+➢ Participación del personal clave: se considera que el propietario, la administradora de tienda y el personal técnico
+participarán, según su disponibilidad, en las actividades de levantamiento de información, revisión de procesos,
+validación de prototipos y comprobación de las funcionalidades relacionadas con sus actividades.
+➢ Validación por parte del Sponsor: se asume que Jhon Medina, en calidad de propietario y Sponsor empresarial,
+continuará participando en la validación de los procesos principales, priorización de requerimientos y aprobación
+de los entregables que requieran conformidad de la empresa.
+➢ Continuidad de los procesos actuales: se considera que las actividades habituales de la tienda y del taller
+continuarán operando durante el desarrollo del proyecto, permitiendo observar y contrastar el funcionamiento
+de Torcly con situaciones reales de la empresa.
+➢ Disponibilidad de registros existentes: se asume que los cuadernos, formatos y demás registros manuales
+disponibles podrán ser utilizados como fuentes de referencia para comprender los procesos actuales y, cuando su
+calidad lo permita, apoyar la preparación de información inicial del sistema.
+➢ Adopción progresiva del sistema: se considera que los usuarios involucrados mostrarán disposición para utilizar
+progresivamente Torcly como herramienta de apoyo a sus actividades, sustituyendo los registros manuales
+correspondientes a los procesos incluidos dentro del alcance.
+➢ Registro adecuado de información: se asume que los usuarios autorizados registrarán información completa y
+actualizada sobre clientes, vehículos, productos, inventario, servicios, ventas, pagos y demás operaciones que
+correspondan a sus funciones.
+➢ Disponibilidad de infraestructura mínima: se considera que la empresa mantendrá operativos los equipos
+actualmente disponibles, principalmente la laptop y la tablet, y dispondrá de conectividad a Internet suficiente
+para acceder al sistema web.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 8
+
+=== PAGE 9 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+➢ Priorización del alcance: se asume que durante el periodo de desarrollo se mantendrá como prioridad la
+implementación de los procesos definidos en el alcance del proyecto, evitando incorporar funcionalidades
+adicionales que comprometan los entregables establecidos.
+➢ Disponibilidad del servicio tecnológico: se considera que los servicios de alojamiento, backend y base de datos
+utilizados para Torcly estarán disponibles durante las etapas de pruebas, validación e implementación del sistema.
+2.6 Limitaciones
+El desarrollo e implementación del Sistema Web Torcly se encuentra sujeto a las siguientes limitaciones:
+➢ Duración del proyecto académico: el proyecto debe desarrollarse dentro del periodo establecido por el curso, por
+lo que las actividades de levantamiento, análisis, diseño, desarrollo, pruebas, validación, implementación y
+documentación deberán ajustarse al cronograma académico disponible.
+➢ Alcance funcional aprobado: Torcly V1.0 comprende diez componentes: Gestión de Clientes y Vehículos, Gestión
+de Productos e Inventario, Gestión de Servicios Automotrices, Gestión de Citas y Atenciones, Gestión de
+Operaciones del Taller, Gestión de Ventas y Pagos, Consulta y Control Operativo, Seguridad y Control de Acceso,
+Inteligencia de Negocios (BI) y Analítica Operativa e Inteligencia Artificial para Apoyo a la Gestión de Inventario.
+Las ampliaciones se gestionarán mediante control de cambios.
+➢ Disponibilidad de los representantes de la empresa: las reuniones, entrevistas y validaciones dependerán de la
+disponibilidad del propietario, administradora y personal técnico, debido a que su actividad principal corresponde
+a la atención y operación cotidiana de la tienda y el taller.
+➢ Calidad de la información histórica: una parte de la información actual se encuentra registrada en medios físicos
+o depende del conocimiento del personal. Por ello, pueden existir registros incompletos, duplicados o sin una
+estructura uniforme, limitando la cantidad de información histórica que pueda ser incorporada al sistema.
+➢ Migración limitada de datos: no se contempla la digitalización total de todos los registros históricos existentes. La
+información inicial que sea incorporada dependerá de su disponibilidad, relevancia, legibilidad y validación por
+parte de la empresa.
+➢ Acceso restringido a información sensible: determinados datos personales, comerciales o financieros de la
+empresa no serán utilizados de manera íntegra en la documentación académica. Cuando sea necesario presentar
+ejemplos o evidencias, se utilizarán datos ficticios, aproximados o anonimizados para proteger la información de
+clientes, proveedores y de la propia organización.
+➢ Dependencia de conectividad: al tratarse de una plataforma web, el acceso a Torcly dependerá de la
+disponibilidad y estabilidad de la conexión a Internet de la empresa. Una interrupción de conectividad podría
+limitar temporalmente el registro o consulta de operaciones.
+➢ Infraestructura tecnológica disponible: el proyecto priorizará el aprovechamiento de los dispositivos que
+actualmente posee la empresa. No se contempla una renovación integral de equipos ni la instalación inicial de
+infraestructura física de servidores dentro del establecimiento.
+➢ Integraciones externas fuera del alcance inicial: la primera versión del proyecto no contempla integración directa
+con sistemas contables, plataformas de facturación electrónica u otros servicios empresariales externos, debido
+al tiempo disponible y a la complejidad técnica que supondría su incorporación.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 9
+
+=== PAGE 10 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+➢ Disponibilidad presupuestaria: el proyecto se desarrolla dentro de un contexto académico y no dispone en el
+Business Case actual de un presupuesto empresarial aprobado para una implementación comercial a gran escala.
+Por ello, cualquier costo futuro relacionado con alojamiento, dominio, equipamiento adicional, mantenimiento o
+servicios externos deberá ser evaluado por la empresa antes de su contratación.
+➢ Validación dentro del periodo académico: las pruebas y validaciones estarán condicionadas al tiempo disponible
+durante el proyecto y a la participación de los usuarios de la empresa, por lo que el alcance de la validación
+corresponderá principalmente a las funcionalidades definidas para la versión inicial de Torcly.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 10
+
+=== PAGE 11 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Sección 3 Gobierno y Equipo de Análisis del Business Case
+3.1 Gobierno
+El GRUPO MECATRONIC MC PERU S.A.C. actualmente no cuenta con un área formal de Tecnologías de Información (TI)
+ni con un responsable especializado en gestión tecnológica. Por ello, las decisiones relacionadas con la incorporación
+de herramientas digitales, mejora de procesos y adopción de nuevas soluciones tecnológicas son tomadas directamente
+por la dirección de la empresa, representada por el propietario.
+Para el presente proyecto, el propietario de la empresa, Jhon Medina, cumple el rol de Sponsor empresarial, siendo el
+principal responsable de validar las necesidades del negocio, proporcionar información sobre los procesos actuales y
+aprobar los requerimientos funcionales de la solución tecnológica propuesta.
+La toma de decisiones del proyecto seguirá un esquema colaborativo entre tres actores principales:
+➢ Empresa cliente: Encargada de proporcionar el conocimiento del negocio, validar los procesos operativos actuales
+y aprobar los cambios planteados en el sistema. El propietario y los responsables de las áreas involucradas
+participarán en la revisión de requerimientos y validación de funcionalidades.
+➢ Equipo de estudiantes: responsable del análisis del problema, levantamiento de requerimientos, diseño,
+desarrollo e implementación del sistema web propuesto. Asimismo, será encargado de documentar los avances
+del proyecto y presentar las soluciones planteadas para la gestión del inventario y control vehicular.
+3.2 Equipo de Análisis del Business Case
+Rol Nombre / Cargo Procedencia
+SPONSOR EMPRESARIAL Jhon Medina – Propietario / Técnico Mecatrónico Empresa
+RESPONSABLE
+Ysabel Ines Quiteros Montoya – Administradora de Tienda Empresa
+ADMINISTRATIVA
+PERSONAL TÉCNICO Técnico Mecánico Empresa
+PERSONAL TÉCNICO Técnico Mecánico Empresa
+PERSONAL DE APOYO
+Ayudante de Taller Empresa
+TÉCNICO
+LÍDER DEL PROYECTO José Manuel Sebastian Mercado Rojas – Líder del Proyecto Equipo
+ANALISTA DE SISTEMAS Arian Armando Bautista Quezada – Analista de Sistemas Equipo
+DESARROLLADOR FULL- Brenda Gabriela Ormeño Bocanegra – Programadora Full- Equipo
+STACK Stack
+ADMINISTRADOR DE Piero Ramírez Alva – Administrador de Base de Datos Equipo
+BASE DE DATOS
+DESARROLLADOR FULL- Carmen Katerin Vega Meza – Programadora Full-Stack Equipo
+STACK
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 11
+
+=== PAGE 12 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Sección 4 Definición del Problema
+4.1 Enunciado del Problema
+¿De qué manera la implementación de un sistema web puede ayudar al GRUPO MECATRONIC MC PERU S.A.C. a
+mejorar la gestión de sus procesos operativos, frente a las dificultades existentes en el seguimiento de vehículos, la
+administración del inventario y el control de las actividades del taller, ocasionadas por el uso de registros manuales y
+la falta de integración de la información?
+4.2 Metodología de Levantamiento de Información
+Técnica Fuente / Participante Fecha Hallazgo principal
+Se identificó que los procesos administrativos relacionados
+con la gestión de productos se realizan principalmente
+YSABEL QUITEROS mediante registros manuales, lo que dificulta mantener un
+MONTOYA / control actualizado del inventario y consultar con rapidez la
+Entrevista ADMINISTRADORA DE 01/09/2026 disponibilidad de los productos.
+TIENDA
+Se evidenció que la información de clientes y vehículos no se
+encuentra centralizada, lo que dificulta el acceso oportuno a
+sus datos, antecedentes e historial de servicios realizados.
+4.3 Organización Cliente y Componentes de su Entorno
+GPI Descripción
+JHON MEDINA – Principal interesado y Sponsor empresarial del proyecto. Interviene en la validación de
+PROPIETARIO / TÉCNICO los procesos operativos del taller, los servicios automotrices y los criterios utilizados para
+MECATRÓNICO la atención y reparación de vehículos. Asimismo, participa en la validación de
+requerimientos y en la aprobación de la solución propuesta.
+YSABEL INES QUITEROS Usuario clave de los procesos administrativos y comerciales de la empresa. Gestiona
+MONTOYA – actualmente productos, inventario, proveedores, pedidos, ventas, medios de pago,
+ADMINISTRADORA DE comprobantes y registros de clientes y vehículos; por ello, participa en el levantamiento
+TIENDA y validación de los requerimientos relacionados con estas operaciones.
+PERSONAL TÉCNICO DEL Usuarios involucrados directamente en la ejecución de los servicios automotrices.
+TALLER Participan en actividades de revisión, diagnóstico, mantenimiento y reparación de
+vehículos, por lo que sus procesos se relacionan con el registro y seguimiento de las
+atenciones realizadas en el taller.
+PERSONAL DE APOYO Personal que brinda apoyo durante las actividades operativas de mantenimiento y
+TÉCNICO DEL TALLER reparación vehicular. Se encuentra relacionado con el flujo de atención del taller y con
+la ejecución de los trabajos asignados durante la permanencia de los vehículos.
+CLIENTES DE GRUPO Interesados externos vinculados con los servicios y productos ofrecidos por la empresa.
+MECATRONIC MC PERU Proporcionan información personal y vehicular durante la atención y se ven beneficiados
+S.A.C.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 12
+
+=== PAGE 13 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+GPI Descripción
+por una gestión más organizada de sus datos, historial de servicios, citas y seguimiento
+de las atenciones realizadas.
+PROVEEDORES DE Interesados externos vinculados con el abastecimiento de productos utilizados por la
+PRODUCTOS, REPUESTOS tienda y el taller. Su relación con el proyecto se encuentra asociada al registro de
+E INSUMOS proveedores, identificación de productos, reposición de existencias y control de
+AUTOMOTRICES entradas al inventario.
+Procesos o servicios que serán modificados o automatizados por el proyecto:
+Procesos/Servicios Descripción de las Modificaciones/Automatizaciones
+GESTIÓN DE INVENTARIO Se digitalizará el registro y control de productos, repuestos, aceites y lubricantes,
+DE PRODUCTOS permitiendo registrar entradas y salidas, consultar existencias disponibles, controlar
+AUTOMOTRICES niveles de stock y mantener trazabilidad de los productos utilizados o comercializados.
+Se centralizará el registro de clientes y sus vehículos, permitiendo consultar
+GESTIÓN DE CLIENTES Y
+información como datos del propietario, placa, marca, modelo y antecedentes de
+VEHÍCULOS
+atención, reduciendo la dependencia de registros manuales dispersos.
+INGRESO Y SEGUIMIENTO Se sistematizará el registro del ingreso de vehículos y su seguimiento durante la
+DE VEHÍCULOS EN EL atención, considerando diagnóstico, trabajos requeridos, técnico responsable, estado
+TALLER del servicio y entrega del vehículo.
+Se organizará el registro de los servicios realizados por el taller, incluyendo diagnóstico,
+GESTIÓN DE SERVICIOS
+trabajos efectuados, costos asociados y productos o repuestos utilizados,
+AUTOMOTRICES
+manteniendo un historial de las atenciones realizadas a cada vehículo.
+Se digitalizará el registro de ventas de productos y servicios, incluyendo importes y
+CONTROL DE VENTAS Y
+medios de pago utilizados por la empresa, como efectivo, Yape, Plin, transferencia y
+COMPROBANTES
+tarjeta, permitiendo registrar también pagos realizados mediante más de un medio.
+GESTIÓN DE CITAS Y Se organizará el registro y programación de citas para la atención de vehículos,
+DISPONIBILIDAD DEL considerando las fechas de atención y la disponibilidad operativa del taller de acuerdo
+TALLER con los vehículos que se encuentren en proceso de servicio o reparación.
+4.4 Entorno Tecnológico Actual
+4.4.1 Software Actual
+Ítem de Software Descripción
+SOFTWARE DE Actualmente, no cuenta con ningún software de gestión, sea un sistema ERP o una
+GESTIÓN (ERP O SAAS) solución SaaS.
+WHATSAPP Aplicación de mensajería utilizada para comunicarse con los clientes, coordinar pedidos o
+consultas con los proveedores y facilitar la comunicación interna entre los trabajadores.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 13
+
+=== PAGE 14 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+4.4.2 Hardware e Infraestructura Actual
+Ítem de Hardware Descripción
+LAPTOP La empresa utiliza una laptop para consultar cotizaciones de productos que no se encuentran
+disponibles en el establecimiento y proporcionar a los clientes la información
+correspondiente.
+TABLET La empresa utiliza una tablet para mantener comunicación con los clientes mediante la
+aplicación WhatsApp Business.
+CELULAR La empresa utiliza un celular para realizar y recibir llamadas telefónicas relacionadas con la
+atención y coordinación con los clientes.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 14
+
+=== PAGE 15 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Sección 5 Visión del Proyecto
+5.1 Descripción del Proyecto
+Descripción del Proyecto
+El proyecto consiste en el desarrollo e implementación de un sistema web de gestión integral para el GRUPO
+MECATRONIC MC PERU S.A.C., orientado a digitalizar, centralizar y fortalecer la gestión de las actividades
+administrativas, comerciales y operativas de la tienda y el taller. La solución permitirá gestionar información de
+clientes, vehículos, productos e inventario, servicios automotrices, citas y atenciones, operaciones del taller, ventas
+y pagos, reduciendo la dependencia de registros manuales y proporcionando trazabilidad sobre las operaciones
+realizadas.
+Como parte de la solución, Torcly incorporará capacidades de Inteligencia de Negocios (BI) y analítica operativa,
+destinadas a generar indicadores, reportes y paneles de control a partir de la información registrada en el sistema.
+Asimismo, incorporará un componente de Inteligencia Artificial aplicado a la gestión de inventario, orientado al
+análisis de información histórica para identificar patrones de consumo y generar estimaciones o recomendaciones
+que apoyen la planificación de reposiciones.
+Estas capacidades apoyarán decisiones de los usuarios autorizados. La IA no realizará compras, pedidos, entradas,
+salidas ni ajustes de existencias de forma automática.
+IDENTIFICADOR DEL PROYECTO: G-01
+5.2 Metas y Objetivos
+Metas de Negocio Descripción
+MEJORAR LA EFICIENCIA OPERATIVA Reducir la dependencia de registros manuales y facilitar el acceso a la
+información necesaria para las actividades de la tienda y del taller.
+FORTALECER EL CONTROL DE LAS Contar con mayor trazabilidad sobre ventas, productos, inventario,
+OPERACIONES vehículos y servicios realizados por la empresa.
+MEJORAR EL CONTROL Y Mantener información actualizada sobre las existencias de productos y
+DISPONIBILIDAD DEL INVENTARIO repuestos, facilitando la identificación de faltantes y mejorando la
+planificación de reposiciones.
+MEJORAR LA GESTIÓN DE LA Disponer de información centralizada que facilite la consulta de datos,
+INFORMACIÓN DE CLIENTES Y antecedentes e historial de servicios de los clientes y vehículos atendidos.
+VEHÍCULOS
+FORTALECER LAS DECISIONES Disponer de indicadores consolidados y análisis histórico de consumo para
+OPERATIVAS supervisar la operación y planificar reposiciones.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 15
+
+=== PAGE 16 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Objetivos del Proyecto Descripción
+DESARROLLAR UN SISTEMA WEB DE Diseñar e implementar una plataforma web que centralice la información y
+GESTIÓN INTEGRAL los principales procesos administrativos y operativos de la tienda y el taller
+de Mecatronic.
+IMPLEMENTAR UN MÓDULO DE Desarrollar funcionalidades para registrar productos, controlar entradas y
+GESTIÓN DE INVENTARIO salidas, consultar existencias y mantener actualizado el stock disponible.
+DESARROLLAR EL MÓDULO DE Implementar funcionalidades para registrar, actualizar y consultar la
+GESTIÓN DE CLIENTES información de los clientes, permitiendo realizar búsquedas mediante datos
+como DNI, RUC o número de contacto, con el fin de mantener sus datos
+centralizados y disponibles.
+DESARROLLAR EL MÓDULO DE Implementar funcionalidades para registrar, actualizar y consultar la
+GESTIÓN DE VEHÍCULOS información de los vehículos atendidos, permitiendo identificarlos mediante
+la placa y relacionarlos con su respectivo cliente, así como mantener un
+historial de los servicios realizados a cada unidad.
+IMPLEMENTAR EL REGISTRO Y Desarrollar funcionalidades para registrar y realizar seguimiento de ventas,
+SEGUIMIENTO DE OPERACIONES servicios del taller, estados de atención y demás operaciones necesarias para
+mantener la trazabilidad de las actividades de la empresa.
+IMPLEMENTAR BI Y ANALÍTICA Desarrollar paneles, indicadores, reportes y tendencias de inventario,
+OPERATIVA ventas, pagos, servicios, citas y operaciones del taller a partir de los datos
+de Torcly.
+IMPLEMENTAR IA PARA APOYO A LA Analizar movimientos, ventas y productos utilizados en servicios para
+REPOSICIÓN identificar patrones y generar estimaciones o recomendaciones de
+reposición, sin ejecución automática.
+5.3 Medidas de Desempeño (KPI)
+Proceso/Servicio Clave KPI Línea Base Actual Meta Esperada
+GESTIÓN INTEGRAL Porcentaje de procesos 0 %, actualmente la 100 % de los procesos
+DE LA INFORMACIÓN principales gestionados empresa no cuenta con un definidos en el alcance
+mediante el sistema web. sistema de gestión disponibles y operativos
+integrado. dentro del sistema web.
+GESTIÓN DE Porcentaje de movimientos 0 %, las entradas, salidas y 100 % de las entradas y salidas
+INVENTARIO de inventario registrados existencias se controlan de productos registradas
+digitalmente. principalmente mediante mediante el sistema.
+registros manuales.
+GESTIÓN DE CLIENTES Porcentaje de clientes 0 % de registros 100 % de los clientes atendidos
+atendidos que cuentan con centralizados en un registrados y disponibles para
+un registro digital sistema. consulta digital.
+completo.
+GESTIÓN DE Porcentaje de vehículos 0 % de vehículos 100 % de los vehículos
+VEHÍCULOS atendidos registrados y gestionados de forma atendidos registrados y
+asociados a un cliente. centralizada.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 16
+
+=== PAGE 17 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Proceso/Servicio Clave KPI Línea Base Actual Meta Esperada
+relacionados con su respectivo
+cliente.
+REGISTRO Y Porcentaje de ventas y 0 % de seguimiento digital, 100 % de las operaciones
+SEGUIMIENTO DE servicios del taller con debido a que actualmente realizadas registradas y con
+OPERACIONES seguimiento registrado en los procesos se gestionan información de seguimiento en
+el sistema. de forma manual. el sistema.
+BI Y ANALÍTICA Indicadores aprobados 0 %; no existe un panel de 100 % de los indicadores
+OPERATIVA disponibles y calculados indicadores integrado. aprobados para V1.0, con
+correctamente / resultados validados frente a
+indicadores aprobados los registros operativos.
+para V1.0.
+IA APLICADA AL Productos elegibles con 0 %; no existe análisis 100 % de productos elegibles
+INVENTARIO estimación o automatizado de consumo. procesados; los no elegibles
+recomendación generada / mostrarán aviso de datos
+productos que cumplen los insuficientes.
+criterios mínimos de datos.
+5.4 Suposiciones
+Para la planificación, desarrollo e implementación del Sistema Web Torcly se consideran las siguientes suposiciones
+clave para el GRUPO MECATRONIC MC PERU S.A.C.:
+➢ Disponibilidad de Información Operativa Base: La empresa facilitará acceso completo a los flujos actuales de
+gestión de inventario, registro de clientes, historial vehicular, atención de taller, ventas y citas. Los registros
+manuales y cuadernos de control vigentes servirán como fuente primaria de referencia para el análisis y diseño de
+requerimientos.
+➢ Participación Activa del Personal Clave: El propietario, la administradora de tienda y el personal técnico del taller
+participarán en las sesiones de levantamiento de información, revisión de prototipos e identificación de
+necesidades operativas de sus respectivas áreas.
+➢ Gobernanza y Validación por el Sponsor: El propietario de la empresa, en su rol de sponsor empresarial, dispondrá
+del tiempo necesario para validar los flujos de negocio, priorizar los requerimientos funcionales y aprobar
+formalmente los entregables del proyecto.
+➢ Disposición a la Transformación Digital: Los usuarios involucrados en las actividades comerciales y de taller
+mostrarán apertura para adoptar progresivamente la plataforma web, reemplazando el uso de cuadernos y
+formatos físicos de control.
+➢ Calidad y oportunidad del registro de datos: se asume el ingreso oportuno y consistente de las operaciones. La
+confiabilidad de los indicadores BI y de las recomendaciones de IA dependerá de la calidad y cantidad de datos
+disponibles; no se presupone un histórico suficiente para todos los productos.
+➢ Continuidad de las Operaciones Durante la Implementación: Las actividades habituales de la tienda y el taller
+mecánico continuarán ejecutándose con normalidad durante el desarrollo del proyecto, permitiendo validar la
+solución tecnológica en un entorno operativo real.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 17
+
+=== PAGE 18 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+➢ Priorización del alcance: se implementarán los diez componentes funcionales aprobados para Torcly V1.0,
+incluidos BI y la IA limitada a apoyo de reposición. Cualquier ampliación se someterá al control de cambios.
+➢ Disponibilidad de Infraestructura Tecnológica Mínima: La empresa mantendrá operativos los equipos de cómputo
+y contará con una conexión estable a internet para el acceso continuo al sistema web.
+5.5 Restricciones
+Se identificaron las siguientes restricciones relacionadas con los procesos actuales de la empresa, disponibilidad de
+recursos, acceso a información y condiciones propias del desarrollo académico:
+➢ Limitación de tiempo para el desarrollo del proyecto: El proyecto estará condicionado al cronograma establecido
+por el curso académico, por lo que las etapas de análisis, levantamiento de requerimientos, diseño, desarrollo,
+pruebas y validación deberán ejecutarse dentro del periodo asignado.
+➢ Alcance funcional controlado: la primera versión se limita a los diez componentes aprobados en la sección 5.6.1.
+BI se alimentará de datos registrados en Torcly y la IA se limitará a recomendaciones de reposición; no realizará
+compras ni movimientos de stock. Los productos con datos insuficientes deberán señalarse expresamente.
+➢ Migración limitada de información histórica: Debido a que actualmente la empresa maneja registros físicos y
+controles manuales, la incorporación de información histórica al sistema dependerá de la disponibilidad, calidad
+y organización de dichos registros. En consecuencia, la migración se limitará a los registros históricos que
+cumplen con estas condiciones.
+➢ Dependencia de conectividad para el uso del sistema web: Al tratarse de una solución web, el acceso y
+funcionamiento del sistema dependerán de la disponibilidad y estabilidad de la conexión a internet de la
+empresa.
+➢ Restricción de integración con sistemas externos: Dentro del alcance inicial del proyecto no se considera la
+integración con plataformas externas, como sistemas contables, servicios de facturación electrónica u otros
+servicios empresariales, debido al tiempo disponible y a la complejidad técnica que implicaría su
+implementación.
+5.6 Entorno Tecnológico Propuesto
+5.6.1 Software Propuesto
+Ítem de Software Descripción
+Software web empresarial que centralizará las operaciones de la tienda y el taller de
+Mecatronic. Su alcance funcional comprende diez componentes:
+➢ Gestión de Clientes y Vehículos
+SISTEMA WEB TORCLY ➢ Gestión de Productos e Inventario
+– GESTIÓN INTEGRAL ➢ Gestión de Servicios Automotrices
+➢ Gestión de Citas y Atenciones
+➢ Gestión de Operaciones del Taller
+➢ Gestión de Ventas y Pagos
+➢ Consulta y Control Operativo
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 18
+
+=== PAGE 19 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Ítem de Software Descripción
+➢ Seguridad y Control de Acceso
+➢ Inteligencia de Negocios (BI) y Analítica Operativa
+➢ Inteligencia Artificial para Apoyo a la Gestión de Inventario
+BI consolidará indicadores de datos operativos. La IA analizará información histórica
+del inventario para apoyar la reposición, sin ejecutar operaciones transaccionales de
+manera autónoma.
+INTELIGENCIA DE Componente integrado que presentará paneles, indicadores, reportes y tendencias de
+NEGOCIOS (BI) Y inventario, ventas, pagos, servicios, citas y operaciones del taller, con filtros y acceso
+ANALÍTICA OPERATIVA por perfil autorizado. Sus resultados provendrán de registros válidos de Torcly.
+Componente integrado que analizará movimientos de inventario, ventas y consumo
+INTELIGENCIA ARTIFICIAL
+en servicios para generar estimaciones o recomendaciones de reposición cuando
+PARA APOYO A LA
+existan datos suficientes. Mostrará la fecha y datos de referencia; indicará insuficiencia
+GESTIÓN DE INVENTARIO
+de datos y no realizará compras ni ajustes de stock automáticamente.
+SERVIDOR DE Componente responsable de ejecutar la lógica de negocio de Torcly y procesar las
+APLICACIONES – operaciones solicitadas desde la aplicación web. Gestionará las reglas del sistema,
+BACKEND garantizando la consistencia de las operaciones registradas.
+Componente para el almacenamiento persistente de usuarios, clientes, vehículos,
+SISTEMA GESTOR DE
+productos, existencias, movimientos de inventario, servicios, citas, operaciones del
+BASE DE DATOS
+taller, ventas, pagos y resultados analíticos, con relaciones y acceso controlado.
+Infraestructura de software destinada a mantener disponible la aplicación web, los
+SERVICIO DE
+servicios de backend y los recursos necesarios para la operación de Torcly a través de
+ALOJAMIENTO WEB Y
+Internet. Permitirá que los usuarios autorizados accedan al sistema desde los
+DESPLIEGUE
+dispositivos habilitados por la empresa mediante un navegador web.
+5.6.2 Hardware Propuesto
+Ítem de Hardware Descripción
+Equipo principal destinado a la operación administrativa del Sistema Web Torcly.
+Permitirá gestionar clientes y vehículos, registrar y consultar productos e inventario,
+LAPTOP ADMINISTRATIVA administrar ventas y pagos, gestionar citas, consultar el seguimiento de los servicios
+del taller y acceder a las funciones administrativas del sistema. Se aprovechará la
+laptop actualmente disponible en la empresa.
+Dispositivo destinado al acceso móvil al Sistema Web Torcly dentro de las áreas
+operativas de la empresa. Permitirá al personal autorizado consultar información de
+TABLET OPERATIVA clientes y vehículos, revisar citas, registrar o actualizar información relacionada con las
+atenciones del taller y consultar el estado de los servicios sin depender exclusivamente
+del equipo administrativo.
+Dispositivo periférico destinado a agilizar la identificación y registro de productos que
+LECTOR DE CÓDIGO DE
+dispongan de código de barras. Permitirá apoyar operaciones de búsqueda, registro de
+BARRAS USB
+ventas y movimientos de inventario, disminuyendo la digitación manual de códigos y
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 19
+
+=== PAGE 20 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Ítem de Hardware Descripción
+facilitando el control de productos, aceites, lubricantes y repuestos compatibles con
+este mecanismo de identificación.
+EQUIPO DE CONECTIVIDAD Equipo de comunicación necesario para proporcionar conectividad a Internet a los
+A INTERNET dispositivos que utilizarán Torcly.
+5.7 Hitos Principales del Proyecto
+Hito/Entregable Fecha Tentativa
+Requerimientos y alcance de Torcly V1.0 validado. 18/09/2026
+Análisis, arquitectura, modelo de datos y prototipos validados. 09/10/2026
+Primera versión funcional: clientes, vehículos, productos e inventario. 23/10/2026
+Versión integrada de servicios, citas, taller, ventas, pagos y control de 13/11/2026
+acceso.
+Paneles BI y componente IA de reposición integrados en la versión 20/11/2026
+candidata.
+Pruebas, validación y corrección de incidencias de los diez componentes. 04/12/2026
+Despliegue, capacitación, piloto, documentación y cierre del proyecto. 11/12/2026
+Sección 6 Evaluación del Proyecto
+6.1 Cumplimiento de Regulaciones
+Mandatos relacionados con el proyecto Citación Regulatoria
+Protección de datos personales de clientes y usuarios
+Ley N.º 29733 – Ley de Protección de Datos Personales
+registrados en el sistema, incluyendo información
+(Perú). Establece principios, obligaciones y medidas para
+identificable como nombres, teléfonos, documentos
+garantizar el adecuado tratamiento de datos personales.
+y datos relacionados con vehículos.
+Uso adecuado de información personal dentro del
+Reglamento de la Ley N.º 29733 – Decreto Supremo N.º 003-
+sistema, considerando que solo usuarios autorizados
+2013-JUS. Define disposiciones para el tratamiento,
+deben acceder a determinados datos según sus
+seguridad y protección de datos personales.
+funciones.
+Implementación de mecanismos de control de Principios de seguridad de la información establecidos en
+acceso mediante usuarios y permisos para evitar buenas prácticas de gestión tecnológica y protección de
+accesos no autorizados a información empresarial. activos digitales.
+Protección de información comercial y operativa de Políticas internas de confidencialidad y manejo responsable
+la empresa, incluyendo registros de inventario, de información empresarial proporcionada por el GRUPO
+servicios, proveedores y operaciones internas. MECATRONIC MC PERU S.A.C.
+Buenas prácticas de gestión de información y respaldo de
+Conservación adecuada de registros digitales
+datos para garantizar disponibilidad y recuperación ante
+generados por la operación del sistema.
+incidentes.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 20
+
+=== PAGE 21 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Mandatos relacionados con el proyecto Citación Regulatoria
+Compromiso ético establecido entre el equipo Capstone y la
+Uso responsable de información obtenida durante el
+empresa para utilizar la información únicamente con fines
+desarrollo académico del proyecto.
+académicos y de desarrollo tecnológico.
+6.2 Alineamiento Estratégico
+Plan Estratégico Objetivos Meta Relación con el Proyecto
+EFICIENCIA DE LOS Optimizar la gestión de las Reducir la dependencia de
+PROCESOS actividades administrativas y registros manuales mediante
+OPERATIVOS operativas de la tienda y el la digitalización de los DIRECTO
+taller. procesos incluidos en el
+alcance del proyecto.
+GESTIÓN Mejorar la disponibilidad y Centralizar la información de
+CENTRALIZADA DE acceso a la información clientes, vehículos,
+LA INFORMACIÓN necesaria para las productos, inventario, DIRECTO
+operaciones de la empresa. servicios, ventas, pagos y
+citas en un único sistema.
+CONTROL DE Fortalecer el control de Mantener actualizado el
+INVENTARIO productos, repuestos, aceites stock mediante el registro de
+y lubricantes disponibles en la entradas y salidas de los DIRECTO
+empresa. productos gestionados por la
+empresa.
+CONTROL Y Mejorar la trazabilidad de los Registrar el ingreso,
+SEGUIMIENTO vehículos atendidos durante diagnóstico, servicios
+VEHICULAR su permanencia en el taller. realizados, estado de DIRECTO
+atención y entrega de los
+vehículos.
+GESTIÓN DE Mejorar la organización y Mantener registros
+CLIENTES Y disponibilidad de la centralizados de clientes y
+VEHÍCULOS información correspondiente vehículos, relacionando cada DIRECTO
+a clientes y vehículos unidad con su propietario y
+atendidos. su historial de servicios.
+MEJORA DE LA Brindar una atención más Reducir los tiempos
+ATENCIÓN AL organizada y facilitar la empleados en la búsqueda de INDIRECTO
+CLIENTE consulta de información información de clientes,
+durante la prestación de los vehículos y antecedentes de
+servicios. atención.
+PLANIFICACIÓN Mejorar el análisis de las Analizar movimientos, ventas DIRECTO
+DEL necesidades de reposición de y consumo en servicios y
+ABASTECIMIENTO productos. generar recomendaciones
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 21
+
+=== PAGE 22 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Plan Estratégico Objetivos Meta Relación con el Proyecto
+para apoyar decisiones de
+reposición.
+CRECIMIENTO Fortalecer progresivamente Incrementar la capacidad
+COMERCIAL la capacidad de la empresa comercial y favorecer el INDIRECTO
+para atender un mayor crecimiento de las ventas de
+volumen de clientes y productos y servicios
+operaciones. automotrices.
+AMPLIACIÓN DE LA Incrementar la capacidad Ampliar las instalaciones y
+INFRAESTRUCTURA física disponible para la espacios destinados al NINGUNA
+FÍSICA DEL TALLER atención simultánea de ingreso, permanencia y
+vehículos. reparación de vehículos.
+RENOVACIÓN DE Modernizar las herramientas Incorporar nuevos equipos y
+EQUIPAMIENTO y equipos utilizados por el herramientas especializadas NINGUNA
+MECÁNICO personal técnico para realizar para diagnóstico,
+ESPECIALIZADO los servicios automotrices. mantenimiento y reparación
+vehicular.
+GESTIÓN BASADA EN Fortalecer el seguimiento de Disponer de indicadores y DIRECTO
+INFORMACIÓN operaciones mediante datos paneles de inventario,
+consolidados. ventas, pagos, servicios, citas
+y taller.
+6.3 Análisis de Impacto
+La implementación del Sistema Web Torcly representará la incorporación de una nueva capacidad tecnológica para el
+GRUPO MECATRONIC MC PERU S.A.C., debido a que actualmente la empresa no dispone de un sistema de gestión
+integrado y sus principales procesos operativos y administrativos se apoyan en registros manuales y herramientas de
+comunicación independientes. La solución permitirá centralizar progresivamente la gestión de clientes, vehículos,
+inventario, servicios automotrices, citas, ventas, pagos y seguimiento de las operaciones del taller.
+➢ Impacto sobre los recursos tecnológicos. El proyecto aprovechará principalmente los recursos de hardware
+actualmente disponibles en la empresa, especialmente la laptop administrativa y la tablet, evitando inicialmente la
+necesidad de realizar una renovación completa de equipos. Estos dispositivos serán utilizados como medios de
+acceso al sistema mediante navegador web. Asimismo, la operación de Torcly incrementará la importancia de
+disponer de una conexión estable a Internet, debido a que el acceso a la aplicación y a los servicios tecnológicos
+asociados dependerá de la conectividad de la empresa. Como recurso complementario, se contempla el uso de un
+lector de código de barras USB para apoyar las operaciones de identificación de productos, inventario y ventas.
+➢ Impacto sobre la arquitectura tecnológica actual. Debido a que la empresa no cuenta actualmente con una
+arquitectura de sistemas empresariales implementada, Torcly constituirá la base inicial para la centralización
+tecnológica de sus procesos. La solución estará conformada por una aplicación web, un componente backend, un
+sistema gestor de base de datos y un servicio de alojamiento web, permitiendo separar la interacción de los usuarios,
+el procesamiento de las reglas de negocio y el almacenamiento persistente de la información. Esta arquitectura
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 22
+
+=== PAGE 23 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+permitirá que los usuarios autorizados accedan al sistema desde los dispositivos disponibles sin requerir inicialmente
+la instalación de infraestructura de servidores físicos dentro de las instalaciones de la empresa.
+➢ Impacto sobre la gestión de la información. La información que actualmente se encuentra distribuida entre
+registros físicos y diferentes medios pasará progresivamente a mantenerse de forma estructurada y relacionada
+dentro del sistema. Esto permitirá disponer de registros centralizados de clientes y vehículos, historial de servicios,
+movimientos de inventario, productos, ventas, pagos y citas. Como consecuencia, el uso de los recursos de TI dejará
+de estar orientado principalmente a actividades de consulta y comunicación para convertirse también en un soporte
+directo de los procesos administrativos y operativos de la empresa.
+➢ Impacto sobre el análisis de datos. BI convertirá registros operativos en indicadores verificables. La IA utilizará datos
+históricos para sugerir reposiciones cuando haya información suficiente; la empresa conservará la decisión. Se
+requerirán controles de consistencia, permisos y trazabilidad de los resultados.
+➢ Impacto sobre los usuarios y la operación. La incorporación de Torcly requerirá que el propietario, la administradora
+y el personal autorizado adopten progresivamente el registro digital de las operaciones correspondientes a sus
+funciones. Esto implicará una adaptación respecto al uso actual de cuadernos y registros físicos, por lo que será
+necesario realizar actividades de capacitación, validación y acompañamiento durante la implementación. La
+confiabilidad de la información dependerá también del registro oportuno y correcto de los datos por parte de los
+usuarios responsables.
+6.4 Consideración de Riesgos
+Riesgo Probabilidad/Impacto Acciones de Mitigación
+Coordinar reuniones con anticipación, establecer
+horarios definidos y priorizar validaciones críticas del
+Baja disponibilidad de los
+proyecto.
+representantes de la empresa para 4
+reuniones y validaciones.
+Responsables: Sebastian Mercado Rojas, líder del
+proyecto; y Jhon Medina, sponsor empresarial.
+Preparar una relación de la información necesaria,
+establecer fechas para su entrega y realizar un
+Retraso en la entrega de seguimiento de los datos pendientes.
+información necesaria para definir 5
+requerimientos. Responsables: Arian Bautista Quezada, analista de
+sistemas; y Ysabel Ines Quiteros Montoya, responsable
+administrativa.
+Revisar y comparar los registros disponibles,
+Diferencias entre los registros identificar datos incompletos o duplicados y validar la
+manuales y la información real de información antes de incorporarla al sistema.
+la empresa podrían afectar la carga 5
+inicial del inventario y de los datos Responsables: Piero Ramírez Alva, administrador de
+de clientes, vehículos y servicios. base de datos; y Ysabel Ines Quiteros Montoya,
+responsable administrativa.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 23
+
+=== PAGE 24 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Riesgo Probabilidad/Impacto Acciones de Mitigación
+Presentar prototipos y avances funcionales, registrar
+Las funcionalidades desarrolladas
+las observaciones de los usuarios y obtener su
+podrían no representar
+validación antes de finalizar cada módulo.
+correctamente los procesos de la
+5
+tienda y del taller si no son
+Responsables: Arian Armando Bautista Quezada,
+validadas oportunamente por los
+analista de sistemas; y José Manuel Sebastian
+usuarios.
+Mercado Rojas, líder del proyecto.
+Registrar las solicitudes de cambio, analizar su efecto
+en el cronograma y desarrollar únicamente aquellas
+Los cambios o la incorporación de
+que sean aprobadas y puedan completarse dentro del
+nuevos requerimientos podrían
+tiempo disponible.
+ampliar el alcance e impedir que 5
+los entregables se completen
+Responsables: José Manuel Sebastian Mercado Rojas,
+dentro del periodo académico.
+líder del proyecto; y Jhon Medina, sponsor
+empresarial.
+Implementar autenticación, perfiles de usuario,
+El acceso no autorizado o la permisos de acceso, copias de seguridad y registros de
+pérdida de información podría las operaciones realizadas en el sistema.
+afectar la confidencialidad y 4
+continuidad de los registros Responsables: Brenda Gabriela Ormeño Bocanegra y
+almacenados. Carmen Katerin Vega Meza, desarrolladoras full-stack;
+y Piero Ramírez Alva, administrador de base de datos.
+Realizar pruebas funcionales de cada módulo, registrar
+los errores encontrados y corregirlos antes de la
+Las fallas en los módulos
+implementación del sistema.
+principales podrían afectar el
+registro del inventario, la atención 5
+Responsables: Brenda Gabriela Ormeño Bocanegra y
+de los servicios y el seguimiento de
+Carmen Katerin Vega Meza, desarrolladoras full-stack;
+los vehículos.
+y Arian Armando Bautista Quezada, analista de
+sistemas.
+El sistema podría presentar
+Desarrollar una interfaz adaptable y realizar pruebas
+problemas de visualización o
+de funcionamiento y visualización en los equipos
+rendimiento en la laptop, tablet o
+disponibles antes de implementar el sistema.
+celulares utilizados por la 4
+empresa, dificultando su uso
+Responsables: Brenda Gabriela Ormeño Bocanegra y
+durante las actividades del taller y
+Carmen Katerin Vega Meza, desarrolladoras full-stack.
+la tienda.
+Información histórica insuficiente Depurar datos, definir umbrales de elegibilidad por
+o inconsistente podría limitar la producto y mostrar la insuficiencia de información.
+3
+utilidad de las recomendaciones Responsables: Piero Ramírez Alva y José Manuel
+de IA. Sebastián Mercado Rojas.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 24
+
+=== PAGE 25 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Riesgo Probabilidad/Impacto Acciones de Mitigación
+Mostrar periodos, fuentes de datos y carácter
+Indicadores BI o recomendaciones orientativo de las recomendaciones; validar
+IA podrían interpretarse como 4 indicadores y mantener aprobación humana.
+decisiones automáticas. Responsables: Arian Armando Bautista Quezada y José
+Manuel Sebastián Mercado Rojas.
+6.6 Análisis de Alternativas
+No Hacer Nada (Status Quo) Factores Clave que muestran la No Viabilidad
+➢ Pérdida Crítica de Información: Alto riesgo de deterioro, extravío o
+duplicidad en los registros de atenciones, historial de mantenimiento
+Mantenimiento del Modelo vehicular y catálogo de inventario.
+Operativo Manual y Basado
+en Cuadernos de Control; ➢ Inoperancia y Lentitud en los Procesos: Tiempos excesivos en la
+Consiste en continuar la recepción vehicular, consulta de stock de repuestos y liquidación de
+gestión del taller y tienda servicios, limitando la capacidad de atención diaria.
+mediante registros en
+cuadernos físicos, de atención ➢ Falta de Trazabilidad y Control Financiero: Imposibilidad de generar
+vehicular y el conocimiento reportes de rendimiento o métricas operativas en tiempo real para la
+empírico del personal toma de decisiones gerenciales del sponsor.
+operativo.
+➢ Incapacidad de Escalabilidad: Bloqueo del crecimiento comercial del
+taller al depender exclusivamente de procesos manuales propensos al
+error humano.
+Opción(es) Alternativa(s) Factores Clave que muestran la No Viabilidad
+➢ Costos fijos recurrentes elevados: Requiere el pago continuo de
+licencias mensuales por usuario o módulo, lo que representa un
+COMPRAR UN SOFTWARE
+gasto fijo inviable para el presupuesto MYPE de la empresa.
+COMERCIAL ESPECIALIZADO
+EN SERVICIOS ➢ Poca adaptación al negocio: Al ser sistemas estandarizados, no
+AUTOMOTRICES COMO LO se acomodan exactamente al flujo dual de la empresa.
+SON AUTOCONTROL ERP,
+➢ Dependencia y cobros adicionales: Implica costos extra por
+ORDERRY O SICO TALLER ERP
+soporte técnico, capacitaciones y modificaciones o reportes
+personalizados que la empresa requiera.
+➢ Costo inicial inalcanzable: Las cotizaciones que ofrecen las
+empresas de software superan por mucho el presupuesto
+CONTRATAR A UNA
+disponible del negocio.
+EMPRESA EXTERNA PARA
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 25
+
+=== PAGE 26 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Opción(es) Alternativa(s) Factores Clave que muestran la No Viabilidad
+DESARROLLAR EL
+➢ Dependencia futura: Se tendría que pagar a la empresa externa
+SOFTWARE.
+cada vez que el sistema necesite correcciones, actualizaciones o
+mantenimiento.
+➢ Tiempos de entrega muy largos: El proceso de contratación y
+desarrollo tomaría demasiado tiempo antes de tener una versión
+lista para usar.
+Sección 7 Selección del Proyecto
+7.1 Metodología
+Criterio Peso (%) Opción A: Cascada Opción B: Scrum Opción C: Kanban
+Adaptabilidad a cambios 20 % 2 5 5
+en los requerimientos
+Participación y 20 % 2 5 4
+retroalimentación del
+cliente
+Entrega incremental de 20 % 1 5 4
+funcionalidades
+Organización y 15 % 4 4 4
+coordinación del equipo
+Seguimiento y control del 15 % 4 5 5
+avance
+Adecuación al plazo de 16 10 % 3 5 4
+semanas
+TOTAL, PONDERADO 100 % 50 % 97 % 87 %
+7.2 Resultados
+Resultados de la selección de la metodología
+Para seleccionar la metodología de desarrollo se compararon Cascada, Scrum y Kanban mediante una matriz de
+evaluación ponderada. Cada alternativa fue calificada en una escala del 1 al 5, considerando las características del
+proyecto y el plazo de dieciséis semanas establecido para su desarrollo.
+Los criterios con mayor peso fueron la adaptación a los cambios, la participación de la empresa y la entrega progresiva
+de funcionalidades. Estos aspectos son importantes porque el desarrollo de Torcly requiere revisiones periódicas. A
+medida que se presenten los módulos, los representantes de Mecatronic podrán brindar observaciones y solicitar los
+ajustes que consideren necesarios.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 26
+
+=== PAGE 27 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Scrum obtuvo el mejor resultado, con un 97 %. Su principal ventaja es que permite dividir el trabajo en entregas
+pequeñas y revisar cada avance antes de continuar. Esto facilitará la participación de la empresa durante el desarrollo
+y permitirá que el equipo realice correcciones sin esperar hasta el final del proyecto.
+Kanban alcanzó un 87 %. Esta metodología permite organizar y supervisar adecuadamente las actividades, pero obtuvo
+una valoración menor en la participación del cliente, las entregas incrementales y la adecuación al plazo académico.
+Por su parte, Cascada obtuvo un 50 %. Aunque propone una secuencia ordenada de trabajo, ofrece menos flexibilidad
+para incorporar cambios cuando el desarrollo ya se encuentra avanzado. Esto podría dificultar la atención de las
+observaciones realizadas por la empresa durante el proyecto.
+De acuerdo con estos resultados, se seleccionó Scrum como metodología para el desarrollo del Sistema Web Torcly. Su
+enfoque se adapta mejor a la necesidad de trabajar con entregas progresivas, recibir validaciones de la empresa y
+realizar ajustes durante las dieciséis semanas disponibles.
+Justificación de la selección del proyecto
+Para justificar la selección del proyecto se revisaron cuatro soluciones disponibles en el mercado peruano: Mi Taller
+CRM, TallerPro, SIGMA y ApiWorking. Estas plataformas ofrecen funciones relacionadas con la gestión de órdenes de
+trabajo, vehículos, inventario, clientes, servicios y facturación. Su presencia en el mercado demuestra que la
+digitalización de los talleres automotrices responde a una necesidad real del sector.
+Aunque estas alternativas cuentan con funcionalidades similares a las planteadas para Torcly, son productos
+comerciales dirigidos a diferentes tipos de talleres y empresas automotrices. Mi Taller CRM y TallerPro funcionan
+mediante planes de suscripción mensual, mientras que SIGMA y ApiWorking requieren contactar con el proveedor para
+conocer sus condiciones comerciales. Su contratación podría generar pagos periódicos, procesos de configuración y
+dependencia del proveedor para recibir soporte o solicitar modificaciones.
+También se consideró mantener los registros manuales y el uso de WhatsApp como herramientas principales. Sin
+embargo, esta alternativa no solucionaría la dispersión de la información ni las dificultades actuales para consultar el
+inventario, conocer el estado de los vehículos y revisar los servicios realizados.
+Otra alternativa evaluada fue contratar a una empresa externa para desarrollar un sistema personalizado. Esta opción
+podría responder a las necesidades de Mecatronic, pero implicaría coordinar el desarrollo, el mantenimiento y las
+futuras modificaciones con un proveedor externo. Asimismo, no permitiría que el equipo del proyecto participe
+directamente en la construcción y validación de la solución durante el periodo académico.
+Por estas razones, se seleccionó el desarrollo del Sistema Web Torcly. A diferencia de las soluciones comerciales
+revisadas, el sistema será elaborado tomando como base los requerimientos identificados directamente en GRUPO
+MECATRONIC MC PERU S.A.C. Sus módulos estarán enfocados en la gestión de clientes y vehículos, el control del
+inventario, los servicios del taller, las citas, las ventas y los pagos.
+La selección de Torcly no significa que las demás soluciones sean inadecuadas. El proyecto fue elegido porque presenta
+una mayor correspondencia con las necesidades y el alcance definidos para Mecatronic. Además, permitirá presentar
+avances progresivos, recibir observaciones de los representantes de la empresa y realizar los ajustes necesarios durante
+su desarrollo.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 27
+
+=== PAGE 28 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Investigación de mercado y benchmarking
+Como parte de la investigación de mercado, se revisaron las páginas oficiales de Mi Taller CRM, TallerPro, SIGMA y
+ApiWorking. El benchmarking consideró sus principales funcionalidades, su modalidad de contratación y su relación
+con las necesidades identificadas en Mecatronic. La siguiente tabla presenta los resultados de esta comparación.
+Solución Principales características Modalidad comercial Relación con Torcly
+analizada
+Mi Taller CRM Gestiona órdenes de trabajo, Software SaaS con Presenta funciones similares a
+clientes, vehículos, inventario planes de suscripción Torcly, pero está diseñado para
+de repuestos, cotizaciones, mensual. atender a distintos talleres
+WhatsApp y facturación mediante planes comerciales.
+electrónica.
+TallerPro Incluye órdenes de trabajo, Sistema por suscripción Permite comprobar que la
+control de inventario, citas, mensual con diferentes gestión integrada del taller es
+cotizaciones, caja y facturación planes y funciones necesaria, aunque su
+electrónica. adicionales. contratación implica pagos
+periódicos.
+SIGMA Cuenta con módulos de ERP automotriz que Su alcance es más amplio, ya que
+mecánica, repuestos, ventas, requiere solicitar una también está dirigido a
+CRM y administración. demostración y concesionarias y negocios de
+propuesta comercial. repuestos.
+ApiWorking Permite controlar órdenes de Solución comercial Atiende procesos similares, pero
+trabajo, repuestos, servicios, cuyas condiciones se no ha sido desarrollada
+clientes, vehículos, caja y consultan directamente específicamente para los
+facturación electrónica. con el proveedor. requerimientos de Mecatronic.
+El benchmarking permitió comprobar que las soluciones revisadas cuentan con funciones útiles para la
+administración de un taller. Sin embargo, funcionan como productos comerciales dirigidos a diferentes
+empresas y sus condiciones dependen de planes, suscripciones o cotizaciones. En cambio, Torcly será
+desarrollado tomando como base los procesos y requerimientos identificados directamente en GRUPO
+MECATRONIC MC PERU S.A.C.
+Fuentes consultadas para el benchmarking
+ApiWorking. (s. f.). Sistema de gestión para talleres mecánicos. https://apiworking.pe/sistema-de-
+gestion-para-talleres-mecanicos/
+Mi Taller CRM. (s. f.). Software CRM para talleres mecánicos de motos y autos en Perú.
+https://mitaller.com.pe/
+SIGMA. (s. f.). Software de gestión para el sector automotriz. https://sigma-peru.com/
+TallerPro. (s. f.). Software de gestión para talleres mecánicos en Perú. https://tallerpro.io/
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 28
+
+=== PAGE 29 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Sección 8 Cronograma del Proyecto
+Semana Entregables Fecha Inicio / Fecha Fin
+Semana 1 Inicio y planificación: diagnóstico, interesados, alcance preliminar y 22/08/2026 – 28/08/2026
+levantamiento de información; inventario de datos disponibles.
+Semana 2 Business Case: problemática, alternativas, objetivos, viabilidad y 29/08/2026 – 04/09/2026
+capacidades BI e IA delimitadas.
+Semana 3 Acta de Constitución: alcance, interesados, gobernabilidad, riesgos 05/09/2026 – 11/09/2026
+y línea base de 16 semanas.
+Semana 4 Validación del alcance y requerimientos preliminares con 12/09/2026 – 18/09/2026
+Mecatronic; organización del backlog y entregables.
+Semana 5 SRS de los diez componentes; reglas de negocio, indicadores BI y 19/09/2026 – 25/09/2026
+criterios de suficiencia de datos para IA.
+Semana 6 Procesos, arquitectura, modelo de datos y diseño funcional de 26/09/2026 – 02/10/2026
+componentes operativos, BI e IA.
+Semana 7 Prototipos y validación de interfaces, tableros, reportes y 03/10/2026 – 09/10/2026
+visualización de recomendaciones.
+Semana 8 Construcción: clientes y vehículos, autenticación, perfiles y control 10/10/2026 – 16/10/2026
+de acceso.
+Semana 9 Productos, inventario, movimientos y registro del consumo de 17/10/2026 – 23/10/2026
+productos en servicios.
+Semana 10 Catálogo de servicios automotrices, citas y atenciones. 24/10/2026 – 30/10/2026
+Semana 11 Operaciones del taller, ventas, pagos y flujos transaccionales 31/10/2026 – 06/11/2026
+integrados.
+Semana 12 Consulta y control operativo; paneles BI con indicadores, filtros y 07/11/2026 – 13/11/2026
+tendencias.
+Semana 13 Preparación de datos y componente IA para analizar consumo y 14/11/2026 – 20/11/2026
+recomendar reposición; integración con inventario.
+Semana 14 Integración de los diez componentes y pruebas funcionales, de 21/11/2026 – 27/11/2026
+cálculos BI, filtros, consistencia y resultados IA.
+Semana 15 Validación con usuarios, pruebas con datos insuficientes y de no 28/11/2026 – 04/12/2026
+ejecución automática; correcciones, despliegue y capacitación.
+Semana 16 Piloto en entorno autorizado, ajustes finales, documentación, 05/12/2026 – 11/12/2026
+aceptación y cierre del proyecto.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 29
+
+=== PAGE 30 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Sección 9 Glosario
+Término / Acrónimo Definición
+Alineamiento Grado de correspondencia entre los objetivos específicos del proyecto y los
+Estratégico planes estratégicos de la organización, clasificado según su nivel de contribución
+en directo, indirecto o nulo.
+Análisis de Alternativas Proceso de evaluación comparativa de distintas opciones de solución al problema
+identificado, mediante el cual se determina la viabilidad técnica, económica y
+operativa de cada una antes de seleccionar la más adecuada.
+Análisis de Impacto Evaluación sistemática de los efectos que la implementación de una solución
+tecnológica genera sobre los recursos, la arquitectura tecnológica, la gestión de
+la información y los usuarios de una organización.
+Backend / Servidor de Componente de software responsable de ejecutar la lógica de negocio de un
+Aplicaciones sistema, procesar las solicitudes originadas desde la interfaz de usuario y
+garantizar la consistencia de las operaciones registradas.
+Business Case Documento formal que sustenta la justificación, viabilidad y conveniencia de la
+ejecución de un proyecto, mediante el análisis estructurado del problema, la
+solución propuesta, sus beneficios esperados y los riesgos asociados.
+Cascada Metodología de gestión de proyectos de carácter secuencial, en la cual cada fase
+del desarrollo debe completarse en su totalidad antes de dar inicio a la siguiente,
+con limitada flexibilidad ante cambios posteriores.
+ERP (Enterprise Sistema informático de planificación de recursos empresariales orientado a
+Resource Planning) integrar en una única plataforma los principales procesos administrativos,
+operativos y financieros de una organización.
+Full-Stack Perfil profesional de desarrollo de software con competencias tanto en el diseño
+y programación de la interfaz de usuario (frontend) como en la lógica de negocio
+y el manejo de datos del servidor (backend).
+GPI (Grupo de Persona natural, grupo u organización que posee interés directo o indirecto en el
+Personas Interesadas) / desarrollo del proyecto, o que se ve afectado por sus resultados, y cuya
+Stakeholders participación resulta relevante para la toma de decisiones.
+Hito Punto de control o entregable de carácter significativo que evidencia un avance
+sustancial del proyecto en una fecha determinada del cronograma.
+Kanban Metodología ágil de gestión visual del flujo de trabajo, basada en la
+representación de tareas mediante tarjetas y tableros, orientada a la mejora
+continua y a la limitación del trabajo en curso.
+KPI (Key Performance Indicador cuantificable utilizado para medir el nivel de cumplimiento de los
+Indicator) objetivos y metas establecidos para el proyecto o para un proceso específico.
+Ley N.º 29733 Ley de Protección de Datos Personales vigente en el Perú, que establece los
+principios, derechos, obligaciones y procedimientos aplicables al tratamiento
+adecuado de datos personales por parte de entidades públicas y privadas.
+Módulo Componente funcional independiente de un sistema informático que agrupa un
+conjunto específico de funcionalidades relacionadas entre sí, integrado dentro de
+la arquitectura general de la solución.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 30
+
+=== PAGE 31 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Término / Acrónimo Definición
+MYPE Micro y Pequeña Empresa; categoría de clasificación empresarial establecida en
+la normativa peruana en función del volumen de ventas anuales y el número de
+trabajadores.
+NDA (Non-Disclosure Acuerdo de confidencialidad mediante el cual las partes se comprometen a
+Agreement) proteger y no divulgar información considerada sensible o estratégica obtenida
+durante el desarrollo de un proyecto.
+Prototipo Representación preliminar y funcional de las interfaces y flujos de un sistema,
+utilizada para validar requerimientos con los usuarios antes de proceder con el
+desarrollo definitivo.
+Requerimiento Especificación que describe una capacidad o comportamiento que el sistema
+Funcional / No debe ejecutar (requerimiento funcional), o una condición de calidad, rendimiento
+Funcional o seguridad bajo la cual dicho sistema debe operar (requerimiento no funcional).
+SaaS (Software as a Modelo de distribución de software mediante el cual una aplicación es alojada
+Service) por un proveedor externo y puesta a disposición del usuario a través de Internet,
+generalmente bajo un esquema de suscripción.
+Scrum Metodología ágil de gestión de proyectos basada en ciclos iterativos e
+incrementales denominados sprints, orientada a la entrega continua de valor y a
+la retroalimentación constante del cliente.
+SGBD (Sistema Gestor Software especializado en el almacenamiento, organización, administración y
+de Base de Datos) recuperación estructurada de la información gestionada por un sistema
+informático.
+Sistema Web Aplicación de software accesible a través de un navegador de Internet, diseñada
+para gestionar información y automatizar procesos administrativos u operativos
+de una organización.
+Sponsor Empresarial Persona designada por la organización cliente como principal responsable de
+validar las necesidades del negocio, aprobar los requerimientos funcionales y
+respaldar la toma de decisiones a lo largo del proyecto.
+Status Quo Situación operativa actual de una organización, considerada como punto de
+referencia o alternativa base frente a una propuesta de cambio o mejora.
+Suposición Afirmación considerada válida para efectos de la planificación y el análisis del
+proyecto, cuya veracidad no ha sido formalmente verificada pero cuya existencia
+se asume para permitir el avance del trabajo.
+Torcly Nombre otorgado al sistema web propuesto en el presente proyecto, orientado a
+la gestión integral de inventario, control vehicular y demás procesos
+administrativos y operativos de la organización cliente.
+Trazabilidad Capacidad de un sistema de registrar, mantener y consultar el historial completo
+de una operación, producto o servicio a lo largo del tiempo, permitiendo su
+seguimiento en cualquier etapa del proceso.
+BI (Inteligencia de Capacidades para producir indicadores, reportes, tendencias y paneles a partir
+Negocios) de datos operativos de Torcly.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 31
+
+=== PAGE 32 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Término / Acrónimo Definición
+Inteligencia Artificial Análisis de datos históricos para identificar patrones y apoyar decisiones de
+(IA) reposición de inventario en Torcly.
+Recomendación de Resultado informativo del análisis de un producto que requiere revisión humana
+reposición y no modifica compras ni existencias.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 32
+
+=== PAGE 33 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Sección 10 Control de Cambios
+Versión Fecha Nombre Descripción
+0.9 05/09/2026 Equipo Capstone Incorporación del análisis de alternativas y metodología
+de selección del proyecto, comparando diferentes
+opciones de solución tecnológica.
+1.0 06/09/2026 Equipo Capstone Versión final del Business Case, consolidación de todas
+las secciones, revisión de coherencia documental y
+preparación para presentación.
+2.5 17/09/2026 Equipo Capstone Alineación con el Acta: diez componentes, BI e IA
+asistencial; objetivos, indicadores, riesgos e hitos;
+cronograma de 16 semanas.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 33
+
+=== PAGE 34 ===
+“Sistema web Torcly para la gestión operativa en el GRUPO
+MECATRONIC MC PERU S.A.C. MECATRONIC MC PERU S.A.C.” — Business Case
+Sección 11 Anexos
+● Actas o minutas de reuniones con la empresa (fecha, asistentes, acuerdos).
+● Evidencia fotográfica o capturas de pantalla de los procesos/sistemas actuales.
+● Transcripciones o resúmenes de entrevistas.
+● Organigrama de la empresa (si se comparte).
+● Matriz de riesgos
+● Consentimiento o correo de autorización de la empresa para usar su información en el trabajo académico.
+Basado en PP-Plantilla-10BC-1.0 · Adaptado para Proyecto de Capstone — UNT Página 34

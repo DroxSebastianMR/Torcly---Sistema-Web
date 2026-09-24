@@ -35,9 +35,33 @@ pnpm format:check
 pnpm start:api    # Ejecuta el backend compilado
 ```
 
+## Base de datos
+
+La API utiliza Prisma ORM y PostgreSQL en Supabase. `DATABASE_URL` apunta al
+pool transaccional y se usa durante la ejecución de Express. `DIRECT_URL`
+apunta al pool de sesión y queda reservado para Prisma CLI y migraciones.
+
+```sh
+pnpm db:generate        # Genera el cliente tipado
+pnpm db:validate        # Valida schema y configuración
+pnpm db:check           # Verifica ambos canales de conexión
+pnpm db:smoke:products  # Verifica CRUD de productos y limpia los datos QA
+pnpm db:migrate:dev     # Crea y aplica migraciones en desarrollo
+pnpm db:migrate:deploy  # Aplica migraciones existentes en despliegues
+pnpm db:studio          # Abre Prisma Studio
+```
+
+Las credenciales viven únicamente en `apps/api/.env`, excluido de Git. El
+archivo `apps/api/.env.example` contiene las variables requeridas sin secretos.
+
 ## Estado actual
 
-El backend implementa salud HTTP, configuración validada, CORS, cabeceras de seguridad, identificadores de solicitud, errores uniformes y cierre del servidor. No incluye aún base de datos, autenticación, correo ni operaciones comerciales.
+El backend implementa salud HTTP y de PostgreSQL, Prisma centralizado,
+configuración validada, CORS, cabeceras de seguridad, identificadores de
+solicitud, errores uniformes y cierre ordenado de servidor y base de datos. El
+catálogo de productos ya incluye API, validaciones, categorías, marcas, unidades,
+desactivación histórica y existencias derivadas de movimientos confirmados. La
+autenticación, correo y demás operaciones comerciales se agregarán por módulos.
 
 El botón de login conserva el acceso temporal de desarrollo con `VITE_ENABLE_DEMO=true`; no autentica contra Express. Producción lo deshabilita. Los endpoints de negocio aún no implementados responden 404.
 

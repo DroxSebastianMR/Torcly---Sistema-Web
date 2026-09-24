@@ -1,0 +1,1995 @@
+=== PAGE 1 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+Documento de requerimientos de
+software
+Sistema Web Torcly para la Gestión Operativa del GRUPO
+MECATRONIC MC PERU S.A.C.
+Fecha: 17/09/2026 | Versión: 2.6
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 1
+
+=== PAGE 2 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+Tabla de contenido
+Historial de Versiones
+Información del Proyecto
+Aprobaciones
+1. Propósito
+2. Alcance del producto y software
+3. Referencias
+4. Funcionalidades del producto
+5. Clases y características de usuarios
+6. Entorno operativo
+7. Requerimientos funcionales
+8. Reglas de negocio
+9. Requerimientos de interfaces externas
+10. Requerimientos no funcionales
+11. Otros requerimientos
+Historial de Versiones
+Fecha Versión Autor Organización Descripción
+07/09/2026 1.0 Equipo del GRUPO Creación inicial del Documento de
+Proyecto MECATRONIC MC Requerimientos de Software.
+PERU S.A.C.
+17/09/2026 2.6 Equipo del GRUPO Alineación de alcance, requisitos,
+Proyecto MECATRONIC MC reglas e interfaces con Business
+PERU S.A.C. Case V2.6 y Acta V2.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 2
+
+=== PAGE 3 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+Información del Proyecto
+Empresa / Organización GRUPO MECATRONIC MC PERU S.A.C.
+Proyecto Sistema Web Torcly para la Gestión Operativa del GRUPO
+MECATRONIC MC PERU S.A.C.
+Fecha de preparación 07/09/2026
+Cliente Ysabel Quiteros Montoya – Administradora de Tienda /
+Representante de Mecatronic
+Patrocinador principal Jhon Medina – Propietario de Mecatronic
+Gerente / Líder de Proyecto José Manuel Sebastián Mercado Rojas – Líder del Proyecto
+Gerente / Líder de Análisis de Arian Armando Bautista Quezada – Analista de Sistemas
+negocio y requerimientos
+Aprobaciones
+Nombre y Cargo Departamento u Fecha Firma
+Apellido Organización
+Jhon Medina Propietario / GRUPO — __________
+Patrocinador del MECATRONIC
+Proyecto MC PERU S.A.C.
+Ysabel Quiteros Administradora de GRUPO — __________
+Montoya Tienda / MECATRONIC
+Representante del MC PERU S.A.C.
+Cliente
+José Manuel Líder del Proyecto Equipo del — __________
+Sebastián Proyecto
+Mercado Rojas
+Arian Armando Analista de Equipo del — __________
+Bautista Sistemas Proyecto
+Quezada
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 3
+
+=== PAGE 4 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+1. Propósito
+El presente Documento de Requerimientos de Software tiene como propósito especificar los
+requerimientos funcionales y no funcionales correspondientes al Sistema Web Torcly, desarrollado
+para el GRUPO MECATRONIC MC PERU S.A.C. La solución está orientada a centralizar y digitalizar
+los principales procesos administrativos y operativos de la tienda y del taller, actualmente
+gestionados principalmente mediante registros manuales.
+Esta especificación detalla los diez componentes aprobados: clientes y vehículos; productos e
+inventario; servicios automotrices; citas y atenciones; operaciones del taller; ventas y pagos; consulta
+y control operativo; seguridad y control de acceso; BI y analítica operativa; e IA asistencial para
+apoyar la reposición de inventario. Las funciones existentes se desglosan en subapartados para
+facilitar su construcción y pruebas.
+Asimismo, el documento establece las funcionalidades del sistema, los tipos de usuarios y sus
+permisos, las reglas de negocio, las interfaces externas, las condiciones del entorno operativo y los
+requerimientos no funcionales necesarios para orientar las etapas de análisis, diseño, desarrollo,
+pruebas, implementación y validación del software.
+El alcance de esta especificación se limita a las funcionalidades definidas para la Versión 1.0 de
+Torcly. No comprende integraciones con sistemas contables, servicios de facturación electrónica ni
+otras plataformas empresariales externas, de acuerdo con las restricciones establecidas para el
+proyecto.
+2. Alcance del producto / Software
+El Sistema Web Torcly tendrá como objetivo general centralizar y digitalizar los principales procesos
+administrativos y operativos de la tienda y del taller del GRUPO MECATRONIC MC PERU S.A.C.,
+permitiendo gestionar de manera organizada, segura y centralizada la información generada durante
+las operaciones de la empresa.
+El alcance funcional de Torcly V1.0 comprende diez componentes: Gestión de Clientes y Vehículos,
+Gestión de Productos e Inventario, Gestión de Servicios Automotrices, Gestión de Citas y
+Atenciones, Gestión de Operaciones del Taller, Gestión de Ventas y Pagos, Consulta y Control
+Operativo, Seguridad y Control de Acceso, Inteligencia de Negocios (BI) y Analítica Operativa, e
+Inteligencia Artificial para Apoyo a la Gestión de Inventario. La IA generará estimaciones o
+recomendaciones cuando haya datos suficientes; las decisiones de compra, entrada, salida y ajuste
+de stock requerirán siempre la intervención de un usuario autorizado.
+La implementación de estas funcionalidades permitirá reducir la dependencia de registros manuales,
+centralizar la información y mejorar la trazabilidad de las operaciones realizadas por la empresa.
+Asimismo, contribuirá a fortalecer el control del inventario, facilitar el acceso a la información de
+clientes y vehículos, organizar las actividades y atenciones del taller y mejorar el seguimiento de
+ventas, servicios, citas y pagos.
+El alcance se deriva de las metas aprobadas: digitalizar y dar trazabilidad a la operación, controlar
+el inventario y las atenciones, mostrar indicadores operativos correctos y apoyar la planificación de
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 4
+
+=== PAGE 5 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+reposiciones con análisis histórico. Los criterios de BI e IA se verificarán sobre datos registrados y
+válidos de Torcly.
+Torcly V1.0 no incluye integraciones contables, facturación electrónica, servicios tributarios ni otras
+plataformas empresariales externas, ni una aplicación móvil nativa. El registro interno de ventas y
+pagos no equivale a emitir comprobantes electrónicos. Las recomendaciones IA no generan pedidos
+ni movimientos de inventario.
+La carga de datos históricos se limitará a los registros proporcionados por Mecatronic que sean
+legibles, completos y validados antes de su incorporación; si un producto carece de información
+suficiente, la IA deberá indicarlo expresamente.
+Correspondencia del alcance aprobado con los requisitos
+Componente aprobado Sección de requisitos
+Clientes y Vehículos 7.3 y 7.4
+Productos e Inventario 7.5 y 7.6
+Servicios Automotrices 7.12
+Citas y Atenciones 7.8
+Operaciones del Taller 7.10 y 7.11
+Ventas y Pagos 7.7 y 7.9
+Consulta y Control Operativo 7.13
+Seguridad y Control de Acceso 7.1 y 7.2
+BI y Analítica Operativa 7.14
+IA para Apoyo al Inventario 7.15
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 5
+
+=== PAGE 6 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+3. Referencias
+Título Autor Versión Fecha Ubicación
+Business Case Equipo del Proyecto 2.6 17/09/2026 Carpeta del
+Capstone Torcly proyecto
+Acta de Constitución Equipo del Proyecto 2.0 17/09/2026 Carpeta del
+Capstone Torcly proyecto
+Entrevista de Equipo del Proyecto / 1.0 01/09/2026 Archivo digital del
+levantamiento de Ysabel Quiteros proyecto
+información Montoya
+4. Funcionalidades del producto
+El Sistema Web Torcly contará con las siguientes funcionalidades principales:
+1. Gestión de acceso y seguridad del sistema: Permitirá controlar el acceso al sistema de
+acuerdo con los usuarios, roles y permisos establecidos.
+2. Gestión de productos e inventario: Permitirá administrar la información de los productos
+y controlar sus entradas, salidas y existencias disponibles.
+3. Gestión de clientes: Permitirá registrar, actualizar y consultar la información de los clientes
+de la empresa.
+4. Gestión de vehículos: Permitirá registrar y consultar la información de los vehículos
+asociados a los clientes, facilitando su identificación y seguimiento.
+5. Gestión de citas y atenciones: Permitirá registrar, programar, consultar y realizar el
+seguimiento de las citas y atenciones relacionadas con los servicios del taller.
+6. Gestión de operaciones y servicios del taller: Permitirá registrar y realizar el seguimiento
+de los trabajos y servicios efectuados a los vehículos, desde el inicio de la atención hasta su
+finalización.
+7. Gestión del historial de servicios: Permitirá consultar los servicios y trabajos realizados
+anteriormente a cada vehículo, manteniendo la trazabilidad de sus atenciones.
+8. Gestión de ventas: Permitirá registrar y consultar las ventas de productos y servicios
+realizadas por la empresa.
+9. Gestión y control de pagos: Permitirá registrar los pagos asociados a las ventas y
+servicios, incluyendo el medio de pago utilizado y su estado correspondiente.
+10. Consulta y seguimiento de información operativa: Permitirá consultar la información
+registrada en el sistema para facilitar el seguimiento de inventario, clientes, vehículos, citas,
+ventas, pagos y operaciones del taller.
+11. Catálogo de servicios automotrices: permitirá mantener servicios activos, sus
+descripciones y precios de referencia para su selección en citas, atenciones, operaciones y
+ventas.
+12. Inteligencia de Negocios (BI) y Analítica Operativa: permitirá consultar indicadores,
+reportes, filtros y tendencias de inventario, ventas, pagos, servicios, citas y taller basados en
+registros válidos.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 6
+
+=== PAGE 7 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+13. IA para apoyo al inventario: analizará movimientos, ventas y uso de productos en servicios;
+ofrecerá estimaciones y recomendaciones trazables de reposición solo con datos
+suficientes, sin ejecutar acciones transaccionales.
+5. Clases y características de usuarios
+Los usuarios del Sistema Web Torcly se clasifican de acuerdo con las funciones que desempeñan
+dentro del GRUPO MECATRONIC MC PERU S.A.C., las funcionalidades del sistema que utilizan y
+el nivel de acceso requerido para realizar sus actividades.
+5.1. Administrador del sistema / Propietario
+Corresponde al usuario con mayor nivel de acceso dentro de Torcly. Este perfil estará orientado
+principalmente al propietario o responsable autorizado de la empresa.
+Características principales:
+➢ Utiliza el sistema de manera frecuente.
+➢ Posee acceso a la mayor parte de las funcionalidades disponibles.
+➢ Puede consultar información administrativa y operativa de la tienda y del taller.
+➢ Puede supervisar información relacionada con inventario, clientes, vehículos, ventas, pagos,
+citas y servicios.
+➢ Puede administrar usuarios, roles y permisos de acceso, de acuerdo con las reglas
+establecidas para el sistema.
+➢ Puede consultar el estado y seguimiento general de las operaciones registradas.
+Funcionalidades relacionadas:
+➢ Gestión de acceso y seguridad.
+➢ Gestión de productos e inventario.
+➢ Gestión de clientes.
+➢ Gestión de vehículos.
+➢ Gestión de citas y atenciones.
+➢ Gestión de operaciones y servicios del taller.
+➢ Consulta del historial de servicios.
+➢ Gestión de ventas.
+➢ Gestión y control de pagos.
+➢ Consulta y seguimiento de información operativa.
+5.2. Administrador de tienda
+Corresponde al personal responsable de las operaciones administrativas y comerciales de la tienda.
+Será uno de los usuarios que utilizará Torcly con mayor frecuencia durante la jornada laboral.
+Características principales:
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 7
+
+=== PAGE 8 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+➢ Uso frecuente del sistema.
+➢ Registra y consulta información de clientes.
+➢ Registra y consulta vehículos asociados a los clientes.
+➢ Administra productos y movimientos de inventario según los permisos asignados.
+➢ Registra ventas de productos y servicios.
+➢ Registra y consulta pagos y medios de pago.
+➢ Gestiona citas y atenciones relacionadas con los clientes.
+➢ Consulta información necesaria para la atención y seguimiento de las operaciones.
+Funcionalidades relacionadas:
+➢ Gestión de productos e inventario.
+➢ Gestión de clientes.
+➢ Gestión de vehículos.
+➢ Gestión de citas y atenciones.
+➢ Gestión de ventas.
+➢ Gestión y control de pagos.
+➢ Consulta del historial de servicios.
+➢ Consulta y seguimiento de información operativa.
+5.3. Responsable del área técnica / Taller
+Corresponde al usuario encargado de supervisar y coordinar las actividades desarrolladas en el
+taller.
+Características principales:
+➢ Uso frecuente del sistema durante las actividades del taller.
+➢ Consulta información de clientes y vehículos.
+➢ Consulta las citas y atenciones programadas.
+➢ Registra y realiza el seguimiento de los trabajos y servicios efectuados.
+➢ Actualiza el estado de las operaciones del taller.
+➢ Consulta el historial de servicios de los vehículos.
+➢ Puede consultar productos o repuestos relacionados con los trabajos realizados, de acuerdo
+con los permisos asignados.
+Funcionalidades relacionadas:
+➢ Gestión de clientes.
+➢ Gestión de vehículos.
+➢ Gestión de citas y atenciones.
+➢ Gestión de operaciones y servicios del taller.
+➢ Gestión del historial de servicios.
+➢ Consulta de productos e inventario.
+➢ Consulta y seguimiento de información operativa.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 8
+
+=== PAGE 9 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+5.4. Personal técnico del taller
+Comprende a los técnicos mecánicos, técnicos mecatrónicos y demás personal técnico autorizado
+que participa directamente en la ejecución de los servicios del taller.
+Características principales:
+➢ Utiliza principalmente las funcionalidades relacionadas con las operaciones técnicas.
+➢ Consulta la información del vehículo asignado.
+➢ Consulta los servicios o trabajos que deben realizarse.
+➢ Registra o actualiza información relacionada con el avance y ejecución de los trabajos, según
+sus permisos.
+➢ Consultas antecedentes o historial de servicios cuando sea necesario.
+➢ Posee un nivel de acceso restringido a las funciones necesarias para el cumplimiento de sus
+actividades.
+Funcionalidades relacionadas:
+➢ Consulta de clientes y vehículos.
+➢ Gestión de operaciones y servicios del taller.
+➢ Consulta del historial de servicios.
+➢ Consulta de citas y atenciones.
+➢ Consulta de información operativa relacionada con los trabajos asignados.
+Los permisos específicos para cada tipo de usuario serán determinados mediante los roles y niveles
+de acceso definidos en el sistema, aplicando el principio de que cada usuario deberá acceder
+únicamente a las funcionalidades necesarias para desempeñar sus responsabilidades.
+El propietario y la administración podrán consultar indicadores BI y recomendaciones IA según
+permisos. El responsable de taller accederá a indicadores de servicios y operaciones si su perfil lo
+autoriza; el técnico solo visualizará datos vinculados a sus labores. La emisión o consulta de
+recomendaciones no otorga facultades automáticas para realizar compras ni alterar existencias.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 9
+
+=== PAGE 10 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+6. Entorno operativo
+El Sistema Web Torcly funcionará bajo un entorno web de arquitectura cliente-servidor, permitiendo
+que los usuarios autorizados accedan al sistema mediante un navegador web desde los equipos
+utilizados en las áreas administrativas y operativas del GRUPO MECATRONIC MC PERU S.A.C.
+El entorno operativo previsto comprende las siguientes condiciones:
+➢ Tipo de aplicación: Aplicación web.
+➢ Dispositivos principales: laptop administrativa y tablet operativa mediante navegador web;
+lector de códigos de barras USB compatible con entrada de teclado cuando esté disponible.
+➢ Sistema operativo del cliente: equipo y navegador actuales compatibles con el entorno
+web, sin exigir una marca o versión exclusiva del sistema operativo.
+➢ Navegadores web: funcionamiento mediante navegadores modernos y actualizados,
+principalmente Google Chrome y Microsoft Edge.
+➢ Conectividad: acceso mediante conexión de red local o Internet.
+➢ Servidor de aplicación: Torcly requerirá un entorno de servidor encargado de ejecutar la
+aplicación, procesar las solicitudes realizadas por los usuarios y gestionar la comunicación
+con la base de datos.
+➢ Base de datos: repositorio central de datos en el entorno autorizado para Torcly; el producto
+conservará registros transaccionales, fuentes analíticas y resultados de recomendaciones
+con control de acceso. La selección del proveedor de alojamiento se concretará en el diseño
+técnico aprobado.
+➢ Resolución e interfaz: diseño web usable desde laptop y tablet, sin requerir aplicaciones
+móviles nativas.
+➢ Seguridad de acceso: autenticación y permisos por perfil; las comprobaciones de
+autorización también se aplicarán en el servidor.
+➢ Sistemas externos: ninguna integración empresarial con contabilidad, facturación
+electrónica o sistemas tributarios en V1.0; los servicios de infraestructura aprobados para
+alojamiento y base de datos no incorporan funciones de negocio externas.
+7. Requerimientos funcionales
+7.1 Gestión de Autenticación y Acceso
+Descripción: Esta funcionalidad permitirá controlar el ingreso de los usuarios autorizados al sistema
+web Torcly mediante credenciales de acceso, verificando la identidad y el estado de la cuenta antes
+de permitir el uso del sistema.
+Prioridad: Alta
+Acciones iniciadoras y comportamiento esperado
+➢ El usuario accede a la pantalla de inicio de sesión del sistema.
+➢ El sistema muestra los campos requeridos para ingresar las credenciales de acceso.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 10
+
+=== PAGE 11 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+➢ El usuario ingresa sus credenciales y solicita iniciar sesión.
+➢ El sistema verifica que los campos obligatorios hayan sido completados.
+➢ Si existen campos vacíos, el sistema impide continuar e indica cuáles deben completarse.
+➢ El sistema valida que las credenciales correspondan a una cuenta registrada.
+➢ El sistema verifica que la cuenta del usuario se encuentre activa.
+➢ Si las credenciales son incorrectas o la cuenta está inactiva, el sistema rechaza el acceso y
+muestra el mensaje correspondiente.
+➢ Si las validaciones son satisfactorias, el sistema inicia la sesión y habilita las opciones
+correspondientes al rol del usuario.
+➢ Cuando el usuario seleccione cerrar sesión, el sistema finalizará la sesión activa e impedirá
+nuevamente el acceso a las funcionalidades protegidas.
+Requerimientos funcionales:
+ID Nombre Descripción
+RF-
+Mostrar formulario de El sistema deberá mostrar una interfaz para ingresar las
+ACC-
+acceso credenciales requeridas.
+001
+RF-
+Validar campos El sistema deberá verificar que todos los campos requeridos
+ACC-
+obligatorios para iniciar sesión estén completos.
+002
+RF- Cuando exista un campo obligatorio sin completar, el sistema
+Informar campos
+ACC- deberá impedir el inicio de sesión e identificar el campo
+vacíos
+003 pendiente.
+RF-
+El sistema deberá comprobar que las credenciales ingresadas
+ACC- Validar credenciales
+correspondan a una cuenta registrada.
+004
+RF- Rechazar
+Cuando las credenciales sean incorrectas, el sistema deberá
+ACC- credenciales
+impedir el acceso y mostrar un mensaje informativo.
+005 incorrectas
+RF-
+Validar estado de El sistema deberá comprobar que la cuenta se encuentre
+ACC-
+cuenta activa.
+006
+RF-
+Impedir acceso a Cuando una cuenta se encuentre desactivada, el sistema
+ACC-
+usuarios inactivos deberá rechazar el acceso.
+007
+RF-
+Cuando las credenciales sean correctas y la cuenta esté
+ACC- Iniciar sesión
+activa, el sistema deberá iniciar una sesión.
+008
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 11
+
+=== PAGE 12 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+RF- Después del inicio de sesión, el sistema deberá habilitar
+Aplicar permisos de
+ACC- únicamente las opciones permitidas de acuerdo con el rol del
+acceso
+009 usuario.
+RF-
+ACC- Cerrar sesión El sistema deberá permitir cerrar la sesión activa.
+010
+RF- Una vez cerrada la sesión, el sistema deberá impedir el acceso
+Restringir acceso
+ACC- a funcionalidades protegidas hasta que se realice una nueva
+después del cierre
+011 autenticación.
+7.2 Gestión de Usuarios
+Descripción: Esta funcionalidad permitirá administrar las cuentas de las personas autorizadas para
+utilizar Torcly, incluyendo su registro, consulta, actualización, asignación de rol y estado.
+Prioridad: Alta
+Acciones iniciadoras y comportamiento esperado
+➢ Un usuario con permisos administrativos accede al módulo de usuarios.
+➢ El sistema muestra los usuarios registrados y las opciones disponibles para su
+administración.
+➢ El administrador puede seleccionar registrar un nuevo usuario.
+➢ El sistema muestra el formulario correspondiente y el administrador ingresa los datos
+requeridos.
+➢ El administrador selecciona el rol que tendrá la nueva cuenta.
+➢ El sistema valida que los campos obligatorios estén completos y que el identificador de
+acceso no se encuentre registrado previamente.
+➢ Si existen datos inválidos, incompletos o duplicados, el sistema impide el registro e informa
+el motivo.
+➢ Si la información es válida, el sistema crea la cuenta y confirma el registro.
+➢ El administrador puede buscar y seleccionar un usuario existente para consultar su
+información.
+➢ El administrador puede modificar sus datos o cambiar el rol asignado.
+➢ Antes de guardar una actualización, el sistema vuelve a validar la información ingresada.
+➢ El administrador puede desactivar una cuenta cuando está ya no deba acceder al sistema.
+➢ El sistema conserva la información histórica de las operaciones realizadas por el usuario
+desactivado.
+➢ Cuando corresponda, el administrador puede volver a activar una cuenta previamente
+desactivada.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 12
+
+=== PAGE 13 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+Requerimientos funcionales:
+ID Nombre Descripción
+RF-USU- El sistema deberá permitir registrar una nueva cuenta de
+Registrar usuario
+001 usuario.
+RF-USU- Registrar datos del El sistema deberá almacenar la información necesaria para
+002 usuario identificar al usuario.
+RF-USU- Validar campos El sistema deberá impedir el registro cuando existan campos
+003 obligatorios obligatorios incompletos.
+Asignar
+RF-USU- El sistema deberá asociar a cada cuenta un identificador
+identificador de
+004 único utilizado para su autenticación.
+acceso
+RF-USU- Evitar usuarios El sistema deberá impedir que se registren dos cuentas con
+005 duplicados el mismo identificador.
+RF-USU-
+Asignar rol El sistema deberá permitir asignar un rol a cada usuario.
+006
+RF-USU- El sistema deberá impedir guardar una cuenta cuando no
+Validar rol
+007 tenga un rol válido asignado.
+RF-USU-
+Consultar usuarios El sistema deberá mostrar la lista de usuarios registrados.
+008
+RF-USU- El sistema deberá permitir localizar usuarios mediante los
+Buscar usuario
+009 criterios definidos.
+RF-USU- Informar búsquedas Si no existen coincidencias, el sistema deberá mostrar un
+010 sin resultados mensaje indicando que no se encontraron usuarios.
+RF-USU- Consultar detalle de El sistema deberá permitir visualizar la información de una
+011 usuario cuenta seleccionada.
+RF-USU- El sistema deberá permitir modificar la información de una
+Actualizar usuario
+012 cuenta existente.
+RF-USU- El sistema deberá permitir modificar el rol de un usuario
+Modificar rol
+013 cuando el responsable tenga permisos suficientes.
+RF-USU- El sistema deberá permitir desactivar una cuenta sin
+Desactivar usuario
+014 eliminarla físicamente.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 13
+
+=== PAGE 14 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+RF-USU- El sistema deberá permitir reactivar una cuenta previamente
+Activar usuario
+015 desactivada.
+RF-USU- Conservar historial La desactivación de una cuenta no deberá eliminar las
+016 del usuario operaciones realizadas anteriormente por dicho usuario.
+7.3 Gestión de Clientes
+Descripción: Esta funcionalidad permitirá registrar, actualizar, buscar y consultar la información de
+los clientes atendidos por Mecatronic.
+Prioridad: Alta
+Acciones iniciadoras y comportamiento esperado
+➢ El usuario autorizado accede al módulo de clientes.
+➢ El sistema muestra los clientes registrados y las opciones de búsqueda y registro.
+➢ El usuario puede seleccionar registrar un nuevo cliente.
+➢ El sistema solicita el tipo de cliente y los datos correspondientes de identificación y contacto.
+➢ El usuario ingresa los datos requeridos.
+➢ El sistema valida que los campos obligatorios estén completos.
+➢ El sistema verifica que el DNI o RUC tenga un formato válido y que no se encuentre
+registrado previamente.
+➢ Si existen datos incompletos, inválidos o duplicados, el sistema impide guardar el registro e
+informa qué debe corregirse.
+➢ Si la información es válida, el sistema registra al cliente y confirma la operación.
+➢ El usuario puede buscar clientes mediante DNI, RUC, nombre, razón social o número de
+contacto.
+➢ El sistema muestra los registros coincidentes o informa cuando no existan resultados.
+➢ El usuario puede seleccionar un cliente para consultar su información.
+➢ El usuario puede modificar los datos del cliente y el sistema valida nuevamente la
+información antes de guardar los cambios.
+➢ Desde el cliente seleccionado, el usuario puede consultar los vehículos asociados.
+➢ Cuando exista información histórica, el usuario puede acceder a las atenciones y
+operaciones vinculadas al cliente.
+Requerimientos funcionales:
+ID NOMBRE DESCRIPCIÓN
+RF-CLI-001 Registrar cliente El sistema deberá permitir registrar clientes.
+Identificar tipo de El sistema deberá permitir diferenciar entre persona
+RF-CLI-002
+cliente natural y persona jurídica cuando corresponda.
+El sistema deberá permitir registrar el DNI o RUC del
+RF-CLI-003 Registrar documento
+cliente.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 14
+
+=== PAGE 15 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+El sistema deberá verificar que el documento cumpla con
+RF-CLI-004 Validar documento
+el formato definido.
+Evitar documento El sistema deberá impedir registrar un cliente con un DNI
+RF-CLI-005
+duplicado o RUC existente.
+Registrar nombre o El sistema deberá permitir almacenar el nombre del
+RF-CLI-006
+razón social cliente o su razón social.
+El sistema deberá permitir almacenar un número de
+RF-CLI-007 Registrar teléfono
+contacto.
+El sistema deberá rechazar los números de contacto que
+RF-CLI-008 Validar teléfono
+no cumplan con el formato permitido.
+Validar campos El sistema deberá impedir el registro cuando falte
+RF-CLI-009
+obligatorios información obligatoria.
+Buscar cliente por El sistema deberá permitir buscar clientes mediante su
+RF-CLI-010
+documento DNI o RUC.
+Buscar cliente por El sistema deberá permitir buscar clientes mediante su
+RF-CLI-011
+nombre nombre o razón social.
+Buscar cliente por El sistema deberá permitir realizar búsquedas mediante
+RF-CLI-012
+teléfono el número de contacto.
+RF-CLI-013 Mostrar resultados El sistema deberá mostrar las coincidencias encontradas.
+Informar búsqueda sin Cuando no existan coincidencias, el sistema deberá
+RF-CLI-014
+resultados mostrar un mensaje informativo.
+El sistema deberá permitir visualizar la información
+RF-CLI-015 Consultar cliente
+completa del cliente.
+RF-CLI-016 Actualizar cliente El sistema deberá permitir modificar los datos del cliente.
+El sistema deberá aplicar las reglas de validación antes
+RF-CLI-017 Validar actualización
+de guardar las modificaciones.
+Consultar vehículos El sistema deberá mostrar los vehículos relacionados con
+RF-CLI-018
+asociados el cliente.
+Consultar historial de El sistema deberá permitir consultar las operaciones
+RF-CLI-019
+atenciones relacionadas con el cliente.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 15
+
+=== PAGE 16 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+7.4 Gestión de Vehículos
+Descripción: Esta funcionalidad permitirá registrar, consultar y actualizar la información de los
+vehículos atendidos por Mecatronic, incluyendo datos como la placa, marca, modelo, año y
+propietario. Asimismo, permitirá relacionar cada vehículo con su respectivo cliente y consultar su
+historial de servicios.
+Prioridad: Alta
+Acciones iniciadoras y comportamiento esperado
+➢ El usuario autorizado accede al módulo de vehículos.
+➢ El sistema muestra los vehículos registrados y las opciones disponibles.
+➢ El usuario selecciona registrar un nuevo vehículo.
+➢ El usuario busca y selecciona al cliente propietario.
+➢ El sistema muestra el formulario para ingresar los datos del vehículo.
+➢ El usuario registra información como placa, marca, modelo, año y demás datos definidos.
+➢ El sistema verifica que los campos obligatorios estén completos.
+➢ El sistema valida el formato de la placa y comprueba que no exista otro vehículo registrado
+con la misma placa.
+➢ Si se registra un año, el sistema valida que corresponda a un valor permitido.
+➢ Si existe información inválida o duplicada, el sistema impide guardar el vehículo e informa el
+error.
+➢ Si los datos son válidos, el sistema registra el vehículo y lo relaciona con el cliente
+seleccionado.
+➢ El usuario puede buscar vehículos mediante placa o cliente propietario.
+➢ Si no existen coincidencias, el sistema muestra un mensaje informativo.
+➢ El usuario puede consultar y actualizar los datos de un vehículo registrado.
+➢ El usuario puede consultar posteriormente el historial de servicios y operaciones
+relacionados con el vehículo.
+Requerimientos Funcionales:
+ID Nombre Descripción
+RF-VEH-
+Registrar vehículo El sistema deberá permitir registrar un vehículo.
+001
+RF-VEH- El sistema deberá almacenar la placa como identificador
+Registrar placa
+002 principal del vehículo.
+RF-VEH- El sistema deberá comprobar que la placa cumpla con el
+Validar placa
+003 formato definido.
+RF-VEH- Evitar placas El sistema deberá impedir registrar dos vehículos con la
+004 duplicadas misma placa.
+RF-VEH-
+Registrar marca El sistema deberá permitir registrar la marca del vehículo.
+005
+RF-VEH-
+Registrar modelo El sistema deberá permitir registrar el modelo del vehículo.
+006
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 16
+
+=== PAGE 17 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+RF-VEH- El sistema deberá permitir registrar el año del vehículo cuando
+Registrar año
+007 corresponda.
+RF-VEH- El sistema deberá impedir el registro de valores no numéricos
+Validar año
+008 o que se encuentren fuera del rango permitido.
+RF-VEH- El sistema deberá permitir relacionar cada vehículo con un
+Asociar cliente
+009 cliente registrado.
+RF-VEH- El sistema deberá impedir que un vehículo sea asociado con
+Validar cliente
+010 un cliente inexistente.
+RF-VEH- El sistema deberá permitir buscar vehículos mediante su
+Buscar por placa
+011 placa.
+RF-VEH- El sistema deberá permitir consultar los vehículos
+Buscar por cliente
+012 pertenecientes a un cliente.
+RF-VEH- El sistema deberá mostrar la información completa del
+Consultar vehículo
+013 vehículo seleccionado.
+RF-VEH- El sistema deberá permitir modificar los datos de un vehículo
+Actualizar vehículo
+014 registrado.
+RF-VEH- El sistema deberá permitir consultar los servicios y las
+Consultar historial
+015 operaciones asociados con el vehículo.
+RF-VEH- Informar búsqueda Cuando no exista un vehículo coincidente, el sistema deberá
+016 sin resultados mostrar un mensaje informativo.
+7.5 Gestión de Productos
+Para cada producto se almacenarán código, nombre, descripción, categoría, precio y otros
+atributos pertinentes. La existencia disponible se consultará desde los movimientos
+confirmados del inventario; no se editará directamente desde el catálogo. Los productos y
+repuestos deberán poder utilizarse en ventas y operaciones del taller.
+Prioridad: Alta
+Acciones iniciadoras y comportamiento esperado
+➢ El usuario autorizado accede al módulo de productos.
+➢ El sistema muestra los productos registrados y las opciones de búsqueda y mantenimiento.
+➢ El usuario selecciona registrar un nuevo producto.
+➢ El sistema muestra el formulario y el usuario ingresa código, nombre, categoría, marca,
+precio y demás datos requeridos.
+➢ El sistema verifica que los campos obligatorios estén completos.
+➢ El sistema comprueba que el código del producto no haya sido utilizado previamente.
+➢ El sistema valida que el precio y demás campos numéricos contengan valores permitidos.
+➢ Si existe información incompleta, inválida o duplicada, el sistema impide guardar el producto
+e informa qué debe corregirse.
+➢ Si la información es correcta, el sistema registra el producto y confirma la operación.
+➢ El usuario puede buscar productos mediante código, nombre o categoría.
+➢ El sistema muestra los resultados encontrados o informa cuando no existen coincidencias.
+➢ El usuario puede seleccionar un producto para consultar su información.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 17
+
+=== PAGE 18 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+➢ El usuario puede modificar los datos de un producto existente.
+➢ El sistema valida los cambios antes de guardarlos.
+➢ Cuando un producto deje de utilizarse o comercializarse, el usuario autorizado puede
+desactivarlo sin eliminar su información histórica.
+Requerimientos Funcionales:
+ID NOMBRE DESCRIPCIÓN
+Registrar
+RF-PRO-001 El sistema deberá permitir registrar un nuevo producto.
+producto
+Asignar código de
+RF-PRO-002 Cada producto deberá contar con un código identificador.
+producto
+Evitar códigos El sistema deberá impedir registrar dos productos con el
+RF-PRO-003
+duplicados mismo código.
+RF-PRO-004 Registrar nombre El sistema deberá almacenar el nombre del producto.
+Registrar
+RF-PRO-005 El sistema deberá permitir asociar una categoría al producto.
+categoría
+El sistema deberá permitir registrar la marca del producto
+RF-PRO-006 Registrar marca
+cuando corresponda.
+RF-PRO-007 Registrar precio El sistema deberá permitir almacenar el precio del producto.
+El sistema deberá impedir el registro de precios negativos o
+RF-PRO-008 Validar precio
+datos no numéricos.
+Validar campos El sistema deberá impedir guardar productos con información
+RF-PRO-009
+obligatorios obligatoria incompleta.
+Buscar producto El sistema deberá permitir buscar productos mediante su
+RF-PRO-010
+por código código.
+Buscar producto El sistema deberá permitir buscar productos mediante su
+RF-PRO-011
+por nombre nombre.
+Buscar producto El sistema deberá permitir realizar búsquedas de productos
+RF-PRO-012
+por categoría por categoría.
+Consultar El sistema deberá mostrar la información registrada del
+RF-PRO-013
+producto producto seleccionado.
+Actualizar El sistema deberá permitir modificar la información de un
+RF-PRO-014
+producto producto registrado.
+Desactivar El sistema deberá permitir desactivar productos sin eliminar
+RF-PRO-015
+producto los movimientos históricos asociados.
+7.6 Gestión de Inventario
+Descripción: Esta funcionalidad permitirá controlar las existencias y los movimientos de los
+productos registrados en el sistema. Se podrán registrar las entradas y salidas de productos,
+consultar el stock disponible y mantener actualizadas las cantidades almacenadas. Asimismo,
+facilitará el seguimiento de los movimientos relacionados con las compras, ventas y el uso de
+repuestos o materiales en los servicios realizados por Mecatronic.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 18
+
+=== PAGE 19 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+Prioridad: Alta
+Acciones iniciadoras y comportamiento esperado
+➢ El usuario autorizado accede al módulo de inventario.
+➢ El sistema muestra los productos y sus existencias actuales.
+➢ El usuario puede seleccionar un producto para consultar su stock y movimientos.
+➢ Para registrar una entrada, el usuario selecciona el producto e ingresa la cantidad
+correspondiente.
+➢ El sistema verifica que la cantidad sea numérica y mayor que cero.
+➢ Si la cantidad es válida, el sistema registra la entrada y aumenta automáticamente el stock.
+➢ Para registrar una salida, el usuario selecciona el producto e ingresa la cantidad
+correspondiente.
+➢ El sistema valida que la cantidad sea mayor que cero y que exista stock suficiente.
+➢ Si la cantidad solicitada supera las existencias disponibles, el sistema rechaza la salida e
+informa el stock actual.
+➢ Si la salida es válida, el sistema registra el movimiento y reduce automáticamente las
+existencias.
+➢ El usuario puede definir o actualizar el nivel mínimo de stock de cada producto.
+➢ El sistema valida que el stock mínimo no contenga valores negativos.
+➢ Cuando las existencias sean iguales o inferiores al mínimo configurado, el sistema muestra
+una alerta de stock bajo.
+➢ El usuario puede consultar el historial de entradas y salidas realizadas.
+➢ Cada movimiento queda relacionado con su fecha, cantidad, tipo de movimiento y usuario
+responsable.
+➢ Si ocurre un error durante el registro de un movimiento, el sistema evita modificar
+parcialmente las existencias.
+Requerimientos funcionales:
+ID Nombre Descripción
+El sistema deberá mostrar la cantidad disponible de
+RF-INV-001 Consultar stock
+cada producto.
+El sistema deberá permitir establecer las existencias
+RF-INV-002 Registrar stock inicial
+iniciales de cada producto.
+El sistema deberá impedir el registro de cantidades
+RF-INV-003 Validar stock inicial
+negativas como stock inicial.
+El sistema deberá permitir registrar el ingreso de
+RF-INV-004 Registrar entrada
+productos al inventario.
+Validar cantidad de
+RF-INV-005 La cantidad ingresada deberá ser mayor que cero.
+entrada
+Una entrada confirmada deberá aumentar
+RF-INV-006 Incrementar stock
+automáticamente las existencias del producto.
+El sistema deberá permitir registrar la salida de
+RF-INV-007 Registrar salida
+productos del inventario.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 19
+
+=== PAGE 20 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+Validar cantidad de
+RF-INV-008 La cantidad registrada deberá ser mayor que cero.
+salida
+El sistema deberá verificar la disponibilidad de stock
+RF-INV-009 Validar disponibilidad
+antes de confirmar una salida.
+El sistema deberá rechazar una salida cuando la
+RF-INV-010 Impedir stock negativo cantidad solicitada sea superior a las existencias
+disponibles.
+Una salida confirmada deberá disminuir
+RF-INV-011 Reducir stock
+automáticamente las existencias del producto.
+Configurar stock El sistema deberá permitir definir una cantidad mínima
+RF-INV-012
+mínimo de existencias para cada producto.
+El sistema deberá impedir el registro de valores
+RF-INV-013 Validar stock mínimo
+negativos como stock mínimo.
+El sistema deberá informar cuando las existencias sean
+RF-INV-014 Alertar stock bajo
+iguales o inferiores al stock mínimo configurado.
+El sistema deberá mostrar las entradas y salidas
+RF-INV-015 Consultar movimientos
+registradas en el inventario.
+Registrar fecha del Cada movimiento deberá conservar la fecha en la que
+RF-INV-016
+movimiento fue registrado.
+Registrar usuario Cada movimiento deberá guardar la identificación del
+RF-INV-017
+responsable usuario que realizó la operación.
+Evitar movimientos El sistema deberá impedir que una misma operación
+RF-INV-018
+duplicados confirmada genere dos modificaciones en el stock.
+7.7 Gestión de Ventas
+Descripción: Esta funcionalidad permitirá registrar, consultar y administrar las ventas realizadas en
+la tienda de Mecatronic. El sistema permitirá seleccionar al cliente, agregar los productos vendidos,
+indicar sus cantidades y precios, calcular el importe total y registrar el método de pago. Asimismo,
+cada venta actualizará automáticamente las existencias del inventario y conservará la información
+necesaria para su posterior consulta y seguimiento.
+Prioridad: Alta
+Acciones iniciadoras y comportamiento esperado
+➢ El usuario autorizado accede al módulo de ventas y selecciona registrar una nueva venta.
+➢ El sistema crea una nueva operación de venta y le asigna un identificador.
+➢ El usuario puede buscar y asociar un cliente cuando corresponda.
+➢ El usuario busca y selecciona los productos que desea incluir.
+➢ El sistema muestra el precio y disponibilidad del producto seleccionado.
+➢ El usuario ingresa la cantidad requerida.
+➢ El sistema valida que la cantidad sea mayor que cero y que exista stock suficiente.
+➢ Si no existe stock suficiente, el sistema impide agregar esa cantidad e informa las existencias
+disponibles.
+➢ Cuando la cantidad sea válida, el sistema incorpora el producto al detalle de la venta y
+calcula su subtotal.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 20
+
+=== PAGE 21 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+➢ El usuario puede agregar otros productos, modificar cantidades o retirar productos antes de
+confirmar la operación.
+➢ Después de cada modificación, el sistema recalcula automáticamente el importe total.
+➢ El sistema impide confirmar una venta que no contenga productos.
+➢ Cuando el usuario confirma la venta, el sistema realiza una validación final de los datos y del
+stock disponible.
+➢ Si las validaciones son satisfactorias, el sistema registra la venta.
+➢ El sistema genera las salidas correspondientes del inventario por los productos vendidos.
+➢ Si ocurre un error durante la confirmación, el sistema evita registrar parcialmente la venta o
+modificar incorrectamente las existencias.
+➢ La venta queda disponible para su posterior consulta y registro de pago.
+Requerimientos funcionales
+ID NOMBRE DESCRIPCIÓN
+RF-VEN-001 Crear venta El sistema deberá permitir crear una nueva venta.
+Generar código El sistema deberá generar un código único para identificar
+RF-VEN-002
+único cada venta.
+El sistema deberá permitir asociar la venta con un cliente
+RF-VEN-003 Asociar cliente
+cuando corresponda.
+RF-VEN-004 Agregar productos El sistema deberá permitir agregar productos a la venta.
+Ingresar cantidad El sistema deberá permitir ingresar la cantidad requerida de
+RF-VEN-005
+por producto cada producto.
+El sistema deberá impedir el ingreso de cantidades iguales
+RF-VEN-006 Validar cantidades
+o menores que cero.
+Validar stock El sistema deberá verificar la disponibilidad de los
+RF-VEN-007
+disponible productos antes de confirmar la venta.
+Informar stock El sistema deberá mostrar un mensaje cuando el stock
+RF-VEN-008
+insuficiente disponible sea insuficiente.
+Mostrar precio El sistema deberá mostrar el precio unitario de cada
+RF-VEN-009
+unitario producto agregado.
+Calcular subtotal El sistema deberá calcular el subtotal de cada producto
+RF-VEN-010
+por producto según su precio y cantidad.
+El sistema deberá sumar los importes de los productos y
+Calcular total de
+RF-VEN-011 servicios registrados, aplicando las reglas monetarias
+venta
+definidas para la venta.
+Modificar El sistema deberá permitir modificar las cantidades de los
+RF-VEN-012
+cantidades productos antes de confirmar la venta.
+El sistema deberá permitir retirar productos antes de
+RF-VEN-013 Retirar productos
+confirmar la venta.
+El sistema deberá recalcular los importes después de
+RF-VEN-014 Recalcular importes
+modificar las cantidades o retirar productos.
+Validar productos El sistema deberá impedir confirmar una venta sin al menos
+RF-VEN-015
+de la venta un producto o servicio activo incluido.
+El sistema deberá permitir confirmar la venta una vez
+RF-VEN-016 Confirmar venta
+completada la información requerida.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 21
+
+=== PAGE 22 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+Generar salidas de El sistema deberá generar las salidas de inventario
+RF-VEN-017
+inventario correspondientes después de confirmar la venta.
+Evitar doble
+El sistema deberá impedir que una misma venta genere
+RF-VEN-018 descuento del
+más de un descuento en el inventario.
+inventario
+Consultar ventas
+RF-VEN-019 El sistema deberá permitir consultar las ventas registradas.
+registradas
+Consultar detalle de El sistema deberá permitir visualizar la información
+RF-VEN-020
+venta detallada de una venta seleccionada.
+RF-VEN- Agregar El sistema deberá permitir añadir a la venta
+021 servicios servicios activos del catálogo y registrar el precio
+aplicado al confirmar la transacción.
+RF-VEN- Evitar doble Si la venta se origina en una operación del taller,
+022 cobro el sistema deberá vincularla y evitar la
+generación de dos cargos por el mismo servicio.
+RF-VEN- Conservar La actualización posterior del precio del producto
+023 importes o servicio no deberá modificar el importe de una
+históricos venta ya confirmada.
+7.8 Gestión de Citas
+Descripción: Esta funcionalidad permitirá programar y administrar las citas correspondientes a las
+atenciones del taller.
+Prioridad: Alta
+Acciones iniciadoras y comportamiento esperado
+➢ El usuario autorizado accede al módulo de citas.
+➢ El sistema muestra las citas registradas y las opciones disponibles.
+➢ El usuario selecciona registrar una nueva cita.
+➢ El usuario busca y selecciona al cliente que solicita la atención.
+➢ El sistema muestra los vehículos asociados a dicho cliente.
+➢ El usuario selecciona el vehículo que será atendido.
+➢ El usuario ingresa la fecha, hora y motivo de la cita.
+➢ El sistema verifica que los campos obligatorios estén completos y que el vehículo
+corresponda al cliente seleccionado.
+➢ El sistema valida que la fecha sea válida para una nueva cita.
+➢ El sistema verifica la disponibilidad correspondiente al horario solicitado.
+➢ Si existe un conflicto de programación, el sistema informa al usuario y solicita seleccionar
+otra fecha u hora.
+➢ Si los datos son válidos, el sistema registra la cita y establece su estado inicial.
+➢ El usuario puede buscar y consultar citas mediante fecha, cliente o estado.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 22
+
+=== PAGE 23 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+➢ El usuario puede seleccionar una cita para modificar su programación.
+➢ Si se modifica la fecha u hora, el sistema vuelve a validar la disponibilidad.
+➢ El usuario puede cancelar una cita y el sistema conserva el registro histórico de la misma.
+➢ Cuando una cita sea atendida, el sistema permite actualizar su estado y utilizar sus datos
+para iniciar una operación del taller.
+Requerimientos funcionales
+ID Nombre Descripción
+RF-CIT-001 Registrar cita El sistema deberá permitir registrar una nueva cita.
+El sistema deberá permitir asociar un cliente registrado
+RF-CIT-002 Asociar cliente
+con la cita.
+El sistema deberá permitir asociar un vehículo
+RF-CIT-003 Asociar vehículo
+registrado con la cita.
+Validar relación entre El sistema deberá verificar que el vehículo seleccionado
+RF-CIT-004
+cliente y vehículo pertenezca al cliente asociado con la cita.
+El sistema deberá permitir registrar la fecha
+RF-CIT-005 Registrar fecha
+programada para la cita.
+El sistema deberá impedir el registro de fechas
+RF-CIT-006 Validar fecha
+anteriores a la fecha actual para nuevas citas.
+El sistema deberá permitir registrar la hora programada
+RF-CIT-007 Registrar hora
+para la cita.
+Registrar motivo de El sistema deberá permitir registrar el motivo de
+RF-CIT-008
+atención atención indicado para la cita.
+Validar campos El sistema deberá impedir el registro de una cita cuando
+RF-CIT-009
+obligatorios existan campos obligatorios incompletos.
+El sistema deberá comprobar la disponibilidad del
+Validar disponibilidad
+RF-CIT-010 horario de acuerdo con las reglas establecidas por el
+del horario
+taller.
+Advertir conflictos de El sistema deberá mostrar una advertencia cuando
+RF-CIT-011
+programación detecte un conflicto con otra cita programada.
+El sistema deberá permitir consultar las citas
+RF-CIT-012 Consultar citas
+registradas.
+El sistema deberá permitir buscar citas según la fecha
+RF-CIT-013 Buscar citas por fecha
+programada.
+El sistema deberá permitir buscar citas asociadas con
+RF-CIT-014 Buscar citas por cliente
+un cliente.
+El sistema deberá permitir buscar citas según su
+RF-CIT-015 Buscar citas por estado
+estado.
+El sistema deberá permitir modificar la fecha o la hora
+RF-CIT-016 Reprogramar cita
+de una cita registrada.
+Validar disponibilidad El sistema deberá comprobar nuevamente la
+RF-CIT-017 durante la disponibilidad del horario antes de confirmar la
+reprogramación reprogramación.
+RF-CIT-018 Cancelar cita El sistema deberá permitir cancelar una cita registrada.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 23
+
+=== PAGE 24 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+Conservar citas El sistema deberá mantener el registro de las citas
+RF-CIT-019
+canceladas canceladas para su posterior consulta.
+Actualizar estado de la El sistema deberá permitir actualizar el estado de una
+RF-CIT-020
+cita cita de acuerdo con su progreso.
+Generar operación de El sistema deberá permitir utilizar una cita atendida
+RF-CIT-021
+taller como origen para registrar una operación de taller.
+7.9 Gestión de Pagos
+Descripción: Esta funcionalidad permitirá registrar y consultar los pagos asociados a las ventas y
+servicios realizados.
+Prioridad: Alta
+Acciones iniciadoras y comportamiento esperado
+➢ El usuario autorizado accede a la funcionalidad de pagos.
+➢ El usuario selecciona la venta o servicio sobre el cual desea registrar un pago.
+➢ El sistema verifica que la operación exista y muestra su información económica
+correspondiente.
+➢ El usuario ingresa el importe recibido.
+➢ El sistema valida que el valor ingresado sea numérico, mayor que cero y compatible con el
+saldo de la operación.
+➢ Si el importe no es válido, el sistema impide continuar e informa el motivo.
+➢ El usuario selecciona uno de los métodos de pago habilitados por Mecatronic.
+➢ El sistema muestra el resumen del pago antes de su confirmación.
+➢ El usuario confirma la operación.
+➢ El sistema registra el importe, fecha, método utilizado y usuario responsable.
+➢ El sistema actualiza el estado de pago de la venta o servicio.
+➢ Cuando se registre un pago parcial, el sistema calculará y conservará el saldo pendiente de
+la operación.
+➢ Si ocurre un error durante el registro, el sistema evita almacenar información incompleta o
+alterar incorrectamente el estado de la operación.
+➢ El usuario puede consultar posteriormente los pagos registrados y el historial
+correspondiente.
+➢ Los pagos confirmados se conservan para mantener la trazabilidad de las operaciones.
+Requerimientos funcionales
+ID NOMBRE DESCRIPCIÓN
+RF-PAG-001 Registrar pago El sistema deberá permitir registrar un nuevo pago.
+El sistema deberá asociar el pago a una única venta u
+Asociar pago a
+RF-PAG-002 operación de servicio facturable existente y evitar dos saldos
+una operación
+independientes por el mismo servicio.
+Validar operación El sistema deberá impedir el registro de pagos para
+RF-PAG-003
+existente operaciones inexistentes.
+RF-PAG-004 Registrar importe El sistema deberá permitir registrar el importe del pago.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 24
+
+=== PAGE 25 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+El sistema deberá verificar que el importe ingresado sea
+RF-PAG-005 Validar importe
+mayor que cero.
+Rechazar
+El sistema deberá rechazar importes que contengan valores
+RF-PAG-006 importes no
+no numéricos.
+numéricos
+Registrar método El sistema deberá permitir registrar el método utilizado para
+RF-PAG-007
+de pago efectuar el pago.
+Seleccionar El sistema deberá permitir seleccionar entre los métodos de
+RF-PAG-008
+método de pago pago habilitados, como efectivo, Yape, Plin o transferencia.
+Registrar fecha El sistema deberá conservar la fecha en la que se realizó el
+RF-PAG-009
+del pago pago.
+El sistema deberá calcular saldo pendiente como total
+Calcular saldo
+RF-PAG-010 confirmado menos pagos válidos acumulados y rechazar un
+pendiente
+pago superior al saldo.
+Actualizar estado El sistema deberá actualizar el estado del pago de acuerdo
+RF-PAG-011
+del pago con el importe registrado.
+Identificar
+El sistema deberá permitir identificar las operaciones que
+RF-PAG-012 operaciones
+tengan pagos pendientes.
+pendientes
+Identificar
+El sistema deberá permitir identificar las operaciones que
+RF-PAG-013 operaciones
+hayan sido pagadas.
+pagadas
+Consultar pagos
+RF-PAG-014 El sistema deberá permitir consultar los pagos registrados.
+registrados
+Consultar pagos El sistema deberá permitir consultar los pagos asociados con
+RF-PAG-015
+por operación una venta o servicio.
+Registrar usuario El sistema deberá guardar la identificación del usuario
+RF-PAG-016
+responsable responsable de registrar el pago.
+Proteger pagos El sistema deberá impedir la eliminación directa de los pagos
+RF-PAG-017
+confirmados confirmados.
+Cuando se produzca un error durante el registro, el sistema
+Gestionar errores
+RF-PAG-018 deberá informar al usuario e impedir que se guarde un pago
+de registro
+incompleto.
+Los pagos parciales se admiten como registro interno de importes positivos hasta cubrir el saldo; no
+se permitirán sobrepagos. Una operación de servicio se cobrará mediante la venta vinculada cuando
+corresponda, evitando duplicar la cuenta por cobrar.
+7.10 Registro de Operaciones del Taller
+Descripción: Esta funcionalidad permitirá crear y documentar las operaciones correspondientes a
+los vehículos ingresados al taller.
+Prioridad: Alta
+Acciones iniciadoras y comportamiento esperado
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 25
+
+=== PAGE 26 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+➢ El usuario autorizado selecciona registrar una nueva operación del taller.
+➢ El sistema asigna un código único a la atención.
+➢ El usuario busca y selecciona al cliente.
+➢ El usuario selecciona el vehículo correspondiente.
+➢ El sistema verifica la relación entre cliente y vehículo.
+➢ El usuario registra el motivo de ingreso del vehículo.
+➢ El sistema almacena la fecha de ingreso y valida que la información obligatoria esté
+completa.
+➢ Si existen datos faltantes o inconsistentes, el sistema impide completar el registro e informa
+qué debe corregirse.
+➢ El técnico autorizado puede posteriormente registrar el diagnóstico realizado.
+➢ El sistema registra al responsable del diagnóstico.
+➢ El usuario registra los trabajos o servicios recomendados.
+➢ Cuando corresponda, se registra un presupuesto estimado y el sistema valida sus importes.
+➢ Se registra la aprobación o rechazo del cliente respecto al trabajo propuesto.
+➢ Cuando un trabajo requiera autorización, el sistema impide iniciarlo mientras no exista
+aprobación.
+➢ El usuario asigna al técnico responsable de la atención.
+➢ Durante la ejecución del trabajo se registran los servicios efectuados y los repuestos
+utilizados.
+➢ Para cada repuesto, el sistema verifica que exista stock suficiente.
+➢ Una vez confirmado su uso, el sistema genera la salida correspondiente del inventario.
+➢ El usuario puede registrar observaciones técnicas relacionadas con la atención.
+➢ Cuando el trabajo concluya, se registra su finalización y la operación queda disponible para
+el seguimiento, pago y posterior entrega.
+Requerimientos funcionales
+ID NOMBRE DESCRIPCIÓN
+RF-OPE-001 Crear operación de taller El sistema deberá permitir crear una nueva operación de taller.
+El sistema deberá generar un código único para identificar
+RF-OPE-002 Generar código único
+cada operación de taller.
+El sistema deberá permitir asociar un cliente registrado con la
+RF-OPE-003 Asociar cliente
+operación de taller.
+El sistema deberá permitir asociar un vehículo registrado con
+RF-OPE-004 Asociar vehículo
+la operación de taller.
+Validar relación entre El sistema deberá comprobar que el vehículo seleccionado
+RF-OPE-005
+cliente y vehículo pertenezca al cliente asociado con la operación.
+El sistema deberá permitir registrar la fecha de ingreso del
+RF-OPE-006 Registrar fecha de ingreso
+vehículo al taller.
+El sistema deberá permitir registrar el motivo por el cual el
+RF-OPE-007 Registrar motivo de ingreso
+vehículo ingresa al taller.
+Validar campos obligatorios El sistema deberá impedir el registro de la operación cuando
+RF-OPE-008
+de ingreso existan campos obligatorios de ingreso incompletos.
+El sistema deberá permitir registrar el diagnóstico realizado al
+RF-OPE-009 Registrar diagnóstico
+vehículo.
+Registrar responsable del El sistema deberá guardar la identificación del técnico
+RF-OPE-010
+diagnóstico responsable de realizar el diagnóstico.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 26
+
+=== PAGE 27 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+Registrar trabajos El sistema deberá permitir registrar los trabajos recomendados
+RF-OPE-011
+recomendados de acuerdo con el diagnóstico.
+Registrar presupuesto El sistema deberá permitir registrar el presupuesto estimado
+RF-OPE-012
+estimado de los trabajos recomendados.
+Validar importes del El sistema deberá rechazar importes negativos o valores no
+RF-OPE-013
+presupuesto numéricos en el presupuesto.
+Registrar decisión del El sistema deberá permitir registrar la aprobación o el rechazo
+RF-OPE-014
+cliente del presupuesto por parte del cliente.
+El sistema deberá impedir el inicio de los trabajos que
+Validar autorización para
+RF-OPE-015 requieran autorización mientras el presupuesto no esté
+iniciar trabajos
+aprobado.
+Asignar técnico El sistema deberá permitir asignar un técnico responsable a la
+RF-OPE-016
+responsable operación de taller.
+El sistema deberá comprobar que el técnico seleccionado se
+RF-OPE-017 Validar estado del técnico
+encuentre activo.
+Registrar trabajos El sistema deberá permitir registrar los trabajos efectuados en
+RF-OPE-018
+realizados el vehículo.
+Registrar repuestos El sistema deberá permitir registrar los repuestos utilizados
+RF-OPE-019
+utilizados durante los trabajos.
+Validar disponibilidad de El sistema deberá verificar la disponibilidad de los repuestos
+RF-OPE-020
+repuestos antes de confirmar su utilización.
+Validar cantidades de El sistema deberá impedir el registro de cantidades superiores
+RF-OPE-021
+repuestos al stock disponible.
+Generar salida de El sistema deberá generar la salida de inventario
+RF-OPE-022
+inventario correspondiente a los repuestos utilizados.
+Evitar doble descuento de El sistema deberá impedir que un mismo repuesto utilizado
+RF-OPE-023
+inventario genere más de un descuento en el inventario.
+Registrar observaciones El sistema deberá permitir registrar observaciones técnicas
+RF-OPE-024
+técnicas relacionadas con los trabajos realizados.
+Registrar fecha de El sistema deberá permitir registrar la fecha de finalización del
+RF-OPE-025
+finalización trabajo cuando corresponda.
+El sistema deberá vincular el importe del servicio con la venta
+RF-OPE-026 Asociar pago del servicio o cuenta por cobrar correspondiente; no duplicará cobros al
+registrar el pago.
+7.11 Seguimiento de Operaciones del Taller
+Descripción: Esta funcionalidad permitirá consultar y controlar el avance de las operaciones
+registradas en el taller desde el ingreso del vehículo hasta su entrega.
+Prioridad: Alta
+Acciones iniciadoras y comportamiento esperado
+➢ El usuario autorizado accede al módulo de seguimiento de operaciones.
+➢ El sistema muestra las operaciones registradas y su estado actual.
+➢ El usuario puede buscar operaciones mediante código, placa, cliente, fecha o estado.
+➢ El sistema muestra los resultados encontrados o informa cuando no existan coincidencias.
+➢ El usuario selecciona una operación para consultar su información detallada.
+➢ El sistema muestra los datos registrados y el estado actual de la atención.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 27
+
+=== PAGE 28 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+➢ El usuario autorizado puede actualizar el estado según el avance del servicio.
+➢ El sistema verifica que el cambio corresponda a una transición permitida dentro del flujo
+establecido.
+➢ Si el cambio de estado no es válido, el sistema lo rechaza e informa al usuario.
+➢ Si es válido, el sistema actualiza la operación.
+➢ Cada cambio de estado queda registrado con fecha, hora y usuario responsable.
+➢ El sistema conserva los estados anteriores para mantener el historial de seguimiento.
+➢ Cuando los trabajos hayan concluido, el usuario puede marcar la operación como finalizada.
+➢ Antes de finalizarla, el sistema verifica que la información obligatoria esté completa.
+➢ Si existen datos pendientes, el sistema impide finalizar la operación e informa lo que falta
+registrar.
+➢ Cuando el vehículo sea entregado, el usuario registra la entrega y su fecha correspondiente.
+➢ La operación queda conservada dentro del historial del vehículo y del cliente para futuras
+consultas.
+El catálogo de estados y sus transiciones se documentará y validará con la representante de
+Mecatronic durante análisis y diseño, antes de aprobar los casos de prueba; ningún estado podrá
+omitirse sin autorización funcional.
+Requerimientos funcionales
+ID NOMBRE DESCRIPCIÓN
+Consultar operaciones El sistema deberá mostrar las operaciones que aún
+RF-SEG-001
+activas no hayan sido cerradas.
+El sistema deberá mostrar el estado actual de cada
+RF-SEG-002 Consultar estado actual
+operación.
+El sistema deberá permitir modificar el estado de la
+RF-SEG-003 Actualizar estado
+operación según el avance del servicio.
+El sistema deberá impedir cambios de estado que
+RF-SEG-004 Validar transición de estado
+no correspondan con el flujo definido.
+Registrar fecha del cambio El sistema deberá conservar la fecha y hora de
+RF-SEG-005
+de estado cada cambio de estado.
+Registrar responsable del El sistema deberá almacenar la identificación del
+RF-SEG-006
+cambio usuario que realizó el cambio de estado.
+Mantener historial de El sistema deberá conservar los estados anteriores
+RF-SEG-007
+estados de la operación.
+Buscar por código de El sistema deberá permitir buscar una operación
+RF-SEG-008
+operación mediante su código.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 28
+
+=== PAGE 29 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+El sistema deberá permitir buscar operaciones
+RF-SEG-009 Buscar por placa
+mediante la placa del vehículo.
+El sistema deberá permitir buscar las operaciones
+RF-SEG-010 Buscar por cliente
+asociadas con un cliente.
+El sistema deberá permitir buscar operaciones
+RF-SEG-011 Buscar por estado
+según su estado.
+El sistema deberá permitir buscar operaciones
+RF-SEG-012 Buscar por fecha
+según la fecha registrada.
+El sistema deberá mostrar un mensaje cuando no
+Informar búsqueda sin
+RF-SEG-013 existan coincidencias con los criterios de
+resultados
+búsqueda.
+El sistema deberá mostrar el cliente, vehículo,
+Consultar detalle de la
+RF-SEG-014 diagnóstico, trabajo, técnico, repuestos y demás
+operación
+información registrada en la operación.
+El sistema deberá permitir indicar que los trabajos
+RF-SEG-015 Registrar finalización
+de la operación han sido concluidos.
+El sistema deberá impedir la finalización de la
+Validar información antes
+RF-SEG-016 operación cuando falte información definida como
+de finalizar
+obligatoria.
+Registrar entrega del El sistema deberá permitir registrar la entrega del
+RF-SEG-017
+vehículo vehículo al cliente.
+El sistema deberá conservar la fecha en la que el
+RF-SEG-018 Registrar fecha de entrega
+vehículo fue entregado al cliente.
+El sistema deberá conservar cada operación
+Incorporar operación al
+RF-SEG-019 finalizada dentro del historial del vehículo
+historial del vehículo
+correspondiente.
+Incorporar operación al El sistema deberá mantener cada atención
+RF-SEG-020
+historial del cliente relacionada con el cliente correspondiente.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 29
+
+=== PAGE 30 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+7.12 Gestión de Servicios Automotrices
+El catálogo maestro describirá los servicios que el taller ofrece y permitirá reutilizarlos en citas,
+atenciones, órdenes de trabajo y ventas. El catálogo no sustituye el registro de cada ejecución.
+Prioridad: Alta.
+Requerimientos funcionales:
+ID Nombre Descripción
+RF-SER-001 Crear servicio El sistema deberá permitir a un usuario autorizado
+registrar un servicio con código único, nombre y
+descripción.
+RF-SER-002 Definir precio de El sistema deberá permitir registrar un precio de
+referencia referencia no negativo y conservar en cada venta el
+importe acordado al confirmarla.
+RF-SER-003 Consultar y buscar El sistema deberá permitir buscar servicios por código
+o nombre y consultar su descripción, estado y precio
+de referencia.
+RF-SER-004 Actualizar catálogo El sistema deberá permitir actualizar datos del servicio
+sin modificar importes ni descripciones históricas de
+operaciones confirmadas.
+RF-SER-005 Desactivar sin borrar El sistema deberá permitir desactivar servicios y
+historial excluirlos de nuevas selecciones, conservando citas,
+operaciones y ventas históricas.
+RF-SER-006 Vincular con El sistema deberá permitir seleccionar un servicio
+operaciones activo del catálogo al registrar una cita o una
+operación del taller.
+RF-SER-007 Validar datos El sistema deberá rechazar códigos repetidos,
+nombres vacíos y precios de referencia negativos.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 30
+
+=== PAGE 31 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+7.13 Consulta y Control Operativo
+La consulta operativa reúne registros individuales y estados actuales para supervisar el trabajo
+diario. Los indicadores agregados y tendencias corresponden al componente BI.
+Prioridad: Alta.
+Requerimientos funcionales:
+ID Nombre Descripción
+RF-CON-001 Vista de operación El sistema deberá mostrar al usuario autorizado un
+resumen de citas, operaciones de taller, ventas, pagos
+y alertas de stock según sus permisos.
+RF-CON-002 Filtrar registros El sistema deberá permitir filtrar los registros de la
+vista por fecha, estado, cliente o vehículo cuando el
+dato exista.
+RF-CON-003 Ir al detalle El sistema deberá permitir abrir el registro que
+sustenta un resultado sin omitir los controles de
+acceso del módulo de origen.
+RF-CON-004 Mostrar estado El sistema deberá reflejar los estados confirmados de
+actualizado los registros; ningún valor mostrado modificará por sí
+mismo una operación.
+RF-CON-005 Mostrar ausencia de Cuando una consulta no encuentre datos, el sistema
+resultados deberá informar que no hay coincidencias, sin inventar
+registros.
+7.14 Inteligencia de Negocios y Analítica Operativa
+Los paneles BI usarán únicamente datos operativos válidos registrados en Torcly y distinguirán los
+indicadores agregados de las consultas individuales.
+Prioridad: Alta.
+Requerimientos funcionales:
+ID Nombre Descripción
+RF-BI-001 Panel operativo El sistema deberá mostrar indicadores aprobados de
+inventario, ventas, pagos, servicios, citas y
+operaciones del taller a los perfiles autorizados.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 31
+
+=== PAGE 32 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+RF-BI-002 Definir cálculo de KPI Cada indicador de V1.0 deberá documentar fuente,
+fórmula, unidad, periodo y tratamiento de anulaciones
+y registros incompletos antes de su aprobación.
+RF-BI-003 Inventario El sistema deberá mostrar existencias, movimientos,
+productos bajo mínimo y productos de mayor
+movimiento para el periodo seleccionado.
+RF-BI-004 Ventas y pagos El sistema deberá mostrar importes de ventas
+confirmadas, pagos confirmados y saldos pendientes
+sin duplicar operaciones ni sumar pagos anulados.
+RF-BI-005 Servicios y taller El sistema deberá mostrar servicios realizados y
+operaciones por estado y periodo; las citas deberán
+poder contarse por estado.
+RF-BI-006 Filtros y tendencias El sistema deberá filtrar indicadores por rango de
+fechas válido y representar tendencias temporales de
+los indicadores definidos.
+RF-BI-007 Conciliación El sistema deberá permitir consultar los registros de
+origen autorizados que respaldan cada indicador y
+recalcularlo cuando cambien los datos confirmados.
+RF-BI-008 Datos ausentes Cuando no existan registros aplicables, el sistema
+deberá indicar ausencia de datos y no presentar una
+cifra estimada como dato real.
+RF-BI-009 Control de acceso El sistema deberá restringir paneles, filtros y detalles
+conforme al perfil autorizado y la sensibilidad de los
+registros.
+7.15 Inteligencia Artificial para Apoyo a la Gestión de Inventario
+El análisis asistencial utilizará salidas históricas confirmadas procedentes de inventario, ventas y
+uso de productos en servicios. Un mismo consumo se contará una sola vez aunque aparezca
+asociado a más de un registro. El usuario mantiene la decisión sobre reposiciones.
+Prioridad: Alta.
+Requerimientos funcionales:
+ID Nombre Descripción
+RF-IA-001 Construir historial El sistema deberá tomar los movimientos de salida
+válido confirmados, su origen, fecha, producto y cantidad;
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 32
+
+=== PAGE 33 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+excluirá anulaciones y evitará duplicar salidas
+generadas por ventas o servicios.
+RF-IA-002 Verificar elegibilidad Antes de estimar, el sistema deberá comprobar el
+criterio mínimo de datos aprobado por producto,
+expresado en número de observaciones y periodo
+histórico; el criterio y su versión quedarán
+documentados en la configuración validada.
+RF-IA-003 Informar insuficiencia Cuando un producto no cumpla el criterio de
+elegibilidad, el sistema deberá indicar «datos
+insuficientes» y omitir una recomendación
+concluyente.
+RF-IA-004 Analizar consumo Para productos elegibles, el sistema deberá aplicar un
+modelo analítico de estimación sobre frecuencia y
+cantidad de salidas confirmadas y producir una
+recomendación de reposición. La técnica y parámetros
+se documentarán para reproducir el resultado.
+RF-IA-005 Mostrar fundamento Cada resultado deberá indicar producto, stock actual,
+periodo analizado, observaciones usadas, estimación,
+fecha y método o versión del análisis.
+RF-IA-006 Consultar y actualizar El usuario autorizado deberá poder consultar
+resultados previos y ejecutar un nuevo análisis con los
+datos disponibles sin alterar silenciosamente
+resultados anteriores.
+RF-IA-007 Trazar resultado El sistema deberá conservar fecha, usuario o proceso
+iniciador, producto, fuentes consideradas y resultado
+para permitir su revisión posterior.
+RF-IA-008 Evaluar resultados Durante la validación, el equipo deberá contrastar las
+estimaciones con una muestra histórica reservada
+cuando exista; registrará el tamaño y error de la
+muestra, o declarará que no hay datos para esa
+prueba.
+RF-IA-009 Exigir decisión Una recomendación no deberá crear compras,
+humana pedidos, entradas, salidas ni ajustes de stock;
+cualquier acción posterior requerirá la operación
+ordinaria de un usuario autorizado.
+RF-IA-010 Controlar acceso Solo perfiles autorizados podrán ejecutar el análisis y
+consultar las recomendaciones, con respeto a los
+permisos de inventario.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 33
+
+=== PAGE 34 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+8. Reglas de negocio
+Las siguientes reglas de negocio establecen las condiciones y principios que deberán cumplirse
+durante la operación del sistema web Torcly. Estas reglas serán aplicables de manera transversal a
+los requerimientos funcionales definidos y servirán para controlar el acceso, la integridad de la
+información, la ejecución de operaciones y la trazabilidad de las actividades realizadas en
+Mecatronic.
+CÓDIGO REGLA DE NEGOCIO APLICA
+PRINCIPALMENTE A
+RN-001 Solo los usuarios registrados y con una cuenta activa Gestión de Accesos
+podrán acceder al sistema.
+RN-002 Cada usuario podrá realizar únicamente las acciones Accesos / Usuarios / Todo
+autorizadas de acuerdo con el rol que tenga asignado. el sistema
+RN-003 Cada cuenta de usuario deberá contar con un Gestión de Usuarios
+identificador de acceso único dentro del sistema.
+RN-004 La desactivación de un usuario no deberá eliminar las Gestión de Usuarios
+operaciones o registros históricos realizados por este.
+RN-005 Un DNI o RUC no podrá estar asociado simultáneamente Gestión de Clientes
+a más de un cliente registrado.
+RN-006 Los datos obligatorios de un cliente deberán encontrarse Gestión de Clientes
+completos antes de permitir su registro.
+RN-007 Cada vehículo deberá estar asociado a un cliente Gestión de Vehículos
+registrado en el sistema.
+RN-008 La placa deberá ser única para cada vehículo registrado. Gestión de Vehículos
+RN-009 Un vehículo solo podrá ser utilizado en operaciones o Vehículos / Citas /
+citas relacionadas con el cliente al que se encuentra Operaciones
+asociado.
+RN-010 Cada producto deberá contar con un código único dentro Gestión de Productos
+del catálogo de Mecatronic.
+RN-011 Los precios registrados para los productos no podrán ser Gestión de Productos
+valores negativos.
+RN-012 Los productos desactivados deberán conservar su Gestión de Productos
+información y movimientos históricos.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 34
+
+=== PAGE 35 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+RN-013 Las existencias de un producto nunca podrán resultar en Gestión de Inventario
+valores negativos.
+RN-014 Toda entrada o salida de inventario deberá corresponder Gestión de Inventario
+a una cantidad mayor que cero.
+RN-015 Una salida de inventario solo podrá realizarse cuando Gestión de Inventario
+exista una cantidad suficiente del producto solicitado.
+RN-016 Cada movimiento de inventario deberá conservar Gestión de Inventario
+información sobre su tipo, cantidad, fecha y usuario
+responsable.
+RN-017 Un movimiento confirmado deberá modificar las Gestión de Inventario
+existencias una sola vez, evitando duplicidades en el
+stock.
+RN-018 Cada producto podrá tener definido un nivel mínimo de Gestión de Inventario
+existencias que será utilizado para determinar cuándo
+debe generarse una alerta de stock bajo.
+RN-019 Una venta deberá contener al menos un producto o Gestión de Ventas
+servicio activo antes de confirmarse.
+RN-020 La validación de existencias se aplicará a los productos Gestión de Ventas
+físicos incluidos en la venta; los servicios no descuentan
+stock por sí solos.
+RN-021 La confirmación de una venta deberá generar una única Ventas / Inventario
+salida de inventario por cada producto físico vendido,
+evitando duplicar consumos asociados a servicios.
+RN-022 El total de una venta deberá corresponder a la suma de Gestión de Ventas
+importes confirmados de productos y servicios incluidos.
+RN-023 Una cita deberá estar asociada a un cliente registrado y Gestión de Citas
+a un vehículo perteneciente a dicho cliente.
+RN-024 No se podrán registrar nuevas citas para fechas Gestión de Citas
+anteriores a la fecha en que se realiza la programación.
+RN-025 La programación de citas deberá respetar la Gestión de Citas
+disponibilidad y capacidad operativa definida para el
+taller.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 35
+
+=== PAGE 36 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+RN-026 Cuando una cita sea cancelada, su registro deberá Gestión de Citas
+conservarse para mantener el historial de programación.
+RN-027 Todo pago deberá estar asociado a una única obligación Gestión de Pagos
+vigente de venta o servicio; cuando el servicio se facture
+mediante una venta, el pago se imputará a esa venta sin
+crear otra obligación.
+RN-028 El importe registrado para un pago deberá ser mayor que Gestión de Pagos
+cero.
+RN-029 Solo podrán utilizarse métodos de pago habilitados por Gestión de Pagos
+Mecatronic.
+RN-030 Un pago confirmado no deberá eliminarse directamente, Gestión de Pagos
+con el propósito de conservar la trazabilidad financiera
+de la operación.
+RN-031 Cada operación del taller deberá estar asociada a un Registro de Operaciones
+cliente y a uno de sus vehículos registrados.
+RN-032 Cada operación del taller deberá contar con un código Registro de Operaciones
+único que permita identificarla durante todo su ciclo de
+atención.
+RN-033 Los trabajos que requieran aprobación del cliente no Registro de Operaciones
+deberán iniciarse mientras la autorización
+correspondiente no haya sido registrada.
+RN-034 Solo un técnico activo podrá ser asignado como Registro de Operaciones
+responsable de una operación del taller.
+RN-035 Un repuesto utilizado durante un servicio solo podrá Operaciones / Inventario
+registrarse cuando exista stock suficiente.
+RN-036 La utilización confirmada de un repuesto en una Operaciones / Inventario
+operación deberá generar una única salida del
+inventario.
+RN-037 Los estados de una operación deberán modificarse Seguimiento de
+únicamente siguiendo la secuencia de atención definida Operaciones
+por Mecatronic.
+RN-038 Cada cambio de estado de una operación deberá Seguimiento de
+conservar la fecha, hora y usuario responsable del Operaciones
+cambio.
+RN-039 Una operación no podrá marcarse como finalizada Seguimiento de
+mientras existan datos obligatorios del servicio Operaciones
+pendientes de registrar.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 36
+
+=== PAGE 37 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+RN-040 Las operaciones finalizadas deberán conservarse como Seguimiento / Clientes /
+parte del historial del cliente y del vehículo Vehículos
+correspondiente.
+RN-041 Los registros históricos relacionados con ventas, pagos, Todo el sistema
+inventario y operaciones del taller deberán conservarse
+aunque los usuarios, productos u otras entidades
+relacionadas sean posteriormente desactivados.
+RN-042 Las operaciones críticas realizadas en el sistema Todo el sistema
+deberán mantener trazabilidad del usuario responsable y
+de la fecha en que fueron ejecutadas.
+RN-043 Cada servicio activo tendrá código único; su Servicios Automotrices
+desactivación no eliminará las citas, operaciones o
+ventas históricas.
+RN-044 La modificación de precios de catálogo no alterará los Productos / Servicios /
+importes confirmados de transacciones anteriores. Ventas
+RN-045 Un mismo producto consumido por un servicio se Taller / Ventas / Inventario
+descontará una sola vez; su referencia en una venta no
+podrá generar otro movimiento de salida por ese
+consumo.
+RN-046 Los pagos confirmados no podrán exceder el saldo Pagos
+pendiente; los pagos parciales mantendrán saldo hasta
+completar el total.
+RN-047 Un indicador BI se calculará únicamente con registros BI
+confirmados y válidos según su ficha de definición.
+RN-048 El periodo y filtros de BI deberán aplicarse por igual al BI
+indicador y a sus registros de origen.
+RN-049 Los datos analíticos se mostrarán únicamente a perfiles BI / Seguridad
+autorizados y no darán acceso indirecto a registros
+restringidos.
+RN-050 Las salidas generadas por ventas o servicios cuentan IA / Inventario
+una sola vez en el histórico de consumo para IA.
+RN-051 Solo productos que cumplan el criterio mínimo de IA
+observaciones y periodo aprobado podrán recibir
+estimaciones; los demás mostrarán insuficiencia de
+datos.
+RN-052 Las recomendaciones IA son informativas y nunca IA / Inventario
+confirmarán compras, pedidos o movimientos de
+inventario por sí mismas.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 37
+
+=== PAGE 38 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+RN-053 Cada análisis IA conservará fecha, producto, versión del IA / Trazabilidad
+criterio y resultado; una nueva ejecución no reescribirá
+silenciosamente el resultado previo.
+RN-054 Los datos históricos incorporados al sistema deberán ser Datos / BI / IA
+legibles, completos y validados antes de usarse en BI o
+IA.
+9. Requerimientos de interfaces externas
+9.1. Interfaces de usuario
+Mockups:
+1. Inicio de Sesión
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 38
+
+=== PAGE 39 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+2. Gestión de Inventario
+3. Operaciones de taller
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 39
+
+=== PAGE 40 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+4. Seguimiento de Operaciones
+Características de las interfaces
+Tipo de interfaz Características
+Campos de identificación y contraseña oculta, botón Iniciar
+Acceso
+sesión y mensajes de validación.
+Administración de Listado de cuentas y formularios para registrar, actualizar,
+usuarios asignar roles y activar o desactivar usuarios.
+Formularios de registro y actualización, búsquedas y
+Clientes y vehículos
+consulta de vehículos asociados e historial de atenciones.
+Productos e Catálogo de productos, consulta de existencias, alertas de
+inventario stock bajo y registro de entradas y salidas.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 40
+
+=== PAGE 41 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+Selección de productos, cantidades, precios y total de
+Ventas y pagos venta; registro y consulta de pagos asociados a ventas o
+servicios.
+Registro de cliente, vehículo, fecha, hora y motivo;
+Citas
+consulta, reprogramación y cancelación de citas.
+Registro de ingreso, diagnóstico, presupuesto,
+Operaciones del
+autorización, técnico responsable, trabajos y repuestos
+taller
+utilizados.
+Seguimiento de Consulta del estado actual, actualización del avance e
+operaciones historial de cambios de cada atención.
+Servicios Catálogo de servicios activos, precio de referencia,
+automotrices búsqueda y selección en citas, operaciones y ventas.
+Consulta y control Resumen de registros y estados actuales, filtros y
+operativo navegación a detalles según permisos.
+BI y analítica Paneles e indicadores de inventario, ventas, pagos,
+operativa servicios, citas y taller, con filtros y consulta de origen.
+IA para inventario Resultados de estimación y recomendación, datos de
+referencia, fecha y aviso de información insuficiente; sin
+acciones automáticas.
+Estándares de interfaz gráfica y organización
+• Mantener tipografía legible, colores y estilos uniformes, con contraste
+suficiente entre texto y fondo.
+• Organizar las pantallas internas mediante encabezado, menú lateral, título
+del módulo y área principal de contenido.
+• Agrupar los campos relacionados, identificar los obligatorios e indicar los
+formatos requeridos.
+• Presentar los registros en tablas con encabezados descriptivos y los
+criterios de búsqueda correspondientes.
+• Identificar los estados mediante etiquetas de texto, sin depender
+únicamente del color.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 41
+
+=== PAGE 42 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+• Adaptar la distribución al tamaño de pantalla sin ocultar información
+indispensable.
+Estándares para botones y mensajes
+Los botones deberán conservar su denominación, apariencia y ubicación en
+pantallas equivalentes: Registrar para iniciar un registro, Guardar para almacenar
+datos, Buscar para realizar consultas, Cancelar para descartar la edición y Volver
+para regresar a la vista anterior.
+Las confirmaciones deberán identificar la operación, como Confirmar venta o
+Confirmar pago. El sistema mostrará mensajes de validación y resultados, y
+solicitará confirmación antes de ejecutar acciones críticas.
+Funciones comunes
+Todas las pantallas internas mostrarán la identificación del usuario, el módulo
+seleccionado, la navegación autorizada y la opción Cerrar sesión. La pantalla de
+inicio de sesión incluirá únicamente los elementos de autenticación.
+9.2. Interfaces de hardware
+Dispositivos y capacidades
+Dispositivo Características y capacidades
+Laptop administrativa con navegador vigente, teclado y
+Laptop
+dispositivo apuntador; requiere conexión a Internet.
+Dispositivo opcional de entrada tipo teclado para productos,
+Lector de códigos
+con digitación manual alternativa; no requiere integración
+de barras USB
+propia.
+Pantalla táctil, navegador web actualizado y conectividad a
+Tablet operativa
+Internet para las funciones permitidas al perfil.
+Protocolos y conectividad
+Los dispositivos deberán disponer de acceso a Internet mediante Ethernet, Wi-Fi o
+datos móviles, según sus características. La comunicación entre el navegador y el
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 42
+
+=== PAGE 43 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+servidor se realizará mediante HTTPS, con cifrado TLS para proteger los datos
+transmitidos.
+Interacción entre el software y el hardware
+• Entrada de datos: el usuario ingresará información y ejecutará acciones
+mediante teclado, mouse, panel táctil o pantalla táctil.
+• Transmisión: el navegador enviará las solicitudes al servidor utilizando la
+conexión de red del dispositivo.
+• Salida de información: los resultados, registros y mensajes del sistema se
+mostrarán en la pantalla del equipo.
+• Control de dispositivos: la interacción con el hardware será gestionada por
+el navegador y el sistema operativo, sin requerir controladores propios de
+Torcly.
+9.3. Interfaces de software
+El sistema web interactuará con los siguientes componentes de software:
+Componente de
+Interacción con Torcly
+software
+Navegadores web Google Chrome, Microsoft Edge
+Sistema operativo compatible con un navegador web
+Sistemas
+actualizado en laptop o tablet. El proyecto no requiere una
+operativos
+aplicación móvil nativa.
+Interfaz de la Capturará los datos ingresados por el usuario, enviará
+aplicación solicitudes a los servicios de la aplicación y mostrará los
+(frontend) resultados y mensajes correspondientes.
+Servicios de la Procesarán las solicitudes, verificarán la autenticación y los
+aplicación permisos, aplicarán las reglas de negocio y gestionarán el
+(backend) acceso a los datos.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 43
+
+=== PAGE 44 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+Almacenará registros operativos, definición de indicadores,
+Base de datos
+datos de origen y resultados trazables de análisis, conforme
+aprobada
+a la arquitectura autorizada.
+Proporcionará almacenamiento y conexiones cifradas y
+Alojamiento de
+autenticadas en el entorno autorizado durante el diseño
+datos autorizado
+técnico.
+Los componentes seleccionados deberán ser compatibles
+Librerías y con las tecnologías de la aplicación y permitir el intercambio
+componentes de de datos, la gestión de conexiones y el tratamiento de errores.
+conexión Sus nombres y versiones se documentarán al definir la
+arquitectura técnica.
+9.4. Interfaces de comunicación
+Elemento Requerimiento
+Acceso web El navegador se comunicará con el servidor mediante HTTPS
+y requerirá conexión a Internet.
+Formularios Los datos ingresados se enviarán al servidor para su
+electrónicos validación y procesamiento.
+Formato de El intercambio entre la interfaz y los servicios utilizará JSON
+mensajes con codificación UTF-8. Las respuestas indicarán el resultado
+de la solicitud.
+Conexión con El backend accederá al repositorio aprobado mediante
+base de datos conexiones autenticadas y cifradas, sin exponer credenciales
+al navegador.
+Seguridad Las comunicaciones utilizarán cifrado TLS y un certificado
+válido. Las solicitudes protegidas verificarán la sesión y los
+permisos del usuario, sin exponer credenciales.
+Fallas de El sistema informará las interrupciones y no confirmará
+comunicación operaciones sin respuesta; aplicará controles para evitar
+duplicarlas al reintentar.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 44
+
+=== PAGE 45 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+La primera versión no incluirá correo electrónico automatizado, mensajería externa
+ni transferencia de archivos mediante FTP.
+10. Requerimientos no funcionales
+RENDIMIENTO
+RNF-01 El sistema deberá responder a las operaciones de registro, actualización,
+consulta y búsqueda en un tiempo máximo de tres segundos, bajo
+condiciones normales de funcionamiento.
+RNF-02 Los reportes e indicadores BI aprobados deberán mostrarse en un
+máximo de cinco segundos para consultas de 30 días con hasta 10
+usuarios concurrentes durante la prueba de aceptación.
+RNF-03 El sistema deberá atender hasta 10 usuarios simultáneos sin pérdida de
+operaciones confirmadas y mantener los registros y consultas comunes
+en un máximo de tres segundos en el entorno de aceptación.
+DISPONIBILIDAD
+RNF-04 El sistema deberá mantener una disponibilidad mensual mínima del 98 %
+durante el horario de funcionamiento de la empresa, sin considerar los
+mantenimientos programados.
+RNF-05 Los mantenimientos que requieran suspender temporalmente el sistema
+deberán ser comunicados a los usuarios responsables con una
+anticipación mínima de 24 horas.
+RNF-06 Ante una interrupción inesperada, el sistema deberá conservar
+únicamente las operaciones confirmadas, evitando el almacenamiento de
+registros incompletos.
+SEGURIDAD
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 45
+
+=== PAGE 46 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+RNF-07 El sistema deberá solicitar un correo electrónico o nombre de usuario y
+una contraseña válida antes de permitir el acceso a sus funcionalidades.
+RNF-08 Las contraseñas deberán almacenarse mediante un algoritmo seguro de
+cifrado unidireccional y nunca deberán conservarse como texto legible.
+RNF-09 El sistema deberá restringir el acceso a los módulos y operaciones de
+acuerdo con el rol y los permisos asignados a cada usuario.
+RNF-10 El sistema deberá bloquear temporalmente una cuenta durante 15
+minutos después de cinco intentos consecutivos de inicio de sesión
+fallidos.
+RNF-11 El sistema deberá cerrar automáticamente la sesión después de 30
+minutos continuos de inactividad.
+RNF-12 Toda comunicación entre el navegador y el servidor deberá realizarse
+mediante el protocolo HTTPS.
+RNF-13 El sistema deberá validar los datos ingresados antes de procesarlos o
+almacenarlos, evitando registros inválidos y ataques informáticos.
+PRIVACIDAD Y AUDITORÍA
+RNF-14 La información personal de clientes y usuarios deberá ser consultada o
+modificada únicamente por personal autorizado.
+RNF-15 El sistema deberá proteger la confidencialidad de datos de clientes,
+vehículos, inventario, ventas, pagos, servicios, indicadores y
+recomendaciones según el perfil autorizado.
+RNF-16 El sistema deberá registrar las operaciones críticas, indicando como
+mínimo el usuario responsable, la fecha, la hora, la acción ejecutada y el
+registro afectado.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 46
+
+=== PAGE 47 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+RESPALDO Y RECUPERACIÓN
+RNF-17 El sistema deberá disponer de una copia recuperable de la base de datos
+al menos cada 24 horas de operación; su fecha y configuración se
+comprobarán durante la validación.
+RNF-18 Los respaldos se conservarán al menos 30 días en una ubicación
+independiente; su eliminación seguirá una política de retención
+documentada.
+RNF-19 Ante una pérdida o corrupción de datos, el sistema deberá permitir
+restaurar la información utilizando la última copia de seguridad disponible
+en un tiempo máximo de cuatro horas.
+USABILIDAD
+RNF-20 La interfaz deberá utilizar nombres, botones, mensajes e instrucciones
+comprensibles para los usuarios de la empresa.
+RNF-21 El sistema deberá mantener una estructura visual uniforme en todas sus
+pantallas, conservando la apariencia y ubicación de menús, formularios y
+botones equivalentes.
+RNF-22 Cuando se produzca un error o se ingrese información inválida, el sistema
+deberá mostrar un mensaje claro que explique el problema y oriente al
+usuario para corregirlo.
+RNF-23 El sistema deberá solicitar confirmación antes de desactivar registros,
+anular ventas, cancelar citas, corregir pagos u otras operaciones críticas
+y conservar sus historiales.
+COMPATIBILIDAD
+RNF-24 El sistema deberá funcionar correctamente en las dos versiones más
+recientes de Google Chrome, Microsoft Edge y Mozilla Firefox.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 47
+
+=== PAGE 48 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+RNF-25 La interfaz web deberá adaptarse a computadoras portátiles y tablets
+utilizadas por la empresa sin ocultar información indispensable; no
+requiere una aplicación móvil nativa.
+RNF-26 Los campos de productos deberán admitir entrada de lectores de códigos
+de barras USB que actúen como teclado y permitir digitación manual
+alternativa.
+COMPATIBILIDAD Y MATENIBILIDAD
+RNF-27 Las operaciones relacionadas con ventas, pagos, inventario y servicios
+deberán mantener la integridad de la información. Si una parte de la
+operación falla, el sistema deberá revertir todos los cambios relacionados.
+RNF-28 El sistema deberá impedir duplicados de identificador de acceso,
+documentos de cliente, placas vehiculares y códigos de producto o
+servicio según la unicidad de cada entidad.
+RNF-29 El sistema deberá desarrollarse mediante una arquitectura modular que
+mantenga separadas la interfaz de usuario, la lógica de negocio y el
+acceso a los datos.
+RNF-30 El proyecto deberá contar con documentación técnica actualizada sobre
+su arquitectura, base de datos, configuración, instalación y despliegue.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 48
+
+=== PAGE 49 ===
+GRUPO MECATRONIC MC PERU S.A.C.
+10.9 Calidad y trazabilidad analítica
+RNF-31: Cada indicador BI deberá poder reproducirse con sus registros de origen,
+fórmula, periodo y filtros; la validación comparará todos los indicadores aprobados
+para V1.0 con un conjunto de datos de prueba conocido.
+RNF-32: El componente IA deberá registrar su versión de método y criterio de
+elegibilidad. Las pruebas incluirán productos con datos suficientes e insuficientes,
+y verificarán que ninguna recomendación cambie existencias o cree pedidos.
+RNF-33: Las operaciones confirmadas usadas en BI e IA deberán mantener su
+integridad y sello temporal; al corregir o anular un registro, los indicadores se
+actualizarán y los análisis históricos conservarán su referencia a la ejecución
+anterior.
+11. Otros requerimientos
+Datos y entrega: mantener integridad referencial, códigos únicos, relación cliente-vehículo
+y conservación de registros históricos. La carga inicial solo incorporará registros legibles,
+completos y validados por Mecatronic. La solución y sus manuales se entregarán,
+probarán y validarán dentro de las 16 semanas del 22/08 al 11/12/2026; el plan contempla
+fase de pruebas del 21/11 al 04/12 y entrega final el 11/12. Este documento no incorpora
+nuevas integraciones empresariales.
+Aceptación de BI e IA: el 100 % de los indicadores BI aprobados para V1.0 deberá estar
+disponible y conciliar con los registros de origen en el conjunto de prueba. El 100 % de
+productos que cumplan el criterio mínimo aprobado deberá procesarse; los demás
+mostrarán datos insuficientes. Se probará que ninguna recomendación genere compras,
+pedidos o movimientos. Las fichas de indicadores y el criterio de elegibilidad deberán
+validarse en la fase de análisis y diseño antes de ejecutar pruebas.
+GRUPO MECATRONIC MC PERU S.A.C.
+Página 49

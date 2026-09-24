@@ -23,6 +23,12 @@ describe('Base HTTP', () => {
     expect(response.status).toBe(400)
     expect(response.body.error.code).toBe('INVALID_JSON')
   })
+  it('responde validación uniforme en productos', async () => {
+    const response = await request(app).post('/api/v1/products').send({})
+    expect(response.status).toBe(400)
+    expect(response.body.error.code).toBe('VALIDATION_ERROR')
+    expect(response.body.error.fields.length).toBeGreaterThan(0)
+  })
   it('permite el origen de desarrollo', async () => {
     const response = await request(app)
       .get('/api/v1/health')

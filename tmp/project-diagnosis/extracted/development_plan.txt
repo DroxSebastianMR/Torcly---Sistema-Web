@@ -1,0 +1,560 @@
+P: PLAN DE DESARROLLO DEL PROYECTO SOFTWARE
+P: Identificación y control del documento
+P: Este plan organiza la ejecución y el control del Sistema Web Torcly. Integra el alcance funcional, la organización del equipo, las estimaciones, los entregables, el calendario, los riesgos y las dependencias del proyecto. Su aplicación permite coordinar el trabajo técnico y las validaciones de la empresa mediante documentos y evidencias verificables.
+P: Historial de Revisiones
+P: Tabla de Contenido
+P: 1 Introducción	4
+P: 1.1 Alcance del plan	4
+P: 1.2 Documentos relacionados	4
+P: 1.3 Definiciones acrónimos y abreviaturas	5
+P: 1.4 Descripción del plan	6
+P: 2 Entorno y fundamentos	6
+P: 2.1 Antecedentes	6
+P: 2.2 Identificación del problema	7
+P: 3 El proyecto	8
+P: 3.1 Objetivos	8
+P: 3.2 Alcance	8
+P: 3.3 Justificación	9
+P: 3.4 Características y beneficios	9
+P: 3.5 Suposiciones y limitaciones	10
+P: 3.6 Evolución y consistencia del plan	11
+P: 4 Resumen de la metodología	11
+P: 4.1 Organización de los equipos del proyecto	12
+P: 4.1.1 Recursos humanos	12
+P: 4.1.2 Organización de los equipos de trabajo	12
+P: 4.2 Herramientas de desarrollo y colaboración	12
+P: 4.3 Control de cambios	13
+P: 4.4 Actualización del plan y comunicaciones	13
+P: 5 Estructura del trabajo y estimados	13
+P: 5.1 Estimación de costos	17
+P: 6 Entregables del proyecto	17
+P: 7 Calendario del proyecto	18
+P: 7.1 Calendario operativo	18
+P: 7.2 Cronograma e iteraciones	19
+P: 7.3 Comienzo y aprobación de los objetos por fase	19
+P: 8 Manejo de riesgos	20
+P: 9 Planeación de dependencias del proyecto	20
+P: 10 Referencias	21
+P: Anexo A Cronograma detallado de actividades	22
+P: Introducción
+P: Alcance del plan
+P: El Plan de Desarrollo establece los lineamientos para planificar, organizar, ejecutar y controlar el desarrollo del Sistema Web Torcly, incluyendo las actividades de análisis, diseño, construcción, integración, pruebas, implementación y cierre, así como la gestión de cambios, comunicaciones, riesgos, calidad, seguridad y documentación. La solución se implementará como una plataforma web orientada a centralizar y digitalizar los principales procesos administrativos y operativos de la tienda y el taller del GRUPO MECATRONIC MC PERU S.A.C., comprendiendo la gestión de usuarios, clientes, vehículos, productos, inventario, servicios automotrices, citas, operaciones del taller, ventas, pagos, consultas y control de acceso.
+P: El sistema incorporará funciones de Inteligencia de Negocios (BI) mediante indicadores, reportes y paneles de control que permitan analizar las existencias, los movimientos de inventario, las ventas, los pagos, los servicios realizados y el estado de las atenciones. Asimismo, incluirá un componente de Inteligencia Artificial orientado a analizar el comportamiento histórico del inventario, identificar tendencias de consumo y estimar posibles necesidades de reposición. Esta información servirá como apoyo para la toma de decisiones, sin efectuar compras ni modificar existencias automáticamente. El alcance comprende también la integración de los módulos, el despliegue en el entorno autorizado, las pruebas funcionales, la elaboración de manuales, la capacitación de los usuarios y las evidencias requeridas para la validación académica y empresarial.
+P: Documentos relacionados
+P: El siguiente registro identifica los diez documentos de control y soporte del proyecto. Las versiones corresponden a los nombres de los archivos recibidos; las fechas indicadas son las que aparecen en su contenido y no representan fechas de aprobación. Los identificadores permiten citarlos de forma consistente dentro de este plan.
+P: Definiciones acrónimos y abreviaturas
+P: Descripción del plan
+P: Los capítulos 2 y 3 presentan el problema y el proyecto; el capítulo 4 define el método de trabajo y los recursos. Los capítulos 5 a 7 desarrollan las estimaciones, los entregables y el calendario. Los capítulos 8 y 9 establecen la gestión de riesgos y dependencias. El capítulo 10 conserva las referencias académicas y el anexo A reúne las 76 actividades del cronograma para su consulta dentro del plan.
+P: Entorno y fundamentos
+P: Antecedentes
+P: Antecedentes internacionales
+P: Chóez Castro (2026), en su tesis Implementación de un sistema de inventario de repuestos y mantenimiento vehicular en la Cooperativa 13 de diciembre de la parroquia Cascol, presentada en la Universidad Estatal del Sur de Manabí, Ecuador, tuvo como objetivo optimizar la gestión de los repuestos y los servicios de mantenimiento vehicular mediante la implementación de un sistema web. La investigación consideró una población y muestra de 30 clientes, además de una entrevista realizada al propietario para identificar los problemas y requerimientos del negocio. Para el desarrollo se empleó una metodología ágil y se implementaron módulos para gestionar productos, servicios, clientes, proveedores, compras, ventas, órdenes de trabajo e indicadores KPI. Asimismo, se efectuaron pruebas funcionales sobre los principales procesos del sistema. Los resultados señalaron mejoras en la organización de la información, la consulta de existencias y los tiempos de respuesta, aunque el estudio no presentó una comparación cuantitativa antes y después de la implementación. Este antecedente resulta pertinente para Torcly porque integra el control del inventario de repuestos con el mantenimiento vehicular y las operaciones del taller, además de incorporar indicadores que apoyan la toma de decisiones.
+P: Pérez Muriel (2021), en su trabajo de titulación Aplicativo web para la gestión de información del taller mecánico “Frenos Car” ubicado en el cantón Durán, presentado en la Universidad Agraria del Ecuador, implementó un sistema web para mejorar el registro y control de la información de un taller dedicado a la reparación de vehículos y venta de repuestos. La investigación tuvo un enfoque descriptivo-cualitativo, consideró una población aproximada de 150 clientes mensuales y trabajó con una muestra de 108 participantes. La información se recopiló mediante encuestas, entrevistas y observación, mientras que el sistema se desarrolló con la metodología Extreme Programming, utilizando PHP y MySQL. La solución integró los procesos de clientes, vehículos, inventario, proveedores, compras, ventas, servicios, facturación, pagos e informes, y fue evaluada mediante pruebas de caja blanca, caja negra y casos funcionales. Como resultado, se facilitó la consulta de los registros y se mejoró el control de las entradas, salidas y existencias de productos, reemplazando la búsqueda manual en cuadernos y hojas de cálculo. Este antecedente aporta a Torcly una referencia para centralizar la información del taller, controlar el inventario y relacionar los servicios realizados con los clientes y sus vehículos.
+P: Antecedentes nacionales
+P: Adama Zevallos (2023), en su tesis Implementación del sistema web para mejorar la calidad del servicio automotriz en el taller mecánico Multiservicios ADAMA de Tarma, presentada en la Universidad Peruana Los Andes, tuvo como objetivo mejorar la atención al cliente mediante un sistema web. La investigación fue cuantitativa, de nivel explicativo y diseño experimental; consideró una población de 178 usuarios y una muestra de 122 participantes. Para desarrollar el sistema se empleó la metodología RUP y se recolectaron datos mediante encuestas y fichas de observación. Según los resultados reportados, la calidad del servicio automotriz mejoró en un 46 %, la capacidad de respuesta de las atenciones en un 69 % y la satisfacción del cliente en un 22,2 %. Este antecedente resulta relevante para Torcly porque muestra cómo la implementación de un sistema web puede contribuir a mejorar la atención y permite considerar la capacidad de respuesta como un indicador para evaluar los procesos del taller.
+P: Chavez Mijahuanca y Espinoza Alburquerque (2024), en su tesis Sistema con reconocimiento de patrones de matrícula para la gestión de mantenimiento vehicular en un taller automotriz Piura 2024, presentada en la Universidad César Vallejo, buscaron mejorar el registro de historiales de mantenimiento y reducir los errores mediante la identificación automatizada de vehículos. La investigación fue aplicada y experimental, y utilizó encuestas y hojas de observación para evaluar los resultados. Los autores reportaron una mejora del 20 % en la eficiencia operativa, una precisión del 81 % en el reconocimiento de matrículas y una valoración positiva de la usabilidad por parte del 82 % de los usuarios. Este antecedente se relaciona con Torcly por su enfoque en el registro vehicular y la organización del historial de mantenimiento. Su aporte permite sustentar la importancia de mantener información confiable y accesible para el seguimiento de los vehículos, aunque emplea una tecnología de identificación adicional al alcance previsto para Torcly.
+P: Antecedentes locales
+P: Castillo Sánchez (2022), en su tesis Sistema de información vía web para mejorar el control de inventario en la empresa Farmoto E.I.R.L. de Trujillo, presentada en la Universidad César Vallejo, tuvo como objetivo mejorar el manejo del inventario mediante una herramienta informática. La investigación consideró una población de 8 trabajadores y empleó la metodología ICONIX para desarrollar el sistema, utilizando PHP y MySQL. Los resultados mostraron que el tiempo promedio de registro de información de los productos disminuyó de 444,51 segundos a 223,48 segundos, lo que representó una reducción del 49,72 %. Este antecedente resulta pertinente para Torcly porque aborda el control de inventario en una empresa que comercializa repuestos de motocicletas y aporta una referencia concreta para evaluar la reducción de tiempos de registro mediante un sistema web.
+P: Rodríguez Loyola y Neyra Crispin (2023), en su tesis Sistema web para mejorar el control de inventario de la empresa SEPROES–Trujillo, presentada en la Universidad César Vallejo, buscaron mejorar el control de existencias mediante la implementación de un sistema web. La investigación fue aplicada, con enfoque cuantitativo y diseño preexperimental. La población y la muestra estuvieron conformadas por 28 artículos del inventario, y los datos se recopilaron mediante observación y fichas de registro. Según el resumen de la investigación, se reportaron aumentos del 27,32 % en el indicador de entregas a tiempo, del 37,08 % en entregas perfectas y del 32,92 % en exactitud del inventario. Este antecedente aporta a Torcly una referencia para evaluar la precisión de las existencias registradas y comparar el desempeño del control de inventario antes y después de implementar el sistema.
+P: Identificación del problema
+P: GRUPO MECATRONIC MC PERU S.A.C. presenta limitaciones en la gestión y control de sus procesos administrativos y operativos debido a que una parte significativa de la información de la tienda y del taller se registra y consulta mediante cuadernos, registros manuales y medios de comunicación independientes, sin disponer de un sistema de información centralizado que permita integrar las operaciones de la empresa.
+P: Esta situación dificulta mantener información actualizada y relacionada sobre clientes y sus vehículos, consultar historiales de atención, controlar las existencias y movimientos de productos, realizar el seguimiento de los servicios ejecutados en el taller y disponer oportunamente de información asociada a citas, ventas y pagos. Asimismo, la dispersión de los registros incrementa la dependencia del conocimiento del personal para recuperar información y genera riesgos de duplicidad, omisión, inconsistencias y pérdida de trazabilidad de las operaciones.
+P: En consecuencia, la empresa presenta la necesidad de fortalecer la disponibilidad, organización, integridad y trazabilidad de la información utilizada en sus procesos administrativos y operativos, principalmente en la gestión del inventario y el control vehicular, de manera que pueda disponer de información confiable y accesible para el seguimiento de las actividades de la tienda y del taller.
+P: En este contexto, la pregunta de evaluación del proyecto se formula de la siguiente manera: ¿De qué manera influye la implementación del Sistema Web Torcly en la gestión del inventario y el control vehicular de GRUPO MECATRONIC MC PERU S.A.C., Trujillo, durante el año 2026?
+P: Objetivo
+P: Desarrollar e implementar el Sistema Web Torcly para optimizar la gestión de los procesos administrativos y operativos de GRUPO MECATRONIC MC PERU S.A.C., mediante la digitalización, centralización y trazabilidad de la información asociada a clientes, vehículos, productos e inventario, servicios automotrices, citas y atenciones, ventas y pagos, facilitando el control de las operaciones de la tienda y del taller y proporcionando información organizada, actualizada y disponible para los usuarios autorizados.
+P: Alcance
+P: Justificación
+P: En el GRUPO MECATRONIC MC PERU S.A.C., la tienda y el taller registran parte de sus actividades mediante cuadernos, formatos físicos y medios separados. Esta forma de trabajo dificulta consultar información actualizada sobre productos y existencias, relacionar clientes con sus vehículos, recuperar historiales de servicios y seguir citas, trabajos, ventas y pagos. La dispersión de los datos también limita la trazabilidad de las atenciones y la obtención de información consolidada para gestionar las operaciones diarias.
+P: El desarrollo de Torcly responde a esta necesidad mediante una plataforma web que reúne los procesos aprobados para la tienda y el taller. Su uso permitirá registrar las operaciones en un mismo entorno, consultar el estado de las atenciones y controlar los movimientos de inventario según los permisos del usuario. Además, los paneles de Inteligencia de Negocios (BI) presentarán indicadores construidos con los datos registrados; el componente de Inteligencia Artificial (IA) analizará el comportamiento de los productos para apoyar decisiones de reposición cuando exista información suficiente.
+P: La solución busca reducir la dependencia de registros manuales y facilitar el acceso oportuno a información consistente. Las recomendaciones de IA serán informativas: las compras y los cambios de existencias permanecerán bajo decisión de personal autorizado. Los beneficios previstos se comprobarán durante las pruebas y la validación con la empresa, sin presentar mejoras aún no medidas como resultados obtenidos.
+P: Características y beneficios
+P: Las características siguientes corresponden al alcance funcional aprobado para Torcly. Cada beneficio se verificará con los registros y pruebas indicados, según la disponibilidad de datos y el perfil autorizado.
+P: Suposiciones y limitaciones
+P: 2.7.1 Suposiciones
+P: Se consideran las siguientes:
+P: Información operativa: Mecatronic facilitará acceso autorizado a los flujos y registros disponibles de inventario, clientes, vehículos, servicios, citas, ventas, pagos y operaciones del taller para comprender y validar los requerimientos.
+P: Participación y validación: el propietario, la administradora y el personal técnico revisarán procesos, prototipos e incrementos según sus responsabilidades y disponibilidad; el sponsor empresarial resolverá prioridades y dará conformidad a los entregables que le correspondan.
+P: Continuidad de la operación y adopción: la tienda y el taller mantendrán sus actividades durante el proyecto, y los usuarios participarán en la transición gradual de los registros manuales hacia Torcly.
+P: Calidad y disponibilidad de datos: los usuarios registrarán operaciones de manera oportuna y consistente. Los indicadores BI dependerán de registros válidos; la IA solo generará estimaciones para productos que cumplan los criterios mínimos de historial, sin presumir que todos los productos disponen de datos suficientes.
+P: Infraestructura y recursos: la empresa mantendrá equipos y conectividad para utilizar la plataforma web, y los servicios tecnológicos necesarios estarán disponibles durante pruebas, validación y despliegue.
+P: 2.7.2 Limitaciones
+P: Las condiciones siguientes delimitan la ejecución y los resultados que pueden obtenerse en esta versión:
+P: Tiempo de desarrollo: el proyecto se planifica en 16 semanas consecutivas, del 22/08/2026 al 11/12/2026. El plazo académico exige coordinar análisis, construcción, integración, pruebas, validación y entrega; las fechas antiguas del anexo de este Plan deberán reprogramarse antes de considerarse línea base operativa.
+P: Disponibilidad de participantes: las entrevistas, revisiones y validaciones dependerán de las labores cotidianas del propietario, la administradora y los técnicos de Mecatronic.
+P: Información histórica y migración: se incorporarán únicamente registros disponibles, legibles, relevantes y validados. No se contempla digitalizar todo el archivo físico; la insuficiencia de datos podrá impedir recomendaciones de IA para ciertos productos y se señalará al usuario.
+P: Alcance y autonomía: la primera versión se limita a los diez componentes aprobados. La IA servirá de apoyo a la reposición y no ejecutará compras, pedidos, entradas, salidas ni ajustes de stock.
+P: Conectividad e infraestructura: el acceso web depende de Internet y de los equipos disponibles; el proyecto no incluye renovación integral del equipamiento ni servidores físicos propios en el local.
+P: Integraciones externas: quedan fuera las conexiones directas con sistemas contables, facturación electrónica, servicios tributarios y otras plataformas empresariales externas.
+P: Confidencialidad y recursos: las evidencias académicas utilizarán información autorizada, ficticia o anonimizada cuando corresponda. Los recursos se sujetarán al presupuesto referencial y cualquier costo o ampliación adicional requerirá evaluación y autorización.
+P: Evolución y consistencia del plan
+P: El Plan de Desarrollo de Torcly se revisará y actualizará conforme avance el proyecto, tomando como base la información recopilada en Mecatronic y los acuerdos establecidos. Durante el análisis y diseño se precisarán las actividades y estimaciones; durante la construcción se incorporarán los ajustes derivados de la revisión de avances con la empresa; y durante las pruebas e implementación se considerarán las incidencias y los resultados de validación. El líder del proyecto coordinará estas revisiones con el equipo, verificando que los objetivos, el alcance, las actividades, los recursos, los plazos y los entregables mantengan coherencia entre sí y con el Business Case, el Acta de Constitución y los requerimientos. Cada modificación quedará registrada en el historial de revisiones para conservar la trazabilidad de la evolución del plan.
+P: Resumen de la metodología
+P: Organización de los equipos del proyecto
+P: 3.1.1 Recursos humanos
+P: 3.1.2 Organización de los equipos de trabajo
+P: Herramientas de Desarrollo y Colaboración
+P: Control de Cambios
+P: Las solicitudes de cambio de Torcly se registrarán en GitHub Issues con un identificador único, descripción, justificación, solicitante, responsable y estado. El Analista de Sistemas revisará su relación con los requerimientos. Las Programadoras Full-Stack y el Desarrollador Backend, Administrador de Base de Datos evaluarán la viabilidad técnica, el esfuerzo necesario y los componentes afectados. El Líder del Proyecto consolidará la evaluación, verificará el impacto en el alcance, los plazos y los recursos, y presentará la propuesta al Sponsor empresarial, con apoyo de la Responsable Administrativa para la revisión operativa. La decisión quedará registrada antes de iniciar su implementación.
+P: Toda solicitud de cambio será registrada por el Analista de Sistemas y revisada con el equipo técnico para determinar su impacto en los requerimientos, recursos y plazos. El Líder del Proyecto consolidará la evaluación y la remitirá al Sponsor empresarial para su aprobación. Si el cambio es autorizado, se asignará al responsable correspondiente para su implementación. Luego, el Analista verificará el cumplimiento del requerimiento y el Líder presentará la funcionalidad a los representantes de Mecatronic para su validación. La solicitud se cerrará cuando se registren las pruebas realizadas y la aceptación del cliente.
+P: Una vez terminadas las funcionalidades previstas para la entrega, cualquier nuevo requerimiento deberá registrarse para una versión posterior, salvo que el Sponsor empresarial autorice su incorporación. Las correcciones necesarias para la entrega deberán estar relacionadas con una solicitud aprobada. Los commits, mensajes de depuración y solicitudes de integración deberán incluir el identificador del cambio para mantener la trazabilidad.
+P: De la Actualización del Plan de Proyecto
+P: El Plan de Desarrollo del Proyecto Software será actualizado durante la ejecución del proyecto cuando se aprueben cambios que afecten el alcance, requerimientos, actividades, cronograma, entregables, riesgos o responsabilidades. Cada modificación será revisada y registrada manteniendo la trazabilidad y el control de versiones de la documentación del proyecto.
+P: La revisión del plan se realizará semanalmente y cuando se aprueben cambios. Las modificaciones autorizadas serán incorporadas en las secciones y documentos correspondientes, manteniendo la consistencia con el cronograma, la matriz de riesgos, la matriz de comunicaciones y la matriz de responsabilidades. Al cierre del proyecto se realizará la consolidación final de la documentación actualizada.
+P: 4 Estructura del trabajo y estimados
+P: 5 entregables del proyecto
+P: Las fechas siguientes son previstas de terminación o presentación a revisión según CRON-01. La conformidad se registrará por separado mediante actas, observaciones cerradas o evidencias equivalentes.
+P: El plan, las matrices de riesgos, comunicaciones y responsabilidades se mantendrán actualizados durante todo el proyecto. Su revisión se realizará semanalmente y cuando se aprueben cambios, con consolidación final al cierre. Los productos preliminares disponibles no se confunden con sus futuras versiones validadas.
+P: 7 Calendario del proyecto
+P: 7.1 Calendario operativo
+P: El calendario de referencia inicia el lunes 14 de septiembre y finaliza el lunes 21 de diciembre de 2026. Utiliza jornadas de lunes a viernes. Los documentos ya elaborados se consideran insumos de revisión y consolidación; su existencia no permite marcar automáticamente como terminadas todas las actividades de inicio.
+P: 7.2 Cronograma e iteraciones
+P: El anexo A reproduce las 76 actividades con sus fechas y predecesoras. El archivo CRON-01 conserva el detalle de duraciones, costo, estado y Gantt. Los ciclos de trabajo se organizan con la siguiente cadencia prevista:
+P: Los objetivos de cada ciclo se priorizarán en el backlog a partir de las actividades habilitadas por sus predecesoras. El líder comprobará capacidad y carga individual antes de comprometer el trabajo. Las revisiones de fase no sustituyen la revisión y aceptación de cada incremento.
+P: 7.3 Comienzo y aprobación de los objetos por fase
+P: El analista prepara los objetos funcionales; el líder coordina su revisión. El equipo técnico revisa arquitectura y datos. Ysabel valida los procesos administrativos y Jhon los procesos del taller y las decisiones empresariales. La conformidad académica corresponde al docente, según los criterios del curso.
+P: 8 Manejo de riesgos
+P: MR-01 contiene 25 riesgos: 17 de nivel alto y 8 de nivel medio. La valoración utiliza impacto y probabilidad en escala de 1 a 3; su producto determina el nivel: 1–2 bajo, 3–4 medio y 6–9 alto. Esta evaluación inicial se actualizará cuando cambie la exposición o se ejecuten las respuestas.
+P: La asignación específica de cada respuesta se conserva en MR-01. El responsable informará semanalmente su estado, evidencia y bloqueos al líder. Los riesgos que comprometan alcance, disponibilidad o aceptación se comunicarán al sponsor y se actualizarán en las matrices relacionadas.
+P: Además de los 25 riesgos registrados, se revisará la cobertura de disponibilidad del equipo, auditoría de operaciones, rendimiento y acompañamiento del piloto. Estos temas no se presentan como riesgos ya incorporados: su alta y valoración deben quedar registradas en MR-01. El riesgo de calendario se actualizará con la programación conciliada, sustituyendo referencias incompatibles de duración.
+P: 9 Planeación de dependencias del proyecto
+P: Las dependencias internas se gestionarán a partir de CRON-01. El cierre de una tarea predecesora deberá sustentarse en evidencia y no solo en el transcurso de su fecha. La planificación paralela estará condicionada a la disponibilidad de información, componentes y responsables.
+P: No se ha identificado dependencia de la finalización de otro proyecto tecnológico de la empresa, ni otro proyecto cuyo éxito dependa formalmente de Torcly. Las futuras ampliaciones se gestionarán por separado. La disponibilidad de los participantes y la conciliación del calendario académico sí constituyen condiciones necesarias para cumplir el plan.
+P: 10 Referencias
+P: Adama Zevallos, C. B. (2023). Implementación del sistema web para mejorar la calidad del servicio automotriz en el taller mecánico Multiservicios ADAMA de Tarma [Tesis de grado, Universidad Peruana Los Andes]. Repositorio Institucional UPLA. https://repositorio.upla.edu.pe/item/b112e7b3-3f86-4d43-8b8b-5dd3b21bade6
+P: Castillo Sánchez, J. L. (2022). Sistema de información vía web para mejorar el control de inventario en la empresa Farmoto E.I.R.L. de Trujillo [Tesis de grado, Universidad César Vallejo]. Repositorio Institucional UCV. https://repositorio.ucv.edu.pe/handle/20.500.12692/108765
+P: Chavez Mijahuanca, J. H., & Espinoza Alburquerque, C. F. (2024). Sistema con reconocimiento de patrones de matrícula para la gestión de mantenimiento vehicular en un taller automotriz Piura 2024 [Tesis de grado, Universidad César Vallejo]. Repositorio Institucional UCV. https://repositorio.ucv.edu.pe/handle/20.500.12692/164851
+P: Hairol Rizal, M. I., & Omar, N. A. (2026). Car service record system. Applied Information Technology and Computer Science, 7(1), 352–370. https://periodical.uthm.edu.my/index.php/aitcs/article/view/20506/7433
+P: Lau, W. X., & Darman, R. (2025). The development of car workshop inventory management system for Thompson Auto Service Centre. Applied Information Technology and Computer Science, 6(1), 82–99. http://periodical.uthm.edu.my/index.php/aitcs/article/view/16445/6289
+P: Rodríguez Loyola, J. A., & Neyra Crispin, N. A. O. (2023). Sistema web para mejorar el control de inventario de la empresa SEPROES-Trujillo [Tesis de grado, Universidad César Vallejo]. Repositorio Institucional UCV. https://repositorio.ucv.edu.pe/handle/20.500.12692/125993
+P: Documentación interna del proyecto: BC-01, AC-01, SRS-01, EA-01, MC-01, CRON-01, COM-01, MR-01 y RACI-01, identificados en la sección 1.2.
+
+=== TABLE 1 ===
+ELABORÓ | REVISÓ | AUTORIZÓ
+José Manuel Sebastian Mercado Rojas Líder del Proyecto, con aportes del Equipo Capstone | Arian Armando Bautista Quezada Revisión de coherencia documental y requerimientos | Jhon Medina Propietario y sponsor empresarial
+Actualización documental: 12/09/2026 | Revisión prevista: pendiente de constancia | Autorización prevista: pendiente de conformidad
+Firma: __________________ | Firma: __________________ | Firma: __________________
+
+=== TABLE 2 ===
+Campo | Detalle
+Código documental | D-ACA002
+Identificador del proyecto | G-01
+Versión del plan | 1.4
+Fecha de actualización | 12/09/2026
+Cliente | GRUPO MECATRONIC MC PERU S.A.C. — RUC 20611339527
+Responsable del mantenimiento | José Manuel Sebastian Mercado Rojas — Líder del Proyecto
+Referencia temporal | Cronograma - Capstone V2.5.xlsx, hoja Gantt Ágil
+Estado de aprobación | Actualización preparada para revisión y conformidad
+
+=== TABLE 3 ===
+VERSIÓN | FECHA | AUTOR | DESCRIPCIÓN
+1.3 | No consignada en el control interno | Equipo del Proyecto Torcly | Versión recibida del plan. Contiene el alcance y la organización inicial; conserva campos de plantilla y apartados de planificación incompletos.
+1.4 | 12/09/2026 | José Manuel Sebastian Mercado Rojas Coordinación del Equipo Capstone | Integración de documentos, corrección de identificación y numeración, actualización del índice y desarrollo de estimaciones, entregables, calendario, aprobaciones previstas, riesgos y dependencias.
+
+=== TABLE 4 ===
+Documentos | Fecha de referencia | Organización | Identificador del documento
+Business_Case_Capstone_V2.6(4).pdf | Versión de referencia recibida para esta actualización | Equipo Capstone / Mecatronic | BC-01 · V2.6
+Acta_Constitucion - Capstone V2(4).pdf | Versión de referencia recibida para esta actualización | Equipo Capstone / Mecatronic | AC-01 · V2
+Documento_Requerimientos_Torcly_V2.6(2).pdf | Versión de referencia recibida para esta actualización | Equipo Capstone / Mecatronic | SRS-01 · V2.6
+Estructura_de_Analisis_Torcly v2.2.pdf | Versión de referencia recibida para esta actualización | Equipo Capstone / UPN | EA-01 · V2.2
+Matriz de consistencia Experimental V1.5.docx.pdf | 2026; sin día de emisión | Equipo Capstone / UPN | MC-01 · V1.5
+Cronograma - Capstone V2.5.xlsx | 14/09/2026 a 21/12/2026, período planificado | Equipo Capstone | CRON-01 · V2.5
+Matriz de Comunicaciones V1.0.xlsx | Sin fecha de emisión; incluye fechas por comunicación | Equipo Capstone / Mecatronic | COM-01 · V1.0
+Matriz de Riesgos - Torcly.xlsx | 01/09/2026 a 21/11/2026, período de cabecera | Equipo Capstone | MR-01 · Sin versión interna declarada
+Matriz_de_Responsabilidades V1.0.xlsx | Sin fecha interna de emisión | Equipo Capstone / Mecatronic | RACI-01 · V1.0
+Plan de Desarrollo del Proyecto Software | 12/09/2026, actualización actual | Equipo Capstone | D-ACA002 · V1.4
+
+=== TABLE 5 ===
+Término o acrónimo | Definición
+EDT | Estructura de Desglose del Trabajo: organización jerárquica del trabajo y los entregables del proyecto.
+SRS | Especificación de requerimientos de software: funcionalidades, reglas de negocio y condiciones de calidad.
+RACI | R ejecuta; A aprueba; C es consultado; I es informado. R/A combina ejecución y aprobación interna cuando así lo establece la matriz.
+Sprint | Período de trabajo de duración fija utilizado para desarrollar y revisar un incremento.
+Backlog | Lista ordenada de funcionalidades, ajustes y tareas pendientes del producto.
+Incremento | Conjunto integrado y verificable de funcionalidades que cumple los criterios de terminación acordados.
+Hito | Punto de control que acredita un resultado o una decisión de aprobación.
+Línea base | Versión de alcance, fechas o costos formalmente aprobada y utilizada para controlar cambios.
+KPI | Indicador que permite evaluar el cumplimiento de objetivos y el desempeño de un proceso.
+Frontend y backend | Interfaz web del usuario y servicios que aplican las reglas de negocio y gestionan los datos.
+SGBD y ORM | Sistema gestor de bases de datos y herramienta de correspondencia entre los objetos de la aplicación y los datos persistidos.
+Trazabilidad | Relación verificable entre requerimientos, actividades, código, pruebas, cambios y entregables.
+
+=== TABLE 6 ===
+En el Alcance | Fuera del Alcance
+Gestión de clientes y vehículos: registro, actualización, consulta y búsqueda de clientes; asociación de vehículos con sus propietarios e historial de atenciones. | Desarrollo de una aplicación móvil nativa para Android o iOS. Torcly será implementado como plataforma web.
+Gestión de productos e inventario: registro y administración de productos, categorías y demás datos requeridos; control de existencias, entradas, salidas y movimientos de inventario. | Integración directa con sistemas contables, ERP u otras plataformas empresariales externas.
+Gestión de operaciones del taller: registro del ingreso del vehículo, diagnóstico, trabajos requeridos, técnico responsable, productos o repuestos utilizados, estados de atención y finalización/entrega. | Integración con plataformas externas de facturación electrónica o envío automático de comprobantes a SUNAT.
+Gestión de servicios automotrices: definición y registro de los servicios prestados y asociación de estos con las atenciones realizadas a los vehículos. | Automatización física o electrónica de las actividades mecánicas realizadas sobre los vehículos.
+Gestión de citas y atenciones: registro, modificación, consulta y seguimiento de citas asociadas con clientes y vehículos, considerando fecha, hora y estado. | Implementación de reservas públicas mediante una aplicación móvil independiente o plataformas externas de reservas.
+Gestión de ventas y pagos: registro de ventas de productos y servicios, importes y medios de pago utilizados por la empresa, incluyendo pagos mediante más de un medio cuando corresponda. | Integración automática con entidades bancarias, Yape, Plin, POS o pasarelas de pago. Los medios de pago serán registrados en Torcly como parte de la operación.
+Consulta y control operativo: búsqueda y consulta de información relacionada con clientes, vehículos, inventario, atenciones, ventas y demás operaciones incorporadas al sistema. | Desarrollo de módulos especializados de contabilidad, planillas, recursos humanos, tributación o gestión financiera empresarial.
+Seguridad y control de acceso: autenticación, usuarios autorizados y restricciones de acceso a las funcionalidades según las responsabilidades definidas para la operación del sistema. | Implementación de infraestructura empresarial de alta disponibilidad, servidores físicos propios o renovación integral del equipamiento tecnológico de la empresa.
+Migración inicial limitada: incorporación de información existente únicamente cuando los registros estén disponibles, sean legibles, relevantes y hayan sido validados. | Digitalización, depuración o migración completa de la totalidad de registros históricos físicos de la empresa.
+Implementación del sistema web: integración de los módulos, pruebas funcionales, validación, despliegue y entrega de documentación técnica y de usuario. | Funcionalidades adicionales no aprobadas dentro de los requerimientos y alcance de la versión inicial; su incorporación requerirá evaluación y control de cambios.
+Inteligencia de Negocios (BI) y Analítica Operativa: indicadores, reportes, filtros y tendencias derivados de información válida registrada en Torcly. | Integración de fuentes analíticas externas no aprobadas para la versión inicial.
+Inteligencia Artificial para Apoyo a la Gestión de Inventario: análisis histórico y recomendaciones de reposición cuando existan datos suficientes. | Compras, pedidos, entradas, salidas o ajustes de existencias ejecutados automáticamente por la IA; aplicaciones de IA a otros procesos.
+
+=== TABLE 7 ===
+Característica | Beneficio esperado y evidencia
+Información centralizada | Consulta relacionada de clientes, vehículos, productos y atenciones; evidencia mediante pruebas y registros del sistema.
+Inventario integrado | Control de movimientos y existencias; contraste entre stock físico y digital.
+Seguimiento vehicular | Identificación por placa, estado e historial; verificación de integridad de registros.
+Operaciones y pagos relacionados | Seguimiento de órdenes, consumos, ventas y pagos; pruebas de flujos completos.
+Seguridad y trazabilidad | Acceso por permisos y registro de operaciones críticas; pruebas por perfil y revisión de auditoría.
+Servicios automotrices, citas y taller | Catálogo de servicios, programación y seguimiento de la atención desde el ingreso hasta el cierre; evidencia mediante casos funcionales y registros relacionados.
+BI y analítica operativa | Indicadores, filtros, tendencias y reportes de inventario, ventas, pagos, servicios, citas y operaciones del taller; contraste de cálculos con registros válidos de Torcly y permisos de consulta.
+IA para reposición de inventario | Estimaciones o recomendaciones informativas para productos con datos históricos suficientes; verificación de criterios de elegibilidad, aviso ante insuficiencia de datos y ausencia de compras o movimientos automáticos.
+
+=== TABLE 8 ===
+Necesidad | Recurso | Cant. | Estado | Comentarios y responsabilidades
+Administración del proyecto | José Manuel Sebastian Mercado Rojas | 25 horas | Disponible | Coordinar al equipo; asignar actividades; supervisar avances; controlar el cronograma; gestionar las revisiones con la empresa.
+Análisis de requerimientos | Arian Armando Bautista Quezada | 25 horas | Disponible | Especificar requerimientos; documentar reglas de negocio; modelar procesos; mantener la trazabilidad; verificar el cumplimiento funcional.
+Desarrollo del sistema web | Brenda Ormeño Bocanegra/ Carmen Katerin Vega Meza | 26 horas | Disponible | Desarrollar interfaces web; implementar servicios backend de los módulos asignados; integrar funcionalidades; ejecutar pruebas; corregir errores.
+Desarrollo backend, administración de base de datos | Piero Ramírez Alva | 26 horas | Disponible | Diseñar la base de datos; administrar su estructura; implementar servicios backend asignados; asegurar la integridad de los datos; optimizar consultas.
+Consultoría del negocio | Jhon Medina/ Ysabel Quiteros Montoya | Según sesiones acordadas | Según coordinación | Aclarar procesos del negocio; revisar avances; validar funcionalidades; comunicar observaciones sobre la operación de la tienda y del taller.
+
+=== TABLE 9 ===
+Nombre | Cargo
+José Manuel Sebastian Mercado Rojas | Líder del Proyecto
+Arian Armando Bautista Quezada | Analista de Sistemas
+Brenda Gabriela Ormeño Bocanegra | Programadora Full-Stack
+Piero Ramírez Alva | Administrador de Base de Datos, Desarrollador Backend
+Carmen Katerin Vega Meza | Programadora Full-Stack
+
+=== TABLE 10 ===
+Herramienta | Fuente | Versión | Cantidad | Estado | Comentarios
+Equipos de cómputo | Equipo Capstone | No aplica | 5 | Disponibles | Desarrollo, pruebas y documentación.
+Visual Studio Code | Microsoft | CONFRIMAR | 5 instalaciones | Previsto en el plan | Editor de desarrollo.
+React y Vite | Proyectos de código abierto | CONFRIMAR | 1 frontend | Definidos en el plan | Interfaz web y construcción de la aplicación.
+Tailwind CSS y shadcn/ui | Proyectos de código abierto | CONFRIMAR | Según proyecto | Definidos en el plan | Estilos y componentes de interfaz.
+Node.js y Express | Proyectos de código abierto | CONFRIMAR | 1 backend | Definidos en el plan | Servicios de aplicación y reglas de negocio.
+PostgreSQL y Supabase | PostgreSQL / Supabase | CONFRIMAR | Según ambientes | Definidos | Persistencia e integridad de los datos.
+Prisma ORM | Proyecto Prisma | CONFRIMAR | 1 configuración | Definido en el plan | Acceso a datos y migraciones.
+Git y GitHub | Git / GitHub | CONFRIMAR | Repositorios del proyecto | Previstos | Versiones, revisión de código y trazabilidad.
+Figma | Figma | CONFRIMAR | 1 proyecto | Previsto | Prototipos y revisión de interfaces.
+Postman | Postman |  | 1 colección compartida | Previsto | Pruebas de servicios y contratos de API.
+Documentos y hojas de cálculo | Equipo Capstone | No aplica | Carpeta del proyecto | En uso documental | Control de versiones de planes y matrices.
+
+=== TABLE 11 ===
+CARGO | RESPONSABLE | PARTICIPACIÓN EN EL CONTROL DE CAMBIOS
+Analista de Sistemas | Arian Armando Bautista Quezada | Registrar la solicitud; analizar los requerimientos afectados; actualizar la documentación aprobada.
+Programadoras Full-Stack | Brenda Gabriela Ormeño Bocanegra / Carmen Katerin Vega Meza | Evaluar el impacto en los módulos asignados; estimar el esfuerzo; implementar cambios autorizados; ejecutar pruebas.
+Desarrollador Backend, Administrador de Base de Datos | Piero Ramírez Alva | Evaluar el impacto en los servicios backend, estructura de datos e integridad de la información; implementar ajustes autorizados; verificar su funcionamiento.
+Líder del Proyecto | José Manuel Sebastian Mercado Rojas | Consolidar la evaluación; coordinar la aprobación; asignar actividades; supervisar la implementación; presentar el resultado al cliente.
+Responsable Administrativa | Ysabel Ines Quiteros Montoya | Revisar el efecto en los procesos administrativos; comunicar observaciones; participar en la validación operativa.
+Sponsor empresarial | Jhon Medina | Aprobar o rechazar los cambios que afecten los compromisos del proyecto; confirmar la aceptación empresarial del resultado.
+
+=== TABLE 12 ===
+PASO | ENTREGABLE EDT Y TRABAJO NECESARIO | HORAS PERSONA
+0 | SISTEMA WEB TORCLY PARA LA GESTIÓN OPERATIVA DEL GRUPO MECATRONIC MC PERU S.A.C. | 1683 h
+1 | 1 GESTIÓN DEL PROYECTO | 100 h
+1.1 | 1.1 Formalización del Proyecto | 28 h
+1.1 | 1.1.1Documentación Fundacional | 28 h
+1.1.01 | 1.1.1.1 Revisar y formalizar: Business Case aprobado | 8 h
+1.1.02 | 1.1.1.2 Revisar y formalizar: Acta de Constitución aprobada | 8 h
+1.1.03 | 1.1.1.3 Elaborar y validar: Registro de Stakeholders validado | 6 h
+1.1.04 | 1.1.1.4 Revisar y formalizar: Alcance base aprobado | 6 h
+1.2.A–C | 1.2 Planificación del Proyecto | 72 h
+1.2.A | 1.2.1 Línea Base de Planificación | 30 h
+1.2.A.01 | 1.2.1.1 Elaborar y validar: EDT del proyecto | 6 h
+1.2.A.02 | 1.2.1.2 Elaborar y validar: Diccionario EDT | 10 h
+1.2.A.03 | 1.2.1.3 Elaborar y validar: Cronograma de 16 semanas | 10 h
+1.2.A.04 | 1.2.1.4 Elaborar y validar: Hitos del proyecto | 4 h
+1.2.B | 1.2.2 Gestión Organizacional | 22 h
+1.2.B.01 | 1.2.2.1 Elaborar y validar: Matriz RACI | 8 h
+1.2.B.02 | 1.2.2.2 Elaborar y validar: Matriz de comunicaciones | 8 h
+1.2.B.03 | 1.2.2.3 Elaborar y validar: Organización del equipo | 6 h
+1.2.C | 1.2.3 Gestión de Riesgos | 20 h
+1.2.C.01 | 1.2.3.1 Elaborar y validar: Matriz de riesgos | 10 h
+1.2.C.02 | 1.2.3.2 Elaborar y validar: Planes de respuesta | 10 h
+2 | 2 ANÁLISIS Y DISEÑO DE LA SOLUCIÓN | 195 h
+2.1 | 2.2 Modelamiento Funcional | 27 h
+2.1 | 2.2.1 Procesos de Negocio | 27 h
+2.1.01 | 2.2.1.1 Diseñar y validar: Modelo de procesos de tienda | 9 h
+2.1.02 | 2.2.1.2 Diseñar y validar: Modelo de procesos del taller | 9 h
+2.1.03 | 2.2.1.3 Diseñar y validar: Diagramas de casos de uso | 9 h
+2.2.A | 2.1 Especificación Funcional | 43 h
+2.2.A | 2.1.1 Requerimientos del Sistema | 43 h
+2.2.A.01 | 2.1.1.1 Diseñar y validar: Documento SRS V2.6 validado | 16 h
+2.2.A.02 | 2.1.1.2 Diseñar y validar: Reglas de negocio consolidadas | 9 h
+2.2.A.03 | 2.1.1.3 Diseñar y validar: Requerimientos no funcionales | 9 h
+2.2.A.04 | 2.1.1.4 Diseñar y validar: Matriz de trazabilidad | 9 h
+2.2.B | 2.3 Diseño de Arquitectura | 42 h
+2.2.B | 2.3.1 Arquitectura de Software | Σ 42 h
+2.2.B.01 | 2.3.1.1 Diseñar y validar: Arquitectura Frontend | 9 h
+2.2.B.02 | 2.3.1.2 Diseñar y validar: Arquitectura Backend | 12 h
+2.2.B.03 | 2.3.1.3 Diseñar y validar: Arquitectura de datos | 12 h
+2.2.B.04 | 2.3.1.4 Diseñar y validar: Arquitectura de despliegue | 9 h
+2.2.C | 2.4 Diseño de Datos | 45 h
+2.2.C | 2.4.1 Modelo de Información | 45 h
+2.2.C.01 | 2.4.1.1 Diseñar y validar: Modelo entidad-relación | 12 h
+2.2.C.02 | 2.4.1.2 Diseñar y validar: Modelo lógico | 12 h
+2.2.C.03 | 2.4.1.3 Diseñar y validar: Modelo físico | 12 h
+2.2.C.04 | 2.4.1.4 Diseñar y validar: Diccionario de datos | 9 h
+2.2.D | 2.5 Diseño UI/UX | 38 h
+2.2.D | 2.5.1 Prototipo del Sistema | 38 h
+2.2.D.01 | 2.5.1.1 Diseñar y validar: Mapa de navegación | 9 h
+2.2.D.02 | 2.5.1.2 Diseñar y validar: Wireframes | 9 h
+2.2.D.03 | 2.5.1.3 Diseñar y validar: Prototipo navegable | 14 h
+2.2.D.04 | 2.5.1.4 Diseñar y validar: Prototipo validado | 6 h
+3 | 3 SEGURIDAD Y CONTROL DE ACCESO | 111 h
+3 | 3.1 Control de Acceso a Torcly | 111 h
+3 | 3.1.1 Frontend de Seguridad | 33 h
+3.01 | 3.1.1.1 Implementar y verificar: Interfaz de inicio de sesión | 11 h
+3.02 | 3.1.1.2 Implementar y verificar: Protección de rutas | 11 h
+3.03 | 3.1.1.3 Implementar y verificar: Visualización según permisos | 11 h
+3 | 3.1.2 Backend de Seguridad | 47 h
+3.04 | 3.1.2.1 Implementar y verificar: Servicio de autenticación | 14 h
+3.05 | 3.1.2.2 Implementar y verificar: Gestión de sesiones | 11 h
+3.06 | 3.1.2.3 Implementar y verificar: Gestión de roles y permisos | 11 h
+3.07 | 3.1.2.4 Implementar y verificar: Protección de credenciales | 11 h
+3 | 3.1.3 Administración de Usuarios | 31 h
+3.08 | 3.1.3.1 Implementar y verificar: Registro y actualización de usuarios | 11 h
+3.09 | 3.1.3.2 Implementar y verificar: Activación y desactivación | 9 h
+3.10 | 3.1.3.3 Implementar y verificar: Asignación de roles | 11 h
+4.A | 4 GESTIÓN DE CLIENTES Y VEHÍCULOS | 133 h
+4.A | 4.1 Gestión de Clientes | 65 h
+4.A | 4.1.1 Frontend de Clientes | 26 h
+4.A.01 | 4.1.1.1 Implementar y verificar: Formulario de registro y actualización | 10 h
+4.A.02 | 4.1.1.2 Implementar y verificar: Listado y búsqueda de clientes | 8 h
+4.A.03 | 4.1.1.3 Implementar y verificar: Vista detallada del cliente | 8 h
+4.A | 4.1.2 Backend de Clientes | 39 h
+4.A.04 | 4.1.2.1 Implementar y verificar: Servicio de registro y actualización | 13 h
+4.A.05 | 4.1.2.2 Implementar y verificar: Validación de DNI/RUC | 13 h
+4.A.06 | 4.1.2.3 Implementar y verificar: Servicio de consulta y búsqueda | 13 h
+4.A | 4.2 Gestión de Vehículos | 68 h
+4.A | 4.2.1 Frontend de Vehículos | 30 h
+4.A.07 | 4.2.1.1 Implementar y verificar: Registro y actualización | 10 h
+4.A.08 | 4.2.1.2 Implementar y verificar: Consulta por placa y cliente | 8 h
+4.A.09 | 4.2.1.3 Implementar y verificar: Historial vehicular | 12 h
+4.A | 4.2.2 Backend de Vehículos | 38 h
+4.A.10 | 4.2.2.1 Implementar y verificar: Servicio de gestión vehicular | 13 h
+4.A.11 | 4.2.2.2 Implementar y verificar: Asociación cliente–vehículo | 12 h
+4.A.12 | 4.2.2.3 Implementar y verificar: Servicio de historial | 13 h
+4.B | 5 GESTIÓN DE PRODUCTOS E INVENTARIO | 184 h
+4.B | 5.1 Catálogo de Productos | 78 h
+4.B | 5.1.1 Frontend de Productos | 36 h
+4.B.01 | 5.1.1.1 Implementar y verificar: Formulario de producto | 12 h
+4.B.02 | 5.1.1.2 Implementar y verificar: Catálogo y búsqueda | 12 h
+4.B.03 | 5.1.1.3 Implementar y verificar: Configuración de producto | 12 h
+4.B | 5.1.2 Backend de Productos | 42 h
+4.B.04 | 5.1.2.1 Implementar y verificar: Servicio de productos | 15 h
+4.B.05 | 5.1.2.2 Implementar y verificar: Validación de códigos | 15 h
+4.B.06 | 5.1.2.3 Implementar y verificar: Gestión de estado | 12 h
+4.B | 5.2 Control de Inventario | 106 h
+4.B | 5.2.1 Frontend de Inventario | 46 h
+4.B.07 | 5.2.1.1 Implementar y verificar: Consulta de existencias | 10 h
+4.B.08 | 5.2.1.2 Implementar y verificar: Registro de movimientos | 12 h
+4.B.09 | 5.2.1.3 Implementar y verificar: Historial de movimientos | 12 h
+4.B.10 | 5.2.1.4 Implementar y verificar: Alertas de stock mínimo | 12 h
+4.B | 5.2.2 Backend de Inventario | 60 h
+4.B.11 | 5.2.2.1 Implementar y verificar: Servicio de movimientos | 15 h
+4.B.12 | 5.2.2.2 Implementar y verificar: Cálculo de existencias | 15 h
+4.B.13 | 5.2.2.3 Implementar y verificar: Control de stock negativo | 15 h
+4.B.14 | 5.2.2.4 Implementar y verificar: Control de stock mínimo | 15 h
+4.C | 6 GESTIÓN DE SERVICIOS AUTOMOTRICES | 55 h
+4.C | 6.1 Catálogo de Servicios | 55 h
+4.C | 6.1.1 Frontend de Servicios | 25 h
+4.C.01 | 6.1.1.1 Implementar y verificar: Registro de servicio | 9 h
+4.C.02 | 6.1.1.2 Implementar y verificar: Consulta y búsqueda | 9 h
+4.C.03 | 6.1.1.3 Implementar y verificar: Activación y desactivación | 7 h
+4.C | 6.1.2 Backend de Servicios | 30 h
+4.C.04 | 6.1.2.1 Implementar y verificar: Servicio de gestión del catálogo | 12 h
+4.C.05 | 6.1.2.2 Implementar y verificar: Gestión de precio referencial | 9 h
+4.C.06 | 6.1.2.3 Implementar y verificar: Conservación de datos históricos | 9 h
+5.A | 7 GESTIÓN DE CITAS Y ATENCIONES | 89 h
+5.A | 7.1 Agenda del Taller | 89 h
+5.A | 7.1.1 Frontend de Citas | 40 h
+5.A.01 | 7.1.1. Implementar y verificar: Registro de cita | 10 h
+5.A.02 | 7.1.1. Implementar y verificar: Agenda de citas | 10 h
+5.A.03 | 7.1.1.3 Implementar y verificar: Reprogramación | 10 h
+5.A.04 | 7.1.1.4 Implementar y verificar: Cancelación | 10 h
+5.A | 7.1.2 Backend de Citas | 49 h
+5.A.05 | 7.1.2.1 Implementar y verificar: Servicio de programación | 13 h
+5.A.06 | 7.1.2.2 Implementar y verificar: Validación de disponibilidad | 13 h
+5.A.07 | 7.1.2.3 Implementar y verificar: Gestión de estados | 10 h
+5.A.08 | 7.1.2.4 Implementar y verificar: Conversión de cita en atención | 13 h
+5.B | 8 GESTIÓN DE OPERACIONES DEL TALLER | 189 h
+5.B | 8.1 Orden de Trabajo | 137 h
+5.B | 8.1.1 Registro de Atención | 48 h
+5.B.01 | 8.1.1.1 Implementar y verificar: Ingreso del vehículo | 12 h
+5.B.02 | 8.1.1.2 Implementar y verificar: Diagnóstico | 12 h
+5.B.03 | 8.1.1.3 Implementar y verificar: Presupuesto | 12 h
+5.B.04 | 8.1.1.4 Implementar y verificar: Autorización del cliente | 12 h
+5.B | 8.1.2 Ejecución del Servicio | 53 h
+5.B.05 | 8.1.2.1 Implementar y verificar: Asignación de técnico | 12 h
+5.B.06 | 8.1.2.2 Implementar y verificar: Servicios realizados | 12 h
+5.B.07 | 8.1.2.3 Implementar y verificar: Repuestos utilizados | 14 h
+5.B.08 | 8.1.2.4 Implementar y verificar: Descuento de inventario | 15 h
+5.B | 8.1.3 Finalización de Atención | 36 h
+5.B.09 | 8.1.3.1 Implementar y verificar: Registro de finalización | 12 h
+5.B.10 | 8.1.3.2 Implementar y verificar: Registro de entrega | 12 h
+5.B.11 | 8.1.3.3 Implementar y verificar: Incorporación al historial | 12 h
+5.B | 8.2 Seguimiento del Taller | 52 h
+5.B | 8.2.1 Control de Estados | 52 h
+5.B.12 | 8.2.1.1 Implementar y verificar: Consulta del estado actual | 10 h
+5.B.13 | 8.2.1.2 Implementar y verificar: Actualización de estado | 12 h
+5.B.14 | 8.2.1.3 Implementar y verificar: Validación de transiciones | 15 h
+5.B.15 | 8.2.1.4 Implementar y verificar: Historial de estados | 15 h
+5.C | 9 GESTIÓN DE VENTAS Y PAGOS | 107 h
+5.C | 9.1 Gestión de Ventas | 47 h
+5.C | 9.1.1 Registro Comercial | 47 h
+5.C.01 | 9.1.1.1 Implementar y verificar: Venta de productos | 11 h
+5.C.02 | 9.1.1.2 Implementar y verificar: Venta de servicios | 11 h
+5.C.03 | 9.1.1.3 Implementar y verificar: Cálculo de importes | 14 h
+5.C.04 | 9.1.1.4 Implementar y verificar: Confirmación de venta | 11 h
+5.C | 9.2 Gestión de Pagos | 60 h
+5.C | 9.2.1 Registro de Pagos | 60 h
+5.C.05 | 9.2.1.1 Implementar y verificar: Registro del importe | 11 h
+5.C.06 | 9.2.1.2 Implementar y verificar: Método de pago | 11 h
+5.C.07 | 9.2.1.3 Implementar y verificar: Pagos parciales | 13 h
+5.C.08 | 9.2.1.4 Implementar y verificar: Cálculo de saldo pendiente | 14 h
+5.C.09 | 9.2.1.5 Implementar y verificar: Historial de pagos | 11 h
+6.A | 10 CONSULTA Y CONTROL OPERATIVO | 37 h
+6.A | 10.1 Consulta Centralizada | Σ 37 h
+6.A | 10.1.1 Panel Operativo | Σ 37 h
+6.A.01 | 10.1.1.1 Implementar y verificar: Consulta de clientes y vehículos | 7 h
+6.A.02 | 10.1.1.2 Implementar y verificar: Consulta de inventario | 7 h
+6.A.03 | 10.1.1.3 Implementar y verificar: Consulta de citas y taller | 7 h
+6.A.04 | 10.1.1.4 Implementar y verificar: Consulta de ventas y pagos | 7 h
+6.A.05 | 10.1.1.5 Implementar y verificar: Filtros de búsqueda operativa | 9 h
+6.B | 11 INTELIGENCIA DE NEGOCIOS Y ANALÍTICA OPERATIVA | 114 h
+6.B | 11.1 Panel Analítico de Torcly | 114 h
+6.B | 11.1.1 Preparación Analítica | 42 h
+6.B.01 | 11.1.1.1 Implementar y verificar: Fuentes de datos operativos | 15 h
+6.B.02 | 11.1.1.2 Implementar y verificar: Definición de indicadores | 12 h
+6.B.03 | 11.1.1.3 Implementar y verificar: Reglas de cálculo de KPI | 15 h
+6.B | 11.1.2 Dashboard BI | 72 h
+6.B.04 | 11.1.2.1 Implementar y verificar: Indicadores de inventario | 15 h
+6.B.05 | 11.1.2.2 Implementar y verificar: Indicadores de ventas y pagos | 15 h
+6.B.06 | 11.1.2.3 Implementar y verificar: Indicadores de servicios y taller | 15 h
+6.B.07 | 11.1.2.4 Implementar y verificar: Filtros temporales | 12 h
+6.B.08 | 11.1.2.5 Implementar y verificar: Visualización de tendencias | 15 h
+6.C | 12 INTELIGENCIA ARTIFICIAL PARA APOYO AL INVENTARIO | 138 h
+6.C | 12.1 Motor de Apoyo a Reposición | 138 h
+6.C | 12.1.1 Preparación de Datos | 60 h
+6.C.01 | 12.1.1.1 Implementar y verificar: Histórico de movimientos | 14 h
+6.C.02 | 12.1.1.2 Implementar y verificar: Histórico de ventas | 14 h
+6.C.03 | 12.1.1.3 Implementar y verificar: Consumo de productos en servicios | 14 h
+6.C.04 | 12.1.1.4 Implementar y verificar: Criterios de elegibilidad de datos | 18 h
+6.C | 12.1.2 Recomendaciones de Reposición | 78 h
+6.C.05 | 12.1.2.1 Implementar y verificar: Análisis de patrones de consumo | 18 h
+6.C.06 | 12.1.2.2 Implementar y verificar: Estimación de reposición | 18 h
+6.C.07 | 12.1.2.3 Implementar y verificar: Recomendación al usuario | 14 h
+6.C.08 | 12.1.2.4 Implementar y verificar: Aviso de datos insuficientes | 10 h
+6.C.09 | 12.1.2.5 Implementar y verificar: Trazabilidad de recomendaciones | 18 h
+7–9 | 13 CALIDAD, IMPLEMENTACIÓN Y CIERRE | 231 h
+7 | 13.1 Aseguramiento de Calidad | 104 h
+7 | 13.1.1 Pruebas del Sistema | 104 h
+7.01 | 13.1.1.1 Ejecutar y documentar: Pruebas funcionales | 22 h
+7.02 | 13.1.1.2 Ejecutar y documentar: Pruebas de integración | 18 h
+7.03 | 13.1.1.3 Ejecutar y documentar: Pruebas no funcionales | 14 h
+7.04 | 13.1.1.4 Ejecutar y documentar: Pruebas BI | 18 h
+7.05 | 13.1.1.5 Ejecutar y documentar: Pruebas IA | 18 h
+7.06 | 13.1.1.6 Ejecutar y documentar: Pruebas de aceptación | 14 h
+8.A | 13.2 Implementación | 36 h
+8.A | 13.2.1 Entorno de Producción | 36 h
+8.A.01 | 13.2.1.1 Configurar y comprobar: Aplicación web desplegada | 9 h
+8.A.02 | 13.2.1.2 Configurar y comprobar: Backend desplegado | 9 h
+8.A.03 | 13.2.1.3 Configurar y comprobar: Base de datos desplegada | 9 h
+8.A.04 | 13.2.1.4 Configurar y comprobar: HTTPS y configuración segura | 9 h
+8.B–9.1 | 13.3 Transferencia de Conocimiento | 49 h
+8.B–9.1 | 13.3.1 Documentación | 37 h
+8.B.01 | 13.3.1.1 Preparar y validar: Manual de usuario | 14 h
+8.B.02 | 13.3.1.2 Preparar y validar: Documentación técnica | 14 h
+8.B.03 | 13.3.1.3 Preparar y validar: Guía de despliegue | 9 h
+8.B–9.1 | 13.3.2 Capacitación | 12 h
+9.1.01 | 13.3.2.1 Impartir y verificar: Capacitación administrativa | 6 h
+9.1.02 | 13.3.2.2 Impartir y verificar: Capacitación técnica | 6 h
+9.2–9.3 | 13.4 Cierre del Proyecto | 42 h
+9.2–9.3 | 13.4.1 Aceptación Final | 20 h
+9.2.01 | 13.4.1.1 Preparar y validar: Demostración final | 9 h
+9.2.02 | 13.4.1.2 Preparar y validar: Acta de aceptación | 5 h
+9.2.03 | 13.4.1.3 Preparar y validar: Sistema Web Torcly V1.0 | 6 h
+9.2–9.3 | 13.4.2 Cierre Documental | 22 h
+9.3.01 | 13.4.2.1 Preparar y validar: Informe final | 14 h
+9.3.02 | 13.4.2.2 Preparar y validar: Evidencias finales | 8 h
+TOTAL | 148 entregables terminales; los subtotales superiores no se vuelven a sumar | 1683 h
+RESERVA | 12 % para riesgos de integración, calidad de datos y correcciones | 202 h
+TOTAL, PLANIFICADO | Base EDT más reserva; carga total del equipo | 1885 h
+
+=== TABLE 13 ===
+Entregable | Descripción | Fecha de la entrega
+Situación actual y alcance preliminar | Procesos, actores y problemática documentados. | 18/09/2026
+Business Case Acta y EDT inicial | Documentación de inicio consolidada para revisión. | 28/09/2026
+SRS y alcance priorizado | Requerimientos y criterios de aceptación presentados al sponsor y usuarios. | 05/10/2026
+Modelo de datos y arquitectura | Estructura de componentes, relaciones y diccionario de datos. | 08/10/2026
+Prototipo de interfaces | Navegación y flujos revisados con ajustes priorizados. | 09/10/2026
+Inventario integrado | Movimientos y existencias integrados y comprobados. | 21/10/2026
+Clientes y vehículos | Registro, asociación e historial integrados. | 22/10/2026
+Citas integradas | Agenda y vínculo con las atenciones verificados. | 04/11/2026
+Ventas y pagos | Flujo de venta y pagos mixtos validado. | 11/11/2026
+Sistema integrado | Módulos, navegación y permisos relacionados. | 17/11/2026
+Evidencias de pruebas y regresión | Incidencias prioritarias corregidas y resultado de validación documentado. | 03/12/2026
+Sistema desplegado | Frontend y backend disponibles en el ambiente autorizado. | 08/12/2026
+Manuales y capacitación | Manual de usuario, documentación técnica y capacitación por procesos. | 10/12/2026
+Evaluación de alcance y KPI | Resultados del piloto e indicadores con sus evidencias. | 17/12/2026
+Entrega y conformidad | Sistema y documentos presentados para aceptación del sponsor. | 18/12/2026
+Cierre del proyecto | Documentación consolidada, lecciones aprendidas y presentación final. | 21/12/2026
+
+=== TABLE 14 ===
+Semana | Período | Actividades principales
+1 | 14/09/2026 20/09/2026 | Inicio y planificación
+2 | 21/09/2026 27/09/2026 | Inicio y planificación
+3 | 28/09/2026 04/10/2026 | Inicio y planificación / Análisis y diseño
+4 | 05/10/2026 11/10/2026 | Análisis y diseño / Construcción Torcly
+5 | 12/10/2026 18/10/2026 | Construcción Torcly
+6 | 19/10/2026 25/10/2026 | Construcción Torcly
+7 | 26/10/2026 01/11/2026 | Construcción Torcly
+8 | 02/11/2026 08/11/2026 | Construcción Torcly
+9 | 09/11/2026 15/11/2026 | Construcción Torcly
+10 | 16/11/2026 22/11/2026 | Construcción Torcly / Pruebas y validación
+11 | 23/11/2026 29/11/2026 | Pruebas y validación
+12 | 30/11/2026 06/12/2026 | Pruebas y validación / Implementación y cierre
+13 | 07/12/2026 13/12/2026 | Implementación y cierre
+14 | 14/12/2026 20/12/2026 | Implementación y cierre
+15 | 21/12/2026 21/12/2026 | Implementación y cierre
+
+=== TABLE 15 ===
+Ciclo | Período planificado | Observación
+1 | 14/09/2026 al 27/09/2026 | Ciclo de dos semanas
+2 | 28/09/2026 al 11/10/2026 | Ciclo de dos semanas
+3 | 12/10/2026 al 25/10/2026 | Ciclo de dos semanas
+4 | 26/10/2026 al 08/11/2026 | Ciclo de dos semanas
+5 | 09/11/2026 al 22/11/2026 | Ciclo de dos semanas
+6 | 23/11/2026 al 06/12/2026 | Ciclo de dos semanas
+7 | 07/12/2026 al 20/12/2026 | Ciclo de dos semanas
+8 | 21/12/2026 al 21/12/2026 | Cierre parcial; solo 21/12/2026
+
+=== TABLE 16 ===
+Disciplinas / Objetos generados o modificados durante la Fase | Comienzo | Aprobación
+Fase de Inicio | 14/09/2026 | 28/09/2026
+Identificación de actores y guía de entrevista | 14/09/2026 | 15/09/2026
+Levantamiento y situación actual | 16/09/2026 | 18/09/2026
+Ficha empresarial y entrevistas consolidadas | 21/09/2026 | 22/09/2026
+Objetivos KPI supuestos y restricciones | 23/09/2026 | 24/09/2026
+Alternativas impactos y riesgos iniciales | 25/09/2026 | 25/09/2026
+Business Case Acta y EDT inicial consolidados | 28/09/2026 | 28/09/2026
+Fase de Elaboración | 29/09/2026 | 09/10/2026
+SRS reglas de negocio y alcance priorizado | 29/09/2026 | 05/10/2026
+Arquitectura de la solución | 05/10/2026 | 05/10/2026
+Modelos de procesos | 05/10/2026 | 06/10/2026
+Modelo entidad relación y diccionario de datos | 07/10/2026 | 08/10/2026
+Navegación y prototipos de interfaces | 06/10/2026 | 09/10/2026
+
+=== TABLE 17 ===
+Grupo de riesgo | Respuesta de control | Responsable principal
+Información y requerimientos | Contrastar entrevistas y observación, validar procesos y mantener criterios de aceptación. | Arian Armando Bautista Quezada
+Alcance cronograma y coordinación | Revisar avance y dependencias, priorizar entregables y tramitar los cambios significativos. | José Manuel Sebastian Mercado Rojas
+Diseño uso y compatibilidad | Validar prototipos y realizar pruebas por dispositivo, navegador y perfil. | Brenda Gabriela Ormeño Bocanegra
+Lógica de negocio e integración | Probar inventario, taller, pagos y permisos mediante escenarios normales y excepcionales. | Carmen Katerin Vega Meza
+Datos y recuperación | Depurar datos iniciales, verificar integridad, respaldos y restauración. | Piero Ramírez Alva
+
+=== TABLE 18 ===
+Dependencia | Tratamiento
+Tiempo del equipo | Coordinar la carga con las demás actividades académicas y revisar compromisos antes de cada ciclo.
+Información y usuarios de Mecatronic | Acordar reuniones, acceso a registros y validadores alternos dentro de las facultades autorizadas.
+SRS prototipos y diseño | Mantener trazabilidad entre requisitos, modelos, datos y criterios de aceptación antes de ampliar la construcción.
+Integración técnica | Coordinar contratos de servicios, migraciones y versiones compatibles entre frontend, backend y base de datos.
+Servicios e infraestructura | Confirmar alojamiento, conectividad, permisos y respaldos antes del despliegue.
+Aceptación y cierre | Reservar tiempo para pruebas, correcciones, capacitación, piloto y conformidad documentada.

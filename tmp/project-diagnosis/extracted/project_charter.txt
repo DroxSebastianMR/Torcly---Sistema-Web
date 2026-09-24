@@ -1,0 +1,406 @@
+=== PAGE 1 ===
+Acta de Constitución del Proyecto
+Proyecto: Sistema Web Torcly para la Gestión Operativa del
+GRUPO MECATRONIC MC PERU S.A.C.
+Código: G-01
+Fecha: 17 de septiembre de 2026
+RACIONALIDAD Y PROPÓSITO DEL PROYECTO:
+El proyecto surge ante la necesidad del GRUPO MECATRONIC MC PERU S.A.C. de mejorar la gestión y el control
+de sus procesos administrativos y operativos, los cuales actualmente dependen principalmente de registros
+manuales y medios de información independientes. Esta situación dificulta mantener un control actualizado del
+inventario, centralizar la información de clientes y vehículos, consultar el historial de servicios y realizar un
+seguimiento organizado de los vehículos durante su atención en el taller, generando riesgos de errores,
+duplicidad, pérdida de información y limitada trazabilidad de las operaciones.
+En respuesta a esta problemática, el propósito del proyecto es desarrollar e implementar el Sistema Web
+Torcly, una solución de gestión integral orientada a digitalizar y centralizar la información relacionada con
+clientes, vehículos, productos, inventario, servicios automotrices, citas, ventas, pagos y operaciones del
+taller. La solución permitirá sustituir progresivamente los registros manuales por información digital
+organizada, actualizada y disponible para los usuarios autorizados. Torcly integrará además BI para el
+seguimiento mediante indicadores y un componente de IA para recomendar reposiciones de inventario con
+datos suficientes; las decisiones comerciales permanecerán bajo responsabilidad de usuarios autorizados.
+Objetivos del Proyecto:
+OBJETIVO GENERAL
+Desarrollar e implementar un sistema web de gestión integral para Mecatronic que centralice y digitalice
+los principales procesos administrativos y operativos de la tienda y del taller, permitiendo gestionar de
+manera organizada la información y operaciones realizadas por la empresa. El alcance incluye diez
+componentes funcionales, con BI e IA asistencial orientada al inventario.
+OBJETIVOS ESPECÍFICOS
+➢ Implementar un módulo de gestión de inventario que permita registrar productos, controlar
+entradas y salidas, consultar existencias y mantener actualizado el stock disponible.
+➢ Desarrollar un módulo de gestión de clientes que permita registrar, actualizar, consultar y buscar
+información mediante datos como DNI, RUC o número de contacto.
+
+=== PAGE 2 ===
+➢ Desarrollar un módulo de gestión de vehículos que permita registrar y consultar las unidades
+atendidas, relacionarlas con sus respectivos clientes y mantener un historial de los servicios
+realizados.
+➢ Implementar un módulo de gestión de ventas que permita registrar las operaciones realizadas,
+productos vendidos, importes y métodos de pago asociados.
+➢ Desarrollar un módulo de gestión de citas que permita registrar, actualizar y consultar las
+atenciones programadas, asociándolas con clientes y vehículos, así como controlar su fecha, hora
+y estado.
+➢ Implementar un módulo de control de pagos que permita registrar y consultar los pagos
+correspondientes a ventas y servicios, incluyendo importe, método de pago y estado de la
+operación.
+➢ Implementar funcionalidades para el registro y seguimiento de operaciones que permitan
+controlar los servicios del taller y conocer el estado de cada atención desde su registro hasta su
+finalización.
+➢ Implementar BI y analítica operativa con indicadores, paneles, tendencias y reportes basados en
+los registros de Torcly.
+➢ Implementar IA para analizar movimientos, ventas y consumo de productos en servicios y generar
+recomendaciones de reposición cuando existan datos suficientes, sin ejecución automática.
+IMPACTO ESPERADO
+La implementación del proyecto permitirá reducir la dependencia de registros manuales, centralizar la
+información de la empresa y mejorar la trazabilidad de sus operaciones. Se espera facilitar el acceso a la
+información, fortalecer el control del inventario, organizar la atención de clientes y vehículos, mejorar el
+seguimiento de ventas, citas y pagos, y proporcionar información más confiable para la gestión diaria de
+Mecatronic. Los paneles de BI facilitarán el seguimiento operativo y la IA apoyará la planificación de
+reposición sin reemplazar la decisión humana.
+Estrategia del Proyecto:
+MODELO DE INTERVENCIÓN
+El proyecto se desarrollará mediante un enfoque incremental basado en Scrum, permitiendo organizar el
+trabajo en entregas progresivas y realizar validaciones periódicas con los representantes del GRUPO
+MECATRONIC MC PERU S.A.C. La intervención comprenderá el levantamiento y validación de
+requerimientos, análisis y diseño de la solución, elaboración de prototipos, desarrollo e integración de los
+módulos, ejecución de pruebas funcionales, validación con los usuarios y entrega final del sistema con su
+documentación correspondiente. Este enfoque permitirá incorporar oportunamente las observaciones de
+la empresa y mantener el desarrollo alineado con sus procesos reales.
+ALCANCE DEL PROYECTO
+
+=== PAGE 3 ===
+El proyecto comprende el análisis, diseño, desarrollo, integración, pruebas, implementación y entrega del
+Sistema Web Torcly, orientado a centralizar y digitalizar los principales procesos administrativos y
+operativos de la tienda y el taller del GRUPO MECATRONIC MC PERU S.A.C.
+El alcance funcional de Torcly comprende los siguientes componentes:
+➢ Gestión de Clientes y Vehículos: registro, actualización, consulta y asociación de clientes con los
+vehículos atendidos por la empresa, permitiendo conservar información necesaria para su
+identificación y seguimiento.
+➢ Gestión de Productos e Inventario: administración del catálogo de productos y control de existencias
+mediante el registro y trazabilidad de los movimientos de inventario.
+➢ Gestión de Servicios Automotrices: administración del catálogo de servicios ofrecidos por el taller,
+incluyendo la información necesaria para su utilización en citas, atenciones y operaciones del taller.
+➢ Gestión de Citas y Atenciones: programación, actualización, consulta y seguimiento de las atenciones
+asociadas a clientes, vehículos y servicios.
+➢ Gestión de Operaciones del Taller: registro y seguimiento de los vehículos atendidos desde su
+recepción hasta la finalización de los trabajos, considerando diagnóstico, servicios realizados,
+productos o repuestos utilizados, responsables y estado de la atención.
+➢ Gestión de Ventas y Pagos: registro y seguimiento de las operaciones comerciales correspondientes a
+productos y servicios, así como de los pagos y medios de pago asociados.
+➢ Consulta y Control Operativo: consulta centralizada de registros y estados transaccionales para dar
+seguimiento a la operación diaria.
+➢ Seguridad y Control de Acceso: autenticación de usuarios, gestión de perfiles autorizados y restricción
+de funcionalidades de acuerdo con los permisos establecidos.
+➢ Inteligencia de Negocios (BI) y Analítica Operativa: paneles, indicadores, reportes, filtros y tendencias
+de inventario, ventas, pagos, servicios, citas y operaciones del taller basados en información registrada
+en Torcly.
+➢ Inteligencia Artificial para Apoyo a la Gestión de Inventario: análisis del histórico de movimientos,
+ventas y consumo en servicios para generar estimaciones o recomendaciones de reposición con datos
+suficientes; visualización de insuficiencia de datos cuando corresponda.
+El proyecto comprende adicionalmente la integración de los módulos desarrollados, las pruebas
+funcionales y de integración, el despliegue en el entorno tecnológico autorizado, la elaboración de la
+documentación técnica y de usuario, la capacitación de los usuarios involucrados y la validación funcional
+de la solución con los representantes de Mecatronic.
+
+=== PAGE 4 ===
+LÍMITES DEL ALCANCE
+La primera versión del Sistema Web Torcly no contempla la integración con sistemas contables,
+plataformas de facturación electrónica, servicios tributarios ni otras plataformas empresariales externas.
+Asimismo, no comprende el desarrollo de aplicaciones móviles nativas.
+La migración de información histórica estará limitada a los registros proporcionados por Mecatronic que
+se encuentren disponibles, legibles, completos y previamente validados para su incorporación al sistema.
+BI y la IA asistencial para reposición de inventario forman parte del alcance comprometido para Torcly
+V1.0. Quedan fuera la ejecución automática de compras, pedidos y movimientos de stock, así como las
+aplicaciones de IA para otros procesos. Toda ampliación se someterá a control de cambios.
+CRONOGRAMA POR FASES E HITOS
+El proyecto se desarrollará durante el periodo comprendido entre el 22 de agosto y el 11 de diciembre de
+2026 (16 semanas consecutivas; cada semana inicia en sábado y concluye en viernes), de acuerdo con la
+línea base de planificación establecida en el Cronograma del Proyecto (CRON-01). La ejecución se
+organizará en cinco fases principales, cuyas actividades podrán presentar solapamientos controlados de
+acuerdo con sus dependencias, disponibilidad de recursos y necesidades de integración.
+FASE 1 – INICIO Y PLANIFICACIÓN (semanas 1 a 4: 22/08 al 18/09)
+Periodo: 22/08/2026 – 18/09/2026
+Comprende la revisión de la información inicial de la empresa, identificación de actores y partes
+interesadas, levantamiento y consolidación de información sobre los procesos de la tienda y el taller,
+definición de la problemática, objetivos, indicadores, supuestos, restricciones y alcance del proyecto, así
+como la preparación de los instrumentos necesarios para orientar su ejecución.
+Hito (18/09/2026): Línea base inicial del proyecto y requerimientos preliminares definidos y validados.
+FASE 2 – ANÁLISIS Y DISEÑO (semanas 5 a 7: 19/09 al 09/10)
+Periodo: 19/09/2026 – 09/10/2026
+Comprende el análisis funcional y técnico de Torcly, el modelado de procesos y requerimientos, definición
+de actores y funcionalidades, diseño de la arquitectura de la solución, modelo de datos y elaboración y
+validación de los prototipos e interfaces principales del sistema.
+Hito (09/10/2026): Análisis funcional, arquitectura, modelo de datos y diseño de la solución
+completados.
+FASE 3 – CONSTRUCCIÓN DEL SISTEMA WEB TORCLY (semanas 8 a 13: 10/10 al 20/11)
+
+=== PAGE 5 ===
+Periodo: 10/10/2026 – 20/11/2026
+Comprende el desarrollo e integración de los ocho componentes operativos y de seguridad, así como BI y
+la IA para apoyo de reposición. Se prepararán los datos históricos y se mostrarán recomendaciones solo
+para productos con información suficiente.
+Durante esta fase se realizarán revisiones periódicas de los incrementos desarrollados para comprobar su
+correspondencia con los requerimientos establecidos.
+Hito (20/11/2026): Diez componentes funcionales desarrollados e integrados en una versión candidata
+de Torcly.
+FASE 4 – PRUEBAS Y VALIDACIÓN (semanas 14 y 15: 21/11 al 04/12)
+Periodo: 21/11/2026 – 04/12/2026
+Comprende pruebas funcionales y de integración de los diez componentes, verificación de cálculos y filtros
+de BI, consistencia de datos, evaluación de IA con históricos suficientes e insuficientes, trazabilidad de
+recomendaciones y confirmación de que la IA no ejecuta compras ni modifica existencias. Se registrarán
+incidencias y validarán resultados con usuarios de Mecatronic.
+Hito (04/12/2026): Torcly V1.0 con módulos operativos, BI e IA asistencial probados y funcionalmente
+validados.
+FASE 5 – IMPLEMENTACIÓN Y CIERRE (semanas 15 y 16: 28/11 al 11/12)
+Periodo: 28/11/2026 – 11/12/2026
+Comprende la preparación del entorno final, despliegue de la solución, verificación posterior a la
+implementación, elaboración y consolidación de la documentación técnica y de usuario, capacitación de
+los usuarios involucrados, presentación de resultados y formalización del cierre del proyecto.
+Hito (11/12/2026): Sistema Web Torcly V1.0 implementado, documentado, validado y entregado.
+PRESUPUESTO RESUMIDO DEL PROYECTO
+Para fines de planificación y evaluación del proyecto, se establece un presupuesto referencial de S/
+10,000.00, distribuido entre las principales categorías necesarias para el análisis, diseño, desarrollo,
+implementación y entrega del Sistema Web Torcly. Los montos son estimados y representan la
+valorización de los recursos requeridos durante la ejecución del proyecto.
+CATEGORÍA DESCRIPCIÓN MONTO
+ESTIMADO
+
+=== PAGE 6 ===
+Recursos humanos Valorización del trabajo realizado por el líder del proyecto, S/ 5,000.00
+analista de sistemas, desarrolladores Full-Stack y administrador
+de base de datos.
+Infraestructura Servicios de alojamiento web, despliegue, dominio y recursos S/ 1,200.00
+tecnológica necesarios para mantener disponible el sistema.
+Hardware y Equipamiento complementario requerido para pruebas y S/ 1,000.00
+equipamiento operación, incluyendo lector de código de barras y accesorios
+tecnológicos.
+Software y Herramientas, servicios y recursos utilizados para diseño, S/ 800.00
+herramientas desarrollo, gestión, pruebas y documentación del proyecto.
+Pruebas e Recursos destinados a pruebas funcionales, validación con S/ 1,000.00
+implementación usuarios, configuración, despliegue y puesta en funcionamiento
+del sistema.
+Contingencia Reserva destinada a cubrir necesidades imprevistas, ajustes S/ 1,000.00
+técnicos o gastos adicionales durante el desarrollo.
+TOTAL, ESTIMADO DEL S/ 10,000.00
+PROYECTO
+RIESGOS DE ALTO NIVEL
+RIESGO DESCRIPCIÓN
+Disponibilidad limitada de los La disponibilidad del propietario, administradora y personal técnico puede afectar
+representantes de la empresa las reuniones de levantamiento, revisión y validación de los entregables del
+proyecto.
+Retraso o insuficiencia de La entrega tardía o incompleta de información sobre los procesos actuales puede
+información retrasar la definición y validación de los requerimientos del Sistema Web Torcly.
+Inconsistencia de los registros Los registros manuales existentes pueden presentar información incompleta,
+actuales duplicada o diferente de la situación real, afectando la preparación y carga inicial
+de datos.
+Cambios en los La incorporación de nuevos requerimientos durante el desarrollo puede
+requerimientos y alcance incrementar el trabajo previsto y comprometer el cumplimiento del cronograma
+académico.
+
+=== PAGE 7 ===
+Fallas funcionales del sistema Errores en los módulos principales podrían afectar el registro del inventario, la
+gestión de clientes y vehículos, las ventas y el seguimiento de las operaciones del
+taller.
+Riesgos de seguridad y El acceso no autorizado, pérdida o alteración de información podría comprometer
+pérdida de información los datos personales, comerciales y operativos almacenados en el sistema.
+Problemas de conectividad o Las interrupciones de Internet o de los servicios tecnológicos utilizados podrían
+disponibilidad tecnológica limitar temporalmente el acceso y funcionamiento del sistema web.
+Problemas de compatibilidad El sistema podría presentar dificultades de visualización o rendimiento en la
+o rendimiento laptop, tablet o dispositivos utilizados por la empresa.
+SUPUESTOS DE ALTO NIVEL
+Supuesto Descripción
+Disponibilidad de información Se asume que la empresa proporcionará la información necesaria sobre
+operativa inventario, clientes, vehículos, servicios, ventas, pagos, citas y demás procesos
+incluidos en el proyecto.
+Participación del personal Se considera que el propietario, la administradora y el personal técnico
+clave participarán en el levantamiento de información, revisión de prototipos y
+validación de funcionalidades.
+Validación del Sponsor Se asume que Jhon Medina, como Sponsor empresarial, participará en la
+priorización de requerimientos y aprobación de los principales entregables del
+proyecto.
+Continuidad de las Se considera que las actividades habituales de la tienda y el taller continuarán
+operaciones de la empresa desarrollándose durante el proyecto, permitiendo validar Torcly sobre los
+procesos reales.
+Adopción progresiva del Se asume que los usuarios involucrados tendrán disposición para utilizar
+sistema progresivamente Torcly y sustituir los registros manuales correspondientes a los
+procesos digitalizados.
+Registro adecuado de Se considera que los usuarios autorizados registrarán información completa,
+información correcta y actualizada en el sistema.
+Disponibilidad de Se asume que la empresa mantendrá disponibles la laptop, tablet y conectividad
+infraestructura mínima a Internet necesarias para utilizar el sistema web.
+Disponibilidad de los servicios Se considera que los servicios de alojamiento, backend y base de datos estarán
+tecnológicos disponibles durante las pruebas, validación e implementación de Torcly.
+
+=== PAGE 8 ===
+RESTRICCIONES DE ALTO NIVEL
+RESTRICCIÓN DESCRIPCIÓN
+Tiempo del proyecto El proyecto deberá ejecutarse dentro del periodo académico establecido, por lo que el
+análisis, diseño, desarrollo, pruebas, implementación y documentación estarán sujetos al
+cronograma definido.
+Alcance funcional La primera versión de Torcly estará limitada a los procesos y funcionalidades prioritarias
+definidas para la gestión operativa de la empresa.
+Migración limitada de No se realizará la digitalización completa de todos los registros históricos; únicamente se
+información histórica incorporará información disponible, legible, relevante y previamente validada.
+Dependencia de Al tratarse de un sistema web, su utilización dependerá de la disponibilidad y estabilidad
+Internet de la conexión a Internet.
+Infraestructura El proyecto priorizará el aprovechamiento de los equipos actualmente disponibles en la
+tecnológica existente empresa y no contempla una renovación integral de infraestructura tecnológica.
+Integraciones La versión inicial no contempla integración directa con sistemas contables, plataformas
+externas fuera del de facturación electrónica u otros servicios empresariales externos.
+alcance
+Acceso limitado a Los datos personales, comerciales y financieros sensibles serán protegidos y, para fines
+información sensible académicos, se utilizarán datos ficticios, aproximados o anonimizados cuando
+corresponda.
+Presupuesto limitado La ejecución deberá mantenerse dentro de los recursos asignados al proyecto, tomando
+como referencia el presupuesto estimado de S/ 10,000.00, por lo que cualquier
+requerimiento adicional deberá ser evaluado antes de su incorporación.
+Estructura de gobernabilidad:
+ESTRUCTURA DE GOBERNABILIDAD DEL PROYECTO
+La gobernabilidad del proyecto establece los niveles de autoridad, responsabilidades, mecanismos de
+supervisión y procedimientos de toma de decisiones que serán aplicados durante el desarrollo del sistema web
+para Mecatronic
+
+=== PAGE 9 ===
+La estructura estará conformada por un representante de la empresa, un líder del proyecto, el equipo de
+desarrollo y el docente encargado de la revisión académica. Esta organización permitirá mantener una
+comunicación clara entre la empresa y el equipo, realizar el seguimiento de los entregables y gestionar
+oportunamente cualquier cambio o situación que pueda afectar el proyecto.
+ROLES Y RESPONSABILIDADES
+Rol / Responsable Responsabilidades principales
+Representante de Mecatronic – Ysabel Quiteros Representar a la empresa durante el proyecto,
+Montoya proporcionar información sobre los procesos
+administrativos, validar los requerimientos, revisar
+los avances funcionales y participar en la aprobación
+de cambios que puedan afectar el alcance del
+sistema.
+Líder del Proyecto – José Manuel Sebastian Planificar y coordinar las actividades del equipo,
+Mercado Rojas realizar seguimiento al cronograma y entregables,
+distribuir responsabilidades, gestionar riesgos e
+incidencias, mantener la comunicación con
+Mecatronic y coordinar la toma de decisiones del
+proyecto.
+Analista de Sistemas – Arian Armando Bautista Levantar, analizar y documentar los requerimientos
+Quezada del sistema, modelar los procesos identificados y
+verificar que las funcionalidades desarrolladas
+respondan a las necesidades de Mecatronic.
+Programador Full-Stack – Brenda Gabriela Ormeño Desarrollar e integrar funcionalidades del sistema
+Bocanegra tanto a nivel de interfaz como de lógica de negocio,
+además de participar en las pruebas y corrección de
+incidencias.
+Administrador de Base de Datos – Piero Ramírez Diseñar, implementar y mantener la estructura de la
+Alva base de datos, gestionar las relaciones entre las
+entidades y garantizar la correcta persistencia e
+integridad de la información utilizada por el sistema.
+
+=== PAGE 10 ===
+Programador Full-Stack – Carmen Katerin Vega Desarrollar e integrar funcionalidades del sistema
+Meza web, colaborar en la implementación de los módulos
+definidos y participar en las pruebas, integración y
+corrección de errores.
+NIVELES DE AUTORIDAD
+La toma de decisiones se organizará de acuerdo con el impacto de cada situación sobre el proyecto.
+TIPO DE DECISIÓN RESPONSABLE DE ANALIZAR RESPONSABLE DE APROBAR
+Decisiones técnicas dentro Equipo de desarrollo Líder del Proyecto
+del alcance aprobado
+Interpretación o aclaración Analista de Sistemas y Líder del Representante de Mecatronic
+de requerimientos Proyecto
+Cambios en requerimientos Líder del Proyecto + Equipo Líder del Proyecto +
+funcionales Representante de Mecatronic
+Cambios que afecten el Líder del Proyecto + Representante de Aprobación conjunta del Líder del
+alcance del proyecto Mecatronic Proyecto y representante de
+Mecatronic
+Modificaciones internas en Líder del Proyecto Líder del Proyecto
+la distribución de tareas
+Validación de Equipo de desarrollo Representante de Mecatronic
+funcionalidades
+desarrolladas
+Revisión de documentación Equipo del Proyecto Docente / Supervisor Académico
+académica
+Aceptación de entregables Líder del Proyecto y Equipo Representante de Mecatronic
+del proyecto
+PROCESO DE TOMA DE DECISIONES
+
+=== PAGE 11 ===
+Las decisiones del proyecto se tomarán considerando su nivel de impacto. Las decisiones técnicas que no
+modifiquen el alcance podrán ser resueltas internamente por el equipo y aprobadas por el Líder del Proyecto.
+Cuando una decisión involucre requerimientos del negocio o funcionalidades solicitadas por Mecatronic,
+deberá ser consultada con Ysabel Quiteros Montoya, como representante de la empresa.
+En caso de que se solicite un cambio que pueda modificar el alcance, los entregables o el cronograma del
+proyecto, la situación será evaluada conjuntamente por el Líder del Proyecto y la representante de Mecatronic.
+La modificación solo será incorporada cuando ambas partes estén de acuerdo con su impacto y prioridad.
+El proceso general será:
+Identificación de la necesidad o problema → Análisis por el equipo → Evaluación del impacto → Presentación
+al responsable correspondiente → Toma de decisión → Registro del acuerdo → Ejecución y seguimiento.
+MECANISMO DE SUPERVISIÓN
+La supervisión del proyecto se realizará de manera continua durante las dieciséis semanas de ejecución.
+El Líder del Proyecto será responsable de verificar el cumplimiento de las actividades, avances, entregables y
+responsabilidades asignadas al equipo.
+Asimismo, se realizarán entre una y dos reuniones semanales con Mecatronic, según la disponibilidad y
+necesidad del proyecto. Estas reuniones permitirán:
+➢ Presentar avances del sistema.
+➢ Validar funcionalidades desarrolladas.
+➢ Aclarar requerimientos.
+➢ Recoger observaciones de la empresa.
+➢ Evaluar posibles cambios.
+➢ Comunicar dificultades o riesgos identificados.
+➢ Confirmar las actividades siguientes.
+Por otra parte, el docente realizará una revisión semanal de la documentación, proporcionando
+retroalimentación sobre los documentos elaborados durante el proyecto.
+RENDICIÓN DE CUENTAS
+Cada integrante del equipo será responsable de las actividades asignadas de acuerdo con su rol. El avance de
+dichas actividades deberá ser comunicado al Líder del Proyecto, quien consolidará el estado general del
+proyecto y verificará el cumplimiento del cronograma.
+Los avances funcionales y decisiones relevantes serán comunicados a la representante de Mecatronic durante
+las reuniones de seguimiento.
+
+=== PAGE 12 ===
+Las principales decisiones, modificaciones de requerimientos y acuerdos alcanzados deberán quedar
+documentados para mantener la trazabilidad durante el desarrollo del proyecto.
+Gerencia del Proyecto:
+
+=== PAGE 13 ===
+Control de Cambios:
+CONTROL DE CAMBIOS
+El proyecto contará con un mecanismo formal para identificar, evaluar, aprobar y dar seguimiento a los
+cambios significativos que puedan surgir durante su desarrollo. Este control permitirá evitar modificaciones
+no autorizadas que afecten el alcance, cronograma, requerimientos o entregables establecidos.
+Cuando un integrante del equipo o el representante de Mecatronic identifique la necesidad de realizar un
+cambio, este deberá ser comunicado al Líder del Proyecto, quien registrará la solicitud y analizará su impacto
+en el sistema.
+La evaluación del cambio deberá considerar principalmente su efecto sobre el alcance, tiempo de desarrollo,
+requerimientos, recursos, funcionalidades y entregables del proyecto.
+Los cambios menores que no afecten el alcance ni los objetivos podrán ser gestionados internamente por el
+Líder del Proyecto. Sin embargo, cuando el cambio implique la incorporación, eliminación o modificación
+significativa de una funcionalidad, deberá ser revisado y aprobado conjuntamente por el Líder del Proyecto y
+la representante de Mecatronic.
+Una vez aprobado, el cambio será incorporado a la documentación correspondiente, al backlog o planificación
+del proyecto y, cuando sea necesario, al cronograma. Asimismo, se comunicará al resto del equipo para su
+implementación y seguimiento.
+PROCESO DE CONTROL DE CAMBIOS
+
+=== PAGE 14 ===
+Identificación del cambio → Registro de la solicitud → Análisis de impacto → Evaluación → Aprobación o
+rechazo → Actualización de la documentación → Implementación → Verificación
+ETAPA RESPONSABLE ACCIÓN
+Identificación Equipo del proyecto / Detectar y comunicar la necesidad de modificar
+Mecatronic un requerimiento, funcionalidad o entregable.
+Registro Líder del Proyecto Documentar la solicitud de cambio y su motivo.
+Análisis de impacto Líder del Proyecto y equipo Evaluar el impacto sobre alcance, tiempo,
+técnico requerimientos, recursos y funcionalidades.
+Aprobación Líder del Proyecto + Aprobar o rechazar los cambios significativos.
+Representante de Mecatronic
+Actualización Líder del Proyecto / Analista de Actualizar requerimientos, documentación,
+Sistemas backlog y cronograma cuando corresponda.
+Implementación Equipo del Proyecto Ejecutar el cambio aprobado.
+Verificación y cierre Líder del Proyecto + Verificar que el cambio haya sido implementado
+Representante de Mecatronic según lo acordado y registrar su cierre.
+CRITERIOS PARA CONSIDERAR UN CAMBIO SIGNIFICATIVO
+Se considerará un cambio significativo cuando:
+➢ Modifique el alcance acordado del proyecto.
+➢ Incorpore o elimine funcionalidades del sistema.
+➢ Modifique requerimientos previamente aprobados.
+➢ Afecte una fecha importante o un entregable.
+➢ Requiera una redistribución considerable del trabajo del equipo.
+➢ Impacte la estructura de la base de datos o la integración entre módulos.
+Aprobado por:
+➢ Jhon Medina – Propietario de Mecatronic / Patrocinador del Proyecto
+➢ José Manuel Sebastián Mercado Rojas – Líder del Proyecto

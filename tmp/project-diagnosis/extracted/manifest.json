@@ -1,0 +1,271 @@
+{
+  "business_case": {
+    "type": "pdf",
+    "path": "C:\\Users\\Sebastian Mercado\\Documents\\UNIVERSIDAD\\CAPSTONE PROJECT SISTEMAS\\SEMANA 4\\Business_Case_Capstone_V2.6.pdf",
+    "pages": 34
+  },
+  "project_charter": {
+    "type": "pdf",
+    "path": "C:\\Users\\Sebastian Mercado\\Documents\\UNIVERSIDAD\\CAPSTONE PROJECT SISTEMAS\\SEMANA 4\\Acta_Constitucion - Capstone V2.pdf",
+    "pages": 14
+  },
+  "srs": {
+    "type": "pdf",
+    "path": "C:\\Users\\Sebastian Mercado\\Documents\\UNIVERSIDAD\\CAPSTONE PROJECT SISTEMAS\\SEMANA 4\\Documento_Requerimientos_Torcly_V2.6.pdf",
+    "pages": 49
+  },
+  "analysis_structure": {
+    "type": "pdf",
+    "path": "C:\\Users\\Sebastian Mercado\\Documents\\UNIVERSIDAD\\CAPSTONE PROJECT SISTEMAS\\SEMANA 4\\Estructura_de_Analisis_Torcly v2.2.pdf",
+    "pages": 7
+  },
+  "edt_diagram": {
+    "type": "pdf",
+    "path": "C:\\Users\\Sebastian Mercado\\Documents\\UNIVERSIDAD\\CAPSTONE PROJECT SISTEMAS\\SEMANA 3\\Diagrama EDT.pdf",
+    "pages": 1
+  },
+  "product_backlog": {
+    "type": "pdf",
+    "path": "C:\\Users\\Sebastian Mercado\\Downloads\\Product_Backlog_Kanban_Torcly (1) (2).pdf",
+    "pages": 9
+  },
+  "daily": {
+    "type": "pdf",
+    "path": "C:\\Users\\Sebastian Mercado\\Downloads\\Daily_Kanban_Torcly_Completo (1).pdf",
+    "pages": 1
+  },
+  "development_plan": {
+    "type": "docx",
+    "path": "C:\\Users\\Sebastian Mercado\\Downloads\\Plan_de_Desarrollo_Torcly_EDT_completa_horas (1).docx",
+    "paragraphs": 156,
+    "tables": 18
+  },
+  "status_report": {
+    "type": "docx",
+    "path": "C:\\Users\\Sebastian Mercado\\Downloads\\2_Informe de Estado del Proyecto (2).docx",
+    "paragraphs": 113,
+    "tables": 9
+  },
+  "status_report_18_sep": {
+    "type": "docx",
+    "path": "C:\\Users\\Sebastian Mercado\\Downloads\\Estado_del_Proyecto_Torcly_18-09-2026.docx",
+    "paragraphs": 94,
+    "tables": 9
+  },
+  "status_report_prior": {
+    "type": "docx",
+    "path": "C:\\Users\\Sebastian Mercado\\Downloads\\2_Informe de Estado del Proyecto.docx",
+    "paragraphs": 112,
+    "tables": 9
+  },
+  "schedule": {
+    "type": "xlsx",
+    "path": "C:\\Users\\Sebastian Mercado\\Documents\\UNIVERSIDAD\\CAPSTONE PROJECT SISTEMAS\\SEMANA 3\\Cronograma - Capstone V2.5.xlsx",
+    "sheets": [
+      {
+        "name": "Plantilla Cronograma",
+        "rows": 148,
+        "columns": 16293
+      },
+      {
+        "name": "Gantt Ágil",
+        "rows": 92,
+        "columns": 28
+      },
+      {
+        "name": "Ejemplo",
+        "rows": 67,
+        "columns": 14
+      }
+    ]
+  },
+  "costing": {
+    "type": "xlsx",
+    "path": "C:\\Users\\Sebastian Mercado\\Downloads\\Costeo_Torcly_por_Paquete_de_Trabajo_V1.0.xlsx",
+    "sheets": [
+      {
+        "name": "Resumen",
+        "rows": 45,
+        "columns": 16
+      },
+      {
+        "name": "Supuestos",
+        "rows": 22,
+        "columns": 6
+      },
+      {
+        "name": "1.1 Formalización del Proyecto",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "1.2 Planificación del Proyecto",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "2.1 Especificación Funcional",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "2.2 Modelamiento Funcional",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "2.3 Diseño de Arquitectura",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "2.4 Diseño de Datos",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "2.5 Diseño UI-UX",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "3.1 Control de Acceso a Torcly",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "4.1 Gestión de Clientes",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "4.2 Gestión de Vehículos",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "5.1 Catálogo de Productos",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "5.2 Control de Inventario",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "6.1 Catálogo de Servicios",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "7.1 Agenda del Taller",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "8.1 Orden de Trabajo",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "8.2 Seguimiento del Taller",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "9.1 Gestión de Ventas",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "9.2 Gestión de Pagos",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "10.1 Consulta Centralizada",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "11.1 Panel Analítico de Torcly",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "12.1 Motor de Apoyo a Reposició",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "13.1 Aseguramiento de Calidad",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "13.2 Implementación",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "13.3 Transferencia de Conocimie",
+        "rows": 32,
+        "columns": 16
+      },
+      {
+        "name": "13.4 Cierre del Proyecto",
+        "rows": 32,
+        "columns": 16
+      }
+    ]
+  },
+  "risks": {
+    "type": "xlsx",
+    "path": "C:\\Users\\Sebastian Mercado\\Downloads\\Matriz_de_Riesgos_Torcly_corregida (1) (1).xlsx",
+    "sheets": [
+      {
+        "name": "Plantilla Matriz de Riesgos ",
+        "rows": 40,
+        "columns": 16
+      },
+      {
+        "name": "Ejemplo",
+        "rows": 24,
+        "columns": 14
+      }
+    ]
+  },
+  "responsibilities": {
+    "type": "xlsx",
+    "path": "C:\\Users\\Sebastian Mercado\\Downloads\\Matriz_de_Responsabilidades_Torcly_Actualizada_V2.5.xlsx",
+    "sheets": [
+      {
+        "name": "Plantilla Matriz Responsabilida",
+        "rows": 381,
+        "columns": 12
+      },
+      {
+        "name": "Ejemplo",
+        "rows": 41,
+        "columns": 14
+      }
+    ]
+  },
+  "communications": {
+    "type": "xlsx",
+    "path": "C:\\Users\\Sebastian Mercado\\Downloads\\Matriz_de_Comunicaciones_Torcly_corregida.xlsx",
+    "sheets": [
+      {
+        "name": "Plantilla Matriz Comunicación",
+        "rows": 51,
+        "columns": 12
+      },
+      {
+        "name": "Ejemplo",
+        "rows": 18,
+        "columns": 12
+      }
+    ]
+  }
+}

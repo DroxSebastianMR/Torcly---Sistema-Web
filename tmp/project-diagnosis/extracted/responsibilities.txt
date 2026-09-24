@@ -1,0 +1,275 @@
+
+=== SHEET Plantilla Matriz Responsabilida (381x12) ===
+C5=Matriz de Asignación de Responsabilidades (RACI)
+C7=Proyecto: | D7=Sistema Web Torcly para la Gestión Operativa del GRUPO MECATRONIC MC PERU S.A.C.
+C8=Código del Proyecto: | D8=G-01
+C10=EDT | D10=Producto / Entregable | E10=Roles del Proyecto y Partes Interesadas
+E11=Líder del Proyecto | F11=Analista de Sistemas | G11=Programadora Full-Stack | H11=Administrador de Base de Datos | I11=Programadora Full-Stack | J11=Patrocinador del Proyecto | K11=Representante del Cliente
+C12=Código EDT | D12=Nombre del producto o entregable | E12=José Manuel Sebastián Mercado Rojas | F12=Arian Armando Bautista Quezada | G12=Brenda Gabriela Ormeño Bocanegra | H12=Piero Ramírez Alva | I12=Carmen Katerin Vega Meza | J12=Jhon Medina | K12=Ysabel Quiteros Montoya
+C14=1 | D14=GESTIÓN DEL PROYECTO | E14=R/A | F14=C | G14=I | H14=I | I14=I | J14=I | K14=I
+C15=1.1 | D15=Formalización del Proyecto | E15=R/A | F15=C | G15=I | H15=I | I15=I | J15=I | K15=I
+C16=1.1.1 | D16=Documentación Fundacional | E16=R/A | F16=C | G16=I | H16=I | I16=I | J16=I | K16=I
+C17=1.1.1.1 | D17=Business Case aprobado | E17=R | F17=C | G17=I | H17=I | I17=I | J17=A | K17=C
+C18=1.1.1.2 | D18=Acta de Constitución aprobada | E18=R | F18=C | G18=I | H18=I | I18=I | J18=A | K18=C
+C19=1.1.1.3 | D19=Registro de Stakeholders validado | E19=R/A | F19=C | G19=I | H19=I | I19=I | J19=C | K19=C
+C20=1.1.1.4 | D20=Alcance base aprobado | E20=R | F20=C | G20=I | H20=I | I20=I | J20=A | K20=C
+C21=1.2 | D21=Planificación del Proyecto | E21=R/A | F21=C | G21=I | H21=I | I21=I | J21=I | K21=I
+C22=1.2.1 | D22=Línea Base de Planificación | E22=R/A | F22=C | G22=I | H22=I | I22=I | J22=I | K22=I
+C23=1.2.1.1 | D23=EDT del proyecto | E23=R/A | F23=C | G23=C | H23=C | I23=C | J23=I | K23=I
+C24=1.2.1.2 | D24=Diccionario EDT | E24=R/A | F24=C | G24=C | H24=C | I24=C | J24=I | K24=I
+C25=1.2.1.3 | D25=Cronograma de 16 semanas | E25=R/A | F25=C | G25=C | H25=C | I25=C | J25=I | K25=I
+C26=1.2.1.4 | D26=Hitos del proyecto | E26=R/A | F26=C | G26=C | H26=C | I26=C | J26=I | K26=I
+C27=1.2.2 | D27=Gestión Organizacional | E27=R/A | F27=C | G27=I | H27=I | I27=I | J27=I | K27=I
+C28=1.2.2.1 | D28=Matriz RACI | E28=R/A | F28=C | G28=C | H28=C | I28=C | J28=I | K28=I
+C29=1.2.2.2 | D29=Matriz de comunicaciones | E29=R/A | F29=C | G29=C | H29=C | I29=C | J29=I | K29=I
+C30=1.2.2.3 | D30=Organización del equipo | E30=R/A | F30=C | G30=C | H30=C | I30=C | J30=I | K30=I
+C31=1.2.3 | D31=Gestión de Riesgos | E31=R/A | F31=C | G31=C | H31=C | I31=C | J31=I | K31=C
+C32=1.2.3.1 | D32=Matriz de riesgos | E32=R/A | F32=C | G32=C | H32=C | I32=C | J32=I | K32=C
+C33=1.2.3.2 | D33=Planes de respuesta | E33=R/A | F33=C | G33=C | H33=C | I33=C | J33=I | K33=C
+C34=2 | D34=ANÁLISIS Y DISEÑO DE LA SOLUCIÓN | E34=C | F34=R/A | G34=C | H34=C | I34=C | J34=C | K34=C
+C35=2.1 | D35=Especificación Funcional | E35=C | F35=R/A | G35=C | H35=C | I35=C | J35=C | K35=C
+C36=2.1.1 | D36=Requerimientos del Sistema | E36=C | F36=R/A | G36=C | H36=C | I36=C | J36=C | K36=C
+C37=2.1.1.1 | D37=Documento SRS V2.6 validado | E37=C | F37=R | G37=C | H37=C | I37=C | J37=A | K37=C
+C38=2.1.1.2 | D38=Reglas de negocio consolidadas | E38=C | F38=R/A | G38=C | H38=C | I38=C | J38=C | K38=C
+C39=2.1.1.3 | D39=Requerimientos no funcionales | E39=C | F39=R/A | G39=C | H39=C | I39=C | J39=C | K39=C
+C40=2.1.1.4 | D40=Matriz de trazabilidad | E40=C | F40=R/A | G40=C | H40=C | I40=C | J40=C | K40=C
+C41=2.2 | D41=Modelamiento Funcional | E41=C | F41=R/A | G41=C | H41=C | I41=C | J41=C | K41=C
+C42=2.2.1 | D42=Procesos de Negocio | E42=C | F42=R/A | G42=C | H42=C | I42=C | J42=C | K42=C
+C43=2.2.1.1 | D43=Modelo de procesos de tienda | E43=C | F43=R | G43=I | H43=I | I43=I | J43=C | K43=A
+C44=2.2.1.2 | D44=Modelo de procesos del taller | E44=C | F44=R | G44=I | H44=I | I44=I | J44=A | K44=C
+C45=2.2.1.3 | D45=Diagramas de casos de uso | E45=C | F45=R/A | G45=C | H45=C | I45=C | J45=C | K45=C
+C46=2.3 | D46=Diseño de Arquitectura | E46=C | F46=R | G46=C | H46=C | I46=A | J46=I | K46=I
+C47=2.3.1 | D47=Arquitectura de Software | E47=C | F47=R | G47=C | H47=C | I47=A | J47=I | K47=I
+C48=2.3.1.1 | D48=Arquitectura Frontend | E48=C | F48=C | G48=R/A | H48=C | I48=C | J48=I | K48=I
+C49=2.3.1.2 | D49=Arquitectura Backend | E49=C | F49=C | G49=C | H49=C | I49=R/A | J49=I | K49=I
+C50=2.3.1.3 | D50=Arquitectura de datos | E50=C | F50=C | G50=C | H50=R/A | I50=C | J50=I | K50=I
+C51=2.3.1.4 | D51=Arquitectura de despliegue | E51=C | F51=C | G51=C | H51=C | I51=R/A | J51=I | K51=I
+C52=2.4 | D52=Diseño de Datos | E52=C | F52=C | G52=I | H52=R/A | I52=C | J52=I | K52=I
+C53=2.4.1 | D53=Modelo de Información | E53=C | F53=C | G53=I | H53=R/A | I53=C | J53=I | K53=I
+C54=2.4.1.1 | D54=Modelo entidad-relación | E54=C | F54=C | G54=I | H54=R/A | I54=C | J54=I | K54=I
+C55=2.4.1.2 | D55=Modelo lógico | E55=C | F55=C | G55=I | H55=R/A | I55=C | J55=I | K55=I
+C56=2.4.1.3 | D56=Modelo físico | E56=C | F56=C | G56=I | H56=R/A | I56=C | J56=I | K56=I
+C57=2.4.1.4 | D57=Diccionario de datos | E57=C | F57=C | G57=I | H57=R/A | I57=C | J57=I | K57=I
+C58=2.5 | D58=Diseño UI/UX | E58=C | F58=C | G58=R/A | H58=I | I58=C | J58=C | K58=C
+C59=2.5.1 | D59=Prototipo del Sistema | E59=C | F59=C | G59=R/A | H59=I | I59=C | J59=C | K59=C
+C60=2.5.1.1 | D60=Mapa de navegación | E60=C | F60=C | G60=R/A | H60=I | I60=C | J60=C | K60=C
+C61=2.5.1.2 | D61=Wireframes | E61=C | F61=C | G61=R/A | H61=I | I61=C | J61=C | K61=C
+C62=2.5.1.3 | D62=Prototipo navegable | E62=C | F62=C | G62=R/A | H62=I | I62=C | J62=C | K62=C
+C63=2.5.1.4 | D63=Prototipo validado | E63=C | F63=C | G63=R | H63=I | I63=C | J63=C | K63=A
+C64=3 | D64=SEGURIDAD Y CONTROL DE ACCESO | E64=R | F64=C | G64=C | H64=C | I64=A | J64=I | K64=I
+C65=3.1 | D65=Control de Acceso a Torcly | E65=C | F65=C | G65=C | H65=C | I65=R/A | J65=I | K65=I
+C66=3.1.1 | D66=Frontend de Seguridad | E66=C | F66=C | G66=R | H66=I | I66=A | J66=I | K66=I
+C67=3.1.1.1 | D67=Interfaz de inicio de sesión | E67=C | F67=C | G67=R | H67=I | I67=A | J67=I | K67=I
+C68=3.1.1.2 | D68=Protección de rutas | E68=C | F68=C | G68=R | H68=I | I68=A | J68=I | K68=I
+C69=3.1.1.3 | D69=Visualización según permisos | E69=C | F69=C | G69=R | H69=I | I69=A | J69=I | K69=I
+C70=3.1.2 | D70=Backend de Seguridad | E70=C | F70=C | G70=C | H70=C | I70=R/A | J70=I | K70=I
+C71=3.1.2.1 | D71=Servicio de autenticación | E71=C | F71=C | G71=C | H71=C | I71=R/A | J71=I | K71=I
+C72=3.1.2.2 | D72=Gestión de sesiones | E72=C | F72=C | G72=C | H72=C | I72=R/A | J72=I | K72=I
+C73=3.1.2.3 | D73=Gestión de roles y permisos | E73=C | F73=C | G73=C | H73=C | I73=R/A | J73=I | K73=I
+C74=3.1.2.4 | D74=Protección de credenciales | E74=C | F74=C | G74=C | H74=C | I74=R/A | J74=I | K74=I
+C75=3.1.3 | D75=Administración de Usuarios | E75=C | F75=C | G75=R | H75=I | I75=A | J75=I | K75=I
+C76=3.1.3.1 | D76=Registro y actualización de usuarios | E76=C | F76=C | G76=R | H76=I | I76=A | J76=I | K76=I
+C77=3.1.3.2 | D77=Activación y desactivación | E77=C | F77=C | G77=R | H77=I | I77=A | J77=I | K77=I
+C78=3.1.3.3 | D78=Asignación de roles | E78=C | F78=C | G78=R | H78=I | I78=A | J78=I | K78=I
+C79=4 | D79=GESTIÓN DE CLIENTES Y VEHÍCULOS | E79=R | F79=C | G79=A | H79=I | I79=C | J79=I | K79=C
+C80=4.1 | D80=Gestión de Clientes | E80=C | F80=C | G80=R/A | H80=I | I80=C | J80=I | K80=C
+C81=4.1.1 | D81=Frontend de Clientes | E81=C | F81=C | G81=R/A | H81=I | I81=C | J81=I | K81=C
+C82=4.1.1.1 | D82=Formulario de registro y actualización | E82=C | F82=C | G82=R/A | H82=I | I82=C | J82=I | K82=C
+C83=4.1.1.2 | D83=Listado y búsqueda de clientes | E83=C | F83=C | G83=R/A | H83=I | I83=C | J83=I | K83=C
+C84=4.1.1.3 | D84=Vista detallada del cliente | E84=C | F84=C | G84=R/A | H84=I | I84=C | J84=I | K84=C
+C85=4.1.2 | D85=Backend de Clientes | E85=C | F85=C | G85=A | H85=I | I85=R | J85=I | K85=C
+C86=4.1.2.1 | D86=Servicio de registro y actualización | E86=C | F86=C | G86=A | H86=I | I86=R | J86=I | K86=C
+C87=4.1.2.2 | D87=Validación de DNI/RUC | E87=C | F87=R | G87=A | H87=I | I87=C | J87=I | K87=C
+C88=4.1.2.3 | D88=Servicio de consulta y búsqueda | E88=C | F88=C | G88=A | H88=I | I88=R | J88=I | K88=C
+C89=4.2 | D89=Gestión de Vehículos | E89=C | F89=C | G89=C | H89=I | I89=R/A | J89=I | K89=C
+C90=4.2.1 | D90=Frontend de Vehículos | E90=C | F90=C | G90=C | H90=I | I90=R/A | J90=I | K90=C
+C91=4.2.1.1 | D91=Registro y actualización | E91=C | F91=C | G91=R | H91=I | I91=A | J91=I | K91=C
+C92=4.2.1.2 | D92=Consulta por placa y cliente | E92=C | F92=C | G92=R | H92=I | I92=A | J92=I | K92=C
+C93=4.2.1.3 | D93=Historial vehicular | E93=C | F93=C | G93=R | H93=I | I93=A | J93=I | K93=C
+C94=4.2.2 | D94=Backend de Vehículos | E94=C | F94=C | G94=C | H94=I | I94=R/A | J94=I | K94=C
+C95=4.2.2.1 | D95=Servicio de gestión vehicular | E95=C | F95=C | G95=C | H95=I | I95=R/A | J95=I | K95=C
+C96=4.2.2.2 | D96=Asociación cliente–vehículo | E96=C | F96=C | G96=C | H96=I | I96=R/A | J96=I | K96=C
+C97=4.2.2.3 | D97=Servicio de historial | E97=C | F97=C | G97=C | H97=I | I97=R/A | J97=I | K97=C
+C98=5 | D98=GESTIÓN DE PRODUCTOS E INVENTARIO | E98=R | F98=C | G98=C | H98=A | I98=C | J98=I | K98=C
+C99=5.1 | D99=Catálogo de Productos | E99=C | F99=C | G99=A | H99=R | I99=C | J99=I | K99=C
+C100=5.1.1 | D100=Frontend de Productos | E100=C | F100=C | G100=A | H100=R | I100=C | J100=I | K100=C
+C101=5.1.1.1 | D101=Formulario de producto | E101=C | F101=C | G101=A | H101=R | I101=C | J101=I | K101=C
+C102=5.1.1.2 | D102=Catálogo y búsqueda | E102=C | F102=C | G102=A | H102=R | I102=C | J102=I | K102=C
+C103=5.1.1.3 | D103=Configuración de producto | E103=C | F103=C | G103=A | H103=R | I103=C | J103=I | K103=C
+C104=5.1.2 | D104=Backend de Productos | E104=C | F104=C | G104=A | H104=R | I104=C | J104=I | K104=C
+C105=5.1.2.1 | D105=Servicio de productos | E105=C | F105=C | G105=A | H105=R | I105=C | J105=I | K105=C
+C106=5.1.2.2 | D106=Validación de códigos | E106=C | F106=C | G106=A | H106=R | I106=C | J106=I | K106=C
+C107=5.1.2.3 | D107=Gestión de estado | E107=C | F107=C | G107=A | H107=R | I107=C | J107=I | K107=C
+C108=5.2 | D108=Control de Inventario | E108=C | F108=C | G108=C | H108=R/A | I108=C | J108=I | K108=C
+C109=5.2.1 | D109=Frontend de Inventario | E109=C | F109=C | G109=C | H109=R/A | I109=C | J109=I | K109=C
+C110=5.2.1.1 | D110=Consulta de existencias | E110=C | F110=C | G110=C | H110=R/A | I110=C | J110=I | K110=C
+C111=5.2.1.2 | D111=Registro de movimientos | E111=C | F111=C | G111=C | H111=R/A | I111=C | J111=I | K111=C
+C112=5.2.1.3 | D112=Historial de movimientos | E112=C | F112=C | G112=C | H112=R/A | I112=C | J112=I | K112=C
+C113=5.2.1.4 | D113=Alertas de stock mínimo | E113=C | F113=C | G113=C | H113=R/A | I113=C | J113=I | K113=C
+C114=5.2.2 | D114=Backend de Inventario | E114=C | F114=C | G114=C | H114=R/A | I114=C | J114=I | K114=C
+C115=5.2.2.1 | D115=Servicio de movimientos | E115=C | F115=C | G115=C | H115=R/A | I115=C | J115=I | K115=C
+C116=5.2.2.2 | D116=Cálculo de existencias | E116=C | F116=C | G116=C | H116=R/A | I116=C | J116=I | K116=C
+C117=5.2.2.3 | D117=Control de stock negativo | E117=C | F117=C | G117=C | H117=R/A | I117=C | J117=I | K117=C
+C118=5.2.2.4 | D118=Control de stock mínimo | E118=C | F118=C | G118=C | H118=R/A | I118=C | J118=I | K118=C
+C119=6 | D119=GESTIÓN DE SERVICIOS AUTOMOTRICES | E119=R | F119=C | G119=C | H119=I | I119=A | J119=C | K119=I
+C120=6.1 | D120=Catálogo de Servicios | E120=C | F120=C | G120=C | H120=I | I120=R/A | J120=C | K120=I
+C121=6.1.1 | D121=Frontend de Servicios | E121=C | F121=C | G121=R | H121=I | I121=A | J121=C | K121=I
+C122=6.1.1.1 | D122=Registro de servicio | E122=C | F122=C | G122=R | H122=I | I122=A | J122=C | K122=I
+C123=6.1.1.2 | D123=Consulta y búsqueda | E123=C | F123=C | G123=R | H123=I | I123=A | J123=C | K123=I
+C124=6.1.1.3 | D124=Activación y desactivación | E124=C | F124=C | G124=R | H124=I | I124=A | J124=C | K124=I
+C125=6.1.2 | D125=Backend de Servicios | E125=C | F125=C | G125=C | H125=I | I125=R/A | J125=C | K125=I
+C126=6.1.2.1 | D126=Servicio de gestión del catálogo | E126=C | F126=C | G126=C | H126=I | I126=R/A | J126=C | K126=I
+C127=6.1.2.2 | D127=Gestión de precio referencial | E127=C | F127=C | G127=C | H127=I | I127=R/A | J127=C | K127=I
+C128=6.1.2.3 | D128=Conservación de datos históricos | E128=C | F128=C | G128=C | H128=I | I128=R/A | J128=C | K128=I
+C129=7 | D129=GESTIÓN DE CITAS Y ATENCIONES | E129=R | F129=C | G129=A | H129=I | I129=C | J129=C | K129=C
+C130=7.1 | D130=Agenda del Taller | E130=C | F130=R | G130=A | H130=I | I130=C | J130=C | K130=C
+C131=7.1.1 | D131=Frontend de Citas | E131=C | F131=C | G131=R/A | H131=I | I131=C | J131=C | K131=C
+C132=7.1.1.1 | D132=Registro de cita | E132=C | F132=C | G132=R/A | H132=I | I132=C | J132=C | K132=C
+C133=7.1.1.2 | D133=Agenda de citas | E133=C | F133=C | G133=R/A | H133=I | I133=C | J133=C | K133=C
+C134=7.1.1.3 | D134=Reprogramación | E134=C | F134=C | G134=R/A | H134=I | I134=C | J134=C | K134=C
+C135=7.1.1.4 | D135=Cancelación | E135=C | F135=C | G135=R/A | H135=I | I135=C | J135=C | K135=C
+C136=7.1.2 | D136=Backend de Citas | E136=C | F136=R | G136=A | H136=I | I136=C | J136=C | K136=C
+C137=7.1.2.1 | D137=Servicio de programación | E137=C | F137=R | G137=A | H137=I | I137=C | J137=C | K137=C
+C138=7.1.2.2 | D138=Validación de disponibilidad | E138=C | F138=R | G138=A | H138=I | I138=C | J138=C | K138=C
+C139=7.1.2.3 | D139=Gestión de estados | E139=C | F139=R | G139=A | H139=I | I139=C | J139=C | K139=C
+C140=7.1.2.4 | D140=Conversión de cita en atención | E140=C | F140=R | G140=A | H140=I | I140=C | J140=C | K140=C
+C141=8 | D141=GESTIÓN DE OPERACIONES DEL TALLER | E141=R | F141=C | G141=C | H141=C | I141=A | J141=C | K141=I
+C142=8.1 | D142=Orden de Trabajo | E142=C | F142=C | G142=C | H142=C | I142=R/A | J142=C | K142=I
+C143=8.1.1 | D143=Registro de Atención | E143=C | F143=R | G143=C | H143=C | I143=A | J143=C | K143=I
+C144=8.1.1.1 | D144=Ingreso del vehículo | E144=C | F144=R | G144=C | H144=C | I144=A | J144=C | K144=I
+C145=8.1.1.2 | D145=Diagnóstico | E145=C | F145=R | G145=C | H145=C | I145=A | J145=C | K145=I
+C146=8.1.1.3 | D146=Presupuesto | E146=C | F146=R | G146=C | H146=C | I146=A | J146=C | K146=I
+C147=8.1.1.4 | D147=Autorización del cliente | E147=C | F147=R | G147=C | H147=C | I147=A | J147=C | K147=I
+C148=8.1.2 | D148=Ejecución del Servicio | E148=C | F148=C | G148=C | H148=C | I148=R/A | J148=C | K148=I
+C149=8.1.2.1 | D149=Asignación de técnico | E149=C | F149=C | G149=C | H149=C | I149=R/A | J149=C | K149=I
+C150=8.1.2.2 | D150=Servicios realizados | E150=C | F150=C | G150=C | H150=C | I150=R/A | J150=C | K150=I
+C151=8.1.2.3 | D151=Repuestos utilizados | E151=C | F151=C | G151=C | H151=C | I151=R/A | J151=C | K151=I
+C152=8.1.2.4 | D152=Descuento de inventario | E152=C | F152=C | G152=C | H152=C | I152=R/A | J152=C | K152=I
+C153=8.1.3 | D153=Finalización de Atención | E153=C | F153=C | G153=R | H153=C | I153=A | J153=C | K153=I
+C154=8.1.3.1 | D154=Registro de finalización | E154=C | F154=C | G154=R | H154=C | I154=A | J154=C | K154=I
+C155=8.1.3.2 | D155=Registro de entrega | E155=C | F155=C | G155=R | H155=C | I155=A | J155=C | K155=I
+C156=8.1.3.3 | D156=Incorporación al historial | E156=C | F156=R | G156=C | H156=C | I156=A | J156=C | K156=I
+C157=8.2 | D157=Seguimiento del Taller | E157=C | F157=C | G157=C | H157=C | I157=R/A | J157=C | K157=I
+C158=8.2.1 | D158=Control de Estados | E158=C | F158=C | G158=C | H158=C | I158=R/A | J158=C | K158=I
+C159=8.2.1.1 | D159=Consulta del estado actual | E159=C | F159=C | G159=C | H159=C | I159=R/A | J159=C | K159=I
+C160=8.2.1.2 | D160=Actualización de estado | E160=C | F160=C | G160=C | H160=C | I160=R/A | J160=C | K160=I
+C161=8.2.1.3 | D161=Validación de transiciones | E161=C | F161=C | G161=C | H161=C | I161=R/A | J161=C | K161=I
+C162=8.2.1.4 | D162=Historial de estados | E162=C | F162=C | G162=C | H162=C | I162=R/A | J162=C | K162=I
+C163=9 | D163=GESTIÓN DE VENTAS Y PAGOS | E163=R | F163=C | G163=A | H163=C | I163=C | J163=I | K163=C
+C164=9.1 | D164=Gestión de Ventas | E164=C | F164=C | G164=R/A | H164=C | I164=C | J164=I | K164=C
+C165=9.1.1 | D165=Registro Comercial | E165=C | F165=C | G165=R/A | H165=C | I165=C | J165=I | K165=C
+C166=9.1.1.1 | D166=Venta de productos | E166=C | F166=C | G166=R/A | H166=C | I166=C | J166=I | K166=C
+C167=9.1.1.2 | D167=Venta de servicios | E167=C | F167=C | G167=R/A | H167=C | I167=C | J167=I | K167=C
+C168=9.1.1.3 | D168=Cálculo de importes | E168=C | F168=C | G168=R/A | H168=C | I168=C | J168=I | K168=C
+C169=9.1.1.4 | D169=Confirmación de venta | E169=C | F169=C | G169=R/A | H169=C | I169=C | J169=I | K169=C
+C170=9.2 | D170=Gestión de Pagos | E170=C | F170=C | G170=A | H170=R | I170=C | J170=I | K170=C
+C171=9.2.1 | D171=Registro de Pagos | E171=C | F171=C | G171=A | H171=R | I171=C | J171=I | K171=C
+C172=9.2.1.1 | D172=Registro del importe | E172=C | F172=C | G172=A | H172=R | I172=C | J172=I | K172=C
+C173=9.2.1.2 | D173=Método de pago | E173=C | F173=C | G173=A | H173=R | I173=C | J173=I | K173=C
+C174=9.2.1.3 | D174=Pagos parciales | E174=C | F174=C | G174=A | H174=R | I174=C | J174=I | K174=C
+C175=9.2.1.4 | D175=Cálculo de saldo pendiente | E175=C | F175=C | G175=A | H175=R | I175=C | J175=I | K175=C
+C176=9.2.1.5 | D176=Historial de pagos | E176=C | F176=C | G176=A | H176=R | I176=C | J176=I | K176=C
+C177=10 | D177=CONSULTA Y CONTROL OPERATIVO | E177=R | F177=A | G177=C | H177=C | I177=C | J177=C | K177=C
+C178=10.1 | D178=Consulta Centralizada | E178=C | F178=R/A | G178=C | H178=C | I178=C | J178=C | K178=C
+C179=10.1.1 | D179=Panel Operativo | E179=C | F179=R/A | G179=C | H179=C | I179=C | J179=C | K179=C
+C180=10.1.1.1 | D180=Consulta de clientes y vehículos | E180=C | F180=R/A | G180=C | H180=C | I180=C | J180=C | K180=C
+C181=10.1.1.2 | D181=Consulta de inventario | E181=C | F181=R/A | G181=C | H181=C | I181=C | J181=C | K181=C
+C182=10.1.1.3 | D182=Consulta de citas y taller | E182=C | F182=R/A | G182=C | H182=C | I182=C | J182=C | K182=C
+C183=10.1.1.4 | D183=Consulta de ventas y pagos | E183=C | F183=R/A | G183=C | H183=C | I183=C | J183=C | K183=C
+C184=10.1.1.5 | D184=Filtros de búsqueda operativa | E184=C | F184=R/A | G184=C | H184=C | I184=C | J184=C | K184=C
+C185=11 | D185=INTELIGENCIA DE NEGOCIOS Y ANALÍTICA OPERATIVA | E185=R | F185=A | G185=C | H185=C | I185=C | J185=C | K185=C
+C186=11.1 | D186=Panel Analítico de Torcly | E186=C | F186=R/A | G186=C | H186=C | I186=C | J186=C | K186=C
+C187=11.1.1 | D187=Preparación Analítica | E187=C | F187=R/A | G187=C | H187=C | I187=C | J187=C | K187=C
+C188=11.1.1.1 | D188=Fuentes de datos operativos | E188=C | F188=A | G188=C | H188=R | I188=C | J188=C | K188=C
+C189=11.1.1.2 | D189=Definición de indicadores | E189=C | F189=R/A | G189=C | H189=C | I189=C | J189=C | K189=C
+C190=11.1.1.3 | D190=Reglas de cálculo de KPI | E190=C | F190=R/A | G190=C | H190=C | I190=C | J190=C | K190=C
+C191=11.1.2 | D191=Dashboard BI | E191=C | F191=A | G191=R | H191=C | I191=C | J191=C | K191=C
+C192=11.1.2.1 | D192=Indicadores de inventario | E192=C | F192=R/A | G192=C | H192=C | I192=C | J192=C | K192=C
+C193=11.1.2.2 | D193=Indicadores de ventas y pagos | E193=C | F193=R/A | G193=C | H193=C | I193=C | J193=C | K193=C
+C194=11.1.2.3 | D194=Indicadores de servicios y taller | E194=C | F194=R/A | G194=C | H194=C | I194=C | J194=C | K194=C
+C195=11.1.2.4 | D195=Filtros temporales | E195=C | F195=R/A | G195=C | H195=C | I195=C | J195=C | K195=C
+C196=11.1.2.5 | D196=Visualización de tendencias | E196=C | F196=A | G196=R | H196=C | I196=C | J196=C | K196=C
+C197=12 | D197=INTELIGENCIA ARTIFICIAL PARA APOYO AL INVENTARIO | E197=C | F197=C | G197=C | H197=R/A | I197=C | J197=C | K197=C
+C198=12.1 | D198=Motor de Apoyo a Reposición | E198=C | F198=C | G198=C | H198=R/A | I198=C | J198=C | K198=C
+C199=12.1.1 | D199=Preparación de Datos | E199=C | F199=C | G199=C | H199=R/A | I199=C | J199=C | K199=C
+C200=12.1.1.1 | D200=Histórico de movimientos | E200=C | F200=C | G200=C | H200=R/A | I200=C | J200=C | K200=C
+C201=12.1.1.2 | D201=Histórico de ventas | E201=C | F201=C | G201=C | H201=R/A | I201=C | J201=C | K201=C
+C202=12.1.1.3 | D202=Consumo de productos en servicios | E202=C | F202=C | G202=C | H202=R/A | I202=C | J202=C | K202=C
+C203=12.1.1.4 | D203=Criterios de elegibilidad de datos | E203=C | F203=C | G203=C | H203=R/A | I203=C | J203=C | K203=C
+C204=12.1.2 | D204=Recomendaciones de Reposición | E204=C | F204=C | G204=C | H204=A | I204=R | J204=C | K204=C
+C205=12.1.2.1 | D205=Análisis de patrones de consumo | E205=C | F205=C | G205=C | H205=A | I205=R | J205=C | K205=C
+C206=12.1.2.2 | D206=Estimación de reposición | E206=C | F206=C | G206=C | H206=A | I206=R | J206=C | K206=C
+C207=12.1.2.3 | D207=Recomendación al usuario | E207=C | F207=C | G207=C | H207=A | I207=R | J207=C | K207=C
+C208=12.1.2.4 | D208=Aviso de datos insuficientes | E208=C | F208=C | G208=C | H208=A | I208=R | J208=C | K208=C
+C209=12.1.2.5 | D209=Trazabilidad de recomendaciones | E209=C | F209=C | G209=C | H209=A | I209=R | J209=C | K209=C
+C210=13 | D210=CALIDAD, IMPLEMENTACIÓN Y CIERRE | E210=R/A | F210=C | G210=C | H210=C | I210=C | J210=C | K210=C
+C211=13.1 | D211=Aseguramiento de Calidad | E211=R | F211=A | G211=C | H211=C | I211=C | J211=C | K211=C
+C212=13.1.1 | D212=Pruebas del Sistema | E212=R | F212=A | G212=C | H212=C | I212=C | J212=C | K212=C
+C213=13.1.1.1 | D213=Pruebas funcionales | E213=C | F213=R/A | G213=C | H213=C | I213=C | J213=C | K213=C
+C214=13.1.1.2 | D214=Pruebas de integración | E214=C | F214=A | G214=C | H214=C | I214=R | J214=C | K214=C
+C215=13.1.1.3 | D215=Pruebas no funcionales | E215=C | F215=A | G215=C | H215=R | I215=C | J215=C | K215=C
+C216=13.1.1.4 | D216=Pruebas BI | E216=C | F216=A | G216=R | H216=C | I216=C | J216=C | K216=C
+C217=13.1.1.5 | D217=Pruebas IA | E217=C | F217=A | G217=C | H217=C | I217=R | J217=C | K217=C
+C218=13.1.1.6 | D218=Pruebas de aceptación | E218=C | F218=R | G218=I | H218=I | I218=I | J218=A | K218=C
+C219=13.2 | D219=Implementación | E219=R | F219=I | G219=C | H219=C | I219=A | J219=C | K219=C
+C220=13.2.1 | D220=Entorno de Producción | E220=R | F220=I | G220=C | H220=C | I220=A | J220=C | K220=C
+C221=13.2.1.1 | D221=Aplicación web desplegada | E221=C | F221=I | G221=R | H221=C | I221=A | J221=C | K221=C
+C222=13.2.1.2 | D222=Backend desplegado | E222=C | F222=I | G222=C | H222=C | I222=R/A | J222=C | K222=C
+C223=13.2.1.3 | D223=Base de datos desplegada | E223=C | F223=I | G223=I | H223=R/A | I223=C | J223=C | K223=C
+C224=13.2.1.4 | D224=HTTPS y configuración segura | E224=C | F224=I | G224=C | H224=C | I224=R/A | J224=C | K224=C
+C225=13.3 | D225=Transferencia de Conocimiento | E225=R/A | F225=C | G225=C | H225=C | I225=C | J225=C | K225=C
+C226=13.3.1 | D226=Documentación | E226=R/A | F226=C | G226=C | H226=C | I226=C | J226=C | K226=C
+C227=13.3.1.1 | D227=Manual de usuario | E227=A | F227=R | G227=C | H227=I | I227=C | J227=C | K227=C
+C228=13.3.1.2 | D228=Documentación técnica | E228=A | F228=C | G228=C | H228=C | I228=R | J228=I | K228=I
+C229=13.3.1.3 | D229=Guía de despliegue | E229=A | F229=I | G229=C | H229=R | I229=C | J229=I | K229=I
+C230=13.3.2 | D230=Capacitación | E230=R/A | F230=C | G230=C | H230=I | I230=C | J230=C | K230=C
+C231=13.3.2.1 | D231=Capacitación administrativa | E231=A | F231=C | G231=R | H231=I | I231=I | J231=I | K231=C
+C232=13.3.2.2 | D232=Capacitación técnica | E232=A | F232=C | G232=I | H232=C | I232=R | J232=C | K232=I
+C233=13.4 | D233=Cierre del Proyecto | E233=R/A | F233=C | G233=C | H233=C | I233=C | J233=C | K233=C
+C234=13.4.1 | D234=Aceptación Final | E234=R | F234=C | G234=C | H234=C | I234=C | J234=A | K234=C
+C235=13.4.1.1 | D235=Demostración final | E235=R | F235=C | G235=C | H235=C | I235=C | J235=A | K235=C
+C236=13.4.1.2 | D236=Acta de aceptación | E236=R | F236=C | G236=C | H236=C | I236=C | J236=A | K236=C
+C237=13.4.1.3 | D237=Sistema Web Torcly V1.0 | E237=R | F237=C | G237=C | H237=C | I237=C | J237=A | K237=C
+C238=13.4.2 | D238=Cierre Documental | E238=R/A | F238=C | G238=C | H238=C | I238=C | J238=C | K238=C
+C239=13.4.2.1 | D239=Informe final | E239=R/A | F239=C | G239=C | H239=C | I239=C | J239=C | K239=C
+C240=13.4.2.2 | D240=Evidencias finales | E240=R/A | F240=C | G240=C | H240=C | I240=C | J240=C | K240=C
+C243=R = Responsable: ejecuta y desarrolla la actividad o entregable. | G243=Cada elemento de la EDT debe contar con un único Responsable (R o R/A).
+C244=A = Aprobador: valida y autoriza formalmente el resultado. | G244=Los roles A, C e I se asignan de acuerdo con la necesidad de cada elemento de la EDT.
+C245=C = Consultado: aporta información, criterio o conocimiento especializado. | G245=Cuando una misma persona ejecuta y aprueba el entregable, se utiliza la asignación R/A.
+C246=I = Informado: recibe comunicación sobre el avance o resultado. | G246=La matriz conserva la estructura y el orden definidos en la EDT vigente del proyecto.
+C248=RESUMEN DE CARGA DE RESPONSABILIDADES DEL EQUIPO
+C249=Integrante | H249=Total de responsabilidades asignadas (R y R/A)
+C250=José Manuel Sebastián Mercado Rojas | H250==COUNTIF(E$14:E$240,"R")+COUNTIF(E$14:E$240,"R/A")
+C251=Arian Armando Bautista Quezada | H251==COUNTIF(F$14:F$240,"R")+COUNTIF(F$14:F$240,"R/A")
+C252=Brenda Gabriela Ormeño Bocanegra | H252==COUNTIF(G$14:G$240,"R")+COUNTIF(G$14:G$240,"R/A")
+C253=Piero Ramírez Alva | H253==COUNTIF(H$14:H$240,"R")+COUNTIF(H$14:H$240,"R/A")
+C254=Carmen Katerin Vega Meza | H254==COUNTIF(I$14:I$240,"R")+COUNTIF(I$14:I$240,"R/A")
+C255=Mínimo de responsabilidades por integrante | H255==MIN(H250:H254)
+C256=Máximo de responsabilidades por integrante | H256==MAX(H250:H254)
+C257=Diferencia máxima entre integrantes | H257==H256-H255
+C258=Criterio de balance: la carga individual se calcula considerando únicamente las asignaciones R y R/A. La diferencia entre el integrante con mayor y menor carga debe mantenerse dentro del margen establecido por el equipo.
+
+=== SHEET Ejemplo (41x14) ===
+D6=Matriz de Responsabilidades
+D8=Proyecto: | E8=Apoyo Educativo
+D9=ID: | E9=HT2011-12
+D11=EDT | E11=Producto o Entregable | F11=Interesados (Stakeholders)
+F12=Erika Estrada      (GP) | G12=Yolanda Andrade (EC) | H12=Jessica Espín     (EF) | I12=David López    (EO) | J12=Raúl Toledo (CE) | K12=Mariana García (EA) | L12=Rosalía Juárez      (DT) | M12=Juan Solís Interesado  (Stakeholder)
+D14=1 | E14=Infraestructura de calidad
+D15=1.1 | E15=30 Escuelas Construidas | F15=A | I15=R | K15=C | L15=I | M15=I
+D16=2 | E16=Mejora de la calidad de la educación
+D17=2.1 | E17=Capacitación | F17=A | J17=R | L17=I
+D18=3 | E18=Apoyo y aceptación del proyecto
+D19=3.1 | E19=Campaña de Comunicación Diseñada | F19=A | G19=R | J19=C | L19=I
+D20=3.2 | E20=Campaña de Comunicación Difundida | F20=I | G20=R | L20=I | M20=I
+D21=4 | E21=Gestión exitosa del proyecto
+D22=4.3 | E22=Auditorias Internas y Externas Completadas | F22=I | H22=R | L22=A
+D27=R = Responsable de la ejecución | F27=Nota: debe haber un único responsable por cada elemento de la EDT
+D28=A = Aprueba | F28=Los demás roles se pueden asignar a más de una persona.
+D29=C = Consultado | F29=No es necesario que para cada elemento de la EDT se asignen los cuatro roles.
+D30=I = Informado
+F33=GP = Gerente de Proyecto
+F34=EO = Especialista en Obras Civiles
+F35=CE = Capacitador en Educación
+F36=EC = Especialista en Comunicación
+F37=EA = Especialista en Adquisiciones
