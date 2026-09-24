@@ -4,6 +4,7 @@ Módulos operativos actuales:
 
 - `health`: disponibilidad de la API;
 - `auth`: autenticación, sesión, permisos y auditoría;
+- `users`: administración de cuentas, roles y estado, con auditoría;
 - `products`: catálogo persistente protegido por permisos.
 
 Los demás directorios documentan el límite previsto para sus sprints correspondientes.

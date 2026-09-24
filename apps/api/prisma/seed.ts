@@ -25,6 +25,7 @@ const defaultPermissionCodes = [
   'customers:read',
   'cash:read',
   'users:read',
+  'users:write',
   'notifications:read',
   'profile:read',
   'reports:read',
