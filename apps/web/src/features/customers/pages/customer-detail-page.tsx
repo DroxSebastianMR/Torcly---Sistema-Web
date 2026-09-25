@@ -7,6 +7,7 @@ import { ErrorState } from '@/components/ui/error-state'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { paths } from '@/app/router/constants/paths'
+import { CustomerVehicles } from '@/features/vehicles/components/customer-vehicles'
 import { CustomerFormModal } from '../components/customer-form-modal'
 import { useCustomer } from '../hooks/use-customers'
 import type { Customer } from '../types/customers.types'
@@ -25,6 +26,10 @@ export default function Page() {
   const canWrite = hasPermission(
     currentUser?.permissions ?? [],
     'customers:write',
+  )
+  const canViewVehicles = hasPermission(
+    currentUser?.permissions ?? [],
+    'vehicles:read',
   )
   const customer = useCustomer(id ?? '')
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
@@ -116,19 +121,17 @@ export default function Page() {
       </section>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]">
-          <header className="flex items-center gap-2 border-b px-5 py-4">
-            <Car size={16} className="text-primary" />
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-forest">
-              Vehículos del cliente
-            </h2>
-          </header>
-          <EmptyState
-            icon={Car}
-            title="Todavía no hay vehículos"
-            description="Cuando se asocie una unidad, verás aquí la placa, marca y modelo del vehículo."
-          />
-        </section>
+        {canViewVehicles && (
+          <section className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]">
+            <header className="flex items-center gap-2 border-b px-5 py-4">
+              <Car size={16} className="text-primary" />
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-forest">
+                Vehículos del cliente
+              </h2>
+            </header>
+            <CustomerVehicles customerId={details.id} />
+          </section>
+        )}
         <section className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]">
           <header className="flex items-center gap-2 border-b px-5 py-4">
             <History size={16} className="text-primary" />

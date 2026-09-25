@@ -10,6 +10,8 @@ export const paths = {
   sales: '/ventas',
   customers: '/clientes',
   customerDetail: '/clientes/:id',
+  vehicles: '/vehiculos',
+  vehicleDetail: '/vehiculos/:id',
   cash: '/caja',
   users: '/usuarios',
   notifications: '/notificaciones',

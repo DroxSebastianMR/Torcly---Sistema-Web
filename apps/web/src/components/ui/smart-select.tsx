@@ -194,10 +194,10 @@ export function SmartSelect({
           <div
             ref={menuRef}
             style={menuStyle}
-            className="fixed z-[60] flex overflow-hidden rounded-xl border border-border/80 bg-card p-2 shadow-[0_18px_40px_rgba(7,28,22,0.16)]"
+            className="fixed z-[60] flex flex-col overflow-hidden rounded-xl border border-border/80 bg-card p-2 shadow-[0_18px_40px_rgba(7,28,22,0.16)]"
           >
             {showsSearchInput && (
-              <div className="relative mb-2 shrink-0">
+              <div className="relative mb-2 w-full shrink-0">
                 <Search
                   aria-hidden
                   className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
@@ -211,6 +211,11 @@ export function SmartSelect({
                   }}
                   onKeyDown={(event) => {
                     if (event.key === 'Escape') setOpen(false)
+                    if (event.key === 'Enter') {
+                      event.preventDefault()
+                      if (allowCustomValue) onChange(query)
+                      setOpen(false)
+                    }
                   }}
                   placeholder={searchPlaceholder}
                   className="h-10 w-full rounded-lg border border-input bg-background py-2 pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -221,7 +226,7 @@ export function SmartSelect({
               id={listId}
               role="listbox"
               aria-label={ariaLabel}
-              className="min-h-0 flex-1 overflow-y-auto py-1"
+              className="min-h-0 w-full flex-1 overflow-y-auto py-1"
             >
               {filteredOptions.map((option) => {
                 const isSelected = option.value === value

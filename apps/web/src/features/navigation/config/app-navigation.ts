@@ -4,6 +4,7 @@ import {
   ShoppingCart,
   Truck,
   UsersRound,
+  Car,
   Wallet,
   Package,
   Warehouse,
@@ -65,6 +66,14 @@ export const appNavigation: readonly NavigationGroup[] = [
         path: paths.customers,
         visible: true,
         permission: 'customers:read',
+      },
+      {
+        id: 'vehicles',
+        label: 'Vehículos',
+        icon: Car,
+        path: paths.vehicles,
+        visible: true,
+        permission: 'vehicles:read',
       },
       {
         id: 'cash',

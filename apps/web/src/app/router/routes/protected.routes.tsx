@@ -111,6 +111,29 @@ export const protectedRoutes: RouteObject[] = [
             ],
           },
           {
+            element: <PermissionRoute permission="vehicles:read" />,
+            children: [
+              {
+                path: paths.vehicles,
+                lazy: async () => ({
+                  Component: (
+                    await import('@/features/vehicles/pages/vehicles-page')
+                  ).default,
+                }),
+              },
+              {
+                path: paths.vehicleDetail,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/vehicles/pages/vehicle-detail-page'
+                    )
+                  ).default,
+                }),
+              },
+            ],
+          },
+          {
             element: <PermissionRoute permission="cash:read" />,
             children: [
               {

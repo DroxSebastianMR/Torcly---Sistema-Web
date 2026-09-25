@@ -22,6 +22,10 @@ export const endpoints = {
     root: '/customers',
     detail: (id: string) => `/customers/${id}`,
   },
+  vehicles: {
+    root: '/vehicles',
+    detail: (id: string) => `/vehicles/${id}`,
+  },
   cash: '/cash',
   users: {
     root: '/users',

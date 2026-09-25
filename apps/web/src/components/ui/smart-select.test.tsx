@@ -68,10 +68,13 @@ describe('SmartSelect', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Buscar usuarios' }))
+    const trigger = screen.getByRole('button', { name: 'Buscar usuarios' })
+    await user.click(trigger)
     await user.type(screen.getByPlaceholderText('Buscar opción…'), 'arianbq')
+    await user.keyboard('{Enter}')
 
     expect(onChange).toHaveBeenLastCalledWith('arianbq')
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
 
   it('permite definir el criterio de coincidencia de cada módulo', async () => {

@@ -25,6 +25,10 @@ vi.mock('../components/customer-form-modal', () => ({
   CustomerFormModal: () => null,
 }))
 
+vi.mock('@/features/vehicles/components/customer-vehicles', () => ({
+  CustomerVehicles: () => <p>Todavía no hay vehículos</p>,
+}))
+
 const existingCustomer: Customer = {
   id: 'c1',
   type: 'NATURAL',
@@ -90,7 +94,9 @@ describe('Ficha de cliente', () => {
 
   it('muestra la ficha con datos y las secciones vacías preparadas', () => {
     auth.useAuth.mockReturnValue({
-      user: { permissions: ['customers:read', 'customers:write'] },
+      user: {
+        permissions: ['customers:read', 'customers:write', 'vehicles:read'],
+      },
     })
     customers.useCustomer.mockReturnValue({
       data: existingCustomer,
@@ -131,5 +137,22 @@ describe('Ficha de cliente', () => {
     renderDetail()
 
     expect(screen.queryByRole('button', { name: 'Editar cliente' })).toBeNull()
+  })
+
+  it('oculta la sección de vehículos sin permiso vehicles:read', () => {
+    auth.useAuth.mockReturnValue({ user: { permissions: ['customers:read'] } })
+    customers.useCustomer.mockReturnValue({
+      data: existingCustomer,
+      isPending: false,
+      isFetching: false,
+      isError: false,
+      refetch: vi.fn(),
+    })
+
+    renderDetail()
+
+    expect(
+      screen.queryByRole('heading', { name: 'Vehículos del cliente' }),
+    ).toBeNull()
   })
 })
