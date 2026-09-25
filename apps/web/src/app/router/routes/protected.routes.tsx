@@ -111,6 +111,21 @@ export const protectedRoutes: RouteObject[] = [
             ],
           },
           {
+            element: <PermissionRoute permission="appointments:read" />,
+            children: [
+              {
+                path: paths.appointments,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/appointments/pages/appointments-page'
+                    )
+                  ).default,
+                }),
+              },
+            ],
+          },
+          {
             element: <PermissionRoute permission="customers:read" />,
             children: [
               {

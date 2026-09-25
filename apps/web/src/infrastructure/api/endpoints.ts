@@ -44,6 +44,12 @@ export const endpoints = {
     detail: (id: string) => `/sales/${id}`,
     confirm: (id: string) => `/sales/${id}/confirm`,
   },
+  appointments: {
+    root: '/appointments',
+    detail: (id: string) => `/appointments/${id}`,
+    reschedule: (id: string) => `/appointments/${id}/reschedule`,
+    cancel: (id: string) => `/appointments/${id}/cancel`,
+  },
   customers: {
     root: '/customers',
     detail: (id: string) => `/customers/${id}`,

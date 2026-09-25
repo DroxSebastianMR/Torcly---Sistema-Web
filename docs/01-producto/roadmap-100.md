@@ -8,7 +8,7 @@ El avance se calcula exclusivamente con historias aprobadas del Product Backlog:
 
 Una historia no recibe porcentaje parcial. Una tarea técnica, migración, prueba o ajuste visual solo cuenta dentro de la historia que habilita y cuando cumple la [Definition of Done](../04-calidad/definition-of-done.md).
 
-Al cierre del Sprint 07 hay **35 de 92 historias aprobadas (38,04%)**. Esta hoja de ruta ordena las 57 historias restantes hasta el 100%; no autoriza a dar por aprobado un sprint sin prueba manual y aprobación expresa del usuario.
+Al cierre del Sprint 08 hay **40 de 92 historias aprobadas (43,48%)**. Esta hoja de ruta ordena las 52 historias restantes hasta el 100%; no autoriza a dar por aprobado un sprint sin prueba manual y aprobación expresa del usuario.
 
 ## Plan de sprints
 

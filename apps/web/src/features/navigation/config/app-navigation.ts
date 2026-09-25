@@ -13,6 +13,7 @@ import {
   Bell,
   CircleUserRound,
   Wrench,
+  CalendarDays,
 } from 'lucide-react'
 import { paths } from '@/app/router/constants/paths'
 import type { NavigationGroup } from '../types/navigation.types'
@@ -51,6 +52,14 @@ export const appNavigation: readonly NavigationGroup[] = [
         path: paths.sales,
         visible: true,
         permission: 'sales:read',
+      },
+      {
+        id: 'appointments',
+        label: 'Citas',
+        icon: CalendarDays,
+        path: paths.appointments,
+        visible: true,
+        permission: 'appointments:read',
       },
       {
         id: 'purchases',

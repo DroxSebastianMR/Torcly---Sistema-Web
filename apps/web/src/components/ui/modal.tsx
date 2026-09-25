@@ -32,6 +32,24 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(', ')
 
+let bodyScrollLockCount = 0
+let previousBodyOverflow = ''
+
+function lockBodyScroll() {
+  if (bodyScrollLockCount === 0) {
+    previousBodyOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+  }
+  bodyScrollLockCount += 1
+}
+
+function unlockBodyScroll() {
+  bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1)
+  if (bodyScrollLockCount === 0) {
+    document.body.style.overflow = previousBodyOverflow
+  }
+}
+
 function getFocusable(panel: HTMLElement): HTMLElement[] {
   return Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
 }
@@ -56,8 +74,7 @@ export function Modal({
   useEffect(() => {
     if (!open) return
     const previousFocus = document.activeElement as HTMLElement | null
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    lockBodyScroll()
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -91,7 +108,7 @@ export function Modal({
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = previousOverflow
+      unlockBodyScroll()
       previousFocus?.focus()
     }
   }, [onClose, open, busy, initialFocusRef])

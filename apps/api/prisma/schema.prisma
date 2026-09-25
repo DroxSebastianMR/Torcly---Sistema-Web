@@ -40,6 +40,11 @@ enum SaleLineType {
   SERVICE
 }
 
+enum AppointmentStatus {
+  PROGRAMADA
+  CANCELADA
+}
+
 enum AuditEventType {
   LOGIN_SUCCESS
   LOGIN_FAILURE
@@ -70,6 +75,9 @@ enum AuditEventType {
   INVENTORY_ADJUSTMENT_REGISTERED
   SALE_CREATED
   SALE_CONFIRMED
+  APPOINTMENT_CREATED
+  APPOINTMENT_RESCHEDULED
+  APPOINTMENT_CANCELLED
 }
 
 model User {
@@ -180,6 +188,7 @@ model Customer {
   email          String?      @db.VarChar(254)
   vehicles       Vehicle[]
   sales          Sale[]
+  appointments   Appointment[]
   createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
 
@@ -198,6 +207,7 @@ model Vehicle {
   year       Int      @map("year")
   customerId String   @map("customer_id") @db.Uuid
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  appointments Appointment[]
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
@@ -320,6 +330,33 @@ model Sale {
   @@index([customerId])
   @@index([status, createdAt])
   @@map("sales")
+}
+
+model Appointment {
+  id             String            @id @default(uuid()) @db.Uuid
+  code           String            @unique @db.VarChar(20)
+  customerId     String            @map("customer_id") @db.Uuid
+  customer       Customer          @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  vehicleId      String            @map("vehicle_id") @db.Uuid
+  vehicle        Vehicle           @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  date           DateTime          @map("date") @db.Date
+  time           DateTime          @map("time") @db.Time(0)
+  reason         String            @db.VarChar(300)
+  status         AppointmentStatus @default(PROGRAMADA)
+  performedBy    String            @map("performed_by") @db.VarChar(80)
+  rescheduledBy  String?           @map("rescheduled_by") @db.VarChar(80)
+  rescheduledAt  DateTime?         @map("rescheduled_at") @db.Timestamptz(3)
+  cancelledBy    String?           @map("cancelled_by") @db.VarChar(80)
+  cancelledAt    DateTime?         @map("cancelled_at") @db.Timestamptz(3)
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([date, time])
+  @@index([status, date, time])
+  @@index([status, createdAt])
+  @@index([customerId])
+  @@index([vehicleId])
+  @@map("appointments")
 }
 
 model SaleLine {
