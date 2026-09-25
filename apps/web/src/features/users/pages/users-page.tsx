@@ -1,7 +1,9 @@
 import { useDeferredValue, useState } from 'react'
-import { Plus, ShieldCheck, UserRoundPlus, Users } from 'lucide-react'
+import { Plus, ShieldCheck, UserRoundPlus } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
+import { ErrorState } from '@/components/ui/error-state'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { UserFormModal } from '../components/user-form-modal'
@@ -27,6 +29,7 @@ export default function Page() {
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [roleUser, setRoleUser] = useState<User | null>(null)
   const [formOpen, setFormOpen] = useState(false)
+  const [statusTarget, setStatusTarget] = useState<User | null>(null)
   const deferredSearch = useDeferredValue(filters.search)
   const queryFilters = { ...filters, search: deferredSearch }
   const users = useUsers(queryFilters)
@@ -40,13 +43,13 @@ export default function Page() {
     setFormOpen(true)
   }
 
-  const toggleStatus = async (user: User) => {
-    const action = user.active ? 'desactivar' : 'activar'
-    if (
-      !window.confirm(`¿Deseas ${action} el acceso de “${user.displayName}”?`)
-    )
-      return
+  const toggleStatus = (user: User) => {
+    setStatusTarget(user)
+  }
 
+  const confirmStatus = async () => {
+    const user = statusTarget
+    if (!user) return
     try {
       await mutations.status.mutateAsync({
         id: user.id,
@@ -59,6 +62,7 @@ export default function Page() {
       )
     } catch (error) {
       toast.error(getUsersErrorMessage(error))
+      throw error
     }
   }
 
@@ -112,25 +116,25 @@ export default function Page() {
           )}
         </div>
 
-        <UsersToolbar filters={filters} onChange={setFilters} />
+        <UsersToolbar
+          filters={filters}
+          onChange={setFilters}
+          suggestions={visibleUsers.map((user) => ({
+            value: user.username,
+            label: `${user.displayName} · @${user.username}`,
+          }))}
+        />
 
         {users.isError ? (
-          <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-muted text-primary">
-              <Users size={22} />
-            </span>
-            <p className="mt-4 font-semibold">No se pudo cargar los usuarios</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Verifica la conexión con la API e inténtalo nuevamente.
-            </p>
-            <Button
-              variant="outline"
-              className="mt-4"
-              onClick={() => void users.refetch()}
-            >
-              Reintentar
-            </Button>
-          </div>
+          <ErrorState
+            title="No se pudo cargar los usuarios"
+            description="Verifica la conexión con la API e inténtalo nuevamente."
+            busy={users.isFetching}
+            action={{
+              label: 'Reintentar',
+              onClick: () => void users.refetch(),
+            }}
+          />
         ) : (
           <UsersTable
             users={visibleUsers}
@@ -189,10 +193,33 @@ export default function Page() {
         onClose={() => setFormOpen(false)}
       />
       <UserRoleModal
+        key={`${roleUser?.id ?? 'none'}:${roleUser?.roles[0]?.id ?? 'none'}`}
         open={roleUser !== null}
         user={roleUser}
         roles={roles.data}
         onClose={() => setRoleUser(null)}
+      />
+      <ConfirmationDialog
+        open={statusTarget !== null}
+        title={statusTarget?.active ? 'Desactivar acceso' : 'Reactivar acceso'}
+        description={
+          statusTarget
+            ? `¿Confirmas que deseas ${
+                statusTarget.active
+                  ? 'desactivar el acceso de'
+                  : 'reactivar el acceso de'
+              } “${statusTarget.displayName}”? ${
+                statusTarget.active
+                  ? 'Su sesión se cerrará y no podrá iniciar sesión hasta que se active.'
+                  : 'Podrá iniciar sesión nuevamente con sus credenciales.'
+              }`
+            : ''
+        }
+        variant={statusTarget?.active ? 'danger' : 'success'}
+        confirmLabel={statusTarget?.active ? 'Desactivar' : 'Reactivar'}
+        pending={mutations.status.isPending}
+        onConfirm={confirmStatus}
+        onCancel={() => setStatusTarget(null)}
       />
     </div>
   )

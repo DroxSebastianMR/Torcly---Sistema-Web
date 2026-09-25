@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import type { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
+import { SmartSelect } from '@/components/ui/smart-select'
 import { userCreateSchema, userProfileSchema } from '../forms/users.schema'
 import { useUserMutations } from '../hooks/use-users'
 import type { RoleOption, User } from '../types/users.types'
@@ -20,9 +21,6 @@ interface UserFormModalProps {
 
 type CreateValues = z.infer<typeof userCreateSchema>
 type ProfileValues = z.infer<typeof userProfileSchema>
-
-const inputClass =
-  'h-11 w-full rounded-lg border border-input bg-background px-3 text-sm focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50'
 
 const emptyCreate: CreateValues = {
   username: '',
@@ -47,19 +45,22 @@ export function UserFormModal({
     resolver: zodResolver(userCreateSchema),
     defaultValues: emptyCreate,
   })
+  const createRoleId = useWatch({ control: createForm.control, name: 'roleId' })
+  const { reset: resetCreateForm } = createForm
   const profileForm = useForm<ProfileValues>({
     resolver: zodResolver(userProfileSchema),
     defaultValues: emptyProfile,
   })
+  const { reset: resetProfileForm } = profileForm
 
   useEffect(() => {
     if (!open) return
     if (user) {
-      profileForm.reset({ email: user.email, displayName: user.displayName })
+      resetProfileForm({ email: user.email, displayName: user.displayName })
     } else {
-      createForm.reset(emptyCreate)
+      resetCreateForm(emptyCreate)
     }
-  }, [createForm, open, profileForm, user])
+  }, [open, resetCreateForm, resetProfileForm, user])
 
   const submitCreate = createForm.handleSubmit(async (values) => {
     try {
@@ -232,14 +233,23 @@ export function UserFormModal({
               />
             </Field>
             <Field label="Rol" error={createError('roleId')} required>
-              <select {...createForm.register('roleId')} className={inputClass}>
-                <option value="">Seleccionar rol</option>
-                {roles?.map((role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.name}
-                  </option>
-                ))}
-              </select>
+              <SmartSelect
+                value={createRoleId}
+                placeholder="Seleccionar rol"
+                aria-label="Rol"
+                options={
+                  roles?.map((role) => ({
+                    value: role.id,
+                    label: role.name,
+                  })) ?? []
+                }
+                onChange={(roleId) =>
+                  createForm.setValue('roleId', roleId, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
+              />
             </Field>
           </div>
         </form>

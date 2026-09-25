@@ -46,3 +46,22 @@ La API Express asignará una cookie HttpOnly y validará autenticación y permis
 ## Diseño
 
 Se conserva la identidad actual: verde bosque, acento verde, superficies claras, sidebar, header y componentes compatibles con shadcn/ui. Cada pantalla debe cubrir carga, vacío, error y éxito, funcionar en laptop/tablet y no depender solo del color para comunicar estado.
+
+## Controles de selección obligatorios
+
+No se declaran controles `<select>` directamente dentro de módulos. Los módulos
+deben importar los componentes de `src/components/ui`:
+
+- `SmartSelect` para una selección única. Siempre usa el selector visual de
+  Torcly; desde once añade automáticamente un campo de búsqueda.
+  Para búsquedas libres con sugerencias, usar `forceSearch` y
+  `allowCustomValue`.
+- `MultiSelect` para seleccionar varios valores cuando el contrato de la API
+  acepte una colección. No simular multiselección si el endpoint solo admite un
+  valor.
+- `DatePicker` para una fecha (`YYYY-MM-DD`) y `DateRangePicker` para un rango
+  `{ from, to }`, únicamente cuando el flujo o endpoint soporte esas fechas.
+- `TimePicker` para horas en formato `HH:mm`.
+
+Usuarios y Productos ya importan `SmartSelect` en filtros y formularios. Todo
+nuevo módulo debe seguir el mismo patrón y documentar cualquier excepción.

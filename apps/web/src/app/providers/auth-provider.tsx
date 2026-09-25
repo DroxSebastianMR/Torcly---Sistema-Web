@@ -27,6 +27,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         user: session.data ?? null,
         loading: session.isPending,
         error: session.isError,
+        errorDetail: session.error,
         retry: () => {
           void session.refetch()
         },

@@ -4,6 +4,7 @@ export interface AuthContextValue {
   user: User | null
   loading: boolean
   error: boolean
+  errorDetail?: unknown
   retry: () => void
   login: (input: LoginInput) => Promise<void>
   logout: () => Promise<void>

@@ -2,6 +2,8 @@ import { useDeferredValue, useState } from 'react'
 import { Boxes, PackagePlus, Plus, Settings2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
+import { ErrorState } from '@/components/ui/error-state'
 import { ProductCatalogModal } from '../components/product-catalog-modal'
 import { ProductFormModal } from '../components/product-form-modal'
 import { ProductsTable } from '../components/products-table'
@@ -27,6 +29,7 @@ export default function Page() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [productFormOpen, setProductFormOpen] = useState(false)
   const [catalogOpen, setCatalogOpen] = useState(false)
+  const [productToToggle, setProductToToggle] = useState<Product | null>(null)
   const deferredSearch = useDeferredValue(filters.search)
   const queryFilters = { ...filters, search: deferredSearch }
   const products = useProducts(queryFilters)
@@ -42,10 +45,6 @@ export default function Page() {
   }
 
   const toggleStatus = async (product: Product) => {
-    const action = product.active ? 'desactivar' : 'activar'
-    if (!window.confirm(`¿Deseas ${action} el producto “${product.name}”?`))
-      return
-
     try {
       await mutations.status.mutateAsync({
         id: product.id,
@@ -54,6 +53,7 @@ export default function Page() {
       toast.success(`Producto ${product.active ? 'desactivado' : 'activado'}.`)
     } catch (error) {
       toast.error(getProductErrorMessage(error))
+      throw error
     }
   }
 
@@ -115,22 +115,22 @@ export default function Page() {
           filters={filters}
           options={options.data}
           onChange={setFilters}
+          suggestions={visibleProducts.map((product) => ({
+            value: product.code,
+            label: `${product.name} · ${product.code}`,
+          }))}
         />
 
         {products.isError ? (
-          <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
-            <p className="font-semibold">No se pudo cargar el catálogo</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Verifica la conexión con la API e inténtalo nuevamente.
-            </p>
-            <Button
-              variant="outline"
-              className="mt-4"
-              onClick={() => void products.refetch()}
-            >
-              Reintentar
-            </Button>
-          </div>
+          <ErrorState
+            title="No se pudo cargar el catálogo"
+            description="Verifica la conexión con la API e inténtalo nuevamente."
+            busy={products.isFetching}
+            action={{
+              label: 'Reintentar',
+              onClick: () => void products.refetch(),
+            }}
+          />
         ) : (
           <ProductsTable
             products={visibleProducts}
@@ -139,7 +139,7 @@ export default function Page() {
               setEditingProduct(product)
               setProductFormOpen(true)
             }}
-            onToggleStatus={(product) => void toggleStatus(product)}
+            onToggleStatus={setProductToToggle}
           />
         )}
 
@@ -188,6 +188,26 @@ export default function Page() {
         open={catalogOpen}
         options={options.data}
         onClose={() => setCatalogOpen(false)}
+      />
+      <ConfirmationDialog
+        open={Boolean(productToToggle)}
+        title={
+          productToToggle?.active
+            ? '¿Desactivar producto?'
+            : '¿Activar producto?'
+        }
+        description={
+          productToToggle?.active
+            ? `“${productToToggle.name}” dejará de estar disponible para las operaciones del taller.`
+            : `“${productToToggle?.name ?? ''}” volverá a estar disponible para las operaciones del taller.`
+        }
+        variant={productToToggle?.active ? 'danger' : 'success'}
+        confirmLabel={productToToggle?.active ? 'Desactivar' : 'Activar'}
+        onCancel={() => setProductToToggle(null)}
+        onConfirm={async () => {
+          if (!productToToggle) return
+          await toggleStatus(productToToggle)
+        }}
       />
     </div>
   )

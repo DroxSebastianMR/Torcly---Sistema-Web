@@ -5,6 +5,7 @@ import {
   Pencil,
   Power,
 } from 'lucide-react'
+import { EmptyState } from '@/components/ui/empty-state'
 import type { Product } from '../types/products.types'
 import { currencyFormatter, numberFormatter } from '../utils/product-formatters'
 
@@ -25,15 +26,11 @@ export function ProductsTable({
 
   if (!products.length) {
     return (
-      <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
-        <span className="flex size-12 items-center justify-center rounded-2xl bg-muted text-primary">
-          <PackageOpen size={23} />
-        </span>
-        <h3 className="mt-4 font-semibold">No se encontraron productos</h3>
-        <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-          Ajusta los filtros o registra el primer producto del catálogo.
-        </p>
-      </div>
+      <EmptyState
+        icon={PackageOpen}
+        title="No se encontraron productos"
+        description="Ajusta los filtros o registra el primer producto del catálogo."
+      />
     )
   }
 

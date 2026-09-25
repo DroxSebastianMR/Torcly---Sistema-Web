@@ -2,28 +2,42 @@ import {
   createBrowserRouter,
   RouterProvider,
   Navigate,
-  Link,
+  useNavigate,
   useRouteError,
   isRouteErrorResponse,
 } from 'react-router-dom'
 import { publicRoutes } from './routes/public.routes'
 import { protectedRoutes } from './routes/protected.routes'
 import { paths } from './constants/paths'
-function RouteError() {
+import { SystemFeedbackScreen } from '@/components/ui/system-feedback-screen'
+
+export function RouteError() {
   const error = useRouteError()
+  const navigate = useNavigate()
+  const notFound = isRouteErrorResponse(error) && error.status === 404
   return (
-    <main className="p-10">
-      <h1 className="text-2xl font-semibold">
-        {isRouteErrorResponse(error) && error.status === 404
-          ? 'Página no encontrada'
-          : 'No se pudo cargar la página'}
-      </h1>
-      <Link className="mt-5 block text-primary" to={paths.dashboard}>
-        Volver al inicio
-      </Link>
-    </main>
+    <SystemFeedbackScreen
+      kind={notFound ? 'not-found' : 'unexpected'}
+      primaryAction={
+        notFound
+          ? {
+              label: 'Volver al inicio',
+              onClick: () => navigate(paths.dashboard),
+            }
+          : { label: 'Reintentar', onClick: () => window.location.reload() }
+      }
+      secondaryAction={
+        notFound
+          ? undefined
+          : {
+              label: 'Volver al inicio',
+              onClick: () => navigate(paths.dashboard),
+            }
+      }
+    />
   )
 }
+
 const router = createBrowserRouter([
   {
     errorElement: <RouteError />,
@@ -34,6 +48,7 @@ const router = createBrowserRouter([
     ],
   },
 ])
+
 export function AppRouter() {
   return <RouterProvider router={router} />
 }

@@ -1,81 +1,92 @@
-import { Search, SlidersHorizontal, X } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { useState } from 'react'
+import { SlidersHorizontal, Trash2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Modal } from '@/components/ui/modal'
+import {
+  SmartSelect,
+  type SmartSelectOption,
+} from '@/components/ui/smart-select'
 import type { ProductFilters, ProductOptions } from '../types/products.types'
 
 interface ProductsToolbarProps {
   filters: ProductFilters
   options?: ProductOptions
   onChange: (filters: ProductFilters) => void
+  suggestions: readonly SmartSelectOption[]
 }
-
-const selectClass =
-  'h-11 rounded-lg border border-input bg-card px-3 text-sm focus-visible:outline-2 focus-visible:outline-ring'
 
 export function ProductsToolbar({
   filters,
   options,
   onChange,
+  suggestions,
 }: ProductsToolbarProps) {
   const hasFilters =
     filters.search || filters.categoryId || filters.status !== 'all'
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [draftCategoryId, setDraftCategoryId] = useState(filters.categoryId)
+  const [draftStatus, setDraftStatus] = useState(filters.status)
+  const categoryOptions =
+    options?.categories.map((category) => ({
+      value: category.id,
+      label: category.name,
+    })) ?? []
+
+  const openFilters = () => {
+    setDraftCategoryId(filters.categoryId)
+    setDraftStatus(filters.status)
+    setFiltersOpen(true)
+  }
 
   return (
     <div className="flex flex-col gap-3 border-b bg-card px-4 py-4 sm:px-5 xl:flex-row xl:items-center">
-      <div className="relative min-w-0 flex-1">
-        <Search
-          aria-hidden="true"
-          size={17}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-        />
-        <Input
+      <div className="min-w-0 flex-1">
+        <SmartSelect
           value={filters.search}
-          onChange={(event) =>
-            onChange({ ...filters, search: event.target.value, page: 1 })
-          }
-          placeholder="Buscar por código, nombre, categoría o código de barras"
-          className="bg-card pl-10"
           aria-label="Buscar productos"
+          placeholder="Buscar por código, nombre o categoría"
+          searchPlaceholder="Escribe un código, nombre o categoría…"
+          emptyMessage="Sigue escribiendo para buscar productos."
+          forceSearch
+          allowCustomValue
+          options={suggestions}
+          onChange={(search) => onChange({ ...filters, search, page: 1 })}
         />
       </div>
       <div className="flex flex-col gap-3 sm:flex-row">
-        <label className="relative">
-          <span className="sr-only">Categoría</span>
-          <select
+        <div className="w-full sm:w-48">
+          <SmartSelect
             value={filters.categoryId}
-            onChange={(event) =>
-              onChange({ ...filters, categoryId: event.target.value, page: 1 })
+            placeholder="Todas las categorías"
+            aria-label="Categoría"
+            options={categoryOptions}
+            onChange={(categoryId) =>
+              onChange({ ...filters, categoryId, page: 1 })
             }
-            className={`${selectClass} w-full sm:w-48`}
-          >
-            <option value="">Todas las categorías</option>
-            {options?.categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="relative">
-          <span className="sr-only">Estado</span>
-          <select
+          />
+        </div>
+        <div className="w-full sm:w-40">
+          <SmartSelect
             value={filters.status}
-            onChange={(event) =>
+            aria-label="Estado"
+            options={[
+              { value: 'all', label: 'Todos los estados' },
+              { value: 'active', label: 'Activos' },
+              { value: 'inactive', label: 'Inactivos' },
+            ]}
+            onChange={(status) =>
               onChange({
                 ...filters,
-                status: event.target.value as ProductFilters['status'],
+                status: status as ProductFilters['status'],
                 page: 1,
               })
             }
-            className={`${selectClass} w-full sm:w-40`}
-          >
-            <option value="all">Todos los estados</option>
-            <option value="active">Activos</option>
-            <option value="inactive">Inactivos</option>
-          </select>
-        </label>
+          />
+        </div>
         {hasFilters && (
           <button
             type="button"
+            aria-label="Limpiar filtros"
             onClick={() =>
               onChange({
                 search: '',
@@ -85,17 +96,77 @@ export function ProductsToolbar({
                 pageSize: filters.pageSize,
               })
             }
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg px-3 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="inline-flex size-11 items-center justify-center rounded-lg bg-red-600 text-white shadow-sm transition-colors hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
           >
-            <X size={16} /> Limpiar
+            <Trash2 aria-hidden size={17} />
           </button>
         )}
       </div>
-      <SlidersHorizontal
-        aria-hidden="true"
-        className="hidden text-muted-foreground xl:block"
-        size={17}
-      />
+      <button
+        type="button"
+        aria-label="Abrir filtros de productos"
+        onClick={openFilters}
+        className="inline-flex size-11 items-center justify-center rounded-lg border border-input text-muted-foreground transition-colors hover:border-primary/45 hover:bg-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
+      >
+        <SlidersHorizontal aria-hidden size={17} />
+      </button>
+      <Modal
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        title="Filtros de productos"
+        description="Combina categoría y estado para encontrar el catálogo que necesitas."
+        className="max-w-md"
+        footer={
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setFiltersOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                onChange({
+                  ...filters,
+                  categoryId: draftCategoryId,
+                  status: draftStatus,
+                  page: 1,
+                })
+                setFiltersOpen(false)
+              }}
+            >
+              Aplicar filtros
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <label className="block text-sm font-medium text-brand-forest">
+            Categoría
+            <SmartSelect
+              value={draftCategoryId}
+              placeholder="Todas las categorías"
+              aria-label="Categoría del producto"
+              className="mt-2"
+              options={categoryOptions}
+              onChange={setDraftCategoryId}
+            />
+          </label>
+          <label className="block text-sm font-medium text-brand-forest">
+            Estado
+            <SmartSelect
+              value={draftStatus}
+              aria-label="Estado del producto"
+              className="mt-2"
+              options={[
+                { value: 'all', label: 'Todos los estados' },
+                { value: 'active', label: 'Activos' },
+                { value: 'inactive', label: 'Inactivos' },
+              ]}
+              onChange={(status) =>
+                setDraftStatus(status as ProductFilters['status'])
+              }
+            />
+          </label>
+        </div>
+      </Modal>
     </div>
   )
 }

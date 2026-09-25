@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
+import { SmartSelect } from '@/components/ui/smart-select'
 import { useUserMutations } from '../hooks/use-users'
 import type { RoleOption, User } from '../types/users.types'
 import { getUsersErrorMessage } from '../utils/user-formatters'
@@ -13,9 +14,6 @@ interface UserRoleModalProps {
   onClose: () => void
 }
 
-const selectClass =
-  'h-11 w-full rounded-lg border border-input bg-background px-3 text-sm focus-visible:outline-2 focus-visible:outline-ring'
-
 export function UserRoleModal({
   open,
   user,
@@ -24,17 +22,12 @@ export function UserRoleModal({
 }: UserRoleModalProps) {
   const mutations = useUserMutations()
   const currentRoleId = user?.roles[0]?.id ?? ''
-
-  useEffect(() => {
-    if (!open) return
-  }, [open])
+  const [roleId, setRoleId] = useState(currentRoleId)
 
   if (!user) return null
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const roleId = String(formData.get('roleId'))
     if (!roleId || roleId === currentRoleId) {
       onClose()
       return
@@ -87,21 +80,15 @@ export function UserRoleModal({
       >
         <label className="block space-y-2 text-sm font-medium">
           <span>Nuevo rol</span>
-          <select
-            name="roleId"
-            defaultValue={currentRoleId}
-            className={selectClass}
-            required
-          >
-            <option value="" disabled>
-              Seleccionar rol
-            </option>
-            {roles?.map((role) => (
-              <option key={role.id} value={role.id}>
-                {role.name}
-              </option>
-            ))}
-          </select>
+          <SmartSelect
+            value={roleId}
+            placeholder="Seleccionar rol"
+            aria-label="Nuevo rol"
+            options={
+              roles?.map((role) => ({ value: role.id, label: role.name })) ?? []
+            }
+            onChange={setRoleId}
+          />
         </label>
       </form>
     </Modal>

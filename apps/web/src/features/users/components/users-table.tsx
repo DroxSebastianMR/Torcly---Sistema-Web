@@ -6,6 +6,7 @@ import {
   UserRoundCog,
   Users,
 } from 'lucide-react'
+import { EmptyState } from '@/components/ui/empty-state'
 import type { User } from '../types/users.types'
 import { dateFormatter } from '../utils/user-formatters'
 
@@ -32,15 +33,11 @@ export function UsersTable({
 
   if (!users.length) {
     return (
-      <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
-        <span className="flex size-12 items-center justify-center rounded-2xl bg-muted text-primary">
-          <Users size={23} />
-        </span>
-        <h3 className="mt-4 font-semibold">No se encontraron usuarios</h3>
-        <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-          Ajusta los filtros o registra el primer usuario con acceso al sistema.
-        </p>
-      </div>
+      <EmptyState
+        icon={Users}
+        title="No se encontraron usuarios"
+        description="Ajusta los filtros o registra el primer usuario con acceso al sistema."
+      />
     )
   }
 
