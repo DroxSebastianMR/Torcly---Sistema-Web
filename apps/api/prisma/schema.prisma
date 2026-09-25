@@ -25,6 +25,11 @@ enum InventoryMovementStatus {
   CANCELLED
 }
 
+enum CustomerType {
+  NATURAL
+  LEGAL
+}
+
 enum AuditEventType {
   LOGIN_SUCCESS
   LOGIN_FAILURE
@@ -37,6 +42,8 @@ enum AuditEventType {
   USER_ROLE_CHANGED
   USER_DEACTIVATED
   USER_ACTIVATED
+  CUSTOMER_CREATED
+  CUSTOMER_UPDATED
 }
 
 model User {
@@ -134,6 +141,25 @@ model AuditLog {
   @@index([userId, createdAt])
   @@index([event, createdAt])
   @@map("audit_logs")
+}
+
+model Customer {
+  id             String       @id @default(uuid()) @db.Uuid
+  type           CustomerType
+  documentNumber String       @unique @map("document_number") @db.VarChar(11)
+  firstName      String?      @map("first_name") @db.VarChar(80)
+  lastName       String?      @map("last_name") @db.VarChar(80)
+  legalName      String?      @map("legal_name") @db.VarChar(160)
+  phone          String       @db.VarChar(20)
+  email          String?      @db.VarChar(254)
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([type])
+  @@index([lastName])
+  @@index([legalName])
+  @@index([phone])
+  @@map("customers")
 }
 
 model ProductCategory {

@@ -95,7 +95,10 @@ describe('Formulario de usuarios', () => {
       screen.getByLabelText(/contraseña inicial/i),
       'Clave-segura-123',
     )
-    await userEvent.selectOptions(screen.getByLabelText(/rol/i), roleId)
+    await userEvent.click(screen.getByLabelText(/rol/i))
+    await userEvent.click(
+      await screen.findByRole('option', { name: 'Administrador' }),
+    )
     await userEvent.click(
       screen.getByRole('button', { name: 'Registrar usuario' }),
     )

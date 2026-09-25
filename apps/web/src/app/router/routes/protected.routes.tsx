@@ -98,6 +98,16 @@ export const protectedRoutes: RouteObject[] = [
                   ).default,
                 }),
               },
+              {
+                path: paths.customerDetail,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/customers/pages/customer-detail-page'
+                    )
+                  ).default,
+                }),
+              },
             ],
           },
           {

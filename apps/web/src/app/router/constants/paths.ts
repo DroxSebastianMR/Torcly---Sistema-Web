@@ -9,6 +9,7 @@ export const paths = {
   purchases: '/compras',
   sales: '/ventas',
   customers: '/clientes',
+  customerDetail: '/clientes/:id',
   cash: '/caja',
   users: '/usuarios',
   notifications: '/notificaciones',

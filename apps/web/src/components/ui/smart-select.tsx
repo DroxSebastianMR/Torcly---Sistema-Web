@@ -1,4 +1,13 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react'
 import { Check, ChevronDown, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -6,6 +15,7 @@ export interface SmartSelectOption {
   value: string
   label: string
   disabled?: boolean
+  searchTerms?: readonly string[]
 }
 
 interface SmartSelectProps {
@@ -22,6 +32,7 @@ interface SmartSelectProps {
   name?: string
   id?: string
   className?: string
+  filterOption?: (option: SmartSelectOption, query: string) => boolean
   'aria-label'?: string
 }
 
@@ -42,27 +53,65 @@ export function SmartSelect({
   name,
   id,
   className,
+  filterOption,
   'aria-label': ariaLabel,
 }: SmartSelectProps) {
   const listId = useId()
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [menuStyle, setMenuStyle] = useState<CSSProperties>()
   const showsSearchInput = forceSearch || options.length > searchThreshold
   const selected = options.find((option) => option.value === value)
+
+  const updateMenuPosition = useCallback(() => {
+    const rect = buttonRef.current?.getBoundingClientRect()
+    if (!rect) return
+
+    const viewportPadding = 8
+    const gap = 8
+    const spaceBelow = window.innerHeight - rect.bottom - viewportPadding
+    const spaceAbove = rect.top - viewportPadding
+    const openAbove = spaceBelow < 180 && spaceAbove > spaceBelow
+    const availableHeight = Math.max(
+      80,
+      Math.min(240, openAbove ? spaceAbove : spaceBelow),
+    )
+
+    setMenuStyle({
+      left: rect.left,
+      width: rect.width,
+      maxHeight: availableHeight,
+      ...(openAbove
+        ? { bottom: window.innerHeight - rect.top + gap }
+        : { top: rect.bottom + gap }),
+    })
+  }, [])
+
   const filteredOptions = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('es')
     if (!normalizedQuery) return options
-    return options.filter((option) =>
-      option.label.toLocaleLowerCase('es').includes(normalizedQuery),
-    )
-  }, [options, query])
+    return options.filter((option) => {
+      if (filterOption) return filterOption(option, normalizedQuery)
+      return [option.label, ...(option.searchTerms ?? [])].some((term) =>
+        term.toLocaleLowerCase('es').includes(normalizedQuery),
+      )
+    })
+  }, [filterOption, options, query])
 
   useEffect(() => {
     if (!open) return
     const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (!wrapperRef.current?.contains(event.target as Node)) setOpen(false)
+      const target = event.target as Node
+      if (
+        !wrapperRef.current?.contains(target) &&
+        !menuRef.current?.contains(target)
+      ) {
+        setOpen(false)
+      }
     }
     document.addEventListener('pointerdown', closeOnOutsidePointer)
     return () =>
@@ -70,14 +119,32 @@ export function SmartSelect({
   }, [open])
 
   useEffect(() => {
+    if (!open) return
+    updateMenuPosition()
+    window.addEventListener('resize', updateMenuPosition)
+    window.addEventListener('scroll', updateMenuPosition, true)
+    return () => {
+      window.removeEventListener('resize', updateMenuPosition)
+      window.removeEventListener('scroll', updateMenuPosition, true)
+    }
+  }, [open, updateMenuPosition])
+
+  useEffect(() => {
     if (open && showsSearchInput)
       requestAnimationFrame(() => searchRef.current?.focus())
   }, [open, showsSearchInput])
+
+  const openMenu = () => {
+    setQuery(showsSearchInput ? (selected?.label ?? value) : '')
+    updateMenuPosition()
+    setOpen(true)
+  }
 
   return (
     <div ref={wrapperRef} className={cn('relative', className)}>
       {name && <input type="hidden" name={name} value={value} />}
       <button
+        ref={buttonRef}
         id={id}
         type="button"
         disabled={disabled}
@@ -87,8 +154,11 @@ export function SmartSelect({
         aria-controls={listId}
         className={controlClass}
         onClick={() => {
-          setOpen((current) => !current)
-          setQuery(showsSearchInput ? (selected?.label ?? value) : '')
+          if (open) {
+            setOpen(false)
+          } else {
+            openMenu()
+          }
         }}
         onKeyDown={(event) => {
           if (
@@ -97,7 +167,7 @@ export function SmartSelect({
             event.key === ' '
           ) {
             event.preventDefault()
-            setOpen(true)
+            openMenu()
           }
         }}
       >
@@ -118,69 +188,76 @@ export function SmartSelect({
           )}
         />
       </button>
-      {open && (
-        <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-xl border border-border/80 bg-card p-2 shadow-[0_18px_40px_rgba(7,28,22,0.16)]">
-          {showsSearchInput && (
-            <div className="relative mb-2">
-              <Search
-                aria-hidden
-                className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-              />
-              <input
-                ref={searchRef}
-                value={query}
-                onChange={(event) => {
-                  setQuery(event.target.value)
-                  if (allowCustomValue) onChange(event.target.value)
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === 'Escape') setOpen(false)
-                }}
-                placeholder={searchPlaceholder}
-                className="h-10 w-full rounded-lg border border-input bg-background py-2 pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              />
-            </div>
-          )}
-          <ul
-            id={listId}
-            role="listbox"
-            aria-label={ariaLabel}
-            className="max-h-60 overflow-y-auto py-1"
+      {open &&
+        menuStyle &&
+        createPortal(
+          <div
+            ref={menuRef}
+            style={menuStyle}
+            className="fixed z-[60] flex overflow-hidden rounded-xl border border-border/80 bg-card p-2 shadow-[0_18px_40px_rgba(7,28,22,0.16)]"
           >
-            {filteredOptions.map((option) => {
-              const isSelected = option.value === value
-              return (
-                <li key={option.value}>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={isSelected}
-                    disabled={option.disabled}
-                    className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-45"
-                    onClick={() => {
-                      onChange(option.value)
-                      setOpen(false)
-                    }}
-                  >
-                    <span className="truncate">{option.label}</span>
-                    {isSelected && (
-                      <Check
-                        aria-hidden
-                        className="size-4 shrink-0 text-primary"
-                      />
-                    )}
-                  </button>
-                </li>
-              )
-            })}
-            {!filteredOptions.length && (
-              <li className="px-3 py-2 text-center text-sm text-muted-foreground">
-                {emptyMessage}
-              </li>
+            {showsSearchInput && (
+              <div className="relative mb-2 shrink-0">
+                <Search
+                  aria-hidden
+                  className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+                />
+                <input
+                  ref={searchRef}
+                  value={query}
+                  onChange={(event) => {
+                    setQuery(event.target.value)
+                    if (allowCustomValue) onChange(event.target.value)
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape') setOpen(false)
+                  }}
+                  placeholder={searchPlaceholder}
+                  className="h-10 w-full rounded-lg border border-input bg-background py-2 pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </div>
             )}
-          </ul>
-        </div>
-      )}
+            <ul
+              id={listId}
+              role="listbox"
+              aria-label={ariaLabel}
+              className="min-h-0 flex-1 overflow-y-auto py-1"
+            >
+              {filteredOptions.map((option) => {
+                const isSelected = option.value === value
+                return (
+                  <li key={option.value}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      disabled={option.disabled}
+                      className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-45"
+                      onClick={() => {
+                        onChange(option.value)
+                        setOpen(false)
+                      }}
+                    >
+                      <span className="truncate">{option.label}</span>
+                      {isSelected && (
+                        <Check
+                          aria-hidden
+                          className="size-4 shrink-0 text-primary"
+                        />
+                      )}
+                    </button>
+                  </li>
+                )
+              })}
+              {!filteredOptions.length && (
+                <li className="px-3 py-2 text-center text-sm text-muted-foreground">
+                  {emptyMessage}
+                </li>
+              )}
+            </ul>
+          </div>,
+          document.body,
+        )}
     </div>
   )
 }

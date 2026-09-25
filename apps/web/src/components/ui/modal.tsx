@@ -148,7 +148,9 @@ export function Modal({
           </div>
         </header>
         {children && (
-          <div className="overflow-y-auto px-5 py-5 sm:px-6">{children}</div>
+          <div className="overflow-y-auto px-5 py-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-6">
+            {children}
+          </div>
         )}
         {footer && (
           <footer className="mt-5 bg-muted/55 px-5 py-4 sm:px-6">

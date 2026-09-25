@@ -18,7 +18,10 @@ export const endpoints = {
   inventory: '/inventory',
   purchases: '/purchases',
   sales: '/sales',
-  customers: '/customers',
+  customers: {
+    root: '/customers',
+    detail: (id: string) => `/customers/${id}`,
+  },
   cash: '/cash',
   users: {
     root: '/users',

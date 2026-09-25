@@ -73,4 +73,29 @@ describe('SmartSelect', () => {
 
     expect(onChange).toHaveBeenLastCalledWith('arianbq')
   })
+
+  it('permite definir el criterio de coincidencia de cada módulo', async () => {
+    const user = userEvent.setup()
+    render(
+      <SmartSelect
+        options={[
+          { value: '90009251', label: 'Cliente natural' },
+          { value: '20900092511', label: 'Cliente jurídico' },
+        ]}
+        value=""
+        onChange={vi.fn()}
+        forceSearch
+        filterOption={(option, query) => option.value === query}
+        aria-label="Buscar clientes"
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Buscar clientes' }))
+    await user.type(screen.getByPlaceholderText('Buscar opción…'), '90009251')
+
+    expect(screen.getByRole('option', { name: 'Cliente natural' })).toBeTruthy()
+    expect(
+      screen.queryByRole('option', { name: 'Cliente jurídico' }),
+    ).toBeNull()
+  })
 })
