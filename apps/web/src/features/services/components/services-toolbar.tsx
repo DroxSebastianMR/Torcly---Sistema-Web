@@ -3,38 +3,30 @@ import {
   SmartSelect,
   type SmartSelectOption,
 } from '@/components/ui/smart-select'
-import type { ProductFilters, ProductOptions } from '../types/products.types'
+import type { ServiceFilters } from '../types/services.types'
 
-interface ProductsToolbarProps {
-  filters: ProductFilters
-  options?: ProductOptions
-  onChange: (filters: ProductFilters) => void
+interface ServicesToolbarProps {
+  filters: ServiceFilters
+  onChange: (filters: ServiceFilters) => void
   suggestions: readonly SmartSelectOption[]
 }
 
-export function ProductsToolbar({
+export function ServicesToolbar({
   filters,
-  options,
   onChange,
   suggestions,
-}: ProductsToolbarProps) {
-  const hasFilters =
-    filters.search || filters.categoryId || filters.status !== 'all'
-  const categoryOptions =
-    options?.categories.map((category) => ({
-      value: category.id,
-      label: category.name,
-    })) ?? []
+}: ServicesToolbarProps) {
+  const hasFilters = filters.search || filters.status !== 'all'
 
   return (
     <div className="flex flex-col gap-3 border-b bg-card px-4 py-4 sm:px-5 xl:flex-row xl:items-center">
       <div className="min-w-0 flex-1">
         <SmartSelect
           value={filters.search}
-          aria-label="Buscar productos"
-          placeholder="Buscar por código, nombre o categoría"
-          searchPlaceholder="Escribe un código, nombre o categoría…"
-          emptyMessage="Sigue escribiendo para buscar productos."
+          aria-label="Buscar servicios"
+          placeholder="Buscar por código o nombre"
+          searchPlaceholder="Escribe un código o nombre…"
+          emptyMessage="Sigue escribiendo para buscar servicios."
           forceSearch
           allowCustomValue
           options={suggestions}
@@ -44,19 +36,8 @@ export function ProductsToolbar({
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="w-full sm:w-48">
           <SmartSelect
-            value={filters.categoryId}
-            placeholder="Todas las categorías"
-            aria-label="Categoría"
-            options={categoryOptions}
-            onChange={(categoryId) =>
-              onChange({ ...filters, categoryId, page: 1 })
-            }
-          />
-        </div>
-        <div className="w-full sm:w-40">
-          <SmartSelect
             value={filters.status}
-            aria-label="Estado"
+            aria-label="Estado del servicio"
             options={[
               { value: 'all', label: 'Todos los estados' },
               { value: 'active', label: 'Activos' },
@@ -65,7 +46,7 @@ export function ProductsToolbar({
             onChange={(status) =>
               onChange({
                 ...filters,
-                status: status as ProductFilters['status'],
+                status: status as ServiceFilters['status'],
                 page: 1,
               })
             }
@@ -78,7 +59,6 @@ export function ProductsToolbar({
             onClick={() =>
               onChange({
                 search: '',
-                categoryId: '',
                 status: 'all',
                 page: 1,
                 pageSize: filters.pageSize,

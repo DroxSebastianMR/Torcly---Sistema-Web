@@ -50,6 +50,14 @@ enum AuditEventType {
   PRODUCT_UPDATED
   PRODUCT_DEACTIVATED
   PRODUCT_ACTIVATED
+  SERVICE_CREATED
+  SERVICE_UPDATED
+  SERVICE_DEACTIVATED
+  SERVICE_ACTIVATED
+  INVENTORY_STOCK_INITIALIZED
+  INVENTORY_ENTRY_REGISTERED
+  INVENTORY_EXIT_REGISTERED
+  INVENTORY_ADJUSTMENT_REGISTERED
 }
 
 model User {
@@ -243,6 +251,21 @@ model Product {
   @@index([brandId])
   @@index([active])
   @@map("products")
+}
+
+model Service {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique @db.VarChar(40)
+  name        String   @db.VarChar(120)
+  description String?  @db.VarChar(500)
+  price       Decimal  @map("price") @db.Decimal(12, 2)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([name])
+  @@index([active])
+  @@map("services")
 }
 
 model InventoryMovement {

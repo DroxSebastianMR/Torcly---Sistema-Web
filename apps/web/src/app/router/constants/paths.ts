@@ -7,6 +7,7 @@ export const paths = {
   productDetail: '/productos/:id',
   barcodes: '/codigos-de-barras',
   inventory: '/inventario',
+  services: '/servicios',
   purchases: '/compras',
   sales: '/ventas',
   customers: '/clientes',

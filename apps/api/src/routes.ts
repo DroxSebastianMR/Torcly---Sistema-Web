@@ -5,6 +5,8 @@ import { authRouter } from './modules/auth/auth.routes.js'
 import { usersRouter } from './modules/users/users.routes.js'
 import { customersRouter } from './modules/customers/customers.routes.js'
 import { vehiclesRouter } from './modules/vehicles/vehicles.routes.js'
+import { inventoryRouter } from './modules/inventory/inventory.routes.js'
+import { servicesRouter } from './modules/services/services.routes.js'
 
 export const apiRouter = Router()
 
@@ -14,3 +16,5 @@ apiRouter.use('/products', productsRouter)
 apiRouter.use('/users', usersRouter)
 apiRouter.use('/customers', customersRouter)
 apiRouter.use('/vehicles', vehiclesRouter)
+apiRouter.use('/inventory', inventoryRouter)
+apiRouter.use('/services', servicesRouter)

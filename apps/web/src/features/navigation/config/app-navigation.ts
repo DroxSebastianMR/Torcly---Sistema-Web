@@ -12,6 +12,7 @@ import {
   UserCog,
   Bell,
   CircleUserRound,
+  Wrench,
 } from 'lucide-react'
 import { paths } from '@/app/router/constants/paths'
 import type { NavigationGroup } from '../types/navigation.types'
@@ -104,6 +105,14 @@ export const appNavigation: readonly NavigationGroup[] = [
         path: paths.inventory,
         visible: true,
         permission: 'inventory:read',
+      },
+      {
+        id: 'services',
+        label: 'Servicios',
+        icon: Wrench,
+        path: paths.services,
+        visible: true,
+        permission: 'services:read',
       },
       {
         id: 'barcodes',

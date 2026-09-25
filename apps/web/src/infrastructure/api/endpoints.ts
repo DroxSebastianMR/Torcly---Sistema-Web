@@ -22,7 +22,21 @@ export const endpoints = {
     detail: (id: string) => `/products/${id}`,
     status: (id: string) => `/products/${id}/status`,
   },
-  inventory: '/inventory',
+  inventory: {
+    root: '/inventory',
+    existence: '/inventory/existencia',
+    movements: '/inventory/historial',
+    initialStock: '/inventory/stock-inicial',
+    entries: '/inventory/entradas',
+    exits: '/inventory/salidas',
+    adjustments: '/inventory/ajustes',
+  },
+  services: {
+    root: '/services',
+    options: '/services/options',
+    detail: (id: string) => `/services/${id}`,
+    status: (id: string) => `/services/${id}/status`,
+  },
   purchases: '/purchases',
   sales: '/sales',
   customers: {

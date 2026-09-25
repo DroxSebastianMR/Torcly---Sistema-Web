@@ -1,4 +1,3 @@
-import { BarChart3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface LoadingScreenProps {
@@ -55,12 +54,14 @@ export function LoadingScreen({
               strokeWidth="3"
               strokeLinecap="round"
               strokeDasharray="46 250"
-              className="text-brand-accent"
+              className="text-[#043129]"
             />
           </svg>
-          <span className="flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_8px_22px_rgba(23,99,76,0.26)] motion-safe:animate-[torcly-loader-breathe_2.8s_ease-in-out_infinite] sm:size-14">
-            <BarChart3 aria-hidden="true" className="size-5 sm:size-6" />
-          </span>
+          <img
+            src="/torcly-icon.png"
+            alt=""
+            className="size-12 rounded-[1.1rem] shadow-[0_8px_22px_rgba(4,49,41,0.26)] motion-safe:animate-[torcly-loader-breathe_2.8s_ease-in-out_infinite] sm:size-14"
+          />
         </div>
 
         <h1 className="mt-8 text-[clamp(1.65rem,3vw,2rem)] font-semibold tracking-[-0.035em] text-brand-forest">

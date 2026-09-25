@@ -3,6 +3,7 @@ export const modules = [
   'products',
   'barcodes',
   'inventory',
+  'services',
   'purchases',
   'sales',
   'customers',

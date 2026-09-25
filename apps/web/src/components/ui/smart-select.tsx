@@ -26,6 +26,7 @@ interface SmartSelectProps {
   searchPlaceholder?: string
   emptyMessage?: string
   searchThreshold?: number
+  menuMaxHeight?: number
   forceSearch?: boolean
   allowCustomValue?: boolean
   disabled?: boolean
@@ -47,6 +48,7 @@ export function SmartSelect({
   searchPlaceholder = 'Buscar opción…',
   emptyMessage = 'Sin opciones.',
   searchThreshold = 10,
+  menuMaxHeight = 240,
   forceSearch = false,
   allowCustomValue = false,
   disabled = false,
@@ -78,7 +80,7 @@ export function SmartSelect({
     const openAbove = spaceBelow < 180 && spaceAbove > spaceBelow
     const availableHeight = Math.max(
       80,
-      Math.min(240, openAbove ? spaceAbove : spaceBelow),
+      Math.min(menuMaxHeight, openAbove ? spaceAbove : spaceBelow),
     )
 
     setMenuStyle({
@@ -89,7 +91,7 @@ export function SmartSelect({
         ? { bottom: window.innerHeight - rect.top + gap }
         : { top: rect.bottom + gap }),
     })
-  }, [])
+  }, [menuMaxHeight])
 
   const filteredOptions = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('es')

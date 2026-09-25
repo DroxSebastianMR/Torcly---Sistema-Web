@@ -73,6 +73,19 @@ export const protectedRoutes: RouteObject[] = [
             ],
           },
           {
+            element: <PermissionRoute permission="services:read" />,
+            children: [
+              {
+                path: paths.services,
+                lazy: async () => ({
+                  Component: (
+                    await import('@/features/services/pages/services-page')
+                  ).default,
+                }),
+              },
+            ],
+          },
+          {
             element: <PermissionRoute permission="purchases:read" />,
             children: [
               {
