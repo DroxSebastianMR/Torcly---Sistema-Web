@@ -25,6 +25,7 @@ const defaultPermissionCodes = [
   'services:write',
   'purchases:read',
   'sales:read',
+  'sales:write',
   'customers:read',
   'customers:write',
   'vehicles:read',

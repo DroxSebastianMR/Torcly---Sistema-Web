@@ -38,6 +38,7 @@ export function useServiceMutations() {
   const queryClient = useQueryClient()
   const refreshServices = async () => {
     await queryClient.invalidateQueries({ queryKey: serviceKeys.all })
+    await queryClient.invalidateQueries({ queryKey: ['sales', 'catalog'] })
   }
 
   return {

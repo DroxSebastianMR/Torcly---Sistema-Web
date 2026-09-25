@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils'
 export interface SmartSelectOption {
   value: string
   label: string
+  meta?: string
   disabled?: boolean
   searchTerms?: readonly string[]
 }
@@ -245,7 +246,12 @@ export function SmartSelect({
                         setOpen(false)
                       }}
                     >
-                      <span className="truncate">{option.label}</span>
+                      <span className="min-w-0 flex-1 truncate">
+                        {option.label}
+                      </span>
+                      <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                        {option.meta}
+                      </span>
                       {isSelected && (
                         <Check
                           aria-hidden

@@ -38,7 +38,12 @@ export const endpoints = {
     status: (id: string) => `/services/${id}/status`,
   },
   purchases: '/purchases',
-  sales: '/sales',
+  sales: {
+    root: '/sales',
+    catalog: '/sales/catalogo',
+    detail: (id: string) => `/sales/${id}`,
+    confirm: (id: string) => `/sales/${id}/confirm`,
+  },
   customers: {
     root: '/customers',
     detail: (id: string) => `/customers/${id}`,

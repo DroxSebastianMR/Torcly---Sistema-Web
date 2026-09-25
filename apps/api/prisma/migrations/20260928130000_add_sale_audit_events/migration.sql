@@ -1,0 +1,3 @@
+-- AlterEnum
+ALTER TYPE "AuditEventType" ADD VALUE 'SALE_CREATED';
+ALTER TYPE "AuditEventType" ADD VALUE 'SALE_CONFIRMED';
