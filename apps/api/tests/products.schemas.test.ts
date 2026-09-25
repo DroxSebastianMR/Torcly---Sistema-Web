@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   productInputSchema,
   productQuerySchema,
+  productUpdateSchema,
 } from '../src/modules/products/products.schemas.js'
 
 const validProduct = {
@@ -23,13 +24,43 @@ describe('Validación de productos', () => {
     expect(parsed.salePrice).toBe(35.5)
   })
 
-  it('rechaza precios y stock mínimo negativos', () => {
+  it('rechaza precios negativos y stock mínimo cero o negativo', () => {
     const result = productInputSchema.safeParse({
       ...validProduct,
       salePrice: -1,
-      minimumStock: -2,
+      minimumStock: 0,
     })
     expect(result.success).toBe(false)
+
+    expect(
+      productInputSchema.safeParse({ ...validProduct, minimumStock: -2 })
+        .success,
+    ).toBe(false)
+  })
+
+  it('rechaza campos que intentan escribir stock o movimientos', () => {
+    const withoutStock = productInputSchema.safeParse({
+      ...validProduct,
+      stock: 100,
+    })
+    expect(withoutStock.success).toBe(false)
+
+    const withMovements = productInputSchema.safeParse({
+      ...validProduct,
+      inventoryMovements: [{ type: 'ENTRY', quantity: 10 }],
+    })
+    expect(withMovements.success).toBe(false)
+  })
+
+  it('rechaza un payload incompleto con los campos obligatorios', () => {
+    const result = productInputSchema.safeParse({})
+    expect(result.success).toBe(false)
+  })
+
+  it('valida el mismo payload en la actualización', () => {
+    const parsed = productUpdateSchema.parse(validProduct)
+    expect(parsed.code).toBe('REP-001')
+    expect(productUpdateSchema.safeParse(validProduct).success).toBe(true)
   })
 
   it('limita la paginación y valida la categoría', () => {

@@ -40,7 +40,7 @@ const emptyValues: ProductFormValues = {
   brandId: '',
   unitId: '',
   salePrice: 0,
-  minimumStock: 0,
+  minimumStock: 1,
 }
 
 export function ProductFormModal({
@@ -111,6 +111,14 @@ export function ProductFormModal({
     return message ? String(message) : undefined
   }
 
+  const stopImplicitSubmit: React.KeyboardEventHandler<HTMLInputElement> = (
+    event,
+  ) => {
+    if (event.key !== 'Enter') return
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
   return (
     <Modal
       open={open}
@@ -161,6 +169,16 @@ export function ProductFormModal({
       <form
         id="product-form"
         onSubmit={submit}
+        onKeyDownCapture={(event) => {
+          const target = event.target as HTMLInputElement
+          if (
+            event.key === 'Enter' &&
+            (target.name === 'code' || target.name === 'barcode')
+          ) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+        }}
         noValidate
         className="space-y-5"
       >
@@ -175,6 +193,7 @@ export function ProductFormModal({
               autoComplete="off"
               placeholder="Ej. REP-001"
               className="uppercase"
+              onKeyDown={stopImplicitSubmit}
             />
           </Field>
           <Field
@@ -187,6 +206,7 @@ export function ProductFormModal({
               autoComplete="off"
               inputMode="numeric"
               placeholder="Escanea o digita el código"
+              onKeyDown={stopImplicitSubmit}
             />
           </Field>
         </div>
@@ -299,7 +319,7 @@ export function ProductFormModal({
             <Input
               {...form.register('minimumStock', { valueAsNumber: true })}
               type="number"
-              min="0"
+              min="1"
               step="0.001"
             />
           </Field>

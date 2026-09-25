@@ -1,9 +1,13 @@
 import { useDeferredValue, useState } from 'react'
 import { Boxes, PackagePlus, Plus, Settings2 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { ErrorState } from '@/components/ui/error-state'
+import { useAuth } from '@/features/auth/hooks/auth-context'
+import { paths } from '@/app/router/constants/paths'
+import { hasPermission } from '@/lib/permissions'
 import { ProductCatalogModal } from '../components/product-catalog-modal'
 import { ProductFormModal } from '../components/product-form-modal'
 import { ProductsTable } from '../components/products-table'
@@ -25,6 +29,12 @@ const initialFilters: ProductFilters = {
 }
 
 export default function Page() {
+  const navigate = useNavigate()
+  const { user: currentUser } = useAuth()
+  const canWrite = hasPermission(
+    currentUser?.permissions ?? [],
+    'products:write',
+  )
   const [filters, setFilters] = useState(initialFilters)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [productFormOpen, setProductFormOpen] = useState(false)
@@ -72,14 +82,16 @@ export default function Page() {
             operaciones del taller.
           </p>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button variant="outline" onClick={() => setCatalogOpen(true)}>
-            <Settings2 size={16} /> Catálogos
-          </Button>
-          <Button onClick={openCreate}>
-            <Plus size={17} /> Registrar producto
-          </Button>
-        </div>
+        {canWrite && (
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button variant="outline" onClick={() => setCatalogOpen(true)}>
+              <Settings2 size={16} /> Catálogos
+            </Button>
+            <Button onClick={openCreate}>
+              <Plus size={17} /> Registrar producto
+            </Button>
+          </div>
+        )}
       </header>
 
       <section className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]">
@@ -135,6 +147,10 @@ export default function Page() {
           <ProductsTable
             products={visibleProducts}
             loading={products.isPending}
+            canWrite={canWrite}
+            onOpenDetail={(product) =>
+              navigate(`${paths.products}/${product.id}`)
+            }
             onEdit={(product) => {
               setEditingProduct(product)
               setProductFormOpen(true)
@@ -186,7 +202,6 @@ export default function Page() {
       />
       <ProductCatalogModal
         open={catalogOpen}
-        options={options.data}
         onClose={() => setCatalogOpen(false)}
       />
       <ConfirmationDialog

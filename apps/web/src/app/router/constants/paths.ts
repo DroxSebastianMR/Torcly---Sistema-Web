@@ -4,6 +4,7 @@ export const paths = {
   resetPassword: '/restablecer-contrasena',
   dashboard: '/dashboard',
   products: '/productos',
+  productDetail: '/productos/:id',
   barcodes: '/codigos-de-barras',
   inventory: '/inventario',
   purchases: '/compras',

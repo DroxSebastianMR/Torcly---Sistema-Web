@@ -30,7 +30,7 @@ export const productFormSchema = z.object({
   minimumStock: z.coerce
     .number<number>()
     .finite()
-    .min(0, 'El stock mínimo no puede ser negativo.'),
+    .min(1, 'El stock mínimo debe ser mayor que cero.'),
 })
 
 export type ProductFormValues = z.input<typeof productFormSchema>
