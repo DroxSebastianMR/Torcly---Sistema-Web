@@ -67,6 +67,7 @@ export function AppointmentsToolbar({
             options={[
               { value: 'all', label: 'Todos los estados' },
               { value: 'PROGRAMADA', label: 'Programadas' },
+              { value: 'ATENDIDA', label: 'Atendidas' },
               { value: 'CANCELADA', label: 'Canceladas' },
             ]}
             onChange={(status) =>

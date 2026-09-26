@@ -21,6 +21,15 @@ vi.mock('../hooks/use-appointments', () => ({
   useAppointmentMutations: appointments.useAppointmentMutations,
 }))
 
+vi.mock('@tanstack/react-query', async (importOriginal) => {
+  const reactQuery =
+    await importOriginal<typeof import('@tanstack/react-query')>()
+  return {
+    ...reactQuery,
+    useQueryClient: () => ({ invalidateQueries: vi.fn() }),
+  }
+})
+
 const customers = vi.hoisted(() => ({ useCustomers: vi.fn() }))
 vi.mock('@/features/customers/hooks/use-customers', () => customers)
 
@@ -54,6 +63,9 @@ const appointmentMock = {
   rescheduledAt: null,
   cancelledBy: null,
   cancelledAt: null,
+  attendedBy: null,
+  attendedAt: null,
+  workOrder: null,
   createdAt: '2026-01-02T00:00:00.000Z',
   updatedAt: '2026-01-02T00:00:00.000Z',
 }

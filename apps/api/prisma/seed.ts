@@ -32,6 +32,8 @@ const defaultPermissionCodes = [
   'vehicles:write',
   'appointments:read',
   'appointments:write',
+  'workshop:read',
+  'workshop:write',
   'cash:read',
   'users:read',
   'users:write',

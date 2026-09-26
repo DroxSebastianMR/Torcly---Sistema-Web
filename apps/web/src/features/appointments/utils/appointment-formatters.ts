@@ -17,7 +17,14 @@ export function getAppointmentErrorMessage(error: unknown) {
 }
 
 export function appointmentStatusLabel(status: AppointmentStatus) {
-  return status === 'PROGRAMADA' ? 'Programada' : 'Cancelada'
+  switch (status) {
+    case 'PROGRAMADA':
+      return 'Programada'
+    case 'ATENDIDA':
+      return 'Atendida'
+    default:
+      return 'Cancelada'
+  }
 }
 
 export function formatAppointmentDate(value: string) {

@@ -126,6 +126,21 @@ export const protectedRoutes: RouteObject[] = [
             ],
           },
           {
+            element: <PermissionRoute permission="workshop:read" />,
+            children: [
+              {
+                path: paths.workOrders,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/work-orders/pages/work-orders-page'
+                    )
+                  ).default,
+                }),
+              },
+            ],
+          },
+          {
             element: <PermissionRoute permission="customers:read" />,
             children: [
               {

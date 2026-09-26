@@ -11,6 +11,7 @@ export const paths = {
   purchases: '/compras',
   sales: '/ventas',
   appointments: '/citas',
+  workOrders: '/ordenes-taller',
   customers: '/clientes',
   customerDetail: '/clientes/:id',
   vehicles: '/vehiculos',

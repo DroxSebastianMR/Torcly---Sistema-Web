@@ -16,7 +16,7 @@ export const appointmentQuerySchema = z.object({
     .refine(isValidDateString, 'Fecha inválida.')
     .optional(),
   customerId: z.uuid('Cliente inválido.').optional(),
-  status: z.enum(['all', 'PROGRAMADA', 'CANCELADA']).default('all'),
+  status: z.enum(['all', 'PROGRAMADA', 'CANCELADA', 'ATENDIDA']).default('all'),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(5).max(100).default(20),
 })

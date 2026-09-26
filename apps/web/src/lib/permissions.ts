@@ -7,6 +7,7 @@ export const modules = [
   'purchases',
   'sales',
   'appointments',
+  'workshop',
   'customers',
   'vehicles',
   'cash',

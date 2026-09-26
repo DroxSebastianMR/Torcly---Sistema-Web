@@ -86,6 +86,13 @@ function toItem(
     cancelledAt: appointment.cancelledAt
       ? appointment.cancelledAt.toISOString()
       : null,
+    attendedBy: appointment.attendedBy
+      ? (actorNames.get(appointment.attendedBy) ?? appointment.attendedBy)
+      : null,
+    attendedAt: appointment.attendedAt
+      ? appointment.attendedAt.toISOString()
+      : null,
+    workOrder: appointment.workOrder ?? null,
     createdAt: appointment.createdAt.toISOString(),
     updatedAt: appointment.updatedAt.toISOString(),
   }
@@ -101,6 +108,7 @@ async function resolveActorNames(
           appointment.performedBy,
           appointment.rescheduledBy,
           appointment.cancelledBy,
+          appointment.attendedBy,
         ])
         .filter(
           (value): value is string =>

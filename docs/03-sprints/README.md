@@ -12,7 +12,7 @@ Los sprints son secuenciales y cada uno tiene una rama, alcance cerrado, criteri
 | 06     | `sprint-06-inventory-services`    | `feature/sprint-06-inventory-services`    | Aprobado    |
 | 07     | `sprint-07-sales`                 | `feature/sprint-07-sales`                 | Aprobado    |
 | 08     | `sprint-08-appointments`          | `feature/sprint-08-appointments`          | Aprobado    |
-| 09     | `sprint-09-workshop-foundation`   | `feature/sprint-09-workshop-foundation`   | Planificado |
+| 09     | `sprint-09-workshop-foundation`   | `feature/sprint-09-workshop-foundation`   | Aprobado    |
 | 10     | `sprint-10-workshop-execution`    | `feature/sprint-10-workshop-execution`    | Planificado |
 | 11     | `sprint-11-payments`              | `feature/sprint-11-payments`              | Planificado |
 | 12     | `sprint-12-operational-dashboard` | `feature/sprint-12-operational-dashboard` | Planificado |

@@ -50,6 +50,17 @@ export const endpoints = {
     reschedule: (id: string) => `/appointments/${id}/reschedule`,
     cancel: (id: string) => `/appointments/${id}/cancel`,
   },
+  workOrders: {
+    root: '/work-orders',
+    detail: (id: string) => `/work-orders/${id}`,
+    catalog: '/work-orders/catalog',
+    technicians: '/work-orders/technicians',
+    diagnosis: (id: string) => `/work-orders/${id}/diagnosis`,
+    budget: (id: string) => `/work-orders/${id}/budget`,
+    budgetSend: (id: string) => `/work-orders/${id}/budget/send`,
+    decision: (id: string) => `/work-orders/${id}/decision`,
+    technician: (id: string) => `/work-orders/${id}/technician`,
+  },
   customers: {
     root: '/customers',
     detail: (id: string) => `/customers/${id}`,

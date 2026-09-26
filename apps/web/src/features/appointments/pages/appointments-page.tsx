@@ -7,7 +7,10 @@ import { ErrorState } from '@/components/ui/error-state'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { useCustomers } from '@/features/customers/hooks/use-customers'
 import { customerDisplayName } from '@/features/customers/utils/customer-formatters'
+import { workOrderKeys } from '@/features/work-orders/hooks/use-work-orders'
+import { workOrdersService } from '@/features/work-orders/services/work-orders.service'
 import { hasPermission } from '@/lib/permissions'
+import { useQueryClient } from '@tanstack/react-query'
 import { AppointmentDetailModal } from '../components/appointment-detail-modal'
 import { AppointmentFormModal } from '../components/appointment-form-modal'
 import { AppointmentsTable } from '../components/appointments-table'
@@ -38,6 +41,11 @@ export default function Page() {
     currentUser?.permissions ?? [],
     'appointments:write',
   )
+  const canAttend = hasPermission(
+    currentUser?.permissions ?? [],
+    'workshop:write',
+  )
+  const queryClient = useQueryClient()
   const mutations = useAppointmentMutations()
   const [filters, setFilters] = useState(initialFilters)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -46,6 +54,7 @@ export default function Page() {
     null,
   )
   const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null)
+  const [attendTarget, setAttendTarget] = useState<Appointment | null>(null)
   const deferredSearch = useDeferredValue(filters.search)
   const queryFilters = { ...filters, search: deferredSearch }
   const appointments = useAppointments(queryFilters)
@@ -112,6 +121,23 @@ export default function Page() {
       await mutations.cancel.mutateAsync(cancelTarget.id)
       toast.success(`Cita ${cancelTarget.code} cancelada.`)
       setCancelTarget(null)
+      setSelectedId(null)
+    } catch (error) {
+      toast.error(getAppointmentErrorMessage(error))
+    }
+  }
+
+  const attendAppointment = async () => {
+    if (!attendTarget) return
+    try {
+      const result = await workOrdersService.createFromAppointment(
+        attendTarget.id,
+      )
+      await queryClient.invalidateQueries({ queryKey: workOrderKeys.all })
+      toast.success(
+        `Cita ${attendTarget.code} atendida. Orden ${result.data.code} creada.`,
+      )
+      setAttendTarget(null)
       setSelectedId(null)
     } catch (error) {
       toast.error(getAppointmentErrorMessage(error))
@@ -254,9 +280,11 @@ export default function Page() {
         appointment={detail.data ?? null}
         loading={detail.isPending}
         canWrite={canWrite}
+        canAttend={canAttend}
         onClose={() => setSelectedId(null)}
         onReschedule={reschedule}
         onCancel={setCancelTarget}
+        onAttend={setAttendTarget}
       />
       <AppointmentFormModal
         open={createOpen || Boolean(rescheduleTarget)}
@@ -279,6 +307,19 @@ export default function Page() {
         confirmLabel="Cancelar cita"
         onConfirm={cancelAppointment}
         onCancel={() => setCancelTarget(null)}
+      />
+      <ConfirmationDialog
+        open={Boolean(attendTarget)}
+        variant="info"
+        title="Atender cita y crear orden"
+        description={
+          attendTarget
+            ? `La cita ${attendTarget.code} pasará a estado atendida y se generará la orden de taller OT-###### con el cliente y vehículo de la cita. Esta acción no se puede deshacer.`
+            : undefined
+        }
+        confirmLabel="Atender y crear orden"
+        onConfirm={attendAppointment}
+        onCancel={() => setAttendTarget(null)}
       />
     </div>
   )

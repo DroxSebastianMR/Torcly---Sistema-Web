@@ -1,4 +1,4 @@
-export type AppointmentStatus = 'PROGRAMADA' | 'CANCELADA'
+export type AppointmentStatus = 'PROGRAMADA' | 'CANCELADA' | 'ATENDIDA'
 export type AppointmentStatusFilter = 'all' | AppointmentStatus
 
 export interface AppointmentCustomerRef {
@@ -29,6 +29,9 @@ export interface Appointment {
   rescheduledAt: string | null
   cancelledBy: string | null
   cancelledAt: string | null
+  attendedBy: string | null
+  attendedAt: string | null
+  workOrder: { id: string; code: string } | null
   createdAt: string
   updatedAt: string
 }

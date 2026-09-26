@@ -26,6 +26,8 @@ const appointmentSummarySelect = {
   rescheduledAt: true,
   cancelledBy: true,
   cancelledAt: true,
+  attendedBy: true,
+  attendedAt: true,
   createdAt: true,
   updatedAt: true,
   customer: {
@@ -45,6 +47,9 @@ const appointmentSummarySelect = {
       model: true,
       year: true,
     },
+  },
+  workOrder: {
+    select: { id: true, code: true },
   },
 } satisfies Prisma.AppointmentSelect
 

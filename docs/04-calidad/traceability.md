@@ -22,4 +22,4 @@
 
 Reglas transversales mínimas: RN-001 a RN-018, RN-041 a RN-044; RNF-07 a RNF-16, RNF-20 a RNF-30 según aplicación.
 
-Las filas de los Sprints 09 a 16 son planificación trazable: cambian a implementadas únicamente tras completar y aprobar su sprint. Los Sprints 07 y 08 están implementados y aprobados.
+Las filas de los Sprints 10 a 16 son planificación trazable: cambian a implementadas únicamente tras completar y aprobar su sprint. Los Sprints 07, 08 y 09 están implementados y aprobados.

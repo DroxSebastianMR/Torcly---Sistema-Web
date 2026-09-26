@@ -14,6 +14,7 @@ import {
   CircleUserRound,
   Wrench,
   CalendarDays,
+  ClipboardList,
 } from 'lucide-react'
 import { paths } from '@/app/router/constants/paths'
 import type { NavigationGroup } from '../types/navigation.types'
@@ -92,6 +93,20 @@ export const appNavigation: readonly NavigationGroup[] = [
         path: paths.cash,
         visible: true,
         permission: 'cash:read',
+      },
+    ],
+  },
+  {
+    id: 'workshop',
+    label: 'Operación de taller',
+    items: [
+      {
+        id: 'workOrders',
+        label: 'Órdenes de taller',
+        icon: ClipboardList,
+        path: paths.workOrders,
+        visible: true,
+        permission: 'workshop:read',
       },
     ],
   },

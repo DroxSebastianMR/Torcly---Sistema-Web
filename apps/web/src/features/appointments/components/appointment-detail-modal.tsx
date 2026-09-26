@@ -1,4 +1,11 @@
-import { CalendarDays, Car, Pencil, UserRound, X } from 'lucide-react'
+import {
+  CalendarDays,
+  Car,
+  ClipboardPlus,
+  Pencil,
+  UserRound,
+  X,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
 import type { Appointment } from '../types/appointments.types'
@@ -13,9 +20,11 @@ interface AppointmentDetailModalProps {
   appointment: Appointment | null
   loading: boolean
   canWrite: boolean
+  canAttend: boolean
   onClose: () => void
   onReschedule: (appointment: Appointment) => void
   onCancel: (appointment: Appointment) => void
+  onAttend: (appointment: Appointment) => void
 }
 
 export function AppointmentDetailModal({
@@ -23,9 +32,11 @@ export function AppointmentDetailModal({
   appointment,
   loading,
   canWrite,
+  canAttend,
   onClose,
   onReschedule,
   onCancel,
+  onAttend,
 }: AppointmentDetailModalProps) {
   const isProgrammed = appointment?.status === 'PROGRAMADA'
 
@@ -55,6 +66,11 @@ export function AppointmentDetailModal({
                 <Pencil size={16} /> Reprogramar
               </Button>
             </>
+          )}
+          {isProgrammed && canAttend && appointment && (
+            <Button type="button" onClick={() => onAttend(appointment)}>
+              <ClipboardPlus size={16} /> Atender y crear orden
+            </Button>
           )}
           <Button type="button" variant="outline" onClick={onClose}>
             Cerrar
@@ -128,6 +144,24 @@ export function AppointmentDetailModal({
                         new Date(appointment.cancelledAt),
                       )
                 }
+              />
+            )}
+            {appointment.attendedAt && (
+              <InfoItem
+                label="Atendida"
+                value={
+                  appointment.attendedBy
+                    ? `${appointment.attendedBy} · ${dateTimeFormatter.format(
+                        new Date(appointment.attendedAt),
+                      )}`
+                    : dateTimeFormatter.format(new Date(appointment.attendedAt))
+                }
+              />
+            )}
+            {appointment.workOrder && (
+              <InfoItem
+                label="Orden de taller"
+                value={appointment.workOrder.code}
               />
             )}
           </div>

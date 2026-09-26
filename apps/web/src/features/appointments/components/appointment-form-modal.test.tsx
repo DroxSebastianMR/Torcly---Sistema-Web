@@ -62,6 +62,9 @@ const existingAppointment: Appointment = {
   rescheduledAt: null,
   cancelledBy: null,
   cancelledAt: null,
+  attendedBy: null,
+  attendedAt: null,
+  workOrder: null,
   createdAt: '2026-01-02T00:00:00.000Z',
   updatedAt: '2026-01-02T00:00:00.000Z',
 }
