@@ -183,6 +183,13 @@ export const inventoryRepository = {
     })
   },
 
+  findUserDisplayNames(ids: string[]) {
+    return databaseService.client.user.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, displayName: true },
+    })
+  },
+
   findByKey(idempotencyKey: string) {
     return databaseService.client.inventoryMovement.findUnique({
       where: { idempotencyKey },

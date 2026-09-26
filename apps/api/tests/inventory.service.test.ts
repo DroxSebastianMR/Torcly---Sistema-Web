@@ -5,6 +5,7 @@ import { AppError } from '../src/shared/errors/app-error.js'
 const repository = vi.hoisted(() => ({
   listExistence: vi.fn(),
   listMovements: vi.fn(),
+  findUserDisplayNames: vi.fn(),
   registerMovement: vi.fn(),
   findByKey: vi.fn(),
 }))
@@ -117,6 +118,25 @@ describe('Servicio de inventario', () => {
       occurredAt: '2026-09-27T10:00:00.000Z',
       product: { code: 'REP-001', name: 'Filtro de aceite' },
     })
+  })
+
+  it('resuelve el nombre de los operadores guardados como UUID', async () => {
+    const operatorId = 'ad311bf4-c52d-4a45-a8ee-cbcbcc5c4d4b'
+    repository.listMovements.mockResolvedValue({
+      items: [movement({ performedBy: operatorId })],
+      total: 1,
+    })
+    repository.findUserDisplayNames.mockResolvedValue([
+      { id: operatorId, displayName: 'Arian' },
+    ])
+
+    const result = await inventoryService.listMovements({
+      page: 1,
+      pageSize: 20,
+    })
+
+    expect(repository.findUserDisplayNames).toHaveBeenCalledWith([operatorId])
+    expect(result.data[0]?.performedBy).toBe('Arian')
   })
 
   it('registra stock inicial, entrada y salida con actor y contexto', async () => {

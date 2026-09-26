@@ -14,8 +14,16 @@ import type {
   MovementType,
 } from './inventory.types.js'
 
+const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
+function isUserId(value: string) {
+  return uuidPattern.test(value)
+}
+
 function toResponse(
   movement: InventoryMovementRecord,
+  actorNames = new Map<string, string>(),
 ): InventoryMovementResponse {
   return {
     id: movement.id,
@@ -24,11 +32,25 @@ function toResponse(
     type: movement.type,
     quantity: Number(movement.quantity),
     notes: movement.notes,
-    performedBy: movement.performedBy,
+    performedBy: actorNames.get(movement.performedBy) ?? movement.performedBy,
     occurredAt: movement.occurredAt.toISOString(),
     referenceType: movement.referenceType,
     referenceId: movement.referenceId,
   }
+}
+
+async function resolveActorNames(movements: InventoryMovementRecord[]) {
+  const ids = [
+    ...new Set(
+      movements
+        .map((movement) => movement.performedBy)
+        .filter((performedBy) => isUserId(performedBy)),
+    ),
+  ]
+  if (!ids.length) return new Map<string, string>()
+
+  const users = await inventoryRepository.findUserDisplayNames(ids)
+  return new Map(users.map((user) => [user.id, user.displayName]))
 }
 
 function paginate(total: number, page: number, pageSize: number) {
@@ -84,8 +106,9 @@ export const inventoryService = {
 
   async listMovements(filters: InventoryMovementFilters) {
     const result = await inventoryRepository.listMovements(filters)
+    const actorNames = await resolveActorNames(result.items)
     return {
-      data: result.items.map(toResponse),
+      data: result.items.map((movement) => toResponse(movement, actorNames)),
       pagination: paginate(result.total, filters.page, filters.pageSize),
     }
   },

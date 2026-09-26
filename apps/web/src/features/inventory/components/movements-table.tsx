@@ -101,18 +101,7 @@ export function MovementsTable({ movements, loading }: MovementsTableProps) {
                   {formatDateTime(movement.occurredAt)}
                 </td>
                 <td className="px-4 py-4 text-muted-foreground">
-                  {movement.referenceId ? (
-                    <span className="inline-flex items-center gap-1.5">
-                      {movement.referenceId}
-                      {movement.referenceType ? (
-                        <span className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                          {movement.referenceType}
-                        </span>
-                      ) : null}
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground/60">—</span>
-                  )}
+                  <span className="text-muted-foreground/60">—</span>
                 </td>
               </tr>
             ))}
@@ -164,12 +153,6 @@ export function MovementsTable({ movements, loading }: MovementsTableProps) {
                   {formatDateTime(movement.occurredAt)}
                 </p>
               </div>
-              {movement.referenceId && (
-                <div className="col-span-2">
-                  <p className="text-xs text-muted-foreground">Referencia</p>
-                  <p className="mt-1 font-medium">{movement.referenceId}</p>
-                </div>
-              )}
               {movement.notes && (
                 <div className="col-span-2">
                   <p className="text-xs text-muted-foreground">Notas</p>
