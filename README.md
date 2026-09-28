@@ -4,7 +4,7 @@ Monorepo de gestión comercial con dos aplicaciones independientes:
 
 - `apps/web`: React, Vite y TypeScript. Conserva la arquitectura por features.
 - `apps/api`: Express 5 y TypeScript. Backend modular con API `/api/v1`.
-- `docs`: arquitectura y contratos.
+- `docs`: fuentes, análisis, arquitectura, sprints y calidad.
 - `output`: documentos entregables. `tmp`: archivos auxiliares locales.
 
 ## Desarrollo
@@ -71,4 +71,4 @@ Compilar ambas aplicaciones. Servir `apps/web/dist` con fallback SPA y ejecutar 
 
 ## Organización
 
-Ver [arquitectura](docs/architecture.md). Las rutas y pantallas conservadas del frontend están documentadas en [referencia frontend](docs/frontend.md).
+Ver el [índice documental](docs/README.md), la [arquitectura](docs/02-arquitectura/architecture.md) y la [referencia frontend](docs/02-arquitectura/frontend.md).

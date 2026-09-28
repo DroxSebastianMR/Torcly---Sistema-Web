@@ -39,17 +39,20 @@ export function NavigationSearch({
         ref={dialogRef}
         onClose={restoreFocus}
         aria-labelledby="navigation-search-title"
-        className="fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg overflow-hidden rounded-2xl border bg-card p-0 text-foreground shadow-2xl backdrop:bg-black/35"
+        className="fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg overflow-hidden rounded-[1.35rem] border border-border/80 bg-card p-0 text-foreground shadow-[0_24px_80px_rgba(7,28,22,0.24)] backdrop:bg-[#071c16]/55 backdrop:backdrop-blur-[2px]"
       >
-        <div className="flex items-center justify-between border-b px-5 py-4">
-          <h2 id="navigation-search-title" className="text-sm font-semibold">
+        <div className="relative px-5 pt-5">
+          <h2
+            id="navigation-search-title"
+            className="pr-12 text-sm font-semibold text-brand-forest"
+          >
             Ir a un módulo
           </h2>
           <button
             type="button"
             onClick={closeSearch}
             aria-label="Cerrar búsqueda"
-            className="flex size-9 items-center justify-center rounded-lg hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary"
+            className="absolute top-4 right-5 flex size-9 items-center justify-center rounded-lg border border-border/80 bg-background text-muted-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary"
           >
             <X size={18} />
           </button>
@@ -112,7 +115,7 @@ export function NavigationSearch({
             No encontramos módulos. Prueba con otro nombre.
           </p>
         )}
-        <div className="border-t bg-background px-5 py-3 text-xs text-muted-foreground">
+        <div className="mt-2 bg-muted/55 px-5 py-3 text-xs text-muted-foreground">
           Tab para recorrer · Enter para abrir · Esc para cerrar
         </div>
       </dialog>

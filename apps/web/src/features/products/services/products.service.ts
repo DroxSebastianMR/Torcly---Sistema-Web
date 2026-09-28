@@ -5,6 +5,7 @@ import type {
   Product,
   ProductFilters,
   ProductInput,
+  ProductCatalog,
   ProductOptions,
   ProductsResponse,
 } from '../types/products.types'
@@ -38,6 +39,15 @@ export const productsService = {
       signal,
     )
   },
+  catalog(signal?: AbortSignal) {
+    return api.get<DataResponse<ProductCatalog>>(
+      endpoints.products.catalog,
+      signal,
+    )
+  },
+  get(id: string, signal?: AbortSignal) {
+    return api.get<DataResponse<Product>>(endpoints.products.detail(id), signal)
+  },
   create(input: ProductInput) {
     return api.post<DataResponse<Product>>(endpoints.products.root, input)
   },
@@ -65,5 +75,42 @@ export const productsService = {
       name,
       symbol,
     })
+  },
+  updateCategory(id: string, name: string) {
+    return api.put<DataResponse<CatalogOption>>(
+      endpoints.products.category(id),
+      {
+        name,
+      },
+    )
+  },
+  updateBrand(id: string, name: string) {
+    return api.put<DataResponse<CatalogOption>>(endpoints.products.brand(id), {
+      name,
+    })
+  },
+  updateUnit(id: string, name: string, symbol: string) {
+    return api.put<DataResponse<CatalogOption>>(endpoints.products.unit(id), {
+      name,
+      symbol,
+    })
+  },
+  updateCategoryStatus(id: string, active: boolean) {
+    return api.patch<DataResponse<CatalogOption>>(
+      endpoints.products.categoryStatus(id),
+      { active },
+    )
+  },
+  updateBrandStatus(id: string, active: boolean) {
+    return api.patch<DataResponse<CatalogOption>>(
+      endpoints.products.brandStatus(id),
+      { active },
+    )
+  },
+  updateUnitStatus(id: string, active: boolean) {
+    return api.patch<DataResponse<CatalogOption>>(
+      endpoints.products.unitStatus(id),
+      { active },
+    )
   },
 }

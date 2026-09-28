@@ -4,6 +4,7 @@ import {
   ShoppingCart,
   Truck,
   UsersRound,
+  Car,
   Wallet,
   Package,
   Warehouse,
@@ -11,6 +12,9 @@ import {
   UserCog,
   Bell,
   CircleUserRound,
+  Wrench,
+  CalendarDays,
+  ClipboardList,
 } from 'lucide-react'
 import { paths } from '@/app/router/constants/paths'
 import type { NavigationGroup } from '../types/navigation.types'
@@ -51,6 +55,14 @@ export const appNavigation: readonly NavigationGroup[] = [
         permission: 'sales:read',
       },
       {
+        id: 'appointments',
+        label: 'Citas',
+        icon: CalendarDays,
+        path: paths.appointments,
+        visible: true,
+        permission: 'appointments:read',
+      },
+      {
         id: 'purchases',
         label: 'Compras',
         icon: Truck,
@@ -67,12 +79,34 @@ export const appNavigation: readonly NavigationGroup[] = [
         permission: 'customers:read',
       },
       {
+        id: 'vehicles',
+        label: 'Vehículos',
+        icon: Car,
+        path: paths.vehicles,
+        visible: true,
+        permission: 'vehicles:read',
+      },
+      {
         id: 'cash',
         label: 'Caja',
         icon: Wallet,
         path: paths.cash,
         visible: true,
         permission: 'cash:read',
+      },
+    ],
+  },
+  {
+    id: 'workshop',
+    label: 'Operación de taller',
+    items: [
+      {
+        id: 'workOrders',
+        label: 'Órdenes de taller',
+        icon: ClipboardList,
+        path: paths.workOrders,
+        visible: true,
+        permission: 'workshop:read',
       },
     ],
   },
@@ -95,6 +129,14 @@ export const appNavigation: readonly NavigationGroup[] = [
         path: paths.inventory,
         visible: true,
         permission: 'inventory:read',
+      },
+      {
+        id: 'services',
+        label: 'Servicios',
+        icon: Wrench,
+        path: paths.services,
+        visible: true,
+        permission: 'services:read',
       },
       {
         id: 'barcodes',

@@ -5,19 +5,24 @@ import {
   Pencil,
   Power,
 } from 'lucide-react'
+import { EmptyState } from '@/components/ui/empty-state'
 import type { Product } from '../types/products.types'
 import { currencyFormatter, numberFormatter } from '../utils/product-formatters'
 
 interface ProductsTableProps {
   products: Product[]
   loading: boolean
-  onEdit: (product: Product) => void
-  onToggleStatus: (product: Product) => void
+  canWrite: boolean
+  onOpenDetail: (product: Product) => void
+  onEdit?: (product: Product) => void
+  onToggleStatus?: (product: Product) => void
 }
 
 export function ProductsTable({
   products,
   loading,
+  canWrite,
+  onOpenDetail,
   onEdit,
   onToggleStatus,
 }: ProductsTableProps) {
@@ -25,15 +30,11 @@ export function ProductsTable({
 
   if (!products.length) {
     return (
-      <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
-        <span className="flex size-12 items-center justify-center rounded-2xl bg-muted text-primary">
-          <PackageOpen size={23} />
-        </span>
-        <h3 className="mt-4 font-semibold">No se encontraron productos</h3>
-        <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-          Ajusta los filtros o registra el primer producto del catálogo.
-        </p>
-      </div>
+      <EmptyState
+        icon={PackageOpen}
+        title="No se encontraron productos"
+        description="Ajusta los filtros o registra el primer producto del catálogo."
+      />
     )
   }
 
@@ -48,9 +49,11 @@ export function ProductsTable({
               <th className="px-4 py-3 text-right">Precio</th>
               <th className="px-4 py-3 text-right">Existencia</th>
               <th className="px-4 py-3">Estado</th>
-              <th className="w-16 px-4 py-3">
-                <span className="sr-only">Acciones</span>
-              </th>
+              {canWrite && (
+                <th className="w-16 px-4 py-3">
+                  <span className="sr-only">Acciones</span>
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -64,7 +67,8 @@ export function ProductsTable({
                     <div className="min-w-0">
                       <button
                         type="button"
-                        onClick={() => onEdit(product)}
+                        onClick={() => onOpenDetail(product)}
+                        aria-label={`Abrir ficha de ${product.name}`}
                         className="block max-w-64 truncate text-left font-semibold text-foreground hover:text-primary"
                       >
                         {product.name}
@@ -99,32 +103,34 @@ export function ProductsTable({
                 <td className="px-4 py-4">
                   <StatusBadge active={product.active} />
                 </td>
-                <td className="px-4 py-4">
-                  <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
-                    <button
-                      type="button"
-                      title="Editar producto"
-                      aria-label={`Editar ${product.name}`}
-                      onClick={() => onEdit(product)}
-                      className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      type="button"
-                      title={
-                        product.active
-                          ? 'Desactivar producto'
-                          : 'Activar producto'
-                      }
-                      aria-label={`${product.active ? 'Desactivar' : 'Activar'} ${product.name}`}
-                      onClick={() => onToggleStatus(product)}
-                      className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary"
-                    >
-                      <Power size={16} />
-                    </button>
-                  </div>
-                </td>
+                {canWrite && (
+                  <td className="px-4 py-4">
+                    <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
+                      <button
+                        type="button"
+                        title="Editar producto"
+                        aria-label={`Editar ${product.name}`}
+                        onClick={() => onEdit?.(product)}
+                        className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        title={
+                          product.active
+                            ? 'Desactivar producto'
+                            : 'Activar producto'
+                        }
+                        aria-label={`${product.active ? 'Desactivar' : 'Activar'} ${product.name}`}
+                        onClick={() => onToggleStatus?.(product)}
+                        className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary"
+                      >
+                        <Power size={16} />
+                      </button>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -136,7 +142,13 @@ export function ProductsTable({
           <article key={product.id} className="px-4 py-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="truncate font-semibold">{product.name}</p>
+                <button
+                  type="button"
+                  onClick={() => onOpenDetail(product)}
+                  className="block max-w-full truncate text-left font-semibold text-foreground hover:text-primary"
+                >
+                  {product.name}
+                </button>
                 <p className="mt-1 font-mono text-xs text-muted-foreground">
                   {product.code}
                 </p>
@@ -156,23 +168,25 @@ export function ProductsTable({
               />
               <Info label="Marca" value={product.brand?.name ?? 'Sin marca'} />
             </div>
-            <div className="mt-4 flex gap-2 border-t pt-3">
-              <button
-                type="button"
-                onClick={() => onEdit(product)}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-muted px-3 py-2 text-sm font-medium"
-              >
-                <Pencil size={15} /> Editar
-              </button>
-              <button
-                type="button"
-                onClick={() => onToggleStatus(product)}
-                className="flex size-10 items-center justify-center rounded-lg border"
-                aria-label={`${product.active ? 'Desactivar' : 'Activar'} ${product.name}`}
-              >
-                <Power size={16} />
-              </button>
-            </div>
+            {canWrite && (
+              <div className="mt-4 flex gap-2 border-t pt-3">
+                <button
+                  type="button"
+                  onClick={() => onEdit?.(product)}
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-muted px-3 py-2 text-sm font-medium"
+                >
+                  <Pencil size={15} /> Editar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onToggleStatus?.(product)}
+                  className="flex size-10 items-center justify-center rounded-lg border"
+                  aria-label={`${product.active ? 'Desactivar' : 'Activar'} ${product.name}`}
+                >
+                  <Power size={16} />
+                </button>
+              </div>
+            )}
           </article>
         ))}
       </div>

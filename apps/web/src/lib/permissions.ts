@@ -3,9 +3,13 @@ export const modules = [
   'products',
   'barcodes',
   'inventory',
+  'services',
   'purchases',
   'sales',
+  'appointments',
+  'workshop',
   'customers',
+  'vehicles',
   'cash',
   'users',
   'notifications',
@@ -13,7 +17,8 @@ export const modules = [
   'reports',
 ] as const
 export type Module = (typeof modules)[number]
-export type Permission = `${Module}:read`
+export type PermissionAction = 'read' | 'write'
+export type Permission = `${Module}:${PermissionAction}`
 export function hasPermission(
   permissions: readonly string[],
   required: Permission,

@@ -1,5 +1,6 @@
-import type { Prisma } from '../../generated/prisma/client.js'
+import type { AuditEventType, Prisma } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
+import type { RequestContext } from '../auth/auth.types.js'
 import type { ProductFilters, ProductInput } from './products.types.js'
 
 const productRelations = {
@@ -13,6 +14,39 @@ const productRelations = {
 } satisfies Prisma.ProductInclude
 
 const productSelect = { include: productRelations } as const
+
+function auditData(
+  event: AuditEventType,
+  actorId: string,
+  identifier: string,
+  context: RequestContext,
+  metadata?: Prisma.InputJsonValue,
+) {
+  return {
+    event,
+    userId: actorId,
+    identifier,
+    requestId: context.requestId,
+    ipAddress: context.ipAddress,
+    metadata,
+  }
+}
+
+type ProductWithRelations = Prisma.ProductGetPayload<typeof productSelect>
+
+function productAuditMetadata(product: ProductWithRelations) {
+  return {
+    productId: product.id,
+    code: product.code,
+    name: product.name,
+    categoryId: product.categoryId,
+    brandId: product.brandId,
+    unitId: product.unitId,
+    salePrice: Number(product.salePrice),
+    minimumStock: Number(product.minimumStock),
+    active: product.active,
+  }
+}
 
 function buildWhere(filters: ProductFilters): Prisma.ProductWhereInput {
   const search = filters.search?.trim()
@@ -64,26 +98,72 @@ export const productsRepository = {
     })
   },
 
-  create(input: ProductInput) {
-    return databaseService.client.product.create({
-      ...productSelect,
-      data: input,
+  create(input: ProductInput, actorId: string, context: RequestContext) {
+    return databaseService.transaction(async (transaction) => {
+      const product = await transaction.product.create({
+        ...productSelect,
+        data: input,
+      })
+      await transaction.auditLog.create({
+        data: auditData(
+          'PRODUCT_CREATED',
+          actorId,
+          product.code,
+          context,
+          productAuditMetadata(product),
+        ),
+      })
+      return product
     })
   },
 
-  update(id: string, input: ProductInput) {
-    return databaseService.client.product.update({
-      ...productSelect,
-      where: { id },
-      data: input,
+  update(
+    id: string,
+    input: ProductInput,
+    actorId: string,
+    context: RequestContext,
+  ) {
+    return databaseService.transaction(async (transaction) => {
+      const product = await transaction.product.update({
+        ...productSelect,
+        where: { id },
+        data: input,
+      })
+      await transaction.auditLog.create({
+        data: auditData(
+          'PRODUCT_UPDATED',
+          actorId,
+          product.code,
+          context,
+          productAuditMetadata(product),
+        ),
+      })
+      return product
     })
   },
 
-  updateStatus(id: string, active: boolean) {
-    return databaseService.client.product.update({
-      ...productSelect,
-      where: { id },
-      data: { active },
+  updateStatus(
+    id: string,
+    active: boolean,
+    actorId: string,
+    context: RequestContext,
+  ) {
+    return databaseService.transaction(async (transaction) => {
+      const product = await transaction.product.update({
+        ...productSelect,
+        where: { id },
+        data: { active },
+      })
+      await transaction.auditLog.create({
+        data: auditData(
+          active ? 'PRODUCT_ACTIVATED' : 'PRODUCT_DEACTIVATED',
+          actorId,
+          product.code,
+          context,
+          productAuditMetadata(product),
+        ),
+      })
+      return product
     })
   },
 
@@ -109,6 +189,25 @@ export const productsRepository = {
     return { categories, brands, units }
   },
 
+  async getCatalog() {
+    const [categories, brands, units] = await Promise.all([
+      databaseService.client.productCategory.findMany({
+        select: { id: true, name: true, active: true },
+        orderBy: { name: 'asc' },
+      }),
+      databaseService.client.productBrand.findMany({
+        select: { id: true, name: true, active: true },
+        orderBy: { name: 'asc' },
+      }),
+      databaseService.client.productUnit.findMany({
+        select: { id: true, name: true, symbol: true, active: true },
+        orderBy: { name: 'asc' },
+      }),
+    ])
+
+    return { categories, brands, units }
+  },
+
   createCategory(name: string) {
     return databaseService.client.productCategory.create({
       data: { name },
@@ -127,6 +226,54 @@ export const productsRepository = {
     return databaseService.client.productUnit.create({
       data: { name, symbol },
       select: { id: true, name: true, symbol: true },
+    })
+  },
+
+  updateCategory(id: string, name: string) {
+    return databaseService.client.productCategory.update({
+      where: { id },
+      data: { name },
+      select: { id: true, name: true, active: true },
+    })
+  },
+
+  updateBrand(id: string, name: string) {
+    return databaseService.client.productBrand.update({
+      where: { id },
+      data: { name },
+      select: { id: true, name: true, active: true },
+    })
+  },
+
+  updateUnit(id: string, name: string, symbol: string) {
+    return databaseService.client.productUnit.update({
+      where: { id },
+      data: { name, symbol },
+      select: { id: true, name: true, symbol: true, active: true },
+    })
+  },
+
+  updateCategoryStatus(id: string, active: boolean) {
+    return databaseService.client.productCategory.update({
+      where: { id },
+      data: { active },
+      select: { id: true, name: true, active: true },
+    })
+  },
+
+  updateBrandStatus(id: string, active: boolean) {
+    return databaseService.client.productBrand.update({
+      where: { id },
+      data: { active },
+      select: { id: true, name: true, active: true },
+    })
+  },
+
+  updateUnitStatus(id: string, active: boolean) {
+    return databaseService.client.productUnit.update({
+      where: { id },
+      data: { active },
+      select: { id: true, name: true, symbol: true, active: true },
     })
   },
 }

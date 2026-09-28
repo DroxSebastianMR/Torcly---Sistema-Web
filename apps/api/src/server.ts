@@ -11,7 +11,8 @@ function startServer() {
   void databaseService
     .connect()
     .then(() => {
-      if (!shuttingDown) console.info('Base de datos: conectada mediante Prisma')
+      if (!shuttingDown)
+        console.info('Base de datos: conectada mediante Prisma')
     })
     .catch(() => {
       if (!shuttingDown) {
