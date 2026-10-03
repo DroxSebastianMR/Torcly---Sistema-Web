@@ -21,10 +21,13 @@ Copiar `.env.example` a `.env` en cada aplicación si no existen. Ya se preparar
 pnpm dev          # Inicia web y API; Ctrl+C detiene ambos
 pnpm dev:web      # Solo frontend
 pnpm dev:api      # Solo backend
+pnpm demo         # Demo offline: solo web, datos locales y sin API/BD
 ```
 
 Web: http://127.0.0.1:5173. API: http://127.0.0.1:3000/api/v1/health.
 Vite reenvía `/api` al puerto 3000. En el navegador, `/api/v1/health` prueba la conexión a Express a través del frontend. Si se cambia el puerto API, actualizar también el proxy en `apps/web/vite.config.ts`.
+
+Para presentar sin conexión, sigue la [guía de demo offline](docs/demo-offline.md).
 
 ```sh
 pnpm build
@@ -63,7 +66,7 @@ catálogo de productos ya incluye API, validaciones, categorías, marcas, unidad
 desactivación histórica y existencias derivadas de movimientos confirmados. La
 autenticación, correo y demás operaciones comerciales se agregarán por módulos.
 
-El botón de login conserva el acceso temporal de desarrollo con `VITE_ENABLE_DEMO=true`; no autentica contra Express. Producción lo deshabilita. Los endpoints de negocio aún no implementados responden 404.
+El modo demo offline se activa únicamente con `pnpm demo` (`VITE_DEMO_MODE=true`). No inicia Express ni Prisma y no realiza solicitudes HTTP: usa datos transitorios en memoria para presentar los Sprints 09 y 10. El modo habitual continúa utilizando autenticación y permisos de la API.
 
 ## Producción
 

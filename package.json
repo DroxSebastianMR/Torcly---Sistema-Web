@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "concurrently --kill-others --names WEB,API --prefix-colors cyan,green \"pnpm dev:web\" \"pnpm dev:api\"",
     "dev:web": "pnpm --filter @torcly/web dev",
+    "demo": "pnpm --filter @torcly/web demo",
     "dev:api": "pnpm --filter @torcly/api dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
