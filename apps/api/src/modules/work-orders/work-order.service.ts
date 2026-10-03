@@ -3,19 +3,35 @@ import { AppError } from '../../shared/errors/app-error.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import {
   workOrdersRepository,
+  type WorkOrderExecutionRecord,
   type WorkOrderRecord,
 } from './work-order.repository.js'
-import { assertHasLines, computeWorkOrderTotals } from './work-order.rules.js'
+import {
+  assertHasLines,
+  computeNetConsumed,
+  computeWorkOrderTotals,
+  roundQuantity,
+} from './work-order.rules.js'
 import type {
+  WorkOrderActivityInput,
+  WorkOrderActivityResponse,
   WorkOrderBudgetInput,
+  WorkOrderConsumptionInput,
+  WorkOrderConsumptionType,
   WorkOrderCustomerRef,
   WorkOrderDecisionInput,
+  WorkOrderDeliveryInput,
   WorkOrderDetail,
+  WorkOrderExecutionResponse,
   WorkOrderFilters,
   WorkOrderLineInput,
   WorkOrderLineResponse,
+  WorkOrderProductLineConsumption,
+  WorkOrderReturnInput,
   WorkOrderSummary,
   WorkOrderTechnicianInput,
+  WorkOrderVehicleHistoryFilters,
+  WorkOrderVehicleHistoryItem,
   WorkOrderVehicleRef,
 } from './work-order.types.js'
 
@@ -104,6 +120,12 @@ function toSummary(
     rejectedBy: string | null
     rejectedAt: Date | null
     decisionNotes: string | null
+    executionStartedBy: string | null
+    executionStartedAt: Date | null
+    readyForDeliveryAt: Date | null
+    deliveredBy: string | null
+    deliveredAt: Date | null
+    deliveryNotes: string | null
     createdAt: Date
     updatedAt: Date
     _count?: { lines: number }
@@ -141,6 +163,20 @@ function toSummary(
       : null,
     rejectedAt: order.rejectedAt ? order.rejectedAt.toISOString() : null,
     decisionNotes: order.decisionNotes,
+    executionStartedBy: order.executionStartedBy
+      ? (actorNames.get(order.executionStartedBy) ?? order.executionStartedBy)
+      : null,
+    executionStartedAt: order.executionStartedAt
+      ? order.executionStartedAt.toISOString()
+      : null,
+    readyForDeliveryAt: order.readyForDeliveryAt
+      ? order.readyForDeliveryAt.toISOString()
+      : null,
+    deliveredBy: order.deliveredBy
+      ? (actorNames.get(order.deliveredBy) ?? order.deliveredBy)
+      : null,
+    deliveredAt: order.deliveredAt ? order.deliveredAt.toISOString() : null,
+    deliveryNotes: order.deliveryNotes,
     createdAt: order.createdAt.toISOString(),
     updatedAt: order.updatedAt.toISOString(),
   }
@@ -157,6 +193,175 @@ function toDetail(
   }
 }
 
+function toActivityResponse(activity: {
+  id: string
+  status: WorkOrderActivityResponse['status']
+  description: string
+  performedBy: string
+  occurredAt: Date
+  completedBy: string | null
+  completedAt: Date | null
+  createdAt: Date
+}): WorkOrderActivityResponse {
+  return {
+    id: activity.id,
+    status: activity.status,
+    description: activity.description,
+    performedBy: activity.performedBy,
+    occurredAt: activity.occurredAt.toISOString(),
+    completedBy: activity.completedBy,
+    completedAt: activity.completedAt
+      ? activity.completedAt.toISOString()
+      : null,
+    createdAt: activity.createdAt.toISOString(),
+  }
+}
+
+function toExecutionResponse(
+  execution: WorkOrderExecutionRecord,
+): WorkOrderExecutionResponse {
+  const productLines: WorkOrderProductLineConsumption[] = execution.lines.map(
+    (line) => {
+      const lineConsumptions = execution.consumptions.filter(
+        (consumption) => consumption.workOrderLineId === line.id,
+      )
+      const consumed = lineConsumptions
+        .filter((consumption) => consumption.type === 'CONSUMPTION')
+        .reduce((sum, consumption) => sum + Number(consumption.quantity), 0)
+      const returned = lineConsumptions
+        .filter((consumption) => consumption.type === 'RETURN')
+        .reduce((sum, consumption) => sum + Number(consumption.quantity), 0)
+      const netConsumed = computeNetConsumed(lineConsumptions)
+      const budgeted = Number(line.quantity)
+      return {
+        lineId: line.id,
+        productId: line.productId,
+        name: line.name,
+        code: line.code,
+        unitLabel: line.unitLabel,
+        budgeted,
+        consumed,
+        returned,
+        netConsumed,
+        pending: roundQuantity(budgeted - netConsumed),
+      }
+    },
+  )
+
+  return {
+    workOrderId: execution.id,
+    code: execution.code,
+    status: execution.status,
+    startedBy: execution.executionStartedBy,
+    startedAt: execution.executionStartedAt
+      ? execution.executionStartedAt.toISOString()
+      : null,
+    readyForDeliveryAt: execution.readyForDeliveryAt
+      ? execution.readyForDeliveryAt.toISOString()
+      : null,
+    deliveredBy: execution.deliveredBy,
+    deliveredAt: execution.deliveredAt
+      ? execution.deliveredAt.toISOString()
+      : null,
+    deliveryNotes: execution.deliveryNotes,
+    activities: execution.activities.map(toActivityResponse),
+    productLines,
+    consumptions: execution.consumptions.map((consumption) => ({
+      id: consumption.id,
+      type: consumption.type,
+      workOrderLineId: consumption.workOrderLineId,
+      productId: consumption.productId,
+      quantity: Number(consumption.quantity),
+      notes: consumption.notes,
+      performedBy: consumption.performedBy,
+      occurredAt: consumption.occurredAt.toISOString(),
+    })),
+  }
+}
+
+function toVehicleHistoryItem(order: {
+  id: string
+  code: string
+  diagnosis: string | null
+  subtotal: unknown
+  total: unknown
+  performedBy: string
+  deliveredBy: string | null
+  deliveredAt: Date | null
+  technician: { id: string; displayName: string } | null
+  activities: Array<{
+    id: string
+    description: string
+    status: WorkOrderActivityResponse['status']
+    performedBy: string
+    occurredAt: Date
+  }>
+  consumptions: Array<{
+    type: WorkOrderConsumptionType
+    quantity: unknown
+    workOrderLine: {
+      id: string
+      productId: string | null
+      name: string
+      code: string
+      unitLabel: string | null
+    }
+  }>
+}): WorkOrderVehicleHistoryItem {
+  const products = new Map<
+    string,
+    {
+      lineId: string
+      productId: string | null
+      name: string
+      code: string
+      unitLabel: string | null
+      quantity: number
+    }
+  >()
+  for (const consumption of order.consumptions) {
+    const line = consumption.workOrderLine
+    const entry =
+      products.get(line.id) ??
+      ({
+        lineId: line.id,
+        productId: line.productId,
+        name: line.name,
+        code: line.code,
+        unitLabel: line.unitLabel,
+        quantity: 0,
+      } satisfies WorkOrderVehicleHistoryItem['products'][number] & {
+        quantity: number
+      })
+    entry.quantity +=
+      consumption.type === 'CONSUMPTION'
+        ? Number(consumption.quantity)
+        : -Number(consumption.quantity)
+    products.set(line.id, entry)
+  }
+
+  return {
+    id: order.id,
+    code: order.code,
+    diagnosis: order.diagnosis,
+    technicianId: order.technician?.id ?? null,
+    technician: order.technician?.displayName ?? null,
+    performedBy: order.performedBy,
+    deliveredBy: order.deliveredBy,
+    deliveredAt: order.deliveredAt ? order.deliveredAt.toISOString() : null,
+    subtotal: Number(order.subtotal),
+    total: Number(order.total),
+    activities: order.activities.map((activity) => ({
+      id: activity.id,
+      description: activity.description,
+      status: activity.status,
+      performedBy: activity.performedBy,
+      occurredAt: activity.occurredAt.toISOString(),
+    })),
+    products: [...products.values()].filter((product) => product.quantity > 0),
+  }
+}
+
 async function resolveActorNames(
   orders: Array<{
     performedBy: string
@@ -164,6 +369,8 @@ async function resolveActorNames(
     budgetSentBy: string | null
     approvedBy: string | null
     rejectedBy: string | null
+    executionStartedBy: string | null
+    deliveredBy: string | null
   }>,
 ): Promise<Map<string, string>> {
   const ids = [
@@ -175,6 +382,8 @@ async function resolveActorNames(
           order.budgetSentBy,
           order.approvedBy,
           order.rejectedBy,
+          order.executionStartedBy,
+          order.deliveredBy,
         ])
         .filter(
           (value): value is string =>
@@ -424,5 +633,143 @@ export const workOrdersService = {
       context,
     )
     return { data: toDetail(order, await resolveActorNames([order])) }
+  },
+
+  async startExecution(
+    id: string,
+    actor: WorkOrderActor | string,
+    context: RequestContext,
+  ) {
+    const order = await workOrdersRepository.startExecution(
+      id,
+      normalizeActor(actor),
+      context,
+    )
+    return { data: toDetail(order, await resolveActorNames([order])) }
+  },
+
+  async getExecution(id: string) {
+    const execution = await workOrdersRepository.getExecution(id)
+    return { data: toExecutionResponse(execution) }
+  },
+
+  async createActivity(
+    id: string,
+    input: WorkOrderActivityInput,
+    actor: WorkOrderActor | string,
+    context: RequestContext,
+  ) {
+    const activity = await workOrdersRepository.addActivity(
+      id,
+      {
+        description: input.description,
+        ...(input.occurredAt ? { occurredAt: input.occurredAt } : {}),
+      },
+      normalizeActor(actor),
+      context,
+    )
+    return { data: toActivityResponse(activity) }
+  },
+
+  async completeActivity(
+    id: string,
+    activityId: string,
+    actor: WorkOrderActor | string,
+    context: RequestContext,
+  ) {
+    const activity = await workOrdersRepository.completeActivity(
+      id,
+      activityId,
+      normalizeActor(actor),
+      context,
+    )
+    return { data: toActivityResponse(activity) }
+  },
+
+  async consume(
+    id: string,
+    input: WorkOrderConsumptionInput,
+    actor: WorkOrderActor | string,
+    context: RequestContext,
+  ) {
+    const result = await workOrdersRepository.consume(
+      id,
+      input,
+      normalizeActor(actor),
+      context,
+    )
+    return {
+      data: {
+        order: toDetail(result.order, await resolveActorNames([result.order])),
+        registrations: result.registrations,
+      },
+    }
+  },
+
+  async returnProducts(
+    id: string,
+    input: WorkOrderReturnInput,
+    actor: WorkOrderActor | string,
+    context: RequestContext,
+  ) {
+    const result = await workOrdersRepository.returnProducts(
+      id,
+      input,
+      normalizeActor(actor),
+      context,
+    )
+    return {
+      data: {
+        order: toDetail(result.order, await resolveActorNames([result.order])),
+        registrations: result.registrations,
+      },
+    }
+  },
+
+  async finalize(
+    id: string,
+    actor: WorkOrderActor | string,
+    context: RequestContext,
+  ) {
+    const order = await workOrdersRepository.finalize(
+      id,
+      normalizeActor(actor),
+      context,
+    )
+    return { data: toDetail(order, await resolveActorNames([order])) }
+  },
+
+  async deliver(
+    id: string,
+    input: WorkOrderDeliveryInput,
+    actor: WorkOrderActor | string,
+    context: RequestContext,
+  ) {
+    const order = await workOrdersRepository.deliver(
+      id,
+      input.notes ?? null,
+      normalizeActor(actor),
+      context,
+    )
+    return { data: toDetail(order, await resolveActorNames([order])) }
+  },
+
+  async getVehicleHistory(
+    vehicleId: string,
+    filters: WorkOrderVehicleHistoryFilters,
+  ) {
+    const result = await workOrdersRepository.listVehicleHistory(
+      vehicleId,
+      filters,
+    )
+    return {
+      data: result.items.map(toVehicleHistoryItem),
+      pagination: {
+        page: filters.page,
+        pageSize: filters.pageSize,
+        total: result.total,
+        totalPages: Math.max(1, Math.ceil(result.total / filters.pageSize)),
+      },
+    }
   },
 }

@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import {
+  workOrderActivitySchema,
   workOrderBudgetSchema,
+  workOrderConsumptionSchema,
   workOrderDecisionSchema,
+  workOrderDeliverySchema,
   workOrderDiagnosisSchema,
   workOrderLineDraftSchema,
+  workOrderReturnSchema,
   workOrderTechnicianSchema,
 } from './work-order.schema'
 
@@ -70,5 +74,67 @@ describe('Esquemas de órdenes de taller (web)', () => {
         technicianId: 'a0000000-0000-4000-8000-000000000001',
       }),
     ).toEqual({ technicianId: 'a0000000-0000-4000-8000-000000000001' })
+  })
+
+  it('acepta una actividad con descripción y fecha opcional', () => {
+    expect(
+      workOrderActivitySchema.parse({
+        description: '  Revisar frenos  ',
+      }),
+    ).toMatchObject({ description: 'Revisar frenos' })
+    expect(
+      workOrderActivitySchema.parse({
+        description: 'Revisar frenos',
+        occurredAt: '2026-09-28',
+      }),
+    ).toMatchObject({ occurredAt: '2026-09-28' })
+    expect(() =>
+      workOrderActivitySchema.parse({ description: '  ' }),
+    ).toThrowError('La descripción debe tener al menos 3 caracteres.')
+  })
+
+  it('el consumo exige línea y cantidad válida', () => {
+    expect(
+      workOrderConsumptionSchema.parse({
+        lineId: 'a0000000-0000-4000-8000-000000000001',
+        quantity: 1.5,
+      }),
+    ).toMatchObject({ quantity: 1.5 })
+    expect(() =>
+      workOrderConsumptionSchema.parse({ lineId: '', quantity: 1 }),
+    ).toThrowError('Selecciona un producto.')
+    expect(() =>
+      workOrderConsumptionSchema.parse({
+        lineId: 'a0000000-0000-4000-8000-000000000001',
+        quantity: 0,
+      }),
+    ).toThrowError('La cantidad debe ser mayor a cero.')
+  })
+
+  it('la devolución admite notas y limita su extensión', () => {
+    expect(
+      workOrderReturnSchema.parse({
+        lineId: 'a0000000-0000-4000-8000-000000000001',
+        quantity: 1,
+        notes: 'Sobró repuesto',
+      }),
+    ).toMatchObject({ notes: 'Sobró repuesto' })
+    expect(() =>
+      workOrderReturnSchema.parse({
+        lineId: 'a0000000-0000-4000-8000-000000000001',
+        quantity: 1,
+        notes: 'x'.repeat(301),
+      }),
+    ).toThrowError('Las notas no pueden superar los 300 caracteres.')
+  })
+
+  it('la entrega es válida con o sin notas', () => {
+    expect(workOrderDeliverySchema.parse({ notes: '' })).toEqual({ notes: '' })
+    expect(
+      workOrderDeliverySchema.parse({ notes: 'Entregado al cliente' }),
+    ).toMatchObject({ notes: 'Entregado al cliente' })
+    expect(() =>
+      workOrderDeliverySchema.parse({ notes: 'x'.repeat(501) }),
+    ).toThrowError('Las notas no pueden superar los 500 caracteres.')
   })
 })

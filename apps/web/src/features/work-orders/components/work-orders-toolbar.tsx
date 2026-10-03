@@ -52,6 +52,9 @@ export function WorkOrdersToolbar({
               { value: 'PENDIENTE_APROBACION', label: 'Pte. aprobación' },
               { value: 'APROBADA', label: 'Aprobadas' },
               { value: 'RECHAZADA', label: 'Rechazadas' },
+              { value: 'EN_EJECUCION', label: 'En ejecución' },
+              { value: 'LISTA_PARA_ENTREGA', label: 'Pta. entrega' },
+              { value: 'ENTREGADA', label: 'Entregadas' },
             ]}
             onChange={(status) =>
               onChange({

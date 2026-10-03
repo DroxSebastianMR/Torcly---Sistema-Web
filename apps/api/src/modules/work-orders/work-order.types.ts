@@ -4,8 +4,13 @@ export type WorkOrderStatus =
   | 'PENDIENTE_APROBACION'
   | 'APROBADA'
   | 'RECHAZADA'
+  | 'EN_EJECUCION'
+  | 'LISTA_PARA_ENTREGA'
+  | 'ENTREGADA'
 export type WorkOrderStatusFilter = 'all' | WorkOrderStatus
 export type WorkOrderLineType = 'PRODUCT' | 'SERVICE'
+export type WorkOrderActivityStatus = 'PENDIENTE' | 'COMPLETADA'
+export type WorkOrderConsumptionType = 'CONSUMPTION' | 'RETURN'
 
 export interface WorkOrderFilters {
   search?: string
@@ -83,6 +88,12 @@ export interface WorkOrderSummary {
   rejectedBy: string | null
   rejectedAt: string | null
   decisionNotes: string | null
+  executionStartedBy: string | null
+  executionStartedAt: string | null
+  readyForDeliveryAt: string | null
+  deliveredBy: string | null
+  deliveredAt: string | null
+  deliveryNotes: string | null
   createdAt: string
   updatedAt: string
 }
@@ -99,6 +110,9 @@ export interface WorkOrderStats {
   pendientesAprobacion: number
   aprobadas: number
   rechazadas: number
+  enEjecucion: number
+  listasParaEntrega: number
+  entregadas: number
 }
 
 export interface WorkOrderCatalogProduct {
@@ -124,4 +138,121 @@ export interface WorkOrderCatalog {
 export interface WorkOrderTechnician {
   id: string
   displayName: string
+}
+
+export interface WorkOrderActivityInput {
+  description: string
+  occurredAt?: string
+}
+
+export interface WorkOrderConsumptionItem {
+  lineId: string
+  quantity: number
+}
+
+export interface WorkOrderConsumptionInput {
+  requestId: string
+  items: WorkOrderConsumptionItem[]
+}
+
+export interface WorkOrderReturnItem {
+  lineId: string
+  quantity: number
+  notes?: string
+}
+
+export interface WorkOrderReturnInput {
+  requestId: string
+  items: WorkOrderReturnItem[]
+}
+
+export interface WorkOrderDeliveryInput {
+  notes?: string
+}
+
+export interface WorkOrderActivityResponse {
+  id: string
+  status: WorkOrderActivityStatus
+  description: string
+  performedBy: string
+  occurredAt: string
+  completedBy: string | null
+  completedAt: string | null
+  createdAt: string
+}
+
+export interface WorkOrderProductLineConsumption {
+  lineId: string
+  productId: string | null
+  name: string
+  code: string
+  unitLabel: string | null
+  budgeted: number
+  consumed: number
+  returned: number
+  netConsumed: number
+  pending: number
+}
+
+export interface WorkOrderConsumptionResponse {
+  id: string
+  type: WorkOrderConsumptionType
+  workOrderLineId: string
+  productId: string | null
+  quantity: number
+  notes: string | null
+  performedBy: string
+  occurredAt: string
+}
+
+export interface WorkOrderExecutionResponse {
+  workOrderId: string
+  code: string
+  status: WorkOrderStatus
+  startedBy: string | null
+  startedAt: string | null
+  readyForDeliveryAt: string | null
+  deliveredBy: string | null
+  deliveredAt: string | null
+  deliveryNotes: string | null
+  activities: WorkOrderActivityResponse[]
+  productLines: WorkOrderProductLineConsumption[]
+  consumptions: WorkOrderConsumptionResponse[]
+}
+
+export interface WorkOrderVehicleHistoryFilters {
+  page: number
+  pageSize: number
+}
+
+export interface WorkOrderVehicleHistoryActivity {
+  id: string
+  description: string
+  status: WorkOrderActivityStatus
+  performedBy: string
+  occurredAt: string
+}
+
+export interface WorkOrderVehicleHistoryProduct {
+  lineId: string
+  productId: string | null
+  name: string
+  code: string
+  unitLabel: string | null
+  quantity: number
+}
+
+export interface WorkOrderVehicleHistoryItem {
+  id: string
+  code: string
+  diagnosis: string | null
+  technicianId: string | null
+  technician: string | null
+  performedBy: string
+  deliveredBy: string | null
+  deliveredAt: string | null
+  subtotal: number
+  total: number
+  activities: WorkOrderVehicleHistoryActivity[]
+  products: WorkOrderVehicleHistoryProduct[]
 }

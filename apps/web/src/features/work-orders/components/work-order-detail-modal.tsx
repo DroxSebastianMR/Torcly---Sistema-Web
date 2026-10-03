@@ -1,13 +1,26 @@
 import {
+  BadgeCheck,
+  CarFront,
   CircleCheck,
   ClipboardList,
+  PackageMinus,
+  PackagePlus,
   Stethoscope,
   UserRound,
+  Wrench,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
-import type { WorkOrderDetail, WorkOrderLine } from '../types/work-orders.types'
+import type {
+  WorkOrderDetail,
+  WorkOrderExecution,
+  WorkOrderLine,
+} from '../types/work-orders.types'
 import {
+  canDeliverWorkOrder,
+  canFinalizeWorkOrder,
+  canManageWorkOrderExecution,
+  canStartWorkOrderExecution,
   currencyFormatter,
   dateTimeFormatter,
   isWorkOrderBudgetEditable,
@@ -15,17 +28,26 @@ import {
   quantityFormatter,
   workOrderStatusLabel,
 } from '../utils/work-order-formatters'
+import { WorkOrderExecutionPanel } from './work-order-execution-panel'
 
 interface WorkOrderDetailModalProps {
   open: boolean
   order: WorkOrderDetail | null
   loading: boolean
   canEdit: boolean
+  execution: WorkOrderExecution | null
+  executionLoading: boolean
   onClose: () => void
   onDiagnosis: (order: WorkOrderDetail) => void
   onBudget: (order: WorkOrderDetail) => void
   onDecide: (order: WorkOrderDetail) => void
   onTechnician: (order: WorkOrderDetail) => void
+  onStartExecution: (order: WorkOrderDetail) => void
+  onActivity: (order: WorkOrderDetail) => void
+  onConsume: (order: WorkOrderDetail) => void
+  onReturn: (order: WorkOrderDetail) => void
+  onFinalize: (order: WorkOrderDetail) => void
+  onDeliver: (order: WorkOrderDetail) => void
 }
 
 export function WorkOrderDetailModal({
@@ -33,12 +55,40 @@ export function WorkOrderDetailModal({
   order,
   loading,
   canEdit,
+  execution,
+  executionLoading,
   onClose,
   onDiagnosis,
   onBudget,
   onDecide,
   onTechnician,
+  onStartExecution,
+  onActivity,
+  onConsume,
+  onReturn,
+  onFinalize,
+  onDeliver,
 }: WorkOrderDetailModalProps) {
+  const canStart = Boolean(
+    order &&
+      canEdit &&
+      canStartWorkOrderExecution(order.status, Boolean(order.technician)),
+  )
+  const inExecution = Boolean(
+    order && canEdit && canManageWorkOrderExecution(order.status),
+  )
+  const canFinalize = Boolean(
+    order && canEdit && canFinalizeWorkOrder(order.status),
+  )
+  const canDeliver = Boolean(
+    order && canEdit && canDeliverWorkOrder(order.status),
+  )
+  const showExecution =
+    Boolean(order) &&
+    (order?.status === 'EN_EJECUCION' ||
+      order?.status === 'LISTA_PARA_ENTREGA' ||
+      order?.status === 'ENTREGADA')
+
   return (
     <Modal
       open={open}
@@ -49,9 +99,51 @@ export function WorkOrderDetailModal({
           ? `Orden ${workOrderStatusLabel[order.status].toLowerCase()}`
           : undefined
       }
-      className="max-w-3xl"
+      className="max-w-4xl"
       footer={
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
+          {canStart && order && (
+            <Button type="button" onClick={() => onStartExecution(order)}>
+              <Wrench size={16} /> Iniciar ejecución
+            </Button>
+          )}
+          {inExecution && order && (
+            <Button type="button" onClick={() => onActivity(order)}>
+              <ClipboardList size={16} /> Registrar actividad
+            </Button>
+          )}
+          {inExecution && order && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onConsume(order)}
+            >
+              <PackageMinus size={16} /> Consumir repuestos
+            </Button>
+          )}
+          {inExecution && order && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onReturn(order)}
+            >
+              <PackagePlus size={16} /> Devolver repuestos
+            </Button>
+          )}
+          {canFinalize && order && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onFinalize(order)}
+            >
+              <BadgeCheck size={16} /> Finalizar orden
+            </Button>
+          )}
+          {canDeliver && order && (
+            <Button type="button" onClick={() => onDeliver(order)}>
+              <CarFront size={16} /> Registrar entrega
+            </Button>
+          )}
           {order && canEdit && order.status === 'RECEPCIONADA' && (
             <Button type="button" onClick={() => onDiagnosis(order)}>
               <Stethoscope size={16} /> Registrar diagnóstico
@@ -222,6 +314,13 @@ export function WorkOrderDetailModal({
                 {order.decisionNotes}
               </p>
             </div>
+          )}
+
+          {showExecution && (
+            <WorkOrderExecutionPanel
+              execution={execution}
+              loading={executionLoading}
+            />
           )}
         </div>
       )}

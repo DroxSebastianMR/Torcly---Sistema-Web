@@ -143,6 +143,9 @@ const statusTone: Record<WorkOrderStatus, string> = {
   PENDIENTE_APROBACION: 'bg-sky-50 text-sky-700',
   APROBADA: 'bg-emerald-50 text-emerald-700',
   RECHAZADA: 'bg-rose-50 text-rose-700',
+  EN_EJECUCION: 'bg-violet-50 text-violet-700',
+  LISTA_PARA_ENTREGA: 'bg-indigo-50 text-indigo-700',
+  ENTREGADA: 'bg-teal-50 text-teal-700',
 }
 
 function StatusBadge({ status }: { status: WorkOrderStatus }) {

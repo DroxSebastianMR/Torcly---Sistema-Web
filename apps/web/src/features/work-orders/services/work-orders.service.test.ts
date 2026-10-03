@@ -96,4 +96,66 @@ describe('Servicio de órdenes de taller (web)', () => {
       technicianId: 'u1',
     })
   })
+
+  it('inicia, consulta y gestiona la ejecución de una orden', async () => {
+    await workOrdersService.startExecution('wo1')
+    expect(api.post).toHaveBeenCalledWith('/work-orders/wo1/execution/start', {})
+
+    await workOrdersService.execution('wo1')
+    expect(api.get).toHaveBeenCalledWith(
+      '/work-orders/wo1/execution',
+      undefined,
+    )
+
+    await workOrdersService.createActivity('wo1', {
+      description: 'Revisar frenos',
+    })
+    expect(api.post).toHaveBeenCalledWith('/work-orders/wo1/activities', {
+      description: 'Revisar frenos',
+    })
+
+    await workOrdersService.completeActivity('wo1', 'act1')
+    expect(api.post).toHaveBeenCalledWith(
+      '/work-orders/wo1/activities/act1/complete',
+      {},
+    )
+  })
+
+  it('consume y devuelve repuestos, finaliza y entrega', async () => {
+    const consumption = {
+      requestId: 'rid',
+      items: [{ lineId: 'l1', quantity: 2 }],
+    }
+    await workOrdersService.consume('wo1', consumption)
+    expect(api.post).toHaveBeenCalledWith(
+      '/work-orders/wo1/consumptions',
+      consumption,
+    )
+
+    const returnInput = {
+      requestId: 'rid2',
+      items: [{ lineId: 'l1', quantity: 1, notes: 'Sobró' }],
+    }
+    await workOrdersService.returnProducts('wo1', returnInput)
+    expect(api.post).toHaveBeenCalledWith(
+      '/work-orders/wo1/returns',
+      returnInput,
+    )
+
+    await workOrdersService.finalize('wo1')
+    expect(api.post).toHaveBeenCalledWith('/work-orders/wo1/finalize', {})
+
+    await workOrdersService.deliver('wo1', { notes: 'Entregado' })
+    expect(api.post).toHaveBeenCalledWith('/work-orders/wo1/delivery', {
+      notes: 'Entregado',
+    })
+  })
+
+  it('consulta el historial técnico de un vehículo paginado', async () => {
+    await workOrdersService.vehicleHistory('v1', 2, 10)
+    expect(api.get).toHaveBeenCalledWith(
+      '/work-orders/vehicles/v1/history?page=2&pageSize=10',
+      undefined,
+    )
+  })
 })

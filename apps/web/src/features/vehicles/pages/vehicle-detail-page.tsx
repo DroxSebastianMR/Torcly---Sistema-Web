@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ArrowLeft, Car, History, Pencil, UsersRound } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
@@ -11,6 +12,13 @@ import {
   dateFormatter,
   documentLabel,
 } from '@/features/customers/utils/customer-formatters'
+import { workOrdersService } from '@/features/work-orders/services/work-orders.service'
+import type { WorkOrderVehicleHistoryItem } from '@/features/work-orders/types/work-orders.types'
+import {
+  dateTimeFormatter,
+  currencyFormatter,
+  quantityFormatter,
+} from '@/features/work-orders/utils/work-order-formatters'
 import { VehicleFormModal } from '../components/vehicle-form-modal'
 import { useVehicle } from '../hooks/use-vehicles'
 import type { Vehicle } from '../types/vehicles.types'
@@ -27,9 +35,17 @@ export default function Page() {
     currentUser?.permissions ?? [],
     'vehicles:write',
   )
+  const canRead = hasPermission(currentUser?.permissions ?? [], 'workshop:read')
   const vehicle = useVehicle(id ?? '')
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
   const [formOpen, setFormOpen] = useState(false)
+  const [historyPage, setHistoryPage] = useState(1)
+  const vehicleHistory = useQuery({
+    queryKey: ['work-orders', 'vehicle-history', id, historyPage],
+    queryFn: ({ signal }) =>
+      workOrdersService.vehicleHistory(id ?? '', historyPage, 10, signal),
+    enabled: Boolean(id) && canRead,
+  })
 
   if (vehicle.isPending) {
     return (
@@ -148,12 +164,80 @@ export default function Page() {
             <h2 className="text-sm font-semibold uppercase tracking-wide text-brand-forest">
               Historial técnico
             </h2>
+            <span className="ml-auto text-xs text-muted-foreground">
+              {vehicleHistory.data?.pagination.total ?? 0}{' '}
+              {vehicleHistory.data?.pagination.total === 1
+                ? 'orden entregada'
+                : 'órdenes entregadas'}
+            </span>
           </header>
-          <EmptyState
-            icon={History}
-            title="Historial técnico en blanco"
-            description="Las intervenciones y visitas al taller aparecerán aquí con fecha y detalle."
-          />
+          {!canRead ? (
+            <EmptyState
+              icon={History}
+              title="Historial técnico en blanco"
+              description="Las intervenciones y visitas al taller aparecerán aquí con fecha y detalle."
+            />
+          ) : vehicleHistory.isPending ? (
+            <div className="divide-y" aria-label="Cargando historial técnico">
+              {Array.from({ length: 3 }, (_, index) => (
+                <div key={index} className="flex animate-pulse gap-4 px-5 py-4">
+                  <div className="size-10 rounded-xl bg-muted" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 w-32 rounded bg-muted" />
+                    <div className="h-2.5 w-48 rounded bg-muted" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : vehicleHistory.isError ? (
+            <EmptyState
+              icon={History}
+              title="No se pudo cargar el historial"
+              description="Verifica la conexión con la API e inténtalo nuevamente."
+            />
+          ) : (vehicleHistory.data?.data.length ?? 0) === 0 ? (
+            <EmptyState
+              icon={History}
+              title="Sin intervenciones registradas"
+              description="Cuando una orden se entregue, aparecerá aquí con sus actividades y repuestos."
+            />
+          ) : (
+            <>
+              <div className="divide-y">
+                {(vehicleHistory.data?.data ?? []).map((entry) => (
+                  <HistoryEntry key={entry.id} entry={entry} />
+                ))}
+              </div>
+              {vehicleHistory.data &&
+                vehicleHistory.data.pagination.totalPages > 1 && (
+                  <footer className="flex items-center justify-between border-t px-5 py-4 text-sm">
+                    <span className="text-muted-foreground">
+                      Página {historyPage} de{' '}
+                      {vehicleHistory.data.pagination.totalPages}
+                    </span>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        disabled={historyPage === 1}
+                        onClick={() => setHistoryPage((current) => current - 1)}
+                      >
+                        Anterior
+                      </Button>
+                      <Button
+                        variant="outline"
+                        disabled={
+                          historyPage >=
+                          vehicleHistory.data.pagination.totalPages
+                        }
+                        onClick={() => setHistoryPage((current) => current + 1)}
+                      >
+                        Siguiente
+                      </Button>
+                    </div>
+                  </footer>
+                )}
+            </>
+          )}
         </section>
       </div>
 
@@ -182,5 +266,52 @@ function Datum({
         {value}
       </dd>
     </div>
+  )
+}
+
+function HistoryEntry({ entry }: { entry: WorkOrderVehicleHistoryItem }) {
+  return (
+    <article className="flex gap-4 px-5 py-4">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/8 text-primary">
+        <History size={17} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="font-mono text-sm font-semibold">{entry.code}</p>
+          <p className="text-xs text-muted-foreground">
+            {entry.deliveredAt
+              ? dateTimeFormatter.format(new Date(entry.deliveredAt))
+              : ''}
+          </p>
+        </div>
+        {entry.diagnosis && (
+          <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+            {entry.diagnosis}
+          </p>
+        )}
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          {entry.technician && <span>Técnico: {entry.technician}</span>}
+          <span>
+            {entry.activities.length}{' '}
+            {entry.activities.length === 1 ? 'actividad' : 'actividades'}
+          </span>
+          {entry.products.length > 0 && (
+            <span className="tabular-nums">
+              {entry.products
+                .map(
+                  (product) =>
+                    `${quantityFormatter.format(product.quantity)}${
+                      product.unitLabel ? ` ${product.unitLabel}` : ''
+                    } ${product.name}`,
+                )
+                .join(', ')}
+            </span>
+          )}
+        </div>
+        <p className="mt-2 text-sm font-semibold tabular-nums">
+          {currencyFormatter.format(entry.total)}
+        </p>
+      </div>
+    </article>
   )
 }

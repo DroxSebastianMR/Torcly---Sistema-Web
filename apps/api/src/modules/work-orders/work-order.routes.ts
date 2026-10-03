@@ -1,14 +1,23 @@
 import { Router } from 'express'
 import { requireAuth, requirePermission } from '../auth/auth.middleware.js'
 import {
+  completeWorkOrderActivity,
+  consumeWorkOrderProduct,
   createWorkOrder,
+  createWorkOrderActivity,
   decideWorkOrder,
+  deliverWorkOrder,
+  finalizeWorkOrder,
   getWorkOrder,
   getWorkOrderCatalog,
+  getWorkOrderExecution,
   getWorkOrderTechnicians,
+  getWorkOrderVehicleHistory,
   listWorkOrders,
+  returnWorkOrderProduct,
   saveWorkOrderBudget,
   sendWorkOrderBudget,
+  startWorkOrderExecution,
   updateWorkOrderDiagnosis,
   updateWorkOrderTechnician,
 } from './work-order.controller.js'
@@ -27,7 +36,17 @@ workOrdersRouter.get(
   requirePermission('workshop:read'),
   getWorkOrderTechnicians,
 )
+workOrdersRouter.get(
+  '/vehicles/:vehicleId/history',
+  requirePermission('workshop:read'),
+  getWorkOrderVehicleHistory,
+)
 workOrdersRouter.get('/:id', requirePermission('workshop:read'), getWorkOrder)
+workOrdersRouter.get(
+  '/:id/execution',
+  requirePermission('workshop:read'),
+  getWorkOrderExecution,
+)
 workOrdersRouter.post('/', requirePermission('workshop:write'), createWorkOrder)
 workOrdersRouter.put(
   '/:id/diagnosis',
@@ -53,4 +72,39 @@ workOrdersRouter.put(
   '/:id/technician',
   requirePermission('workshop:write'),
   updateWorkOrderTechnician,
+)
+workOrdersRouter.post(
+  '/:id/execution/start',
+  requirePermission('workshop:write'),
+  startWorkOrderExecution,
+)
+workOrdersRouter.post(
+  '/:id/activities',
+  requirePermission('workshop:write'),
+  createWorkOrderActivity,
+)
+workOrdersRouter.post(
+  '/:id/activities/:activityId/complete',
+  requirePermission('workshop:write'),
+  completeWorkOrderActivity,
+)
+workOrdersRouter.post(
+  '/:id/consumptions',
+  requirePermission('workshop:write'),
+  consumeWorkOrderProduct,
+)
+workOrdersRouter.post(
+  '/:id/returns',
+  requirePermission('workshop:write'),
+  returnWorkOrderProduct,
+)
+workOrdersRouter.post(
+  '/:id/finalize',
+  requirePermission('workshop:write'),
+  finalizeWorkOrder,
+)
+workOrdersRouter.post(
+  '/:id/delivery',
+  requirePermission('workshop:write'),
+  deliverWorkOrder,
 )
