@@ -1,5 +1,8 @@
 import { isAxiosError } from 'axios'
-import type { WorkOrderStatus } from '../types/work-orders.types'
+import type {
+  WorkOrderActivityStatus,
+  WorkOrderStatus,
+} from '../types/work-orders.types'
 
 export const workOrderStatusLabel: Record<WorkOrderStatus, string> = {
   RECEPCIONADA: 'Recepcionada',
@@ -7,6 +10,17 @@ export const workOrderStatusLabel: Record<WorkOrderStatus, string> = {
   PENDIENTE_APROBACION: 'Pte. aprobación',
   APROBADA: 'Aprobada',
   RECHAZADA: 'Rechazada',
+  EN_EJECUCION: 'En ejecución',
+  LISTA_PARA_ENTREGA: 'Pta. entrega',
+  ENTREGADA: 'Entregada',
+}
+
+export const workOrderActivityStatusLabel: Record<
+  WorkOrderActivityStatus,
+  string
+> = {
+  PENDIENTE: 'Pendiente',
+  COMPLETADA: 'Completada',
 }
 
 const budgetEditableStatuses: WorkOrderStatus[] = [
@@ -28,6 +42,25 @@ export function isWorkOrderBudgetEditable(status: WorkOrderStatus) {
 
 export function isWorkOrderTechnicianEditable(status: WorkOrderStatus) {
   return technicianEditableStatuses.includes(status)
+}
+
+export function canStartWorkOrderExecution(
+  status: WorkOrderStatus,
+  hasTechnician: boolean,
+) {
+  return status === 'APROBADA' && hasTechnician
+}
+
+export function canManageWorkOrderExecution(status: WorkOrderStatus) {
+  return status === 'EN_EJECUCION'
+}
+
+export function canFinalizeWorkOrder(status: WorkOrderStatus) {
+  return status === 'EN_EJECUCION'
+}
+
+export function canDeliverWorkOrder(status: WorkOrderStatus) {
+  return status === 'LISTA_PARA_ENTREGA'
 }
 
 export function canSendWorkOrderBudget(

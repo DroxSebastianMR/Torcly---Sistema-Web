@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import {
   canDecideWorkOrder,
+  canDeliverWorkOrder,
+  canFinalizeWorkOrder,
+  canManageWorkOrderExecution,
   canSendWorkOrderBudget,
+  canStartWorkOrderExecution,
   currencyFormatter,
   isWorkOrderBudgetEditable,
   isWorkOrderTechnicianEditable,
+  workOrderActivityStatusLabel,
   workOrderLineSubtotal,
   workOrderStatusLabel,
 } from './work-order-formatters'
@@ -16,6 +21,14 @@ describe('Formateadores de órdenes de taller (web)', () => {
     expect(workOrderStatusLabel.PENDIENTE_APROBACION).toBe('Pte. aprobación')
     expect(workOrderStatusLabel.APROBADA).toBe('Aprobada')
     expect(workOrderStatusLabel.RECHAZADA).toBe('Rechazada')
+    expect(workOrderStatusLabel.EN_EJECUCION).toBe('En ejecución')
+    expect(workOrderStatusLabel.LISTA_PARA_ENTREGA).toBe('Pta. entrega')
+    expect(workOrderStatusLabel.ENTREGADA).toBe('Entregada')
+  })
+
+  it('etiqueta los estados de actividad', () => {
+    expect(workOrderActivityStatusLabel.PENDIENTE).toBe('Pendiente')
+    expect(workOrderActivityStatusLabel.COMPLETADA).toBe('Completada')
   })
 
   it('calcula el subtotal de una línea sin errores de redondeo', () => {
@@ -46,6 +59,23 @@ describe('Formateadores de órdenes de taller (web)', () => {
   it('decisión solo en pendiente de aprobación', () => {
     expect(canDecideWorkOrder('PENDIENTE_APROBACION')).toBe(true)
     expect(canDecideWorkOrder('APROBADA')).toBe(false)
+  })
+
+  it('inicio de ejecución solo aprobada con técnico asignado', () => {
+    expect(canStartWorkOrderExecution('APROBADA', true)).toBe(true)
+    expect(canStartWorkOrderExecution('APROBADA', false)).toBe(false)
+    expect(canStartWorkOrderExecution('EN_EJECUCION', true)).toBe(false)
+    expect(canStartWorkOrderExecution('PENDIENTE_APROBACION', true)).toBe(false)
+  })
+
+  it('gestión de ejecución, finalización y entrega según estado', () => {
+    expect(canManageWorkOrderExecution('EN_EJECUCION')).toBe(true)
+    expect(canManageWorkOrderExecution('APROBADA')).toBe(false)
+    expect(canFinalizeWorkOrder('EN_EJECUCION')).toBe(true)
+    expect(canFinalizeWorkOrder('LISTA_PARA_ENTREGA')).toBe(false)
+    expect(canDeliverWorkOrder('LISTA_PARA_ENTREGA')).toBe(true)
+    expect(canDeliverWorkOrder('EN_EJECUCION')).toBe(false)
+    expect(canDeliverWorkOrder('ENTREGADA')).toBe(false)
   })
 
   it('formatea moneda en soles', () => {

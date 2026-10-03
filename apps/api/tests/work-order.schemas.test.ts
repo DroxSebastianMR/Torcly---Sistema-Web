@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import {
   createWorkOrderSchema,
+  workOrderActivitySchema,
   workOrderBudgetSchema,
+  workOrderConsumptionSchema,
   workOrderDecisionSchema,
+  workOrderDeliverySchema,
   workOrderDiagnosisSchema,
   workOrderQuerySchema,
+  workOrderReturnSchema,
+  workOrderStartExecutionSchema,
   workOrderTechnicianSchema,
 } from '../src/modules/work-orders/work-order.schemas.js'
 
@@ -101,6 +106,12 @@ describe('Schemas de órdenes de taller', () => {
     ).toThrow()
   })
 
+  it('exige un objeto vacío para las acciones de ejecución', () => {
+    expect(workOrderStartExecutionSchema.parse({})).toEqual({})
+    expect(() => workOrderStartExecutionSchema.parse(undefined)).toThrow()
+    expect(() => workOrderStartExecutionSchema.parse({ unexpected: true })).toThrow()
+  })
+
   it('valida filtros por estado y técnico', () => {
     expect(workOrderQuerySchema.parse({})).toMatchObject({
       status: 'all',
@@ -116,5 +127,100 @@ describe('Schemas de órdenes de taller', () => {
         technicianId: 'a0000000-0000-4000-8000-000000000001',
       }).technicianId,
     ).toBe('a0000000-0000-4000-8000-000000000001')
+  })
+
+  it('acepta los nuevos estados de ejecución en los filtros', () => {
+    expect(workOrderQuerySchema.parse({ status: 'EN_EJECUCION' }).status).toBe(
+      'EN_EJECUCION',
+    )
+    expect(
+      workOrderQuerySchema.parse({ status: 'LISTA_PARA_ENTREGA' }).status,
+    ).toBe('LISTA_PARA_ENTREGA')
+    expect(workOrderQuerySchema.parse({ status: 'ENTREGADA' }).status).toBe(
+      'ENTREGADA',
+    )
+  })
+
+  it('valida la actividad con descripción y fecha opcional', () => {
+    expect(
+      workOrderActivitySchema.parse({
+        description: 'Revisar frenos',
+        occurredAt: '2026-09-20',
+      }),
+    ).toEqual({ description: 'Revisar frenos', occurredAt: '2026-09-20' })
+    expect(
+      workOrderActivitySchema.parse({ description: 'Revisar frenos' }),
+    ).toEqual({ description: 'Revisar frenos' })
+    expect(() =>
+      workOrderActivitySchema.parse({ description: ' x ' }),
+    ).toThrow()
+    expect(() =>
+      workOrderActivitySchema.parse({
+        description: 'a'.repeat(501),
+      }),
+    ).toThrow()
+    expect(() =>
+      workOrderActivitySchema.parse({
+        description: 'Revisar frenos',
+        occurredAt: '20/09/2026',
+      }),
+    ).toThrow()
+  })
+
+  it('valida el consumo con requestId e items de líneas', () => {
+    const lineId = 'a0000000-0000-4000-8000-000000000001'
+    const requestId = 'a0000000-0000-4000-8000-000000000002'
+    expect(
+      workOrderConsumptionSchema.parse({
+        requestId,
+        items: [{ lineId, quantity: 1 }],
+      }),
+    ).toEqual({ requestId, items: [{ lineId, quantity: 1 }] })
+    expect(() => workOrderConsumptionSchema.parse({ items: [] })).toThrow()
+    expect(() =>
+      workOrderConsumptionSchema.parse({ requestId, items: [] }),
+    ).toThrow()
+    expect(() =>
+      workOrderConsumptionSchema.parse({
+        requestId,
+        items: [{ lineId, quantity: 0 }],
+      }),
+    ).toThrow()
+    expect(() =>
+      workOrderConsumptionSchema.parse({
+        requestId: 'no-uuid',
+        items: [{ lineId, quantity: 1 }],
+      }),
+    ).toThrow()
+  })
+
+  it('valida la devolución con observación opcional', () => {
+    const lineId = 'a0000000-0000-4000-8000-000000000001'
+    const requestId = 'a0000000-0000-4000-8000-000000000002'
+    expect(
+      workOrderReturnSchema.parse({
+        requestId,
+        items: [{ lineId, quantity: 0.5, notes: 'Sobró aceite' }],
+      }),
+    ).toEqual({
+      requestId,
+      items: [{ lineId, quantity: 0.5, notes: 'Sobró aceite' }],
+    })
+    expect(() =>
+      workOrderReturnSchema.parse({
+        requestId,
+        items: [{ lineId, quantity: 0.5, notes: 'a'.repeat(301) }],
+      }),
+    ).toThrow()
+  })
+
+  it('valida la entrega con observación opcional', () => {
+    expect(workOrderDeliverySchema.parse({})).toEqual({})
+    expect(
+      workOrderDeliverySchema.parse({ notes: 'Cliente retiró el vehículo' }),
+    ).toEqual({ notes: 'Cliente retiró el vehículo' })
+    expect(() =>
+      workOrderDeliverySchema.parse({ notes: 'a'.repeat(501) }),
+    ).toThrow()
   })
 })

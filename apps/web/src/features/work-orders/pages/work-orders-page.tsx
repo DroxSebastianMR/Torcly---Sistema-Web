@@ -1,12 +1,19 @@
 import { useDeferredValue, useMemo, useState } from 'react'
-import { ClipboardList } from 'lucide-react'
+import { BadgeCheck, ClipboardList, Wrench } from 'lucide-react'
+import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { ErrorState } from '@/components/ui/error-state'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
+import { WorkOrderActivityModal } from '../components/work-order-activity-modal'
 import { WorkOrderBudgetModal } from '../components/work-order-budget-modal'
+import { WorkOrderConsumptionModal } from '../components/work-order-consumption-modal'
 import { WorkOrderDecisionModal } from '../components/work-order-decision-modal'
+import { WorkOrderDeliveryModal } from '../components/work-order-delivery-modal'
 import { WorkOrderDetailModal } from '../components/work-order-detail-modal'
 import { WorkOrderDiagnosisModal } from '../components/work-order-diagnosis-modal'
+import { WorkOrderReturnModal } from '../components/work-order-return-modal'
 import { WorkOrderTechnicianModal } from '../components/work-order-technician-modal'
 import { WorkOrdersTable } from '../components/work-orders-table'
 import { WorkOrdersToolbar } from '../components/work-orders-toolbar'
@@ -14,7 +21,9 @@ import { useQuery } from '@tanstack/react-query'
 import {
   workOrderKeys,
   useWorkOrder,
+  useWorkOrderExecution,
   useWorkOrders,
+  useWorkOrdersMutations,
 } from '../hooks/use-work-orders'
 import { workOrdersService } from '../services/work-orders.service'
 import type {
@@ -22,7 +31,7 @@ import type {
   WorkOrderFilters,
   WorkOrderSummary,
 } from '../types/work-orders.types'
-import { Button } from '@/components/ui/button'
+import { getWorkOrderErrorMessage } from '../utils/work-order-formatters'
 
 const initialFilters: WorkOrderFilters = {
   search: '',
@@ -38,6 +47,7 @@ export default function Page() {
     currentUser?.permissions ?? [],
     'workshop:write',
   )
+  const mutations = useWorkOrdersMutations()
   const [filters, setFilters] = useState(initialFilters)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [diagnosisTarget, setDiagnosisTarget] =
@@ -48,11 +58,34 @@ export default function Page() {
   )
   const [technicianTarget, setTechnicianTarget] =
     useState<WorkOrderDetail | null>(null)
+  const [activityTarget, setActivityTarget] = useState<WorkOrderDetail | null>(
+    null,
+  )
+  const [consumptionTarget, setConsumptionTarget] =
+    useState<WorkOrderDetail | null>(null)
+  const [returnTarget, setReturnTarget] = useState<WorkOrderDetail | null>(null)
+  const [deliveryTarget, setDeliveryTarget] = useState<WorkOrderDetail | null>(
+    null,
+  )
+  const [startOrder, setStartOrder] = useState<WorkOrderDetail | null>(null)
+  const [finalizeOrder, setFinalizeOrder] = useState<WorkOrderDetail | null>(
+    null,
+  )
 
   const deferredSearch = useDeferredValue(filters.search)
   const queryFilters = { ...filters, search: deferredSearch }
   const orders = useWorkOrders(queryFilters)
   const detail = useWorkOrder(selectedId ?? '')
+  const showExecution = useMemo(
+    () =>
+      detail.data?.status === 'EN_EJECUCION' ||
+      detail.data?.status === 'LISTA_PARA_ENTREGA' ||
+      detail.data?.status === 'ENTREGADA',
+    [detail.data?.status],
+  )
+  const execution = useWorkOrderExecution(selectedId ?? '', {
+    enabled: showExecution,
+  })
   const technicians = useQuery({
     queryKey: [...workOrderKeys.all, 'technicians'],
     queryFn: ({ signal }) => workOrdersService.technicians(signal),
@@ -98,6 +131,44 @@ export default function Page() {
   const handleTechnician = (order: WorkOrderDetail) => {
     setSelectedId(null)
     setTechnicianTarget(order)
+  }
+  const handleActivity = (order: WorkOrderDetail) => {
+    setSelectedId(null)
+    setActivityTarget(order)
+  }
+  const handleConsume = (order: WorkOrderDetail) => {
+    setSelectedId(null)
+    setConsumptionTarget(order)
+  }
+  const handleReturn = (order: WorkOrderDetail) => {
+    setSelectedId(null)
+    setReturnTarget(order)
+  }
+  const handleDeliver = (order: WorkOrderDetail) => {
+    setSelectedId(null)
+    setDeliveryTarget(order)
+  }
+
+  const confirmStart = async () => {
+    if (!startOrder) return
+    try {
+      await mutations.startExecution.mutateAsync(startOrder.id)
+      setStartOrder(null)
+    } catch (error) {
+      toast.error(getWorkOrderErrorMessage(error))
+      throw error
+    }
+  }
+
+  const confirmFinalize = async () => {
+    if (!finalizeOrder) return
+    try {
+      await mutations.finalize.mutateAsync(finalizeOrder.id)
+      setFinalizeOrder(null)
+    } catch (error) {
+      toast.error(getWorkOrderErrorMessage(error))
+      throw error
+    }
   }
 
   return (
@@ -158,6 +229,27 @@ export default function Page() {
               {summary?.aprobadas ?? 0}
             </p>
             <p className="text-xs text-muted-foreground">aprobadas</p>
+          </div>
+          <div className="h-8 w-px bg-border" />
+          <div>
+            <p className="text-xl font-semibold tabular-nums text-violet-700">
+              {summary?.enEjecucion ?? 0}
+            </p>
+            <p className="text-xs text-muted-foreground">en ejecución</p>
+          </div>
+          <div className="h-8 w-px bg-border" />
+          <div>
+            <p className="text-xl font-semibold tabular-nums text-indigo-700">
+              {summary?.listasParaEntrega ?? 0}
+            </p>
+            <p className="text-xs text-muted-foreground">pta. entrega</p>
+          </div>
+          <div className="h-8 w-px bg-border" />
+          <div>
+            <p className="text-xl font-semibold tabular-nums text-teal-700">
+              {summary?.entregadas ?? 0}
+            </p>
+            <p className="text-xs text-muted-foreground">entregadas</p>
           </div>
           {orders.isFetching && !orders.isPending && (
             <span className="ml-auto text-xs text-muted-foreground">
@@ -233,11 +325,19 @@ export default function Page() {
         order={detail.data ?? null}
         loading={detail.isPending}
         canEdit={canWrite}
+        execution={execution.data ?? null}
+        executionLoading={execution.isPending}
         onClose={() => setSelectedId(null)}
         onDiagnosis={handleDiagnosis}
         onBudget={handleBudget}
         onDecide={handleDecide}
         onTechnician={handleTechnician}
+        onStartExecution={setStartOrder}
+        onActivity={handleActivity}
+        onConsume={handleConsume}
+        onReturn={handleReturn}
+        onFinalize={setFinalizeOrder}
+        onDeliver={handleDeliver}
       />
       <WorkOrderDiagnosisModal
         open={Boolean(diagnosisTarget)}
@@ -258,6 +358,58 @@ export default function Page() {
         open={Boolean(technicianTarget)}
         order={technicianTarget}
         onClose={() => setTechnicianTarget(null)}
+      />
+      <WorkOrderActivityModal
+        open={Boolean(activityTarget)}
+        order={activityTarget}
+        onClose={() => setActivityTarget(null)}
+      />
+      <WorkOrderConsumptionModal
+        open={Boolean(consumptionTarget)}
+        order={consumptionTarget}
+        execution={execution.data ?? null}
+        onClose={() => setConsumptionTarget(null)}
+      />
+      <WorkOrderReturnModal
+        open={Boolean(returnTarget)}
+        order={returnTarget}
+        execution={execution.data ?? null}
+        onClose={() => setReturnTarget(null)}
+      />
+      <WorkOrderDeliveryModal
+        open={Boolean(deliveryTarget)}
+        order={deliveryTarget}
+        onClose={() => setDeliveryTarget(null)}
+      />
+      <ConfirmationDialog
+        open={Boolean(startOrder)}
+        title="Iniciar la ejecución"
+        description={
+          startOrder
+            ? `La orden ${startOrder.code} pasará a ejecución; a partir de aquí podrás registrar actividades y consumos de repuestos.`
+            : undefined
+        }
+        variant="info"
+        icon={Wrench}
+        confirmLabel="Iniciar ejecución"
+        pending={mutations.startExecution.isPending}
+        onConfirm={() => void confirmStart()}
+        onCancel={() => setStartOrder(null)}
+      />
+      <ConfirmationDialog
+        open={Boolean(finalizeOrder)}
+        title="Finalizar la orden"
+        description={
+          finalizeOrder
+            ? `La orden ${finalizeOrder.code} pasará a lista para entrega y ya no admitirá más consumos ni actividades.`
+            : undefined
+        }
+        variant="info"
+        icon={BadgeCheck}
+        confirmLabel="Finalizar orden"
+        pending={mutations.finalize.isPending}
+        onConfirm={() => void confirmFinalize()}
+        onCancel={() => setFinalizeOrder(null)}
       />
     </div>
   )

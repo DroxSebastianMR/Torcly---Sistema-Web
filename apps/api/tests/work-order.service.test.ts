@@ -17,6 +17,15 @@ const repository = vi.hoisted(() => ({
   sendBudget: vi.fn(),
   decide: vi.fn(),
   updateTechnician: vi.fn(),
+  startExecution: vi.fn(),
+  getExecution: vi.fn(),
+  addActivity: vi.fn(),
+  completeActivity: vi.fn(),
+  consume: vi.fn(),
+  returnProducts: vi.fn(),
+  finalize: vi.fn(),
+  deliver: vi.fn(),
+  listVehicleHistory: vi.fn(),
 }))
 
 vi.mock('../src/modules/work-orders/work-order.repository.js', () => ({
@@ -89,6 +98,12 @@ function record(overrides: Record<string, unknown> = {}) {
     rejectedBy: null,
     rejectedAt: null,
     decisionNotes: null,
+    executionStartedBy: null,
+    executionStartedAt: null,
+    readyForDeliveryAt: null,
+    deliveredBy: null,
+    deliveredAt: null,
+    deliveryNotes: null,
     subtotal: 0,
     total: 0,
     performedBy: 'user-1',
@@ -123,6 +138,9 @@ describe('Servicio de órdenes de taller', () => {
       pendientesAprobacion: 0,
       aprobadas: 0,
       rechazadas: 0,
+      enEjecucion: 0,
+      listasParaEntrega: 0,
+      entregadas: 0,
     })
 
     const result = await workOrdersService.list({
@@ -163,6 +181,12 @@ describe('Servicio de órdenes de taller', () => {
           rejectedBy: null,
           rejectedAt: null,
           decisionNotes: null,
+          executionStartedBy: null,
+          executionStartedAt: null,
+          readyForDeliveryAt: null,
+          deliveredBy: null,
+          deliveredAt: null,
+          deliveryNotes: null,
           createdAt: '2026-09-25T00:00:00.000Z',
           updatedAt: '2026-09-25T00:00:00.000Z',
         },
@@ -175,6 +199,9 @@ describe('Servicio de órdenes de taller', () => {
         pendientesAprobacion: 0,
         aprobadas: 0,
         rechazadas: 0,
+        enEjecucion: 0,
+        listasParaEntrega: 0,
+        entregadas: 0,
       },
     })
   })
@@ -489,5 +516,389 @@ describe('Servicio de órdenes de taller', () => {
       actor,
       context,
     )
+  })
+
+  it('inicia la ejecución de una orden aprobada', async () => {
+    repository.startExecution.mockResolvedValue(
+      record({
+        status: 'EN_EJECUCION',
+        executionStartedBy: 'Ana Pérez',
+        executionStartedAt: new Date('2026-09-27T00:00:00.000Z'),
+      }),
+    )
+
+    const result = await workOrdersService.startExecution(
+      'work-order-1',
+      actor,
+      context,
+    )
+
+    expect(repository.startExecution).toHaveBeenCalledWith(
+      'work-order-1',
+      actor,
+      context,
+    )
+    expect(result.data.status).toBe('EN_EJECUCION')
+    expect(result.data.executionStartedBy).toBe('Ana Pérez')
+    expect(result.data.executionStartedAt).toBe('2026-09-27T00:00:00.000Z')
+  })
+
+  it('registra una actividad técnica con fecha opcional', async () => {
+    const occurredAt = new Date('2026-09-20T00:00:00.000Z')
+    repository.addActivity.mockResolvedValue({
+      id: 'activity-1',
+      status: 'PENDIENTE',
+      description: 'Revisar frenos traseros',
+      performedBy: 'Ana Pérez',
+      occurredAt,
+      completedBy: null,
+      completedAt: null,
+      createdAt: occurredAt,
+    })
+
+    const result = await workOrdersService.createActivity(
+      'work-order-1',
+      { description: 'Revisar frenos traseros', occurredAt: '2026-09-20' },
+      actor,
+      context,
+    )
+
+    expect(repository.addActivity).toHaveBeenCalledWith(
+      'work-order-1',
+      { description: 'Revisar frenos traseros', occurredAt: '2026-09-20' },
+      actor,
+      context,
+    )
+    expect(result.data).toMatchObject({
+      id: 'activity-1',
+      status: 'PENDIENTE',
+      description: 'Revisar frenos traseros',
+      occurredAt: '2026-09-20T00:00:00.000Z',
+      completedBy: null,
+      completedAt: null,
+    })
+  })
+
+  it('completa una actividad registrando al responsable', async () => {
+    repository.completeActivity.mockResolvedValue({
+      id: 'activity-1',
+      status: 'COMPLETADA',
+      description: 'Revisar frenos traseros',
+      performedBy: 'Ana Pérez',
+      occurredAt: new Date('2026-09-20T00:00:00.000Z'),
+      completedBy: 'Ana Pérez',
+      completedAt: new Date('2026-09-27T00:00:00.000Z'),
+      createdAt: new Date('2026-09-20T00:00:00.000Z'),
+    })
+
+    const result = await workOrdersService.completeActivity(
+      'work-order-1',
+      'activity-1',
+      actor,
+      context,
+    )
+
+    expect(repository.completeActivity).toHaveBeenCalledWith(
+      'work-order-1',
+      'activity-1',
+      actor,
+      context,
+    )
+    expect(result.data.status).toBe('COMPLETADA')
+    expect(result.data.completedBy).toBe('Ana Pérez')
+    expect(result.data.completedAt).toBe('2026-09-27T00:00:00.000Z')
+  })
+
+  it('resume la ejecución con consumos netos por línea', async () => {
+    const occurredAt = new Date('2026-09-27T00:00:00.000Z')
+    repository.getExecution.mockResolvedValue({
+      id: 'work-order-1',
+      code: 'OT-000001',
+      status: 'EN_EJECUCION',
+      executionStartedBy: 'Ana Pérez',
+      executionStartedAt: occurredAt,
+      readyForDeliveryAt: null,
+      deliveredBy: null,
+      deliveredAt: null,
+      deliveryNotes: null,
+      lines: [
+        {
+          id: 'line-1',
+          productId,
+          name: 'Aceite 5W-30',
+          code: 'P-001',
+          unitLabel: 'btl',
+          quantity: 2,
+        },
+      ],
+      activities: [
+        {
+          id: 'activity-1',
+          status: 'PENDIENTE',
+          description: 'Revisar frenos traseros',
+          performedBy: 'Ana Pérez',
+          occurredAt,
+          completedBy: null,
+          completedAt: null,
+          createdAt: occurredAt,
+        },
+      ],
+      consumptions: [
+        {
+          id: 'consumption-1',
+          type: 'CONSUMPTION',
+          workOrderLineId: 'line-1',
+          productId,
+          quantity: 1,
+          notes: null,
+          performedBy: 'Ana Pérez',
+          occurredAt,
+        },
+        {
+          id: 'consumption-2',
+          type: 'RETURN',
+          workOrderLineId: 'line-1',
+          productId,
+          quantity: 0.5,
+          notes: null,
+          performedBy: 'Ana Pérez',
+          occurredAt,
+        },
+      ],
+    })
+
+    const result = await workOrdersService.getExecution('work-order-1')
+
+    expect(repository.getExecution).toHaveBeenCalledWith('work-order-1')
+    expect(result.data).toMatchObject({
+      workOrderId: 'work-order-1',
+      code: 'OT-000001',
+      status: 'EN_EJECUCION',
+      startedBy: 'Ana Pérez',
+    })
+    expect(result.data.productLines).toHaveLength(1)
+    expect(result.data.productLines[0]).toMatchObject({
+      lineId: 'line-1',
+      productId,
+      budgeted: 2,
+      consumed: 1,
+      returned: 0.5,
+      netConsumed: 0.5,
+      pending: 1.5,
+    })
+    expect(result.data.activities).toHaveLength(1)
+    expect(result.data.consumptions).toHaveLength(2)
+  })
+
+  it('registra el consumo de repuestos y devuelve el detalle', async () => {
+    repository.consume.mockResolvedValue({
+      order: record({ status: 'EN_EJECUCION', technicianId }),
+      registrations: [
+        {
+          consumptionId: 'consumption-1',
+          movementId: 'movement-1',
+          productId,
+          quantity: 1,
+        },
+      ],
+    })
+
+    const requestId = 'a0000000-0000-4000-8000-000000000007'
+    const result = await workOrdersService.consume(
+      'work-order-1',
+      { requestId, items: [{ lineId: 'line-1', quantity: 1 }] },
+      actor,
+      context,
+    )
+
+    expect(repository.consume).toHaveBeenCalledWith(
+      'work-order-1',
+      { requestId, items: [{ lineId: 'line-1', quantity: 1 }] },
+      actor,
+      context,
+    )
+    expect(result.data.registrations).toEqual([
+      {
+        consumptionId: 'consumption-1',
+        movementId: 'movement-1',
+        productId,
+        quantity: 1,
+      },
+    ])
+    expect(result.data.order.status).toBe('EN_EJECUCION')
+  })
+
+  it('registra la devolución de repuestos con observación', async () => {
+    repository.returnProducts.mockResolvedValue({
+      order: record({ status: 'EN_EJECUCION', technicianId }),
+      registrations: [
+        {
+          consumptionId: 'consumption-3',
+          movementId: 'movement-3',
+          productId,
+          quantity: 0.5,
+        },
+      ],
+    })
+
+    const requestId = 'a0000000-0000-4000-8000-000000000008'
+    const result = await workOrdersService.returnProducts(
+      'work-order-1',
+      {
+        requestId,
+        items: [{ lineId: 'line-1', quantity: 0.5, notes: 'Sobró aceite' }],
+      },
+      actor,
+      context,
+    )
+
+    expect(repository.returnProducts).toHaveBeenCalledWith(
+      'work-order-1',
+      {
+        requestId,
+        items: [{ lineId: 'line-1', quantity: 0.5, notes: 'Sobró aceite' }],
+      },
+      actor,
+      context,
+    )
+    expect(result.data.registrations).toHaveLength(1)
+  })
+
+  it('finaliza la ejecución pasando a lista para entrega', async () => {
+    repository.finalize.mockResolvedValue(
+      record({
+        status: 'LISTA_PARA_ENTREGA',
+        readyForDeliveryAt: new Date('2026-09-27T00:00:00.000Z'),
+      }),
+    )
+
+    const result = await workOrdersService.finalize(
+      'work-order-1',
+      actor,
+      context,
+    )
+
+    expect(repository.finalize).toHaveBeenCalledWith(
+      'work-order-1',
+      actor,
+      context,
+    )
+    expect(result.data.status).toBe('LISTA_PARA_ENTREGA')
+    expect(result.data.readyForDeliveryAt).toBe('2026-09-27T00:00:00.000Z')
+  })
+
+  it('entrega la orden registrando la observación', async () => {
+    repository.deliver.mockResolvedValue(
+      record({
+        status: 'ENTREGADA',
+        deliveredBy: 'Ana Pérez',
+        deliveredAt: new Date('2026-09-27T00:00:00.000Z'),
+        deliveryNotes: 'Cliente retiró el vehículo',
+      }),
+    )
+
+    const result = await workOrdersService.deliver(
+      'work-order-1',
+      { notes: 'Cliente retiró el vehículo' },
+      actor,
+      context,
+    )
+
+    expect(repository.deliver).toHaveBeenCalledWith(
+      'work-order-1',
+      'Cliente retiró el vehículo',
+      actor,
+      context,
+    )
+    expect(result.data.status).toBe('ENTREGADA')
+    expect(result.data.deliveredBy).toBe('Ana Pérez')
+    expect(result.data.deliveredAt).toBe('2026-09-27T00:00:00.000Z')
+    expect(result.data.deliveryNotes).toBe('Cliente retiró el vehículo')
+  })
+
+  it('devuelve el historial del vehículo con repuestos netos', async () => {
+    repository.listVehicleHistory.mockResolvedValue({
+      items: [
+        {
+          id: 'work-order-1',
+          code: 'OT-000001',
+          diagnosis: 'Falla en el sistema de frenos',
+          subtotal: 321,
+          total: 321,
+          performedBy: 'Ana Pérez',
+          deliveredBy: 'Ana Pérez',
+          deliveredAt: new Date('2026-09-27T00:00:00.000Z'),
+          technician: { id: technicianId, displayName: 'Luis Torres' },
+          activities: [
+            {
+              id: 'activity-1',
+              description: 'Revisar frenos traseros',
+              status: 'COMPLETADA',
+              performedBy: 'Ana Pérez',
+              occurredAt: new Date('2026-09-20T00:00:00.000Z'),
+            },
+          ],
+          consumptions: [
+            {
+              type: 'CONSUMPTION',
+              quantity: 1,
+              workOrderLine: {
+                id: 'line-1',
+                productId,
+                name: 'Aceite 5W-30',
+                code: 'P-001',
+                unitLabel: 'btl',
+              },
+            },
+            {
+              type: 'RETURN',
+              quantity: 0.5,
+              workOrderLine: {
+                id: 'line-1',
+                productId,
+                name: 'Aceite 5W-30',
+                code: 'P-001',
+                unitLabel: 'btl',
+              },
+            },
+          ],
+        },
+      ],
+      total: 1,
+    })
+
+    const result = await workOrdersService.getVehicleHistory(vehicleId, {
+      page: 1,
+      pageSize: 20,
+    })
+
+    expect(repository.listVehicleHistory).toHaveBeenCalledWith(vehicleId, {
+      page: 1,
+      pageSize: 20,
+    })
+    expect(result.data[0]).toMatchObject({
+      code: 'OT-000001',
+      diagnosis: 'Falla en el sistema de frenos',
+      technicianId,
+      technician: 'Luis Torres',
+      deliveredAt: '2026-09-27T00:00:00.000Z',
+      activities: [{ id: 'activity-1', status: 'COMPLETADA' }],
+      products: [
+        {
+          lineId: 'line-1',
+          productId,
+          name: 'Aceite 5W-30',
+          code: 'P-001',
+          unitLabel: 'btl',
+          quantity: 0.5,
+        },
+      ],
+    })
+    expect(result.pagination).toEqual({
+      page: 1,
+      pageSize: 20,
+      total: 1,
+      totalPages: 1,
+    })
   })
 })

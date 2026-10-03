@@ -60,6 +60,17 @@ export const endpoints = {
     budgetSend: (id: string) => `/work-orders/${id}/budget/send`,
     decision: (id: string) => `/work-orders/${id}/decision`,
     technician: (id: string) => `/work-orders/${id}/technician`,
+    execution: (id: string) => `/work-orders/${id}/execution`,
+    executionStart: (id: string) => `/work-orders/${id}/execution/start`,
+    activities: (id: string) => `/work-orders/${id}/activities`,
+    activityComplete: (id: string, activityId: string) =>
+      `/work-orders/${id}/activities/${activityId}/complete`,
+    consumptions: (id: string) => `/work-orders/${id}/consumptions`,
+    returns: (id: string) => `/work-orders/${id}/returns`,
+    finalize: (id: string) => `/work-orders/${id}/finalize`,
+    delivery: (id: string) => `/work-orders/${id}/delivery`,
+    vehicleHistory: (vehicleId: string) =>
+      `/work-orders/vehicles/${vehicleId}/history`,
   },
   customers: {
     root: '/customers',

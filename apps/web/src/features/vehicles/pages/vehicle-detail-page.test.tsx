@@ -2,7 +2,7 @@
 
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import Page from './vehicle-detail-page'
 
@@ -16,6 +16,16 @@ vi.mock('../hooks/use-vehicles', () => ({
   useVehicle: vehicles.useVehicle,
   useVehiclesByCustomer: vi.fn(),
 }))
+
+const reactQuery = vi.hoisted(() => ({ useQuery: vi.fn() }))
+vi.mock('@tanstack/react-query', async (importOriginal) => {
+  const original =
+    await importOriginal<typeof import('@tanstack/react-query')>()
+  return {
+    ...original,
+    useQuery: reactQuery.useQuery,
+  }
+})
 
 vi.mock('../components/vehicle-form-modal', () => ({
   VehicleFormModal: () => null,
@@ -52,6 +62,16 @@ function renderDetail() {
 }
 
 describe('Ficha de vehículo', () => {
+  beforeEach(() => {
+    reactQuery.useQuery.mockReturnValue({
+      data: undefined,
+      isPending: false,
+      isError: false,
+      isFetching: false,
+      refetch: vi.fn(),
+    })
+  })
+
   afterEach(() => {
     cleanup()
     vi.clearAllMocks()
@@ -130,5 +150,67 @@ describe('Ficha de vehículo', () => {
     expect(
       screen.getByText('No se pudo cargar la ficha del vehículo'),
     ).toBeTruthy()
+  })
+
+  it('muestra el historial técnico con el permiso de taller', () => {
+    auth.useAuth.mockReturnValue({
+      user: { permissions: ['vehicles:read', 'workshop:read'] },
+    })
+    vehicles.useVehicle.mockReturnValue({
+      data: existingPlate,
+      isPending: false,
+      isFetching: false,
+      isError: false,
+      refetch: vi.fn(),
+    })
+    reactQuery.useQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            id: 'wo1',
+            code: 'OT-000001',
+            diagnosis: 'Revisión de frenos',
+            technicianId: 't1',
+            technician: 'Juan',
+            performedBy: 'Ana',
+            deliveredBy: 'Ana',
+            deliveredAt: '2026-09-28T00:00:00.000Z',
+            subtotal: 100,
+            total: 120,
+            activities: [
+              {
+                id: 'a1',
+                description: 'Cambiar pastillas',
+                status: 'COMPLETADA' as const,
+                performedBy: 'Juan',
+                occurredAt: '2026-09-28T00:00:00.000Z',
+              },
+            ],
+            products: [
+              {
+                lineId: 'l1',
+                productId: 'p1',
+                name: 'Pastillas',
+                code: 'PAS-01',
+                unitLabel: 'und',
+                quantity: 1,
+              },
+            ],
+          },
+        ],
+        pagination: { page: 1, pageSize: 10, total: 1, totalPages: 1 },
+      },
+      isPending: false,
+      isError: false,
+      isFetching: false,
+      refetch: vi.fn(),
+    })
+
+    renderDetail()
+
+    expect(screen.getByText('OT-000001')).toBeTruthy()
+    expect(screen.getByText('Técnico: Juan')).toBeTruthy()
+    expect(screen.getByText('1 und Pastillas')).toBeTruthy()
+    expect(screen.getByText('Revisión de frenos')).toBeTruthy()
   })
 })

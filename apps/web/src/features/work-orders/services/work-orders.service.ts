@@ -2,12 +2,20 @@ import { api } from '@/infrastructure/api/client'
 import { endpoints } from '@/infrastructure/api/endpoints'
 import type {
   DataResponse,
+  WorkOrderActivity,
+  WorkOrderActivityInput,
   WorkOrderBudgetInput,
   WorkOrderCatalog,
+  WorkOrderConsumptionInput,
+  WorkOrderConsumptionMutationResult,
   WorkOrderDecisionInput,
+  WorkOrderDeliveryInput,
   WorkOrderDetail,
+  WorkOrderExecution,
   WorkOrderFilters,
+  WorkOrderReturnInput,
   WorkOrderTechnician,
+  WorkOrderVehicleHistoryResponse,
   WorkOrdersResponse,
 } from '../types/work-orders.types'
 
@@ -80,6 +88,69 @@ export const workOrdersService = {
     return api.put<DataResponse<WorkOrderDetail>>(
       endpoints.workOrders.technician(id),
       { technicianId },
+    )
+  },
+  startExecution(id: string) {
+    return api.post<DataResponse<WorkOrderDetail>>(
+      endpoints.workOrders.executionStart(id),
+      {},
+    )
+  },
+  execution(id: string, signal?: AbortSignal) {
+    return api.get<DataResponse<WorkOrderExecution>>(
+      endpoints.workOrders.execution(id),
+      signal,
+    )
+  },
+  createActivity(id: string, input: WorkOrderActivityInput) {
+    return api.post<DataResponse<WorkOrderActivity>>(
+      endpoints.workOrders.activities(id),
+      input,
+    )
+  },
+  completeActivity(id: string, activityId: string) {
+    return api.post<DataResponse<WorkOrderActivity>>(
+      endpoints.workOrders.activityComplete(id, activityId),
+      {},
+    )
+  },
+  consume(id: string, input: WorkOrderConsumptionInput) {
+    return api.post<DataResponse<WorkOrderConsumptionMutationResult>>(
+      endpoints.workOrders.consumptions(id),
+      input,
+    )
+  },
+  returnProducts(id: string, input: WorkOrderReturnInput) {
+    return api.post<DataResponse<WorkOrderConsumptionMutationResult>>(
+      endpoints.workOrders.returns(id),
+      input,
+    )
+  },
+  finalize(id: string) {
+    return api.post<DataResponse<WorkOrderDetail>>(
+      endpoints.workOrders.finalize(id),
+      {},
+    )
+  },
+  deliver(id: string, input: WorkOrderDeliveryInput) {
+    return api.post<DataResponse<WorkOrderDetail>>(
+      endpoints.workOrders.delivery(id),
+      input,
+    )
+  },
+  vehicleHistory(
+    vehicleId: string,
+    page: number,
+    pageSize: number,
+    signal?: AbortSignal,
+  ) {
+    const query = new URLSearchParams({
+      page: String(page),
+      pageSize: String(pageSize),
+    })
+    return api.get<WorkOrderVehicleHistoryResponse>(
+      `${endpoints.workOrders.vehicleHistory(vehicleId)}?${query.toString()}`,
+      signal,
     )
   },
 }

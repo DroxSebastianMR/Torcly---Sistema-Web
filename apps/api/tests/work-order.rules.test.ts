@@ -2,11 +2,20 @@ import { describe, expect, it } from 'vitest'
 import {
   assertAppointmentAttendable,
   assertBudgetEditable,
+  assertCanCompleteActivity,
+  assertCanConsume,
   assertCanDecide,
+  assertCanDeliver,
+  assertCanFinalize,
+  assertCanRegisterActivity,
+  assertCanReturn,
+  assertCanStartExecution,
   assertHasLines,
   assertTechnicianEditable,
+  computeNetConsumed,
   computeWorkOrderTotals,
   roundMoney,
+  roundQuantity,
   shouldMoveToDiagnosis,
 } from '../src/modules/work-orders/work-order.rules.js'
 
@@ -132,5 +141,95 @@ describe('Reglas de órdenes de taller', () => {
     expect(shouldMoveToDiagnosis('RECEPCIONADA')).toBe('EN_DIAGNOSTICO')
     expect(shouldMoveToDiagnosis('EN_DIAGNOSTICO')).toBe('EN_DIAGNOSTICO')
     expect(shouldMoveToDiagnosis('APROBADA')).toBe('APROBADA')
+  })
+
+  it('inicia la ejecución solo sobre órdenes aprobadas con técnico', () => {
+    expect(() =>
+      assertCanStartExecution({
+        code: 'OT-000001',
+        status: 'APROBADA',
+        technicianId: 'a0000000-0000-4000-8000-000000000001',
+      }),
+    ).not.toThrow()
+    expect(() =>
+      assertCanStartExecution({
+        code: 'OT-000002',
+        status: 'EN_DIAGNOSTICO',
+        technicianId: 'a0000000-0000-4000-8000-000000000001',
+      }),
+    ).toThrowError(
+      expect.objectContaining({
+        status: 409,
+        code: 'WORK_ORDER_STATUS_INVALID',
+      }),
+    )
+    expect(() =>
+      assertCanStartExecution({
+        code: 'OT-000003',
+        status: 'APROBADA',
+        technicianId: null,
+      }),
+    ).toThrowError(
+      expect.objectContaining({
+        status: 409,
+        code: 'WORK_ORDER_TECHNICIAN_REQUIRED',
+      }),
+    )
+  })
+
+  it('exige estar en ejecución para actividades, consumos y finalización', () => {
+    for (const assert of [
+      assertCanRegisterActivity,
+      assertCanCompleteActivity,
+      assertCanConsume,
+      assertCanReturn,
+      assertCanFinalize,
+    ]) {
+      expect(() =>
+        assert({ code: 'OT-000001', status: 'EN_EJECUCION' }),
+      ).not.toThrow()
+      for (const status of [
+        'RECEPCIONADA',
+        'APROBADA',
+        'LISTA_PARA_ENTREGA',
+        'ENTREGADA',
+      ]) {
+        expect(() =>
+          assert({ code: 'OT-000002', status: status as never }),
+        ).toThrowError(
+          expect.objectContaining({
+            status: 409,
+            code: 'WORK_ORDER_STATUS_INVALID',
+          }),
+        )
+      }
+    }
+  })
+
+  it('solo entrega órdenes listas para entrega', () => {
+    expect(() =>
+      assertCanDeliver({ code: 'OT-000001', status: 'LISTA_PARA_ENTREGA' }),
+    ).not.toThrow()
+    expect(() =>
+      assertCanDeliver({ code: 'OT-000002', status: 'EN_EJECUCION' }),
+    ).toThrowError(
+      expect.objectContaining({
+        status: 409,
+        code: 'WORK_ORDER_STATUS_INVALID',
+      }),
+    )
+  })
+
+  it('redondea cantidades y calcula el neto consumido', () => {
+    expect(roundQuantity(1.0004)).toBe(1)
+    expect(roundQuantity(1.0006)).toBe(1.001)
+    expect(
+      computeNetConsumed([
+        { type: 'CONSUMPTION', quantity: 2 },
+        { type: 'CONSUMPTION', quantity: 0.5 },
+        { type: 'RETURN', quantity: 0.5 },
+      ]),
+    ).toBe(2)
+    expect(computeNetConsumed([])).toBe(0)
   })
 })

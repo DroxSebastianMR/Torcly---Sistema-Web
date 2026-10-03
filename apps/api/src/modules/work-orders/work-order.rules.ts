@@ -1,5 +1,8 @@
 import { AppError } from '../../shared/errors/app-error.js'
-import type { WorkOrderStatus } from './work-order.types.js'
+import type {
+  WorkOrderConsumptionType,
+  WorkOrderStatus,
+} from './work-order.types.js'
 
 export const BUDGET_EDITABLE_STATUSES: readonly WorkOrderStatus[] = [
   'RECEPCIONADA',
@@ -87,6 +90,104 @@ export function assertCanDecide(order: {
       `La orden ${order.code} no tiene un presupuesto enviado pendiente de decisión.`,
     )
   }
+}
+
+export function assertCanStartExecution(order: {
+  code: string
+  status: WorkOrderStatus
+  technicianId: string | null
+}): void {
+  if (order.status !== 'APROBADA') {
+    throw new AppError(
+      409,
+      'WORK_ORDER_STATUS_INVALID',
+      `La orden ${order.code} solo puede iniciar su ejecución cuando está aprobada.`,
+    )
+  }
+  if (!order.technicianId) {
+    throw new AppError(
+      409,
+      'WORK_ORDER_TECHNICIAN_REQUIRED',
+      `Asigna un técnico a la orden ${order.code} antes de iniciar la ejecución.`,
+    )
+  }
+}
+
+export function assertCanRegisterActivity(order: {
+  code: string
+  status: WorkOrderStatus
+}): void {
+  assertExecutionRunning(order, 'registrar actividades')
+}
+
+export function assertCanCompleteActivity(order: {
+  code: string
+  status: WorkOrderStatus
+}): void {
+  assertExecutionRunning(order, 'completar actividades')
+}
+
+export function assertCanConsume(order: {
+  code: string
+  status: WorkOrderStatus
+}): void {
+  assertExecutionRunning(order, 'registrar consumos de repuestos')
+}
+
+export function assertCanReturn(order: {
+  code: string
+  status: WorkOrderStatus
+}): void {
+  assertExecutionRunning(order, 'registrar devoluciones de repuestos')
+}
+
+export function assertCanFinalize(order: {
+  code: string
+  status: WorkOrderStatus
+}): void {
+  assertExecutionRunning(order, 'finalizar la ejecución')
+}
+
+function assertExecutionRunning(
+  order: { code: string; status: WorkOrderStatus },
+  action: string,
+): void {
+  if (order.status !== 'EN_EJECUCION') {
+    throw new AppError(
+      409,
+      'WORK_ORDER_STATUS_INVALID',
+      `La orden ${order.code} solo permite ${action} mientras está en ejecución.`,
+    )
+  }
+}
+
+export function assertCanDeliver(order: {
+  code: string
+  status: WorkOrderStatus
+}): void {
+  if (order.status !== 'LISTA_PARA_ENTREGA') {
+    throw new AppError(
+      409,
+      'WORK_ORDER_STATUS_INVALID',
+      `La orden ${order.code} solo puede entregarse cuando está lista para entrega.`,
+    )
+  }
+}
+
+export function roundQuantity(value: number): number {
+  return Math.round((value + Number.EPSILON) * 1000) / 1000
+}
+
+export function computeNetConsumed(
+  consumptions: ReadonlyArray<{
+    type: WorkOrderConsumptionType
+    quantity: unknown
+  }>,
+): number {
+  return consumptions.reduce((net, consumption) => {
+    const quantity = Number(consumption.quantity)
+    return consumption.type === 'CONSUMPTION' ? net + quantity : net - quantity
+  }, 0)
 }
 
 export function shouldMoveToDiagnosis(

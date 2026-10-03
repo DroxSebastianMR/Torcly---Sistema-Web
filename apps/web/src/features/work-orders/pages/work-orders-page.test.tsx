@@ -12,11 +12,15 @@ vi.mock('@/features/auth/hooks/auth-context', () => auth)
 const orders = vi.hoisted(() => ({
   useWorkOrders: vi.fn(),
   useWorkOrder: vi.fn(),
+  useWorkOrderExecution: vi.fn(),
+  useWorkOrdersMutations: vi.fn(),
 }))
 vi.mock('../hooks/use-work-orders', () => ({
   workOrderKeys: { all: ['work-orders'] },
   useWorkOrders: orders.useWorkOrders,
   useWorkOrder: orders.useWorkOrder,
+  useWorkOrderExecution: orders.useWorkOrderExecution,
+  useWorkOrdersMutations: orders.useWorkOrdersMutations,
 }))
 
 const reactQuery = vi.hoisted(() => ({ useQuery: vi.fn() }))
@@ -43,6 +47,18 @@ vi.mock('../components/work-order-decision-modal', () => ({
 }))
 vi.mock('../components/work-order-technician-modal', () => ({
   WorkOrderTechnicianModal: () => null,
+}))
+vi.mock('../components/work-order-activity-modal', () => ({
+  WorkOrderActivityModal: () => null,
+}))
+vi.mock('../components/work-order-consumption-modal', () => ({
+  WorkOrderConsumptionModal: () => null,
+}))
+vi.mock('../components/work-order-return-modal', () => ({
+  WorkOrderReturnModal: () => null,
+}))
+vi.mock('../components/work-order-delivery-modal', () => ({
+  WorkOrderDeliveryModal: () => null,
 }))
 
 const orderMock = {
@@ -72,6 +88,12 @@ const orderMock = {
   rejectedBy: null,
   rejectedAt: null,
   decisionNotes: null,
+  executionStartedBy: null,
+  executionStartedAt: null,
+  readyForDeliveryAt: null,
+  deliveredBy: null,
+  deliveredAt: null,
+  deliveryNotes: null,
   createdAt: '2026-01-02T00:00:00.000Z',
   updatedAt: '2026-01-02T00:00:00.000Z',
 }
@@ -89,6 +111,9 @@ function response(
       pendientesAprobacion: 0,
       aprobadas: 0,
       rechazadas: 0,
+      enEjecucion: 0,
+      listasParaEntrega: 0,
+      entregadas: 0,
     },
     ...overrides,
   }
@@ -103,6 +128,20 @@ function defaultMocks(permissions: string[]) {
   reactQuery.useQuery.mockReturnValue({
     data: [],
     isPending: false,
+  })
+  orders.useWorkOrderExecution.mockReturnValue({
+    data: undefined,
+    isPending: false,
+  })
+  orders.useWorkOrdersMutations.mockReturnValue({
+    startExecution: {
+      isPending: false,
+      mutateAsync: vi.fn().mockResolvedValue({}),
+    },
+    finalize: {
+      isPending: false,
+      mutateAsync: vi.fn().mockResolvedValue({}),
+    },
   })
 }
 
@@ -177,6 +216,9 @@ describe('Página de órdenes de taller', () => {
           pendientesAprobacion: 0,
           aprobadas: 0,
           rechazadas: 0,
+          enEjecucion: 0,
+          listasParaEntrega: 0,
+          entregadas: 0,
         },
       }),
       isPending: false,

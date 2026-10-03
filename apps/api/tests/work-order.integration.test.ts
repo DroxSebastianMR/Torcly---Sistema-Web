@@ -67,6 +67,9 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     order2Id: '',
     order3Id: '',
     appointmentCancelledId: '',
+    lineId: '',
+    initialMovementId: '',
+    activities: [] as string[],
   }
   const cleanupRoleIds: string[] = []
   let sharedPasswordHash = ''
@@ -297,6 +300,14 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     await databaseService.client.auditLog.deleteMany({
       where: { userId: { in: userIds } },
     })
+    await databaseService.client.inventoryMovement.deleteMany({
+      where: { referenceId: { in: workOrderIds } },
+    })
+    if (state.initialMovementId) {
+      await databaseService.client.inventoryMovement.delete({
+        where: { id: state.initialMovementId },
+      })
+    }
     await databaseService.client.vehicle.deleteMany({
       where: { customerId: state.customerId },
     })
@@ -640,6 +651,343 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     })
   }, 60_000)
 
+  it('inicia la ejecución solo sobre órdenes aprobadas con técnico', async () => {
+    const adminAgent = await loginAs(identity.username)
+
+    const unassigned = await adminAgent
+      .put(`/api/v1/work-orders/${state.order1Id}/technician`)
+      .send({ technicianId: null })
+    expect(unassigned.status).toBe(200)
+
+    const withoutTechnician = await adminAgent.post(
+      `/api/v1/work-orders/${state.order1Id}/execution/start`,
+    )
+    expect(withoutTechnician.status).toBe(409)
+    expect(withoutTechnician.body.error.code).toBe(
+      'WORK_ORDER_TECHNICIAN_REQUIRED',
+    )
+
+    const assigned = await adminAgent
+      .put(`/api/v1/work-orders/${state.order1Id}/technician`)
+      .send({ technicianId: technicianUserId.id })
+    expect(assigned.status).toBe(200)
+
+    const started = await adminAgent.post(
+      `/api/v1/work-orders/${state.order1Id}/execution/start`,
+    )
+    expect(started.status).toBe(200)
+    expect(started.body.data.status).toBe('EN_EJECUCION')
+    expect(started.body.data.executionStartedBy).toBe(identity.name)
+    expect(started.body.data.executionStartedAt).toBeTruthy()
+
+    const repeated = await adminAgent.post(
+      `/api/v1/work-orders/${state.order1Id}/execution/start`,
+    )
+    expect(repeated.status).toBe(409)
+    expect(repeated.body.error.code).toBe('WORK_ORDER_STATUS_INVALID')
+  }, 60_000)
+
+  it('rechaza actividades, consumos y finalización fuera de ejecución', async () => {
+    const adminAgent = await loginAs(identity.username)
+    const activity = await adminAgent
+      .post(`/api/v1/work-orders/${state.order2Id}/activities`)
+      .send({ description: 'Inspección general' })
+    expect(activity.status).toBe(409)
+    expect(activity.body.error.code).toBe('WORK_ORDER_STATUS_INVALID')
+
+    const dummyLineId = 'a0000000-0000-4000-8000-000000000009'
+    const consumption = await adminAgent
+      .post(`/api/v1/work-orders/${state.order2Id}/consumptions`)
+      .send({
+        requestId: randomUUID(),
+        items: [{ lineId: dummyLineId, quantity: 1 }],
+      })
+    expect(consumption.status).toBe(409)
+    expect(consumption.body.error.code).toBe('WORK_ORDER_STATUS_INVALID')
+
+    const finalized = await adminAgent.post(
+      `/api/v1/work-orders/${state.order2Id}/finalize`,
+    )
+    expect(finalized.status).toBe(409)
+    expect(finalized.body.error.code).toBe('WORK_ORDER_STATUS_INVALID')
+  }, 60_000)
+
+  it('registra actividades con responsable y fecha', async () => {
+    const adminAgent = await loginAs(identity.username)
+    const first = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/activities`)
+      .send({ description: 'Revisar sistema de frenos' })
+    expect(first.status).toBe(200)
+    expect(first.body.data.status).toBe('PENDIENTE')
+    expect(first.body.data.performedBy).toBe(identity.name)
+    state.activities.push(first.body.data.id)
+
+    const withDate = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/activities`)
+      .send({ description: 'Cambiar pastillas', occurredAt: isoInDays(0) })
+    expect(withDate.status).toBe(200)
+    expect(withDate.body.data.occurredAt).toMatch(/^\d{4}-\d{2}-\d{2}T/)
+    state.activities.push(withDate.body.data.id)
+
+    const third = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/activities`)
+      .send({ description: 'Purga del circuito hidráulico' })
+    expect(third.status).toBe(200)
+    state.activities.push(third.body.data.id)
+  }, 60_000)
+
+  it('consume repuestos con salida de inventario e idempotencia', async () => {
+    const adminAgent = await loginAs(identity.username)
+
+    const initial = await databaseService.client.inventoryMovement.create({
+      data: {
+        productId: state.productActiveId,
+        type: 'INITIAL',
+        status: 'CONFIRMED',
+        quantity: 1,
+        idempotencyKey: `initial-ot-${suffix}`,
+        notes: 'Stock inicial para pruebas',
+        performedBy: identity.name,
+        occurredAt: new Date(),
+      },
+      select: { id: true },
+    })
+    state.initialMovementId = initial.id
+
+    const detail = await adminAgent.get(`/api/v1/work-orders/${state.order1Id}`)
+    expect(detail.status).toBe(200)
+    const line = detail.body.data.lines.find(
+      (entry: { type: string }) => entry.type === 'PRODUCT',
+    )
+    expect(line).toBeDefined()
+    state.lineId = line.id
+
+    const requestId = randomUUID()
+    const consumed = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/consumptions`)
+      .send({ requestId, items: [{ lineId: state.lineId, quantity: 1 }] })
+    expect(consumed.status).toBe(200)
+    expect(consumed.body.data.registrations).toHaveLength(1)
+    expect(consumed.body.data.registrations[0]).toMatchObject({
+      productId: state.productActiveId,
+      quantity: 1,
+    })
+    expect(consumed.body.data.order.status).toBe('EN_EJECUCION')
+
+    const movements = await databaseService.client.inventoryMovement.findMany({
+      where: { referenceType: 'work-order', referenceId: state.order1Id },
+      select: { type: true, quantity: true },
+    })
+    expect(
+      movements.map((movement) => ({
+        type: movement.type,
+        quantity: Number(movement.quantity),
+      })),
+    ).toEqual([{ type: 'EXIT', quantity: 1 }])
+
+    const replayed = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/consumptions`)
+      .send({ requestId, items: [{ lineId: state.lineId, quantity: 1 }] })
+    expect(replayed.status).toBe(200)
+    expect(replayed.body.data.registrations).toHaveLength(0)
+  }, 60_000)
+
+  it('rechaza consumo sin stock suficiente', async () => {
+    const adminAgent = await loginAs(identity.username)
+    const response = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/consumptions`)
+      .send({
+        requestId: randomUUID(),
+        items: [{ lineId: state.lineId, quantity: 1 }],
+      })
+    expect(response.status).toBe(409)
+    expect(response.body.error.code).toBe('INSUFFICIENT_STOCK')
+  }, 60_000)
+
+  it('rechaza consumo que excede el presupuesto', async () => {
+    const adminAgent = await loginAs(identity.username)
+    const response = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/consumptions`)
+      .send({
+        requestId: randomUUID(),
+        items: [{ lineId: state.lineId, quantity: 1.5 }],
+      })
+    expect(response.status).toBe(409)
+    expect(response.body.error.code).toBe('WORK_ORDER_QUANTITY_EXCEEDS_BUDGET')
+  }, 60_000)
+
+  it('devuelve repuestos compensando el inventario', async () => {
+    const adminAgent = await loginAs(identity.username)
+    const requestId = randomUUID()
+    const returned = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/returns`)
+      .send({
+        requestId,
+        items: [{ lineId: state.lineId, quantity: 1, notes: 'Sobró repuesto' }],
+      })
+    expect(returned.status).toBe(200)
+    expect(returned.body.data.registrations).toHaveLength(1)
+    expect(returned.body.data.registrations[0].quantity).toBe(1)
+
+    const movements = await databaseService.client.inventoryMovement.findMany({
+      where: { referenceType: 'work-order', referenceId: state.order1Id },
+      select: { type: true, quantity: true },
+    })
+    expect(
+      movements.map((movement) => ({
+        type: movement.type,
+        quantity: Number(movement.quantity),
+      })),
+    ).toEqual(expect.arrayContaining([{ type: 'ADJUSTMENT_IN', quantity: 1 }]))
+
+    const replayed = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/returns`)
+      .send({ requestId, items: [{ lineId: state.lineId, quantity: 1 }] })
+    expect(replayed.status).toBe(200)
+    expect(replayed.body.data.registrations).toHaveLength(0)
+  }, 60_000)
+
+  it('rechaza devolver más que el neto consumido', async () => {
+    const adminAgent = await loginAs(identity.username)
+    const response = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/returns`)
+      .send({
+        requestId: randomUUID(),
+        items: [{ lineId: state.lineId, quantity: 0.5 }],
+      })
+    expect(response.status).toBe(409)
+    expect(response.body.error.code).toBe('WORK_ORDER_RETURN_EXCEEDS_CONSUMED')
+  }, 60_000)
+
+  it('reanuda la ejecución consumiendo una unidad adicional', async () => {
+    const adminAgent = await loginAs(identity.username)
+    const response = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/consumptions`)
+      .send({
+        requestId: randomUUID(),
+        items: [{ lineId: state.lineId, quantity: 1 }],
+      })
+    expect(response.status).toBe(200)
+    expect(response.body.data.registrations).toHaveLength(1)
+  }, 60_000)
+
+  it('finaliza solo con todas las actividades completadas', async () => {
+    const adminAgent = await loginAs(identity.username)
+
+    const pending = await adminAgent.post(
+      `/api/v1/work-orders/${state.order1Id}/finalize`,
+    )
+    expect(pending.status).toBe(409)
+    expect(pending.body.error.code).toBe('WORK_ORDER_ACTIVITIES_PENDING')
+
+    for (const activityId of state.activities) {
+      const completed = await adminAgent.post(
+        `/api/v1/work-orders/${state.order1Id}/activities/${activityId}/complete`,
+      )
+      expect(completed.status).toBe(200)
+    }
+
+    const execution = await adminAgent.get(
+      `/api/v1/work-orders/${state.order1Id}/execution`,
+    )
+    expect(execution.status).toBe(200)
+    expect(
+      execution.body.data.activities.every(
+        (activity: { status: string }) => activity.status === 'COMPLETADA',
+      ),
+    ).toBe(true)
+    expect(execution.body.data.productLines[0]).toMatchObject({
+      budgeted: 2,
+      consumed: 2,
+      returned: 1,
+      netConsumed: 1,
+      pending: 1,
+    })
+
+    const finished = await adminAgent.post(
+      `/api/v1/work-orders/${state.order1Id}/finalize`,
+    )
+    expect(finished.status).toBe(200)
+    expect(finished.body.data.status).toBe('LISTA_PARA_ENTREGA')
+    expect(finished.body.data.readyForDeliveryAt).toBeTruthy()
+  }, 60_000)
+
+  it('exige al menos una actividad y entrega solo listas', async () => {
+    const adminAgent = await loginAs(identity.username)
+
+    await adminAgent
+      .put(`/api/v1/work-orders/${state.order3Id}/diagnosis`)
+      .send({ diagnosis: 'Cita para actividad obligatoria' })
+    await adminAgent.put(`/api/v1/work-orders/${state.order3Id}/budget`).send({
+      lines: [{ type: 'SERVICE', serviceId: state.serviceId }],
+    })
+    await adminAgent.post(`/api/v1/work-orders/${state.order3Id}/budget/send`)
+    await adminAgent
+      .post(`/api/v1/work-orders/${state.order3Id}/decision`)
+      .send({ decision: 'APPROVED' })
+    const assigned = await adminAgent
+      .put(`/api/v1/work-orders/${state.order3Id}/technician`)
+      .send({ technicianId: technicianUserId.id })
+    expect(assigned.status).toBe(200)
+    const started = await adminAgent.post(
+      `/api/v1/work-orders/${state.order3Id}/execution/start`,
+    )
+    expect(started.status).toBe(200)
+
+    const noActivities = await adminAgent.post(
+      `/api/v1/work-orders/${state.order3Id}/finalize`,
+    )
+    expect(noActivities.status).toBe(409)
+    expect(noActivities.body.error.code).toBe('WORK_ORDER_NO_ACTIVITIES')
+
+    const notReady = await adminAgent
+      .post(`/api/v1/work-orders/${state.order2Id}/delivery`)
+      .send({})
+    expect(notReady.status).toBe(409)
+    expect(notReady.body.error.code).toBe('WORK_ORDER_STATUS_INVALID')
+
+    const delivered = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/delivery`)
+      .send({ notes: 'Cliente retiró el vehículo' })
+    expect(delivered.status).toBe(200)
+    expect(delivered.body.data.status).toBe('ENTREGADA')
+    expect(delivered.body.data.deliveredBy).toBe(identity.name)
+    expect(delivered.body.data.deliveredAt).toBeTruthy()
+    expect(delivered.body.data.deliveryNotes).toBe('Cliente retiró el vehículo')
+
+    const double = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/delivery`)
+      .send({})
+    expect(double.status).toBe(409)
+    expect(double.body.error.code).toBe('WORK_ORDER_STATUS_INVALID')
+  }, 60_000)
+
+  it('expone el historial del vehículo con solo entregadas', async () => {
+    const adminAgent = await loginAs(identity.username)
+    const history = await adminAgent.get(
+      `/api/v1/work-orders/vehicles/${state.vehicleAId}/history`,
+    )
+    expect(history.status).toBe(200)
+    const order = history.body.data.find(
+      (item: { id: string }) => item.id === state.order1Id,
+    )
+    expect(order).toBeDefined()
+    expect(order.technician).toBe(technicianIdentity.name)
+    expect(order.deliveredAt).toBeTruthy()
+    expect(order.products).toEqual([expect.objectContaining({ quantity: 1 })])
+    expect(order.activities.length).toBeGreaterThanOrEqual(1)
+
+    const vehicleBHistory = await adminAgent.get(
+      `/api/v1/work-orders/vehicles/${state.vehicleBId}/history`,
+    )
+    expect(vehicleBHistory.status).toBe(200)
+    expect(
+      vehicleBHistory.body.data.some(
+        (item: { id: string }) => item.id === state.order2Id,
+      ),
+    ).toBe(false)
+  }, 60_000)
+
   it('registra la auditoría de todas las mutaciones del taller', async () => {
     const events = await databaseService.client.auditLog.findMany({
       where: { userId: adminIds.userId },
@@ -654,5 +1002,14 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     expect(codes).toContain('WORK_ORDER_BUDGET_APPROVED')
     expect(codes).toContain('WORK_ORDER_BUDGET_REJECTED')
     expect(codes).toContain('WORK_ORDER_TECHNICIAN_ASSIGNED')
+    expect(codes).toContain('WORK_ORDER_EXECUTION_STARTED')
+    expect(codes).toContain('WORK_ORDER_ACTIVITY_CREATED')
+    expect(codes).toContain('WORK_ORDER_ACTIVITY_COMPLETED')
+    expect(codes).toContain('WORK_ORDER_PRODUCT_CONSUMED')
+    expect(codes).toContain('WORK_ORDER_PRODUCT_RETURNED')
+    expect(codes).toContain('WORK_ORDER_READY_FOR_DELIVERY')
+    expect(codes).toContain('WORK_ORDER_DELIVERED')
+    expect(codes).toContain('INVENTORY_EXIT_REGISTERED')
+    expect(codes).toContain('INVENTORY_ADJUSTMENT_REGISTERED')
   }, 60_000)
 })
