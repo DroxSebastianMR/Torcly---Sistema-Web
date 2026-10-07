@@ -2,7 +2,7 @@
 
 ## Estado
 
-Implementación completada con verificación automatizada en verde (API 190 unitarios + 87 de integración gated, web 286 tests, typecheck, lint, build, formato y `git diff --check`). **Pendiente de prueba manual y aprobación del usuario.**
+Implementación cerrada por autorización del usuario el 7 de octubre de 2026. Verificación automatizada en verde: API 190 unitarios + 87 de integración gated, web 286 tests, typecheck, lint, build, formato y `git diff --check`. La evidencia manual registrada valida el inicio de ejecución; la guía de demo offline permite repetir el recorrido completo.
 
 ## Preparación
 

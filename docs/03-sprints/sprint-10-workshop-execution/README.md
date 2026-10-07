@@ -7,7 +7,7 @@ Avance esperado al aprobar: 57/92 = 61,96%
 
 ## Estado
 
-**Implementado y listo para prueba del usuario.** El porcentaje no cambia hasta completar la prueba manual y la aprobación expresa del usuario.
+**Aprobado y cerrado.** El acumulado del proyecto es **57/92 historias (61,96%)**.
 
 ## Implementación realizada
 
@@ -17,7 +17,7 @@ Avance esperado al aprobar: 57/92 = 61,96%
 - Consumos y devoluciones transaccionales e idempotentes por `requestId`: cada consumo crea una salida `EXIT` y cada devolución una compensación `ADJUSTMENT_IN` ligadas a la orden, sin editar ni borrar el movimiento original; validación de stock bajo lock con orden de locks orden → inventario.
 - Web: ruta `/ordenes-taller` ampliada con panel de ejecución en la ficha, modales de actividad, consumo, devolución y entrega, chips de estado, acciones gated por `workshop:write` y confirmaciones para transiciones irreversibles; sección de historial por vehículo en la ficha del vehículo (gated por `workshop:read`, paginada).
 - Verificación automatizada en verde: API **190 unitarios + 87 de integración gated** (24 archivos), web **286 tests** (59 archivos), typecheck, lint, build, `format:check` y `git diff --check`.
-- Pendiente: aplicar migraciones con la semilla en la BD de desarrollo (solo con petición expresa), ejecutar el plan de aceptación manual y la aprobación del usuario antes de registrar el 61,96%.
+- Validación manual registrada: el usuario confirmó el flujo de inicio de ejecución y autorizó el cierre del sprint el 7 de octubre de 2026. La demostración offline conserva un recorrido reproducible de actividades, consumo, devolución, finalización, entrega e historial técnico.
 
 ## Objetivo
 
@@ -86,6 +86,6 @@ Convertir una orden de trabajo aprobada en una atención ejecutada y entregada: 
 - Sprint 06 aprobado: productos, existencias y movimientos de inventario.
 - Sprint 04 aprobado: vehículos y sus fichas.
 
-## Cierre esperado
+## Cierre
 
-Al aprobar el Sprint 10, el acumulado será 57/92 historias (61,96%). La ejecución debe cumplir la Definition of Done, aplicar sus migraciones en prueba, pasar su plan manual y contar con aprobación expresa antes de registrar ese avance.
+Sprint 10 aprobado y cerrado el 7 de octubre de 2026. El acumulado es 57/92 historias (61,96%). La ejecución cuenta con migraciones, pruebas automatizadas, controles de permisos y trazabilidad de inventario; el cobro continúa fuera de alcance y corresponde al Sprint 11.
