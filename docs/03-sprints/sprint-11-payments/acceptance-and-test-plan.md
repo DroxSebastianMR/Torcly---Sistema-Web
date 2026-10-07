@@ -2,14 +2,13 @@
 
 ## Estado
 
-Listo para prueba manual. Implementación, pruebas automatizadas, typecheck, lint, build, formato y `git diff --check` en verde. Las migraciones están creadas pero **no aplicadas**: se aplican solo cuando el usuario autorice la prueba en la base de desarrollo.
+Listo para prueba manual. Implementación, pruebas automatizadas, typecheck, lint, build, formato y `git diff --check` en verde. Las migraciones y la semilla ya fueron aplicadas en la base de desarrollo el 07 oct. 2026.
 
 ## Preparación
 
-1. Aplicar las migraciones del Sprint 11 y ejecutar una semilla conocida solo cuando el usuario lo autorice.
-2. Iniciar sesión con un usuario que tenga `cash:read`, `cash:write`, `sales:read` y `sales:write`.
-3. Contar con una venta `CONFIRMED` con cliente, total positivo y sin pagos previos; por ejemplo, total S/ 300.00.
-4. Anotar el total y confirmar que el inventario ya fue descontado por la venta antes de registrar un pago.
+1. Iniciar sesión con un usuario que tenga `cash:read`, `cash:write`, `sales:read` y `sales:write`.
+2. Contar con una venta `CONFIRMED` con cliente, total positivo y sin pagos previos; por ejemplo, total S/ 300.00.
+3. Anotar el total y confirmar que el inventario ya fue descontado por la venta antes de registrar un pago.
 
 ## Casos principales
 
