@@ -35,6 +35,7 @@ const defaultPermissionCodes = [
   'workshop:read',
   'workshop:write',
   'cash:read',
+  'cash:write',
   'users:read',
   'users:write',
   'notifications:read',

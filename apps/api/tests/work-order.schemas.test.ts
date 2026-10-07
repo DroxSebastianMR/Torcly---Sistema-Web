@@ -109,7 +109,9 @@ describe('Schemas de órdenes de taller', () => {
   it('exige un objeto vacío para las acciones de ejecución', () => {
     expect(workOrderStartExecutionSchema.parse({})).toEqual({})
     expect(() => workOrderStartExecutionSchema.parse(undefined)).toThrow()
-    expect(() => workOrderStartExecutionSchema.parse({ unexpected: true })).toThrow()
+    expect(() =>
+      workOrderStartExecutionSchema.parse({ unexpected: true }),
+    ).toThrow()
   })
 
   it('valida filtros por estado y técnico', () => {

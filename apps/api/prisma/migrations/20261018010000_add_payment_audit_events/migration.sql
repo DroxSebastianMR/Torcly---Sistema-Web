@@ -1,0 +1,5 @@
+-- AlterEnum
+ALTER TYPE "AuditEventType" ADD VALUE 'PAYMENT_REGISTERED';
+
+-- AlterEnum
+ALTER TYPE "AuditEventType" ADD VALUE 'PAYMENT_COMPENSATED';

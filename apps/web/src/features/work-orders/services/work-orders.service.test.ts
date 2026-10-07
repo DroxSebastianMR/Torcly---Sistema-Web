@@ -99,7 +99,10 @@ describe('Servicio de órdenes de taller (web)', () => {
 
   it('inicia, consulta y gestiona la ejecución de una orden', async () => {
     await workOrdersService.startExecution('wo1')
-    expect(api.post).toHaveBeenCalledWith('/work-orders/wo1/execution/start', {})
+    expect(api.post).toHaveBeenCalledWith(
+      '/work-orders/wo1/execution/start',
+      {},
+    )
 
     await workOrdersService.execution('wo1')
     expect(api.get).toHaveBeenCalledWith(

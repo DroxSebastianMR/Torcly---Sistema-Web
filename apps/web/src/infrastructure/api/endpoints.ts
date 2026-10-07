@@ -80,7 +80,12 @@ export const endpoints = {
     root: '/vehicles',
     detail: (id: string) => `/vehicles/${id}`,
   },
-  cash: '/cash',
+  payments: {
+    root: '/payments',
+    detail: (id: string) => `/payments/${id}`,
+    pay: (id: string) => `/payments/${id}/pay`,
+    compensate: (paymentId: string) => `/payments/${paymentId}/compensate`,
+  },
   users: {
     root: '/users',
     roles: '/users/roles',

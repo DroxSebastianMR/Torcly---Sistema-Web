@@ -10,6 +10,7 @@ import { servicesRouter } from './modules/services/services.routes.js'
 import { salesRouter } from './modules/sales/sales.routes.js'
 import { appointmentsRouter } from './modules/appointments/appointment.routes.js'
 import { workOrdersRouter } from './modules/work-orders/work-order.routes.js'
+import { paymentsRouter } from './modules/payments/payment.routes.js'
 
 export const apiRouter = Router()
 
@@ -24,3 +25,4 @@ apiRouter.use('/services', servicesRouter)
 apiRouter.use('/sales', salesRouter)
 apiRouter.use('/appointments', appointmentsRouter)
 apiRouter.use('/work-orders', workOrdersRouter)
+apiRouter.use('/payments', paymentsRouter)
