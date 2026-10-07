@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Pendiente de inicio.** Esta acta no autoriza implementar ni contar historias hasta que Sprint 11 esté aprobado.
+**Listo para prueba del usuario.** Implementación y verificaciones automatizadas completas. Esta acta no cambia el avance ni cierra Sprint 12 hasta la prueba manual conjunta y la aprobación expresa del usuario.
 
 ## Para aprobar
 
@@ -18,7 +18,7 @@
 
 ## Registro
 
-- Fecha de inicio: pendiente.
+- Fecha de inicio: 07 oct. 2026.
 - Fecha de aprobación: pendiente.
 - Aprobado por: pendiente.
 - Observaciones: pendiente.

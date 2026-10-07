@@ -98,4 +98,8 @@ export const endpoints = {
   reports: '/reports',
   barcodes: '/barcodes',
   dashboard: '/dashboard',
+  operations: {
+    summary: '/operations/summary',
+    attention: (section: string) => `/operations/attention/${section}`,
+  },
 } as const

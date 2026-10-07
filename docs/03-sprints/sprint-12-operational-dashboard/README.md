@@ -8,7 +8,7 @@ Avance esperado al aprobar: 65/92 = 70,65%
 
 ## Estado
 
-**Documentado; no iniciado.** No se implementará código ni se modificará el avance hasta que el usuario complete y apruebe la prueba manual del Sprint 11. Esta documentación solo congela el alcance siguiente.
+**Listo para prueba del usuario.** La excepción autorizada permitió implementar el Sprint 12 antes del cierre manual del Sprint 11. El avance permanece en 57/92 hasta la aprobación conjunta expresa.
 
 ## Objetivo
 
@@ -67,3 +67,9 @@ Ofrecer una vista operativa de lectura para que el taller consulte, desde un ún
 - Requiere Sprint 11 aprobado y datos reales de los módulos operativos previos.
 - Requiere acceso de lectura a las fuentes usadas en cada indicador.
 - Al aprobar, el proyecto pasa de 62/92 a **65/92 historias (70,65%)**.
+
+## Implementación y verificación
+
+- API: módulo `operations` de solo lectura, con resumen y listas de atención paginadas en `/api/v1/operations`; permisos por sección, filtros de fecha, saldo reutilizado desde `payments` y stock calculado desde movimientos confirmados.
+- Web: Dashboard reemplaza el placeholder con período, tarjetas operativas y enlaces a los módulos de origen.
+- Verificado: API 233 pruebas correctas (95 integración gated), typecheck y lint; web typecheck, lint y build; `format:check` y `git diff --check`.
