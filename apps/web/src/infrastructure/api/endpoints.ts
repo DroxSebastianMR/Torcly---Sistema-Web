@@ -95,7 +95,10 @@ export const endpoints = {
   },
   notifications: '/notifications',
   profile: '/profile',
-  reports: '/reports',
+  reports: {
+    summary: '/reports/summary',
+    block: (block: string) => `/reports/blocks/${block}`,
+  },
   barcodes: '/barcodes',
   dashboard: '/dashboard',
   operations: {
