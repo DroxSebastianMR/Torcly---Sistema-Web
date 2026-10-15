@@ -24,3 +24,6 @@ Los sprints son secuenciales y cada uno tiene una rama, alcance cerrado, criteri
 El porcentaje solo cambia después de completar [Definition of Done](../04-calidad/definition-of-done.md) y registrar la aprobación.
 
 La planificación completa y los porcentajes acumulados están en [roadmap-100.md](../01-producto/roadmap-100.md).
+
+Para ejecutar una validación encadenada desde autenticación hasta BI, consultar
+la [guía manual integral de los Sprints 01 a 13](manual-testing-sprints-01-13/README.md).
