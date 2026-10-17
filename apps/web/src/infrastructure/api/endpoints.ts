@@ -31,6 +31,11 @@ export const endpoints = {
     exits: '/inventory/salidas',
     adjustments: '/inventory/ajustes',
   },
+  replenishment: {
+    eligibility: '/replenishment/eligibility',
+    runs: '/replenishment/runs',
+    run: (code: string) => `/replenishment/runs/${code}`,
+  },
   services: {
     root: '/services',
     options: '/services/options',

@@ -22,8 +22,19 @@ function startServer() {
       }
     })
 
-  server.on('error', async () => {
-    console.error('No se pudo iniciar la API.')
+  server.on('error', async (error) => {
+    const code =
+      typeof error === 'object' && error !== null && 'code' in error
+        ? String(error.code)
+        : 'UNKNOWN'
+    console.error(
+      JSON.stringify({
+        level: 'error',
+        event: 'api_start_failed',
+        code,
+        message: error.message,
+      }),
+    )
     await databaseService.disconnect()
     process.exit(1)
   })

@@ -7,6 +7,18 @@ function moduleFromPath(path: string) {
   return segments.at(2) ?? 'unknown'
 }
 
+function operationFromMethod(method: string) {
+  return (
+    {
+      GET: 'read',
+      POST: 'create_or_action',
+      PUT: 'replace',
+      PATCH: 'update',
+      DELETE: 'delete',
+    }[method] ?? 'request'
+  )
+}
+
 export const requestTiming: RequestHandler = (request, response, next) => {
   const startedAt = performance.now()
   const requestId = String(response.locals.requestId ?? 'unknown')
@@ -20,6 +32,7 @@ export const requestTiming: RequestHandler = (request, response, next) => {
         event: 'http_request_completed',
         requestId,
         module: moduleFromPath(path),
+        operation: operationFromMethod(request.method),
         method: request.method,
         path,
         status: response.statusCode,

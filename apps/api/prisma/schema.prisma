@@ -134,6 +134,7 @@ enum AuditEventType {
   WORK_ORDER_DELIVERED
   PAYMENT_REGISTERED
   PAYMENT_COMPENSATED
+  REPLENISHMENT_RUN_EXECUTED
 }
 
 model User {
@@ -149,6 +150,7 @@ model User {
   sessions            AuthSession[]
   auditLogs           AuditLog[]
   assignedWorkOrders  WorkOrder[]  @relation("WorkOrderTechnician")
+  replenishmentRuns   ReplenishmentRun[]
   createdAt           DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt           DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
 
@@ -329,6 +331,7 @@ model Product {
   saleLines          SaleLine[]
   workOrderLines     WorkOrderLine[]
   workOrderConsumptions WorkOrderConsumption[]
+  replenishmentRecommendations ReplenishmentRecommendation[]
   createdAt          DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt          DateTime            @updatedAt @map("updated_at") @db.Timestamptz(3)
 
@@ -586,4 +589,57 @@ model Payment {
   @@index([customerId])
   @@index([method, occurredAt])
   @@map("payments")
+}
+
+model ReplenishmentRun {
+  id                 String                       @id @default(uuid()) @db.Uuid
+  code               String                       @unique @db.VarChar(20)
+  strategyVersion    String                       @map("strategy_version") @db.VarChar(20)
+  fromDate           DateTime                     @map("from_date") @db.Date
+  toDate             DateTime                     @map("to_date") @db.Date
+  coverageTargetDays Int                          @map("coverage_target_days")
+  actorId            String?                      @map("actor_id") @db.Uuid
+  actorName          String                       @map("actor_name") @db.VarChar(80)
+  idempotencyKey     String?                      @unique @map("idempotency_key") @db.VarChar(100)
+  eligibleCount      Int                          @default(0) @map("eligible_count")
+  suggestedTotal     Decimal                      @default(0) @map("suggested_total") @db.Decimal(14, 3)
+  executedAt         DateTime                     @default(now()) @map("executed_at") @db.Timestamptz(3)
+  createdAt          DateTime                     @default(now()) @map("created_at") @db.Timestamptz(3)
+  actor              User?                        @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  recommendations    ReplenishmentRecommendation[]
+
+  @@index([actorId])
+  @@index([executedAt])
+  @@map("replenishment_runs")
+}
+
+model ReplenishmentRecommendation {
+  id                  String            @id @default(uuid()) @db.Uuid
+  runId               String            @map("run_id") @db.Uuid
+  productId           String            @map("product_id") @db.Uuid
+  productCode         String            @map("product_code") @db.VarChar(40)
+  productName         String            @map("product_name") @db.VarChar(120)
+  unitLabel           String?           @map("unit_label") @db.VarChar(20)
+  eligible            Boolean
+  reason              String?           @db.VarChar(40)
+  strategyVersion     String            @map("strategy_version") @db.VarChar(20)
+  stockCurrent        Decimal?          @map("stock_current") @db.Decimal(14, 3)
+  minimumStock        Decimal?          @map("minimum_stock") @db.Decimal(12, 3)
+  demandQuantity      Decimal           @map("demand_quantity") @db.Decimal(14, 3)
+  demandPoints        Int               @map("demand_points")
+  periodDays          Int               @map("period_days")
+  dailyDemand         Decimal?          @map("daily_demand") @db.Decimal(14, 6)
+  coverageTargetDays  Int               @map("coverage_target_days")
+  targetStock         Decimal?          @map("target_stock") @db.Decimal(14, 3)
+  suggestedQuantity   Decimal?          @map("suggested_quantity") @db.Decimal(14, 3)
+  currentCoverageDays Decimal?          @map("current_coverage_days") @db.Decimal(10, 1)
+  priority            String?           @db.VarChar(10)
+  explanation         String            @db.VarChar(600)
+  sortOrder           Int               @map("sort_order")
+  run                 ReplenishmentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  product             Product           @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([runId, sortOrder])
+  @@index([productId])
+  @@map("replenishment_recommendations")
 }

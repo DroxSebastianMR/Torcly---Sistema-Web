@@ -70,6 +70,16 @@ export const protectedRoutes: RouteObject[] = [
                   ).default,
                 }),
               },
+              {
+                path: paths.replenishment,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/replenishment/pages/replenishment-page'
+                    )
+                  ).default,
+                }),
+              },
             ],
           },
           {
