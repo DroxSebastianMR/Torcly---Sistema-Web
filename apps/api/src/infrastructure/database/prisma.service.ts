@@ -40,9 +40,9 @@ class PrismaService {
             level: 'info',
             event: 'database_transaction_completed',
             requestId: context?.requestId ?? null,
-            module: context?.path.split('/').filter(Boolean).at(2) ?? 'system',
+            module: context?.route.split('/').filter(Boolean).at(2) ?? 'system',
             method: context?.method ?? null,
-            path: context?.path ?? null,
+            route: context?.route ?? null,
             durationMs: Number((performance.now() - startedAt).toFixed(2)),
           }),
         )

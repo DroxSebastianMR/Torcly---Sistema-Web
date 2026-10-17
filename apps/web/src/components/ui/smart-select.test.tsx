@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SmartSelect } from './smart-select'
 
 const smallOptions = [
@@ -15,6 +15,10 @@ const largeOptions = Array.from({ length: 11 }, (_, index) => ({
 }))
 
 describe('SmartSelect', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   it('usa el selector visual de Torcly sin búsqueda hasta diez opciones', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
@@ -100,5 +104,48 @@ describe('SmartSelect', () => {
     expect(
       screen.queryByRole('option', { name: 'Cliente jurídico' }),
     ).toBeNull()
+  })
+
+  it('cierra con Escape y devuelve el foco al disparador', async () => {
+    const user = userEvent.setup()
+    render(
+      <SmartSelect
+        options={smallOptions}
+        value=""
+        onChange={vi.fn()}
+        aria-label="Sucursal"
+      />,
+    )
+
+    const trigger = screen.getByRole('button', { name: 'Sucursal' })
+    await user.click(trigger)
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+
+    await user.keyboard('{Escape}')
+
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(screen.queryByRole('option', { name: 'Almacén' })).toBeNull()
+    expect(document.activeElement).toBe(trigger)
+  })
+
+  it('devuelve el foco al disparador tras seleccionar una opción', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <SmartSelect
+        options={smallOptions}
+        value=""
+        onChange={onChange}
+        aria-label="Sucursal"
+      />,
+    )
+
+    const trigger = screen.getByRole('button', { name: 'Sucursal' })
+    await user.click(trigger)
+    await user.click(screen.getByRole('option', { name: 'Boutique' }))
+
+    expect(onChange).toHaveBeenCalledWith('b')
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(trigger)
   })
 })

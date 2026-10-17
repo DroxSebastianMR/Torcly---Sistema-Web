@@ -7,4 +7,11 @@ Módulo de ventas: listado con búsqueda y filtro por estado, detalle modal, reg
 - Confirmar registra las salidas de inventario por producto; una venta confirmada es de solo lectura.
 - La edición y la confirmación están limitadas por `sales:write`; la consulta por `sales:read`.
 
+## Experiencia (Sprint 15)
+
+- El modal de venta **no se cierra** ante un rechazo del servidor: conserva los
+  valores ingresados y muestra el error para corregirlo.
+- El listado expone una acción accesible por fila (`Ver venta <código>`) alcanzable
+  con teclado, además de la fila clicable y la tarjeta móvil equivalente.
+
 Sprint propietario: 07.

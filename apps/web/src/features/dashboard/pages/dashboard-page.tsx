@@ -3,12 +3,14 @@ import {
   Activity,
   ArrowRight,
   CalendarDays,
+  Inbox,
   Package,
   ReceiptText,
   Wrench,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
 import { paths } from '@/app/router/constants/paths'
 import {
@@ -35,6 +37,9 @@ export default function Page() {
     to: null as string | null,
   })
   const summary = useOperationsSummary(period)
+  const visibleSections = sections.filter(({ key }) =>
+    Boolean(summary.data?.sections[key]),
+  )
   return (
     <div className="space-y-6">
       <header>
@@ -84,6 +89,9 @@ export default function Page() {
         >
           Limpiar
         </Button>
+        <p className="w-full text-xs text-muted-foreground sm:w-auto sm:self-center">
+          Los filtros de fecha ajustan la consulta operativa.
+        </p>
       </section>
       {summary.isError ? (
         <ErrorState
@@ -93,26 +101,35 @@ export default function Page() {
             onClick: () => void summary.refetch(),
           }}
         />
+      ) : !summary.data ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="rounded-2xl border bg-card p-6"
+        >
+          <p className="text-sm text-muted-foreground">
+            Cargando resumen operativo…
+          </p>
+        </div>
+      ) : visibleSections.length === 0 ? (
+        <EmptyState
+          icon={Inbox}
+          title="Sin información operativa"
+          description="No hay datos de operación disponibles para el periodo seleccionado. Ajusta las fechas o inténtalo más tarde."
+        />
       ) : (
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {!summary.data && (
-            <p className="text-sm text-muted-foreground">
-              Cargando resumen operativo…
-            </p>
-          )}
-          {sections
-            .filter(({ key }) => Boolean(summary.data?.sections[key]))
-            .map(({ key, path, icon: Icon }) => (
-              <SummaryCard
-                key={key}
-                section={key}
-                path={path}
-                Icon={Icon}
-                period={period}
-                summary={summary.data?.sections[key]}
-                label={summary.data?.descriptors[key]?.label ?? key}
-              />
-            ))}
+          {visibleSections.map(({ key, path, icon: Icon }) => (
+            <SummaryCard
+              key={key}
+              section={key}
+              path={path}
+              Icon={Icon}
+              period={period}
+              summary={summary.data?.sections[key]}
+              label={summary.data?.descriptors[key]?.label ?? key}
+            />
+          ))}
         </section>
       )}
     </div>
@@ -156,13 +173,32 @@ function SummaryCard({
           <p className="text-2xl font-bold">{summary ? total : '…'}</p>
         </div>
       </div>
-      <p className="mt-4 text-sm text-muted-foreground">
-        {attention.isPending
-          ? 'Cargando atención…'
-          : attention.data?.data.length
-            ? `${attention.data.data.length} elemento(s) requieren atención.`
-            : 'Sin elementos que requieran atención.'}
-      </p>
+      <div className="mt-4 text-sm text-muted-foreground">
+        {attention.isPending ? (
+          <p role="status" aria-live="polite">
+            Cargando atención…
+          </p>
+        ) : attention.isError ? (
+          <div role="alert" className="space-y-1">
+            <p className="text-amber-700">
+              No se pudo cargar la atención de este módulo.
+            </p>
+            <button
+              type="button"
+              className="font-semibold text-primary hover:underline"
+              onClick={() => void attention.refetch()}
+            >
+              Reintentar
+            </button>
+          </div>
+        ) : (
+          <p>
+            {attention.data?.data.length
+              ? `${attention.data.data.length} elemento(s) requieren atención.`
+              : 'Sin elementos que requieran atención.'}
+          </p>
+        )}
+      </div>
       <Link
         className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary"
         to={path}

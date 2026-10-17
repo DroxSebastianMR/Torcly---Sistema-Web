@@ -99,13 +99,13 @@ describe('Modal de detalle de corrida de reabastecimiento', () => {
     expect(
       screen.getByRole('heading', { name: 'Corrida RAB-000001' }),
     ).toBeTruthy()
-    expect(screen.getByText('Filtro de aceite')).toBeTruthy()
-    expect(screen.getByText('RPLA-001')).toBeTruthy()
-    expect(screen.getByText('Elegible')).toBeTruthy()
-    expect(screen.getByText('Crítica')).toBeTruthy()
-    expect(screen.getByText('Balata')).toBeTruthy()
-    expect(screen.getByText('Datos insuficientes')).toBeTruthy()
-    expect(screen.getByText('Sugerido total')).toBeTruthy()
+    expect(screen.getAllByText('Filtro de aceite').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('RPLA-001').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Elegible').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Crítica').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Balata').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Datos insuficientes').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Sugerido total').length).toBeGreaterThan(0)
     expect(screen.getAllByText('20').length).toBeGreaterThanOrEqual(2)
   })
 
@@ -115,16 +115,16 @@ describe('Modal de detalle de corrida de reabastecimiento', () => {
     renderModal('RAB-000001')
 
     await userEvent.click(
-      screen.getByRole('button', {
+      screen.getAllByRole('button', {
         name: 'Ver explicación de Filtro de aceite',
-      }),
+      })[0],
     )
 
     expect(
-      screen.getByText(
+      screen.getAllByText(
         'Prioridad Crítica: el stock actual no supera el mínimo.',
-      ),
-    ).toBeTruthy()
+      ).length,
+    ).toBeGreaterThan(0)
   })
 
   it('muestra el estado de error con reintento', () => {

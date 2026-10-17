@@ -1,4 +1,4 @@
-import { ClipboardList, MoreHorizontal, UserRound } from 'lucide-react'
+import { ClipboardList, Eye, MoreHorizontal, UserRound } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import type {
   WorkOrderStatus,
@@ -44,6 +44,9 @@ export function WorkOrdersTable({
               <th className="px-4 py-3">Estado</th>
               <th className="px-4 py-3">Técnico</th>
               <th className="px-4 py-3 text-right">Total</th>
+              <th className="w-20 px-4 py-3">
+                <span className="sr-only">Acciones</span>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -99,6 +102,20 @@ export function WorkOrdersTable({
                 <td className="px-4 py-4 text-right font-semibold tabular-nums">
                   {currencyFormatter.format(order.total)}
                 </td>
+                <td className="px-4 py-4 text-right">
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onOpen(order)
+                    }}
+                    aria-label={`Ver orden ${order.code}`}
+                    title="Ver detalle"
+                    className="inline-flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
+                  >
+                    <Eye size={16} />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -129,6 +146,16 @@ export function WorkOrdersTable({
               <span className="font-semibold tabular-nums">
                 {currencyFormatter.format(order.total)}
               </span>
+            </div>
+            <div className="mt-4 border-t pt-3">
+              <button
+                type="button"
+                onClick={() => onOpen(order)}
+                aria-label={`Ver orden ${order.code}`}
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-muted px-3 text-sm font-medium"
+              >
+                <Eye size={15} /> Ver detalle
+              </button>
             </div>
           </article>
         ))}

@@ -8,3 +8,13 @@ Módulos operativos actuales:
 - `products`: catálogo persistente protegido por permisos.
 
 Los demás directorios documentan el límite previsto para sus sprints correspondientes.
+
+## Instrumentación transversal (Sprint 15)
+
+El middleware `request-timing` mide la duración de cada petición y emite
+`http_request_completed` con metadatos técnicos seguros: `requestId`, `module`,
+`operation`, `method`, `route` (normalizada), `status` y `durationMs`. La ruta se
+normaliza en `shared/observability/normalize-route.ts` para agrupar operaciones sin
+exponer UUIDs ni identificadores numéricos. Nunca se registran contraseñas, cookies,
+tokens, cabeceras de autorización ni cuerpos sensibles. `metrics` recibe la carga de
+módulos de la web y normaliza el `path` antes de registrarlo.

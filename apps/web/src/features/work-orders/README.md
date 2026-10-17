@@ -12,4 +12,9 @@ Módulo de órdenes de taller: resumen, búsqueda, filtros por estado/técnico, 
 - El historial de mantenimiento del vehículo (órdenes entregadas) se consulta desde la ficha del vehículo, protegido por `workshop:read` y paginado.
 - La consulta está limitada por `workshop:read`; las acciones por `workshop:write`.
 
+## Experiencia (Sprint 15)
+
+- El listado ofrece una acción accesible por fila (`Ver orden <código>`) alcanzable
+  con teclado y su botón equivalente en la tarjeta móvil.
+
 Sprint propietario: 09 (base) y 10 (ejecución y entrega).

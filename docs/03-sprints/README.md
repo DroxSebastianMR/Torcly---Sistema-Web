@@ -18,7 +18,7 @@ Los sprints son secuenciales y cada uno tiene una rama, alcance cerrado, criteri
 | 12     | `sprint-12-operational-dashboard` | `feature/sprint-12-operational-dashboard` | Implementado |
 | 13     | `sprint-13-bi`                    | `feature/sprint-13-bi`                    | Implementado |
 | 14     | `sprint-14-ai-replenishment`      | `feature/sprint-14-ai-replenishment`      | Aprobado     |
-| 15     | `sprint-15-quality-performance`   | `feature/sprint-15-quality-performance`   | Planificado  |
+| 15     | `sprint-15-quality-performance`   | `feature/sprint-15-quality-performance`   | Documentado  |
 | 16     | `sprint-16-security-readiness`    | `feature/sprint-16-security-readiness`    | Planificado  |
 
 El porcentaje solo cambia después de completar [Definition of Done](../04-calidad/definition-of-done.md) y registrar la aprobación.

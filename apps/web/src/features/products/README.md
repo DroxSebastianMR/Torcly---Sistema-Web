@@ -20,6 +20,12 @@ El modal «Catálogos» administra categorías, marcas y unidades: permite crear
 
 El stock proviene de inventory: se muestra como «Existencia disponible» en la ficha y como dato informativo en el modal de edición, siempre de solo lectura. El formulario envía únicamente datos comerciales; nunca el stock.
 
+## Señal de stock bajo (Sprint 15)
+
+El aviso de stock bajo no depende solo del color: en escritorio y en la tarjeta
+móvil aparece el icono de alerta con el texto «Stock bajo», de modo que el estado es
+comprensible sin percibir color.
+
 ## Compatibilidad con lector USB
 
 Los campos de código y código de barras evitan el envío implícito al presionar Enter (`stopImplicitSubmit`), de modo que un escáner tipo teclado puede escribir el código completo y la validación se dispara al enfocar el campo (RHF) en lugar de enviar el formulario a mitad de la lectura.

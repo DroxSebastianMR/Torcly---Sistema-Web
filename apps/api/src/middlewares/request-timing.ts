@@ -1,6 +1,7 @@
 import { performance } from 'node:perf_hooks'
-import type { RequestHandler } from 'express'
+import type { Request, RequestHandler } from 'express'
 import { requestMetricsContext } from '../shared/observability/request-context.js'
+import { normalizeRoutePath } from '../shared/observability/normalize-route.js'
 
 function moduleFromPath(path: string) {
   const segments = path.split('/').filter(Boolean)
@@ -19,10 +20,18 @@ function operationFromMethod(method: string) {
   )
 }
 
+function resolvedRoute(request: Request): string {
+  const routePath = request.route?.path
+  if (typeof routePath === 'string' && routePath.length > 0) {
+    return `${request.baseUrl}${routePath}` || '/'
+  }
+  return normalizeRoutePath(request.path)
+}
+
 export const requestTiming: RequestHandler = (request, response, next) => {
   const startedAt = performance.now()
   const requestId = String(response.locals.requestId ?? 'unknown')
-  const path = request.path
+  const method = request.method
 
   response.once('finish', () => {
     if (process.env.NODE_ENV === 'test') return
@@ -31,15 +40,18 @@ export const requestTiming: RequestHandler = (request, response, next) => {
         level: 'info',
         event: 'http_request_completed',
         requestId,
-        module: moduleFromPath(path),
-        operation: operationFromMethod(request.method),
-        method: request.method,
-        path,
+        module: moduleFromPath(resolvedRoute(request)),
+        operation: operationFromMethod(method),
+        method,
+        route: resolvedRoute(request),
         status: response.statusCode,
         durationMs: Number((performance.now() - startedAt).toFixed(2)),
       }),
     )
   })
 
-  requestMetricsContext.run({ requestId, method: request.method, path }, next)
+  requestMetricsContext.run(
+    { requestId, method, route: normalizeRoutePath(request.path) },
+    next,
+  )
 }

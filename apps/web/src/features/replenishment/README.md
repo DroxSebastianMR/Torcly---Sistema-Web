@@ -9,4 +9,9 @@ Módulo de reabastecimiento asistido: recomendaciones de compra explicables calc
 - El botón de ejecución se oculta sin `inventory:write`; la consulta de la página exige `inventory:read` desde la ruta.
 - No se exponen UUIDs; solo códigos de producto y de corrida (`RAB-####`).
 
+## Experiencia (Sprint 15)
+
+- Las tablas de recomendaciones y de corridas incluyen tarjetas responsive para
+  tablet y móvil (`md:hidden`), equivalentes a la tabla de escritorio.
+
 Sprint propietario: 14.

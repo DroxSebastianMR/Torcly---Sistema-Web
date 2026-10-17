@@ -224,6 +224,27 @@ describe('Formulario de ventas', () => {
     expect(onClose).toHaveBeenCalledOnce()
   })
 
+  it('mantiene el modal abierto cuando el servidor rechaza la operación', async () => {
+    const user = userEvent.setup()
+    const mutations = {
+      create: {
+        isPending: false,
+        mutateAsync: vi.fn().mockRejectedValue(new Error('duplicate')),
+      },
+      update: { isPending: false, mutateAsync: vi.fn() },
+      confirm: { isPending: false, mutateAsync: vi.fn() },
+    }
+    sales.useSaleMutations.mockReturnValue(mutations)
+    const { onClose } = renderModal()
+
+    await addProduct(user)
+    await user.click(screen.getByRole('button', { name: 'Guardar borrador' }))
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalled())
+    expect(onClose).not.toHaveBeenCalled()
+    expect(screen.getByRole('heading', { name: 'Nueva venta' })).toBeTruthy()
+  })
+
   it('precarga la venta y confirma una existente con su actualización', async () => {
     const user = userEvent.setup()
     const mutations = {

@@ -264,6 +264,7 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
       }
     } catch (error) {
       toast.error(getSaleErrorMessage(error))
+      return
     }
     closeModal()
   }

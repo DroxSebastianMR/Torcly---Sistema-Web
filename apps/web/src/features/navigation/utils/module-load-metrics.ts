@@ -9,6 +9,10 @@ export function reportModuleLoad(
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ path, durationMs, navigationType }),
+    body: JSON.stringify({
+      path,
+      durationMs: Number(durationMs.toFixed(2)),
+      navigationType,
+    }),
   }).catch(() => undefined)
 }

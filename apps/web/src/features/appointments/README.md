@@ -7,4 +7,9 @@ Módulo de citas: resumen, búsqueda, filtros por fecha/cliente/estado, listado 
 - Reprogramar, cancelar y **atender** están disponibles solo para citas `PROGRAMADA` con `appointments:write`; cancelar conserva el registro con su estado histórico y atender genera una única orden de taller (`OT-######`) marcando la cita como `ATENDIDA`.
 - La consulta y el acceso a la página están limitados por `appointments:read`.
 
+## Experiencia (Sprint 15)
+
+- El listado ofrece una acción accesible por fila (`Ver cita <código>`) alcanzable
+  con teclado y su botón equivalente en la tarjeta móvil.
+
 Sprint propietario: 08.

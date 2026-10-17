@@ -223,6 +223,11 @@ function Info({
       <p className={`mt-1 font-medium ${warning ? 'text-amber-700' : ''}`}>
         {value}
       </p>
+      {warning && (
+        <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-amber-700">
+          <AlertTriangle aria-hidden size={12} /> Stock bajo
+        </p>
+      )}
     </div>
   )
 }

@@ -143,6 +143,11 @@ export function SmartSelect({
     setOpen(true)
   }
 
+  const closeMenu = useCallback((restoreFocus = false) => {
+    setOpen(false)
+    if (restoreFocus) buttonRef.current?.focus()
+  }, [])
+
   return (
     <div ref={wrapperRef} className={cn('relative', className)}>
       {name && <input type="hidden" name={name} value={value} />}
@@ -158,12 +163,17 @@ export function SmartSelect({
         className={controlClass}
         onClick={() => {
           if (open) {
-            setOpen(false)
+            closeMenu()
           } else {
             openMenu()
           }
         }}
         onKeyDown={(event) => {
+          if (event.key === 'Escape' && open) {
+            event.preventDefault()
+            closeMenu()
+            return
+          }
           if (
             event.key === 'ArrowDown' ||
             event.key === 'Enter' ||
@@ -197,6 +207,12 @@ export function SmartSelect({
           <div
             ref={menuRef}
             style={menuStyle}
+            onKeyDown={(event) => {
+              if (event.key === 'Escape') {
+                event.preventDefault()
+                closeMenu(true)
+              }
+            }}
             className="fixed z-[60] flex flex-col overflow-hidden rounded-xl border border-border/80 bg-card p-2 shadow-[0_18px_40px_rgba(7,28,22,0.16)]"
           >
             {showsSearchInput && (
@@ -213,11 +229,11 @@ export function SmartSelect({
                     if (allowCustomValue) onChange(event.target.value)
                   }}
                   onKeyDown={(event) => {
-                    if (event.key === 'Escape') setOpen(false)
+                    if (event.key === 'Escape') closeMenu(true)
                     if (event.key === 'Enter') {
                       event.preventDefault()
                       if (allowCustomValue) onChange(query)
-                      setOpen(false)
+                      closeMenu(true)
                     }
                   }}
                   placeholder={searchPlaceholder}
@@ -243,7 +259,7 @@ export function SmartSelect({
                       className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-45"
                       onClick={() => {
                         onChange(option.value)
-                        setOpen(false)
+                        closeMenu(true)
                       }}
                     >
                       <span className="min-w-0 flex-1 truncate">

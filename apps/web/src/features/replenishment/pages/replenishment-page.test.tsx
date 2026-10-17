@@ -201,12 +201,12 @@ describe('Página de reabastecimiento', () => {
 
     renderPage()
 
-    expect(screen.getByText('Filtro de aceite')).toBeTruthy()
-    expect(screen.getByText('RPLA-001')).toBeTruthy()
-    expect(screen.getByText('Elegible')).toBeTruthy()
-    expect(screen.getByText('Crítica')).toBeTruthy()
-    expect(screen.getByText('Balata')).toBeTruthy()
-    expect(screen.getByText('Datos insuficientes')).toBeTruthy()
+    expect(screen.getAllByText('Filtro de aceite').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('RPLA-001').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Elegible').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Crítica').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Balata').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Datos insuficientes').length).toBeGreaterThan(0)
   })
 
   it('muestra el estado de carga mientras consulta', () => {
@@ -287,10 +287,12 @@ describe('Página de reabastecimiento', () => {
 
     await userEvent.click(screen.getByRole('tab', { name: 'Historial' }))
 
-    expect(screen.getByText('RAB-000001')).toBeTruthy()
+    expect(screen.getAllByText('RAB-000001').length).toBeGreaterThan(0)
     expect(
-      screen.getByRole('button', { name: 'Ver detalle de corrida RAB-000001' }),
-    ).toBeTruthy()
+      screen.getAllByRole('button', {
+        name: 'Ver detalle de corrida RAB-000001',
+      }).length,
+    ).toBeGreaterThan(0)
   })
 
   it('muestra el estado vacío del historial sin corridas', async () => {
