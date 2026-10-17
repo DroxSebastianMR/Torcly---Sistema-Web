@@ -1,14 +1,25 @@
-import type { PropsWithChildren } from 'react'
+import { useEffect, type PropsWithChildren } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import { AuthContext } from '@/features/auth/hooks/auth-context'
 import { authService } from '@/features/auth/services/auth.service'
+import { onSessionExpired } from '@/infrastructure/api/session-events'
 export function AuthProvider({ children }: PropsWithChildren) {
   const client = useQueryClient()
   const clearBusinessQueries = () =>
     client.removeQueries({
       predicate: (query) => query.queryKey[0] !== 'auth',
     })
+  useEffect(
+    () =>
+      onSessionExpired(() => {
+        client.removeQueries({
+          predicate: (query) => query.queryKey[0] !== 'auth',
+        })
+        client.setQueryData(['auth', 'session'], null)
+      }),
+    [client],
+  )
   const session = useQuery({
     queryKey: ['auth', 'session'],
     queryFn: async ({ signal }) => {

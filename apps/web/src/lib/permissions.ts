@@ -15,6 +15,8 @@ export const modules = [
   'notifications',
   'profile',
   'reports',
+  'maintenance',
+  'audit',
 ] as const
 export type Module = (typeof modules)[number]
 export type PermissionAction = 'read' | 'write'

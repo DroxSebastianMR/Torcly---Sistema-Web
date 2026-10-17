@@ -2,14 +2,29 @@ import { env } from '../../config/env.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import { authRepository, type AuthUserRecord } from './auth.repository.js'
 import { hashPassword, verifyPassword } from './password.js'
+import { getPasswordResetNotifier } from './password-reset-notifier.js'
+import { createRecoveryToken, hashRecoveryToken } from './recovery-token.js'
 import { createSessionToken, hashSessionToken } from './session-token.js'
-import type { AuthUser, LoginInput, RequestContext } from './auth.types.js'
+import type {
+  AuthUser,
+  LoginInput,
+  PasswordRecoveryRequestInput,
+  PasswordResetInput,
+  RequestContext,
+} from './auth.types.js'
 
 const invalidCredentials = () =>
   new AppError(
     401,
     'AUTH_INVALID_CREDENTIALS',
     'No se pudo iniciar sesión con las credenciales proporcionadas.',
+  )
+
+const invalidRecoveryToken = () =>
+  new AppError(
+    400,
+    'AUTH_RESET_INVALID',
+    'El enlace de recuperación no es válido o expiró.',
   )
 
 const dummyPasswordHashPromise = hashPassword('torcly-dummy-password')
@@ -105,6 +120,57 @@ export const authService = {
 
   async logout(tokenHash: string, userId: string, context: RequestContext) {
     await authRepository.revokeSession(tokenHash, userId, context)
+  },
+
+  async requestPasswordRecovery(
+    input: PasswordRecoveryRequestInput,
+    context: RequestContext,
+  ) {
+    const identifier = input.identifier.trim().toLowerCase()
+    const user = await authRepository.findUserByIdentifier(identifier)
+
+    if (!user || !user.active) return
+
+    const token = createRecoveryToken()
+    const expiresAt = new Date(
+      Date.now() + env.PASSWORD_RESET_TTL_MINUTES * 60 * 1000,
+    )
+    await authRepository.recordPasswordResetRequested(
+      user.id,
+      hashRecoveryToken(token),
+      expiresAt,
+      context,
+    )
+    await getPasswordResetNotifier().send({
+      to: user.email,
+      token,
+      expiresAt,
+      requestId: context.requestId,
+    })
+  },
+
+  async resetPassword(input: PasswordResetInput, context: RequestContext) {
+    const tokenHash = hashRecoveryToken(input.token)
+    const record = await authRepository.findPasswordResetToken(tokenHash)
+    const now = new Date()
+
+    if (
+      !record ||
+      record.consumedAt ||
+      record.expiresAt <= now ||
+      !record.user.active
+    ) {
+      throw invalidRecoveryToken()
+    }
+
+    const passwordHash = await hashPassword(input.password)
+    const result = await authRepository.consumePasswordResetToken(
+      tokenHash,
+      passwordHash,
+      now,
+      context,
+    )
+    if (!result.consumed) throw invalidRecoveryToken()
   },
 
   async assertPermission(

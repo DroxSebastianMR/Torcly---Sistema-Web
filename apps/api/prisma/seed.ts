@@ -41,6 +41,9 @@ const defaultPermissionCodes = [
   'notifications:read',
   'profile:read',
   'reports:read',
+  'audit:read',
+  'maintenance:read',
+  'maintenance:write',
 ] as const
 
 export interface SeedInput {

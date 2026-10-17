@@ -1,7 +1,11 @@
 import type { RequestHandler } from 'express'
 import { clearSessionCookie, setSessionCookie } from './auth.cookies.js'
 import { getRequestContext } from './auth.middleware.js'
-import { loginSchema } from './auth.schemas.js'
+import {
+  loginSchema,
+  passwordRecoverySchema,
+  passwordResetSchema,
+} from './auth.schemas.js'
 import { authService } from './auth.service.js'
 
 export const login: RequestHandler = async (request, response) => {
@@ -25,4 +29,23 @@ export const logout: RequestHandler = async (request, response) => {
   )
   clearSessionCookie(response)
   response.status(204).send()
+}
+
+export const requestPasswordRecovery: RequestHandler = async (
+  request,
+  response,
+) => {
+  await authService.requestPasswordRecovery(
+    passwordRecoverySchema.parse(request.body),
+    getRequestContext(request, response),
+  )
+  response.status(200).json({ status: 'ok' })
+}
+
+export const resetPassword: RequestHandler = async (request, response) => {
+  await authService.resetPassword(
+    passwordResetSchema.parse(request.body),
+    getRequestContext(request, response),
+  )
+  response.status(200).json({ status: 'ok' })
 }

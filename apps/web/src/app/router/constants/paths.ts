@@ -22,4 +22,6 @@ export const paths = {
   notifications: '/notificaciones',
   profile: '/perfil',
   reports: '/reportes',
+  maintenance: '/mantenimiento',
+  audit: '/auditoria',
 } as const

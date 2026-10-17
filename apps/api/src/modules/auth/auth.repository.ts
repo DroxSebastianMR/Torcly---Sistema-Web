@@ -174,6 +174,81 @@ export const authRepository = {
       }),
     })
   },
+
+  recordPasswordResetRequested(
+    userId: string,
+    tokenHash: string,
+    expiresAt: Date,
+    context: RequestContext,
+  ) {
+    const now = new Date()
+    return databaseService.transaction(async (transaction) => {
+      await transaction.passwordResetToken.updateMany({
+        where: { userId, consumedAt: null },
+        data: { consumedAt: now },
+      })
+      await transaction.passwordResetToken.create({
+        data: {
+          tokenHash,
+          userId,
+          expiresAt,
+          requestId: context.requestId,
+        },
+      })
+      await transaction.auditLog.create({
+        data: auditData('PASSWORD_RESET_REQUESTED', context, { userId }),
+      })
+    })
+  },
+
+  findPasswordResetToken(tokenHash: string) {
+    return databaseService.client.passwordResetToken.findUnique({
+      where: { tokenHash },
+      include: { user: { select: { id: true, active: true } } },
+    })
+  },
+
+  consumePasswordResetToken(
+    tokenHash: string,
+    passwordHash: string,
+    now: Date,
+    context: RequestContext,
+  ) {
+    return databaseService.transaction(async (transaction) => {
+      const consumed = await transaction.passwordResetToken.updateMany({
+        where: {
+          tokenHash,
+          consumedAt: null,
+          expiresAt: { gt: now },
+        },
+        data: { consumedAt: now },
+      })
+      if (consumed.count !== 1) return { consumed: false as const }
+
+      const token = await transaction.passwordResetToken.findUniqueOrThrow({
+        where: { tokenHash },
+        select: { userId: true },
+      })
+      await transaction.user.update({
+        where: { id: token.userId },
+        data: {
+          passwordHash,
+          failedLoginAttempts: 0,
+          lockedUntil: null,
+        },
+      })
+      await transaction.authSession.updateMany({
+        where: { userId: token.userId, revokedAt: null },
+        data: { revokedAt: now },
+      })
+      await transaction.auditLog.create({
+        data: auditData('PASSWORD_RESET_COMPLETED', context, {
+          userId: token.userId,
+        }),
+      })
+      return { consumed: true as const }
+    })
+  },
 }
 
 export type AuthUserRecord = NonNullable<

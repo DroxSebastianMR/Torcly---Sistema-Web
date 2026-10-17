@@ -30,6 +30,12 @@ const schema = z.object({
   SESSION_IDLE_MINUTES: z.coerce.number().int().min(5).max(1440).default(30),
   LOGIN_MAX_ATTEMPTS: z.coerce.number().int().min(1).max(20).default(5),
   LOGIN_LOCK_MINUTES: z.coerce.number().int().min(1).max(1440).default(15),
+  PASSWORD_RESET_TTL_MINUTES: z.coerce
+    .number()
+    .int()
+    .min(5)
+    .max(1440)
+    .default(30),
 })
 
 const isTest = process.env.NODE_ENV === 'test'

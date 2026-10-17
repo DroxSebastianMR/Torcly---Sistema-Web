@@ -11,5 +11,6 @@ Módulo de solo lectura con indicadores históricos y trazables para ventas, cob
 - Los saldos reutilizan `payment.rules.ts` (`computePaidAmount`, `computeBalance`, `collectionStatusFromBalance`); el stock reutiliza `inventory.rules.ts` (`computeStock`) y el stock bajo la misma consulta que la consulta operativa. No se recalculan con reglas paralelas.
 - Los bloques no autorizados se omiten del resumen y se rechazan con `403 REPORTS_BLOCK_FORBIDDEN`; nunca se representan como cero. No se exponen UUIDs.
 - Es solo lectura: no registra movimientos, pagos, ventas, citas ni órdenes.
+- Procedencia (HU-92): cada respuesta incluye `generatedAt` en el resumen y en cada bloque, junto con `period`, `descriptor.source` y el criterio, de modo que un indicador puede contrastarse con la fuente y el momento en que se generó.
 
-Sprint propietario: 13.
+Sprint propietario: 13; 16 (HU-92).

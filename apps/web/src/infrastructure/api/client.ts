@@ -12,4 +12,7 @@ export const api = {
   async patch<T>(url: string, body?: unknown) {
     return (await http.patch<T>(url, body)).data
   },
+  async delete<T>(url: string) {
+    return (await http.delete<T>(url)).data
+  },
 }

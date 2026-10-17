@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { hashPassword, verifyPassword } from '../src/modules/auth/password.js'
 import {
+  createRecoveryToken,
+  hashRecoveryToken,
+} from '../src/modules/auth/recovery-token.js'
+import {
   createSessionToken,
   hashSessionToken,
 } from '../src/modules/auth/session-token.js'
@@ -25,6 +29,17 @@ describe('Criptografía de autenticación', () => {
     const hash = hashSessionToken(first)
 
     expect(first).not.toBe(second)
+    expect(hash).toMatch(/^[a-f0-9]{64}$/)
+    expect(hash).not.toContain(first)
+  })
+
+  it('genera tokens de recuperación aleatorios y almacena solo su huella', () => {
+    const first = createRecoveryToken()
+    const second = createRecoveryToken()
+    const hash = hashRecoveryToken(first)
+
+    expect(first).not.toBe(second)
+    expect(first.length).toBeGreaterThanOrEqual(40)
     expect(hash).toMatch(/^[a-f0-9]{64}$/)
     expect(hash).not.toContain(first)
   })

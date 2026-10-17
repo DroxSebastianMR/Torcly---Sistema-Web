@@ -36,6 +36,11 @@ function roundQuantity(value: number): number {
   return Math.round((value + Number.EPSILON) * 1000) / 1000
 }
 
+type BlockData<B extends ReportBlock> = Omit<
+  Extract<ReportBlockData, { block: B }>,
+  'generatedAt'
+>
+
 function sumAmount(amounts: readonly number[]): number {
   return roundMoney(amounts.reduce((sum, amount) => sum + amount, 0))
 }
@@ -80,7 +85,7 @@ function emptyTrend(
 async function buildSalesBlock(
   period: ReportPeriod,
   granularity: ReportGranularity,
-): Promise<Extract<ReportBlockData, { block: 'sales' }>> {
+): Promise<BlockData<'sales'>> {
   const [salesRows, lines] = await Promise.all([
     reportsRepository.listSalesInPeriod(period.from, period.to),
     reportsRepository.listSaleLinesInPeriod(period.from, period.to),
@@ -111,7 +116,7 @@ async function buildSalesBlock(
 async function buildPaymentsBlock(
   period: ReportPeriod,
   granularity: ReportGranularity,
-): Promise<Extract<ReportBlockData, { block: 'payments' }>> {
+): Promise<BlockData<'payments'>> {
   const [paymentRows, obligations] = await Promise.all([
     reportsRepository.listPaymentsInPeriod(period.from, period.to),
     reportsRepository.listPendingObligations(),
@@ -177,7 +182,7 @@ async function buildPaymentsBlock(
 async function buildInventoryBlock(
   period: ReportPeriod,
   granularity: ReportGranularity,
-): Promise<Extract<ReportBlockData, { block: 'inventory' }>> {
+): Promise<BlockData<'inventory'>> {
   const [movementRows, lowStock] = await Promise.all([
     reportsRepository.listMovementsInPeriod(period.from, period.to),
     reportsRepository.listLowStockProducts(),
@@ -227,7 +232,7 @@ async function buildInventoryBlock(
 async function buildServicesBlock(
   period: ReportPeriod,
   granularity: ReportGranularity,
-): Promise<Extract<ReportBlockData, { block: 'services' }>> {
+): Promise<BlockData<'services'>> {
   const serviceRows = await reportsRepository.listServiceLinesInPeriod(
     period.from,
     period.to,
@@ -287,7 +292,7 @@ async function buildServicesBlock(
 async function buildWorkshopBlock(
   period: ReportPeriod,
   granularity: ReportGranularity,
-): Promise<Extract<ReportBlockData, { block: 'workshop' }>> {
+): Promise<BlockData<'workshop'>> {
   const [workOrders, deliveries, appointmentsByStatus] = await Promise.all([
     reportsRepository.listWorkOrdersInPeriod(period.from, period.to),
     reportsRepository.listDeliveredWorkOrdersInPeriod(period.from, period.to),
@@ -358,17 +363,21 @@ async function buildBlock(
   period: ReportPeriod,
   granularity: ReportGranularity,
 ): Promise<ReportBlockData> {
+  const generatedAt = new Date().toISOString()
   switch (block) {
     case 'sales':
-      return buildSalesBlock(period, granularity)
+      return { ...(await buildSalesBlock(period, granularity)), generatedAt }
     case 'payments':
-      return buildPaymentsBlock(period, granularity)
+      return { ...(await buildPaymentsBlock(period, granularity)), generatedAt }
     case 'inventory':
-      return buildInventoryBlock(period, granularity)
+      return {
+        ...(await buildInventoryBlock(period, granularity)),
+        generatedAt,
+      }
     case 'services':
-      return buildServicesBlock(period, granularity)
+      return { ...(await buildServicesBlock(period, granularity)), generatedAt }
     case 'workshop':
-      return buildWorkshopBlock(period, granularity)
+      return { ...(await buildWorkshopBlock(period, granularity)), generatedAt }
   }
 }
 

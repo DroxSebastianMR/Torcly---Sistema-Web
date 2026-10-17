@@ -1,5 +1,10 @@
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
-import type { DatabaseHealthResponse, HealthResponse } from './health.types.js'
+import type {
+  DatabaseHealthResponse,
+  HealthResponse,
+  ReadinessCheckStatus,
+  ReadinessResponse,
+} from './health.types.js'
 
 export function getHealth(): HealthResponse {
   return {
@@ -19,4 +24,27 @@ export async function getDatabaseHealth(): Promise<DatabaseHealthResponse> {
     latencyMs: Math.round(performance.now() - startedAt),
     timestamp: new Date().toISOString(),
   }
+}
+
+export function buildReadiness(
+  database: ReadinessCheckStatus,
+  now: Date = new Date(),
+): ReadinessResponse {
+  return {
+    status: database === 'ok' ? 'ok' : 'degraded',
+    service: 'torcly-api',
+    checks: { database },
+    timestamp: now.toISOString(),
+  }
+}
+
+export async function getReadiness(): Promise<ReadinessResponse> {
+  let database: ReadinessCheckStatus = 'ok'
+  try {
+    await databaseService.ping()
+  } catch {
+    database = 'unavailable'
+  }
+
+  return buildReadiness(database)
 }

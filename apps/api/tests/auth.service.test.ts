@@ -13,6 +13,9 @@ const repository = vi.hoisted(() => ({
   expireSession: vi.fn(),
   revokeSession: vi.fn(),
   recordAccessDenied: vi.fn(),
+  recordPasswordResetRequested: vi.fn(),
+  findPasswordResetToken: vi.fn(),
+  consumePasswordResetToken: vi.fn(),
 }))
 
 vi.mock('../src/modules/auth/auth.repository.js', () => ({
@@ -20,6 +23,10 @@ vi.mock('../src/modules/auth/auth.repository.js', () => ({
 }))
 
 import { authService } from '../src/modules/auth/auth.service.js'
+import { setPasswordResetNotifier } from '../src/modules/auth/password-reset-notifier.js'
+import type { PasswordResetMessage } from '../src/modules/auth/password-reset-notifier.js'
+
+const sent: PasswordResetMessage[] = []
 
 const context = {
   requestId: 'request-test',
@@ -65,7 +72,15 @@ function userRecord(passwordHash: string) {
 }
 
 describe('Servicio de autenticación', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    sent.length = 0
+    setPasswordResetNotifier({
+      send: async (message) => {
+        sent.push(message)
+      },
+    })
+  })
 
   it('crea una sesión y devuelve solo los permisos asignados', async () => {
     const user = userRecord(await hashPassword('Clave-segura-2026'))
@@ -156,5 +171,95 @@ describe('Servicio de autenticación', () => {
       ),
     ).rejects.toMatchObject({ status: 403, code: 'AUTH_FORBIDDEN' })
     expect(repository.recordAccessDenied).toHaveBeenCalledOnce()
+  })
+
+  it('solicita recuperación almacenando solo el hash y sin exponer el token', async () => {
+    const user = userRecord(await hashPassword('Clave-segura-2026'))
+    repository.findUserByIdentifier.mockResolvedValue(user)
+
+    await authService.requestPasswordRecovery({ identifier: 'ADMIN' }, context)
+
+    expect(repository.findUserByIdentifier).toHaveBeenCalledWith('admin')
+    const call = repository.recordPasswordResetRequested.mock.calls[0]
+    expect(call[0]).toBe(user.id)
+    expect(call[1]).toMatch(/^[a-f0-9]{64}$/)
+    expect(call[2].getTime()).toBeGreaterThan(Date.now() + 25 * 60 * 1000)
+    expect(sent).toHaveLength(1)
+    expect(sent[0].token).toBeTruthy()
+    expect(call[1]).not.toBe(sent[0].token)
+  })
+
+  it('responde igual para identificadores inexistentes sin crear tokens', async () => {
+    repository.findUserByIdentifier.mockResolvedValue(null)
+
+    await expect(
+      authService.requestPasswordRecovery({ identifier: 'nadie' }, context),
+    ).resolves.toBeUndefined()
+    expect(repository.recordPasswordResetRequested).not.toHaveBeenCalled()
+    expect(sent).toHaveLength(0)
+  })
+
+  it('no genera recuperación para cuentas inactivas', async () => {
+    const user = {
+      ...userRecord(await hashPassword('Clave-segura-2026')),
+      active: false,
+    }
+    repository.findUserByIdentifier.mockResolvedValue(user)
+
+    await authService.requestPasswordRecovery(
+      { identifier: user.email },
+      context,
+    )
+
+    expect(repository.recordPasswordResetRequested).not.toHaveBeenCalled()
+    expect(sent).toHaveLength(0)
+  })
+
+  it('consume un token vigente y delega el cambio de contraseña', async () => {
+    repository.findPasswordResetToken.mockResolvedValue({
+      tokenHash: 'a'.repeat(64),
+      userId: '70c3d238-3fd5-42c7-9a3e-d1eea534899e',
+      expiresAt: new Date(Date.now() + 60_000),
+      consumedAt: null,
+      requestId: null,
+      createdAt: new Date(),
+      user: { id: '70c3d238-3fd5-42c7-9a3e-d1eea534899e', active: true },
+    })
+    repository.consumePasswordResetToken.mockResolvedValue({ consumed: true })
+
+    await authService.resetPassword(
+      {
+        token: 'token-de-recuperacion-suficientemente-largo',
+        password: 'Nueva-clave-2026',
+      },
+      context,
+    )
+
+    expect(repository.consumePasswordResetToken).toHaveBeenCalledOnce()
+    const call = repository.consumePasswordResetToken.mock.calls[0]
+    expect(call[1]).toContain('scrypt')
+  })
+
+  it('rechaza tokens vencidos o ya consumidos sin cambiar la contraseña', async () => {
+    repository.findPasswordResetToken.mockResolvedValue({
+      tokenHash: 'a'.repeat(64),
+      userId: '70c3d238-3fd5-42c7-9a3e-d1eea534899e',
+      expiresAt: new Date(Date.now() - 1000),
+      consumedAt: new Date(Date.now() - 500),
+      requestId: null,
+      createdAt: new Date(),
+      user: { id: '70c3d238-3fd5-42c7-9a3e-d1eea534899e', active: true },
+    })
+
+    await expect(
+      authService.resetPassword(
+        {
+          token: 'token-de-recuperacion-suficientemente-largo',
+          password: 'Nueva-clave-2026',
+        },
+        context,
+      ),
+    ).rejects.toMatchObject({ status: 400, code: 'AUTH_RESET_INVALID' })
+    expect(repository.consumePasswordResetToken).not.toHaveBeenCalled()
   })
 })

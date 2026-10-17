@@ -52,6 +52,7 @@ export interface ReportTrendPoint {
 export interface SalesReportData {
   block: 'sales'
   descriptor: ReportDescriptor
+  generatedAt: string
   period: ReportPeriod
   granularity: ReportGranularity
   metrics: {
@@ -72,6 +73,7 @@ export interface SalesReportData {
 export interface PaymentsReportData {
   block: 'payments'
   descriptor: ReportDescriptor
+  generatedAt: string
   period: ReportPeriod
   granularity: ReportGranularity
   metrics: {
@@ -89,6 +91,7 @@ export interface PaymentsReportData {
 export interface InventoryReportData {
   block: 'inventory'
   descriptor: ReportDescriptor
+  generatedAt: string
   period: ReportPeriod
   granularity: ReportGranularity
   metrics: {
@@ -110,6 +113,7 @@ export interface InventoryReportData {
 export interface ServicesReportData {
   block: 'services'
   descriptor: ReportDescriptor
+  generatedAt: string
   period: ReportPeriod
   granularity: ReportGranularity
   metrics: {
@@ -130,6 +134,7 @@ export interface ServicesReportData {
 export interface WorkshopReportData {
   block: 'workshop'
   descriptor: ReportDescriptor
+  generatedAt: string
   period: ReportPeriod
   granularity: ReportGranularity
   metrics: {

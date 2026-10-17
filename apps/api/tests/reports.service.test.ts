@@ -139,6 +139,22 @@ describe('Servicio de reportes', () => {
     )
   })
 
+  it('incluye procedencia con período, fuente y momento de generación', async () => {
+    repository.listSalesInPeriod.mockResolvedValue([])
+    repository.listSaleLinesInPeriod.mockResolvedValue([])
+
+    const result = await getBlock(
+      'sales',
+      { from: '2026-10-01', to: '2026-10-31' },
+      allPermissions,
+    )
+
+    expect(result.period).toEqual({ from: '2026-10-01', to: '2026-10-31' })
+    expect(result.descriptor.source).toBe('sales')
+    expect(result.generatedAt).toBeTruthy()
+    expect(Number.isNaN(Date.parse(result.generatedAt))).toBe(false)
+  })
+
   it('deriva cobrado y saldo pendiente con las reglas de payments', async () => {
     repository.listPaymentsInPeriod.mockResolvedValue([
       {

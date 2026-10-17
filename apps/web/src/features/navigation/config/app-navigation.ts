@@ -16,6 +16,8 @@ import {
   Wrench,
   CalendarDays,
   ClipboardList,
+  ScrollText,
+  CalendarClock,
 } from 'lucide-react'
 import { paths } from '@/app/router/constants/paths'
 import type { NavigationGroup } from '../types/navigation.types'
@@ -184,6 +186,22 @@ export const appNavigation: readonly NavigationGroup[] = [
         path: paths.profile,
         visible: true,
         permission: 'profile:read',
+      },
+      {
+        id: 'maintenance',
+        label: 'Mantenimiento',
+        icon: CalendarClock,
+        path: paths.maintenance,
+        visible: true,
+        permission: 'maintenance:read',
+      },
+      {
+        id: 'audit',
+        label: 'Auditoría',
+        icon: ScrollText,
+        path: paths.audit,
+        visible: true,
+        permission: 'audit:read',
       },
     ],
   },

@@ -104,6 +104,14 @@ export const endpoints = {
     summary: '/reports/summary',
     block: (block: string) => `/reports/blocks/${block}`,
   },
+  maintenance: {
+    status: '/maintenance',
+    windows: '/maintenance/windows',
+    window: (id: string) => `/maintenance/windows/${id}`,
+  },
+  audit: {
+    root: '/audit',
+  },
   barcodes: '/barcodes',
   dashboard: '/dashboard',
   operations: {

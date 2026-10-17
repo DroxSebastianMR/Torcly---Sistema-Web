@@ -261,6 +261,33 @@ export const protectedRoutes: RouteObject[] = [
               },
             ],
           },
+          {
+            element: <PermissionRoute permission="maintenance:read" />,
+            children: [
+              {
+                path: paths.maintenance,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/maintenance/pages/maintenance-page'
+                    )
+                  ).default,
+                }),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute permission="audit:read" />,
+            children: [
+              {
+                path: paths.audit,
+                lazy: async () => ({
+                  Component: (await import('@/features/audit/pages/audit-page'))
+                    .default,
+                }),
+              },
+            ],
+          },
         ],
       },
     ],

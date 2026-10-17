@@ -16,3 +16,12 @@ export interface LoginInput {
   identifier: string
   password: string
 }
+
+export interface PasswordRecoveryRequestInput {
+  identifier: string
+}
+
+export interface PasswordResetInput {
+  token: string
+  password: string
+}

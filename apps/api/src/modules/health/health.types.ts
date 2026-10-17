@@ -10,3 +10,14 @@ export interface DatabaseHealthResponse {
   latencyMs: number
   timestamp: string
 }
+
+export type ReadinessCheckStatus = 'ok' | 'unavailable'
+
+export interface ReadinessResponse {
+  status: 'ok' | 'degraded'
+  service: 'torcly-api'
+  checks: {
+    database: ReadinessCheckStatus
+  }
+  timestamp: string
+}

@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { AppHeader } from '@/features/navigation/components/app-header'
 import { AppSidebar } from './components/app-sidebar'
+import { MaintenanceBanner } from '@/features/maintenance/components/maintenance-banner'
 import { reportModuleLoad } from '@/features/navigation/utils/module-load-metrics'
 
 export function AppLayout() {
@@ -63,6 +64,7 @@ export function AppLayout() {
       </aside>
       <div className="lg:pl-64">
         <AppHeader sidebarOpen={open} onOpenSidebar={() => setOpen(true)} />
+        <MaintenanceBanner />
         <main id="content" className="mx-auto max-w-7xl p-6 lg:p-10">
           <Outlet />
         </main>
