@@ -57,11 +57,14 @@ export default function Page() {
   const [runOpen, setRunOpen] = useState(false)
   const [detailCode, setDetailCode] = useState<string | null>(null)
   const deferredSearch = useDeferredValue(eligibilityFilters.search)
-  const eligibility = useEligibility({
-    ...eligibilityFilters,
-    search: deferredSearch,
-  })
-  const runs = useReplenishmentRuns(historyFilters)
+  const eligibility = useEligibility(
+    {
+      ...eligibilityFilters,
+      search: deferredSearch,
+    },
+    view === 'recommendations',
+  )
+  const runs = useReplenishmentRuns(historyFilters, view === 'history')
 
   const appliedPeriod = eligibility.data?.period ?? {
     from: eligibilityFilters.from,

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm, useFormState, useWatch } from 'react-hook-form'
+import { Controller, useForm, useFormState } from 'react-hook-form'
 import { Undo2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
 import { usePaymentMutations } from '../hooks/use-payments'
 import {
+  formatPaymentAmount,
+  parsePaymentAmount,
   paymentCompensationSchema,
   type PaymentCompensationFormValues,
 } from '../forms/payment.schema'
@@ -32,15 +34,19 @@ export function CompensationFormModal({
   const mutations = usePaymentMutations()
   const form = useForm<PaymentCompensationFormValues>({
     resolver: zodResolver(paymentCompensationSchema),
-    defaultValues: { amount: 0, reason: '', notes: '' },
+    defaultValues: { amount: '', reason: '', notes: '' },
   })
-  const { reset, getValues, setValue } = form
+  const { reset, getValues } = form
   const formState = useFormState({ control: form.control })
   const busy = mutations.compensate.isPending
-  const amount = useWatch({ control: form.control, name: 'amount' })
 
   useEffect(() => {
-    if (open) reset({ amount: event?.amount ?? 0, reason: '', notes: '' })
+    if (open)
+      reset({
+        amount: formatPaymentAmount(event?.amount ?? 0),
+        reason: '',
+        notes: '',
+      })
   }, [open, event?.amount, reset])
 
   const closeModal = () => {
@@ -56,7 +62,12 @@ export function CompensationFormModal({
       return
     }
     const values = getValues()
-    if (values.amount > event.amount) {
+    const amount = parsePaymentAmount(values.amount)
+    if (amount === null) {
+      toast.error('Revisa el importe y el motivo de la compensación.')
+      return
+    }
+    if (amount > event.amount) {
       toast.error(
         `La compensación no puede superar el importe del pago (${currencyFormatter.format(
           event.amount,
@@ -69,7 +80,7 @@ export function CompensationFormModal({
         paymentId: event.id,
         input: {
           requestId: crypto.randomUUID(),
-          amount: values.amount,
+          amount,
           reason: values.reason.trim(),
           notes: values.notes?.trim() || undefined,
         },
@@ -129,20 +140,29 @@ export function CompensationFormModal({
           >
             Importe a compensar
           </label>
-          <Input
-            id="compensation-amount"
-            aria-label="Importe a compensar"
-            type="number"
-            min="0.01"
-            step="0.01"
-            placeholder="0.00"
-            value={Number.isNaN(amount) ? '' : String(amount)}
-            onChange={(event) =>
-              setValue(
-                'amount',
-                event.target.value === '' ? 0 : Number(event.target.value),
-              )
-            }
+          <Controller
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <Input
+                id="compensation-amount"
+                aria-label="Importe a compensar"
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                placeholder="0.00"
+                name={field.name}
+                ref={field.ref}
+                value={field.value}
+                onChange={(event) => field.onChange(event.target.value)}
+                onBlur={() => {
+                  const parsed = parsePaymentAmount(field.value)
+                  if (parsed !== null) {
+                    field.onChange(formatPaymentAmount(parsed))
+                  }
+                }}
+              />
+            )}
           />
           {formState.errors.amount && (
             <p className="text-xs text-red-600">
@@ -158,12 +178,21 @@ export function CompensationFormModal({
           >
             Motivo
           </label>
-          <Input
-            id="compensation-reason"
-            aria-label="Motivo de la compensación"
-            placeholder="Ej.: Cobro duplicado"
-            value={form.getValues('reason')}
-            onChange={(event) => setValue('reason', event.target.value)}
+          <Controller
+            control={form.control}
+            name="reason"
+            render={({ field }) => (
+              <Input
+                id="compensation-reason"
+                aria-label="Motivo de la compensación"
+                placeholder="Ej.: Cobro duplicado"
+                name={field.name}
+                ref={field.ref}
+                value={field.value}
+                onChange={(event) => field.onChange(event.target.value)}
+                onBlur={field.onBlur}
+              />
+            )}
           />
           {formState.errors.reason && (
             <p className="text-xs text-red-600">
@@ -182,11 +211,20 @@ export function CompensationFormModal({
               (opcional)
             </span>
           </label>
-          <Input
-            id="compensation-notes"
-            aria-label="Observación de la compensación"
-            value={form.getValues('notes') ?? ''}
-            onChange={(event) => setValue('notes', event.target.value)}
+          <Controller
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <Input
+                id="compensation-notes"
+                aria-label="Observación de la compensación"
+                name={field.name}
+                ref={field.ref}
+                value={field.value ?? ''}
+                onChange={(event) => field.onChange(event.target.value)}
+                onBlur={field.onBlur}
+              />
+            )}
           />
           {formState.errors.notes && (
             <p className="text-xs text-red-600">

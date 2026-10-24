@@ -35,6 +35,7 @@ interface SmartSelectProps {
   id?: string
   className?: string
   filterOption?: (option: SmartSelectOption, query: string) => boolean
+  onOpen?: () => void
   'aria-label'?: string
 }
 
@@ -57,6 +58,7 @@ export function SmartSelect({
   id,
   className,
   filterOption,
+  onOpen,
   'aria-label': ariaLabel,
 }: SmartSelectProps) {
   const listId = useId()
@@ -138,6 +140,7 @@ export function SmartSelect({
   }, [open, showsSearchInput])
 
   const openMenu = () => {
+    onOpen?.()
     setQuery(showsSearchInput ? (selected?.label ?? value) : '')
     updateMenuPosition()
     setOpen(true)

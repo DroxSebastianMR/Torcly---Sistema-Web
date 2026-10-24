@@ -49,18 +49,15 @@ function buildWhere(filters: CustomerListFilters): Prisma.CustomerWhereInput {
 export const customersRepository = {
   async list(filters: CustomerListFilters) {
     const where = buildWhere(filters)
-    const [items, total] = await databaseService.transaction(
-      async (transaction) =>
-        Promise.all([
-          transaction.customer.findMany({
-            where,
-            orderBy: { updatedAt: 'desc' },
-            skip: (filters.page - 1) * filters.pageSize,
-            take: filters.pageSize,
-          }),
-          transaction.customer.count({ where }),
-        ]),
-    )
+    const [items, total] = await Promise.all([
+      databaseService.client.customer.findMany({
+        where,
+        orderBy: { updatedAt: 'desc' },
+        skip: (filters.page - 1) * filters.pageSize,
+        take: filters.pageSize,
+      }),
+      databaseService.client.customer.count({ where }),
+    ])
 
     return { items, total }
   },

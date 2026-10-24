@@ -197,53 +197,51 @@ export const paymentsRepository = {
   async listObligations(
     filters: Pick<PaymentFilters, 'search' | 'from' | 'to'>,
   ): Promise<ObligationRow[]> {
-    return databaseService.transaction(async (transaction) => {
-      const sales = await transaction.sale.findMany({
-        where: buildObligationWhere(filters),
-        select: obligationSaleSelect,
-        orderBy: { confirmedAt: 'desc' },
-      })
-      if (!sales.length) return []
-
-      const payments = await transaction.payment.findMany({
-        where: { saleId: { in: sales.map((sale) => sale.id) } },
-        select: {
-          saleId: true,
-          type: true,
-          amount: true,
-          method: true,
-          occurredAt: true,
-        },
-        orderBy: { occurredAt: 'asc' },
-      })
-      const paymentsBySale = new Map<
-        string,
-        Array<{
-          type: PaymentType
-          amount: number
-          method: PaymentMethod
-          occurredAt: Date
-        }>
-      >()
-      for (const payment of payments) {
-        const list = paymentsBySale.get(payment.saleId) ?? []
-        list.push({
-          type: payment.type,
-          amount: Number(payment.amount),
-          method: payment.method,
-          occurredAt: payment.occurredAt,
-        })
-        paymentsBySale.set(payment.saleId, list)
-      }
-
-      return sales.map((sale) => ({
-        ...sale,
-        status: 'CONFIRMED' as const,
-        total: Number(sale.total),
-        confirmedAt: sale.confirmedAt ?? sale.createdAt,
-        payments: paymentsBySale.get(sale.id) ?? [],
-      }))
+    const sales = await databaseService.client.sale.findMany({
+      where: buildObligationWhere(filters),
+      select: obligationSaleSelect,
+      orderBy: { confirmedAt: 'desc' },
     })
+    if (!sales.length) return []
+
+    const payments = await databaseService.client.payment.findMany({
+      where: { saleId: { in: sales.map((sale) => sale.id) } },
+      select: {
+        saleId: true,
+        type: true,
+        amount: true,
+        method: true,
+        occurredAt: true,
+      },
+      orderBy: { occurredAt: 'asc' },
+    })
+    const paymentsBySale = new Map<
+      string,
+      Array<{
+        type: PaymentType
+        amount: number
+        method: PaymentMethod
+        occurredAt: Date
+      }>
+    >()
+    for (const payment of payments) {
+      const list = paymentsBySale.get(payment.saleId) ?? []
+      list.push({
+        type: payment.type,
+        amount: Number(payment.amount),
+        method: payment.method,
+        occurredAt: payment.occurredAt,
+      })
+      paymentsBySale.set(payment.saleId, list)
+    }
+
+    return sales.map((sale) => ({
+      ...sale,
+      status: 'CONFIRMED' as const,
+      total: Number(sale.total),
+      confirmedAt: sale.confirmedAt ?? sale.createdAt,
+      payments: paymentsBySale.get(sale.id) ?? [],
+    }))
   },
 
   async findById(id: string): Promise<ObligationDetailRow | null> {

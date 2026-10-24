@@ -32,6 +32,23 @@ describe('SystemFeedbackScreen', () => {
     )
   })
 
+  it('identifica visual y accesiblemente el error 404 sin cambiar el título amigable', () => {
+    render(<SystemFeedbackScreen kind="not-found" />)
+
+    const alert = screen.getByRole('alert')
+    expect(alert.textContent).toContain('Error 404')
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Página no encontrada' }),
+    ).toBeTruthy()
+    expect(alert.textContent).toContain('La dirección que buscas no existe')
+  })
+
+  it('no muestra el código 404 en errores inesperados', () => {
+    render(<SystemFeedbackScreen kind="unexpected" />)
+
+    expect(screen.getByRole('alert').textContent).not.toContain('Error 404')
+  })
+
   it('permite sobrescribir título, descripción e ícono', () => {
     render(
       <SystemFeedbackScreen

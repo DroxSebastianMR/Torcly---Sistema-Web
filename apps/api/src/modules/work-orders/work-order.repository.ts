@@ -268,19 +268,17 @@ async function requireOrder(
 export const workOrdersRepository = {
   async list(filters: WorkOrderFilters) {
     const where = buildWhere(filters)
-    return databaseService.transaction(async (transaction) => {
-      const [items, total] = await Promise.all([
-        transaction.workOrder.findMany({
-          select: workOrderSummarySelect,
-          where,
-          orderBy: { createdAt: 'desc' },
-          skip: (filters.page - 1) * filters.pageSize,
-          take: filters.pageSize,
-        }),
-        transaction.workOrder.count({ where }),
-      ])
-      return { items, total }
-    })
+    const [items, total] = await Promise.all([
+      databaseService.client.workOrder.findMany({
+        select: workOrderSummarySelect,
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (filters.page - 1) * filters.pageSize,
+        take: filters.pageSize,
+      }),
+      databaseService.client.workOrder.count({ where }),
+    ])
+    return { items, total }
   },
 
   findById(id: string): Promise<WorkOrderRecord | null> {
@@ -363,49 +361,29 @@ export const workOrdersRepository = {
   },
 
   async getStats() {
-    return databaseService.transaction(async (transaction) => {
-      const [
-        total,
-        recepcionadas,
-        enDiagnostico,
-        pendientesAprobacion,
-        aprobadas,
-        rechazadas,
-        enEjecucion,
-        listasParaEntrega,
-        entregadas,
-      ] = await Promise.all([
-        transaction.workOrder.count(),
-        transaction.workOrder.count({ where: { status: 'RECEPCIONADA' } }),
-        transaction.workOrder.count({ where: { status: 'EN_DIAGNOSTICO' } }),
-        transaction.workOrder.count({
-          where: { status: 'PENDIENTE_APROBACION' },
-        }),
-        transaction.workOrder.count({ where: { status: 'APROBADA' } }),
-        transaction.workOrder.count({ where: { status: 'RECHAZADA' } }),
-        transaction.workOrder.count({ where: { status: 'EN_EJECUCION' } }),
-        transaction.workOrder.count({
-          where: { status: 'LISTA_PARA_ENTREGA' },
-        }),
-        transaction.workOrder.count({ where: { status: 'ENTREGADA' } }),
-      ])
-      return {
-        total,
-        recepcionadas,
-        enDiagnostico,
-        pendientesAprobacion,
-        aprobadas,
-        rechazadas,
-        enEjecucion,
-        listasParaEntrega,
-        entregadas,
-      }
+    const grouped = await databaseService.client.workOrder.groupBy({
+      by: ['status'],
+      _count: { _all: true },
     })
+    const counts = new Map(
+      grouped.map((item) => [item.status, item._count._all]),
+    )
+    return {
+      total: grouped.reduce((sum, item) => sum + item._count._all, 0),
+      recepcionadas: counts.get('RECEPCIONADA') ?? 0,
+      enDiagnostico: counts.get('EN_DIAGNOSTICO') ?? 0,
+      pendientesAprobacion: counts.get('PENDIENTE_APROBACION') ?? 0,
+      aprobadas: counts.get('APROBADA') ?? 0,
+      rechazadas: counts.get('RECHAZADA') ?? 0,
+      enEjecucion: counts.get('EN_EJECUCION') ?? 0,
+      listasParaEntrega: counts.get('LISTA_PARA_ENTREGA') ?? 0,
+      entregadas: counts.get('ENTREGADA') ?? 0,
+    }
   },
 
   async getCatalog() {
-    return databaseService.transaction(async (transaction) => {
-      const products = await transaction.product.findMany({
+    const [products, services] = await Promise.all([
+      databaseService.client.product.findMany({
         where: { active: true },
         select: {
           id: true,
@@ -415,28 +393,28 @@ export const workOrdersRepository = {
           unit: { select: { name: true, symbol: true } },
         },
         orderBy: { name: 'asc' },
-      })
-      const services = await transaction.service.findMany({
+      }),
+      databaseService.client.service.findMany({
         where: { active: true },
         select: { id: true, code: true, name: true, price: true },
         orderBy: { name: 'asc' },
-      })
-      return {
-        products: products.map((product) => ({
-          id: product.id,
-          code: product.code,
-          name: product.name,
-          unit: product.unit,
-          salePrice: Number(product.salePrice),
-        })),
-        services: services.map((service) => ({
-          id: service.id,
-          code: service.code,
-          name: service.name,
-          price: Number(service.price),
-        })),
-      }
-    })
+      }),
+    ])
+    return {
+      products: products.map((product) => ({
+        id: product.id,
+        code: product.code,
+        name: product.name,
+        unit: product.unit,
+        salePrice: Number(product.salePrice),
+      })),
+      services: services.map((service) => ({
+        id: service.id,
+        code: service.code,
+        name: service.name,
+        price: Number(service.price),
+      })),
+    }
   },
 
   listTechnicians() {
@@ -1062,11 +1040,16 @@ export const workOrdersRepository = {
 
         await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:inventory:${productId}`}))`
 
-        const confirmed = await transaction.inventoryMovement.findMany({
+        const confirmed = await transaction.inventoryMovement.groupBy({
+          by: ['type'],
           where: { productId, status: 'CONFIRMED' },
-          select: { type: true, quantity: true },
+          _sum: { quantity: true },
         })
-        const currentStock = computeStock(confirmed)
+        const stockMovements = confirmed.map((movement) => ({
+          type: movement.type,
+          quantity: movement._sum.quantity ?? 0,
+        }))
+        const currentStock = computeStock(stockMovements)
         const hasInitialMovement = confirmed.some(
           (movement) => movement.type === 'INITIAL',
         )
@@ -1094,7 +1077,7 @@ export const workOrdersRepository = {
         })
 
         const stockAfter = computeStock([
-          ...confirmed,
+          ...stockMovements,
           { type: 'EXIT', quantity: Number(movement.quantity) },
         ])
         await transaction.auditLog.create({
@@ -1280,11 +1263,16 @@ export const workOrdersRepository = {
 
         await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:inventory:${productId}`}))`
 
-        const confirmed = await transaction.inventoryMovement.findMany({
+        const confirmed = await transaction.inventoryMovement.groupBy({
+          by: ['type'],
           where: { productId, status: 'CONFIRMED' },
-          select: { type: true, quantity: true },
+          _sum: { quantity: true },
         })
-        const stockBefore = computeStock(confirmed)
+        const stockMovements = confirmed.map((movement) => ({
+          type: movement.type,
+          quantity: movement._sum.quantity ?? 0,
+        }))
+        const stockBefore = computeStock(stockMovements)
         const movement = await transaction.inventoryMovement.create({
           data: {
             productId,
@@ -1302,7 +1290,7 @@ export const workOrdersRepository = {
         })
 
         const stockAfter = computeStock([
-          ...confirmed,
+          ...stockMovements,
           { type: 'ADJUSTMENT_IN', quantity: Number(movement.quantity) },
         ])
         await transaction.auditLog.create({

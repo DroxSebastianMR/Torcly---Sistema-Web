@@ -1,12 +1,16 @@
-import type { AuditEventType, Prisma } from '../../generated/prisma/client.js'
+import { type AuditEventType, Prisma } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import type { ProductFilters, ProductInput } from './products.types.js'
 
-const productRelations = {
+const productListRelations = {
   category: { select: { id: true, name: true } },
   brand: { select: { id: true, name: true } },
   unit: { select: { id: true, name: true, symbol: true } },
+} satisfies Prisma.ProductInclude
+
+const productRelations = {
+  ...productListRelations,
   inventoryMovements: {
     where: { status: 'CONFIRMED' as const },
     select: { type: true, quantity: true },
@@ -14,6 +18,7 @@ const productRelations = {
 } satisfies Prisma.ProductInclude
 
 const productSelect = { include: productRelations } as const
+const productListSelect = { include: productListRelations } as const
 
 function auditData(
   event: AuditEventType,
@@ -74,21 +79,50 @@ function buildWhere(filters: ProductFilters): Prisma.ProductWhereInput {
 export const productsRepository = {
   async list(filters: ProductFilters) {
     const where = buildWhere(filters)
-    const [items, total] = await databaseService.transaction(
-      async (transaction) =>
-        Promise.all([
-          transaction.product.findMany({
-            ...productSelect,
-            where,
-            orderBy: [{ active: 'desc' }, { name: 'asc' }],
-            skip: (filters.page - 1) * filters.pageSize,
-            take: filters.pageSize,
-          }),
-          transaction.product.count({ where }),
-        ]),
-    )
+    const [items, total] = await Promise.all([
+      databaseService.client.product.findMany({
+        ...productListSelect,
+        where,
+        orderBy: [{ active: 'desc' }, { name: 'asc' }],
+        skip: (filters.page - 1) * filters.pageSize,
+        take: filters.pageSize,
+      }),
+      databaseService.client.product.count({ where }),
+    ])
 
-    return { items, total }
+    if (!items.length) return { items: [], total }
+
+    const grouped = await databaseService.client.inventoryMovement.groupBy({
+      by: ['productId', 'type'],
+      where: {
+        status: 'CONFIRMED',
+        productId: { in: items.map((item) => item.id) },
+      },
+      _sum: { quantity: true },
+    })
+    const movementsByProduct = new Map<
+      string,
+      Array<{
+        type: (typeof grouped)[number]['type']
+        quantity: Prisma.Decimal
+      }>
+    >()
+    for (const movement of grouped) {
+      const movements = movementsByProduct.get(movement.productId) ?? []
+      movements.push({
+        type: movement.type,
+        quantity: movement._sum.quantity ?? new Prisma.Decimal(0),
+      })
+      movementsByProduct.set(movement.productId, movements)
+    }
+
+    return {
+      items: items.map((item) => ({
+        ...item,
+        inventoryMovements: movementsByProduct.get(item.id) ?? [],
+      })),
+      total,
+    }
   },
 
   findById(id: string) {

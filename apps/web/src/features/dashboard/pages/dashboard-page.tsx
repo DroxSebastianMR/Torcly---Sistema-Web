@@ -13,10 +13,7 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
 import { paths } from '@/app/router/constants/paths'
-import {
-  useOperationsAttention,
-  useOperationsSummary,
-} from '../hooks/use-operations'
+import { useOperationsSummary } from '../hooks/use-operations'
 import type { OperationalSection } from '../types/operations.types'
 
 const sections: Array<{
@@ -122,10 +119,8 @@ export default function Page() {
           {visibleSections.map(({ key, path, icon: Icon }) => (
             <SummaryCard
               key={key}
-              section={key}
               path={path}
               Icon={Icon}
-              period={period}
               summary={summary.data?.sections[key]}
               label={summary.data?.descriptors[key]?.label ?? key}
             />
@@ -137,24 +132,29 @@ export default function Page() {
 }
 
 function SummaryCard({
-  section,
   path,
   Icon,
-  period,
   summary,
   label,
 }: {
-  section: OperationalSection
   path: string
   Icon: typeof Activity
-  period: { from: string | null; to: string | null }
   summary: Record<string, unknown> | undefined
   label: string
 }) {
-  const attention = useOperationsAttention(section, period)
   const total =
     typeof summary?.total === 'number'
       ? summary.total
+      : typeof summary?.pendingCount === 'number'
+        ? summary.pendingCount
+        : typeof summary?.lowStockCount === 'number'
+          ? summary.lowStockCount
+          : typeof summary?.confirmedCount === 'number'
+            ? summary.confirmedCount
+            : 0
+  const attentionCount =
+    typeof summary?.attentionCount === 'number'
+      ? summary.attentionCount
       : typeof summary?.pendingCount === 'number'
         ? summary.pendingCount
         : typeof summary?.lowStockCount === 'number'
@@ -174,29 +174,10 @@ function SummaryCard({
         </div>
       </div>
       <div className="mt-4 text-sm text-muted-foreground">
-        {attention.isPending ? (
-          <p role="status" aria-live="polite">
-            Cargando atención…
-          </p>
-        ) : attention.isError ? (
-          <div role="alert" className="space-y-1">
-            <p className="text-amber-700">
-              No se pudo cargar la atención de este módulo.
-            </p>
-            <button
-              type="button"
-              className="font-semibold text-primary hover:underline"
-              onClick={() => void attention.refetch()}
-            >
-              Reintentar
-            </button>
-          </div>
+        {attentionCount > 0 ? (
+          <p>{attentionCount} elemento(s) requieren atención.</p>
         ) : (
-          <p>
-            {attention.data?.data.length
-              ? `${attention.data.data.length} elemento(s) requieren atención.`
-              : 'Sin elementos que requieran atención.'}
-          </p>
+          <p>Sin elementos que requieran atención.</p>
         )}
       </div>
       <Link

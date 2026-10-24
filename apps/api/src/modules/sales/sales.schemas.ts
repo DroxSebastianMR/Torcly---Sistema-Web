@@ -1,4 +1,8 @@
 import { z } from 'zod'
+import {
+  hasAtMostThreeDecimals,
+  QUANTITY_MAX_DECIMALS_MESSAGE,
+} from '../../shared/validation/quantity.js'
 
 export const saleIdSchema = z.object({
   id: z.uuid('Venta inválida.'),
@@ -19,7 +23,8 @@ export const saleProductLineSchema = z
       .number()
       .finite()
       .min(0.001, 'La cantidad debe ser mayor a cero.')
-      .max(999_999_999, 'La cantidad es demasiado grande.'),
+      .max(999_999_999, 'La cantidad es demasiado grande.')
+      .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE),
   })
   .strict()
 

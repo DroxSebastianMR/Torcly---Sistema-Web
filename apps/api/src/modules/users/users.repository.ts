@@ -59,19 +59,16 @@ function buildWhere(filters: UserListFilters): Prisma.UserWhereInput {
 export const usersRepository = {
   async list(filters: UserListFilters) {
     const where = buildWhere(filters)
-    const [items, total] = await databaseService.transaction(
-      async (transaction) =>
-        Promise.all([
-          transaction.user.findMany({
-            ...userInclude,
-            where,
-            orderBy: [{ active: 'desc' }, { displayName: 'asc' }],
-            skip: (filters.page - 1) * filters.pageSize,
-            take: filters.pageSize,
-          }),
-          transaction.user.count({ where }),
-        ]),
-    )
+    const [items, total] = await Promise.all([
+      databaseService.client.user.findMany({
+        ...userInclude,
+        where,
+        orderBy: [{ active: 'desc' }, { displayName: 'asc' }],
+        skip: (filters.page - 1) * filters.pageSize,
+        take: filters.pageSize,
+      }),
+      databaseService.client.user.count({ where }),
+    ])
 
     return { items, total }
   },

@@ -23,7 +23,7 @@ export function useExistence(filters: InventoryFilters) {
   })
 }
 
-export function useInventoryProductOptions() {
+export function useInventoryProductOptions(enabled = true) {
   return useQuery({
     queryKey: inventoryKeys.productOptions(),
     queryFn: ({ signal }) =>
@@ -32,13 +32,15 @@ export function useInventoryProductOptions() {
         signal,
       ),
     select: (response) => response.data,
+    enabled,
   })
 }
 
-export function useMovements(filters: MovementFilters) {
+export function useMovements(filters: MovementFilters, enabled = true) {
   return useQuery({
     queryKey: inventoryKeys.movements(filters),
     queryFn: ({ signal }) => inventoryService.listMovements(filters, signal),
+    enabled,
   })
 }
 

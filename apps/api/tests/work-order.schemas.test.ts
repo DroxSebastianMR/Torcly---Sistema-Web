@@ -216,6 +216,52 @@ describe('Schemas de órdenes de taller', () => {
     ).toThrow()
   })
 
+  it('acepta hasta tres decimales en presupuesto, consumo y devolución', () => {
+    const productId = 'a0000000-0000-4000-8000-000000000001'
+    const lineId = 'a0000000-0000-4000-8000-000000000002'
+    const requestId = 'a0000000-0000-4000-8000-000000000003'
+    const decimalMessage = 'La cantidad admite hasta tres decimales.'
+
+    for (const quantity of [1, 1.2, 1.23, 1.234]) {
+      expect(
+        workOrderBudgetSchema.safeParse({
+          lines: [{ type: 'PRODUCT', productId, quantity }],
+        }).success,
+      ).toBe(true)
+      expect(
+        workOrderConsumptionSchema.safeParse({
+          requestId,
+          items: [{ lineId, quantity }],
+        }).success,
+      ).toBe(true)
+      expect(
+        workOrderReturnSchema.safeParse({
+          requestId,
+          items: [{ lineId, quantity }],
+        }).success,
+      ).toBe(true)
+    }
+
+    const budget = workOrderBudgetSchema.safeParse({
+      lines: [{ type: 'PRODUCT', productId, quantity: 1.2345 }],
+    })
+    const consumption = workOrderConsumptionSchema.safeParse({
+      requestId,
+      items: [{ lineId, quantity: 1.2345 }],
+    })
+    const returned = workOrderReturnSchema.safeParse({
+      requestId,
+      items: [{ lineId, quantity: 1.2345 }],
+    })
+
+    for (const result of [budget, consumption, returned]) {
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0]?.message).toBe(decimalMessage)
+      }
+    }
+  })
+
   it('valida la entrega con observación opcional', () => {
     expect(workOrderDeliverySchema.parse({})).toEqual({})
     expect(

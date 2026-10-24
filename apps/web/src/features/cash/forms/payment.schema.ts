@@ -1,14 +1,48 @@
 import { z } from 'zod'
 
+export const MAX_PAYMENT_AMOUNT = 999_999_999
+
+const amountTextPattern = /^\d+(?:\.\d{0,2})?$/
+
+export function parsePaymentAmount(value: string): number | null {
+  const trimmed = value.trim()
+  if (!amountTextPattern.test(trimmed)) return null
+  const amount = Number(trimmed)
+  return Number.isFinite(amount) ? amount : null
+}
+
+export function formatPaymentAmount(amount: number): string {
+  return Number.isFinite(amount) ? amount.toFixed(2) : ''
+}
+
 const amountSchema = z
-  .number()
-  .finite('El importe debe ser un número válido.')
-  .positive('El importe debe ser mayor a cero.')
-  .max(999_999_999, 'El importe es demasiado grande.')
-  .refine((value) => {
-    const cents = Math.round(value * 100)
-    return Math.abs(value * 100 - cents) < 1e-6
-  }, 'El importe solo admite hasta dos decimales.')
+  .string()
+  .trim()
+  .min(1, 'El importe es obligatorio.')
+  .superRefine((value, context) => {
+    const amount = parsePaymentAmount(value)
+    if (amount === null) {
+      context.addIssue({
+        code: 'custom',
+        message:
+          'El importe debe ser un número válido con hasta dos decimales.',
+      })
+      return
+    }
+    if (amount <= 0) {
+      context.addIssue({
+        code: 'custom',
+        message: 'El importe debe ser mayor a cero.',
+      })
+      return
+    }
+    if (amount > MAX_PAYMENT_AMOUNT) {
+      context.addIssue({
+        code: 'custom',
+        message: 'El importe es demasiado grande.',
+      })
+    }
+  })
 
 export const paymentRegisterSchema = z.object({
   amount: amountSchema,

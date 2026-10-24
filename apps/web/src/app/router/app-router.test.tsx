@@ -43,6 +43,7 @@ describe('RouteError', () => {
 
     const alert = await screen.findByRole('alert')
     expect(alert.textContent).toContain('Página no encontrada')
+    expect(alert.textContent).toContain('Error 404')
 
     await userEvent.click(
       screen.getByRole('button', { name: 'Volver al inicio' }),
@@ -55,6 +56,7 @@ describe('RouteError', () => {
 
     const alert = await screen.findByRole('alert')
     expect(alert.textContent).toContain('Algo salió mal')
+    expect(alert.textContent).not.toContain('Error 404')
     expect(screen.getByRole('button', { name: 'Reintentar' })).toBeTruthy()
     expect(
       screen.getByRole('button', { name: 'Volver al inicio' }),

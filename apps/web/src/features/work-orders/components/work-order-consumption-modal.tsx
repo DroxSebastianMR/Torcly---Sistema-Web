@@ -152,7 +152,7 @@ export function WorkOrderConsumptionModal({
             aria-label="Repuesto a consumir"
             placeholder="Seleccionar repuesto"
             searchPlaceholder="Buscar repuesto…"
-            emptyMessage="No hay repuestos pendientes por consumir."
+            emptyMessage="No hay repuestos pendientes. Solo aparecen los productos del presupuesto aprobado que aún tienen cantidad por consumir."
             options={options}
             disabled={busy}
             onChange={(lineId) => {

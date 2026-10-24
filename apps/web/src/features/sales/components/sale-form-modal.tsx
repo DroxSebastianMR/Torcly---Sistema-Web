@@ -13,6 +13,10 @@ import {
 import { useCustomers } from '@/features/customers/hooks/use-customers'
 import { customerDisplayName } from '@/features/customers/utils/customer-formatters'
 import {
+  hasAtMostThreeDecimals,
+  QUANTITY_MAX_DECIMALS_MESSAGE,
+} from '@/lib/quantity'
+import {
   createSaleDraft,
   saleFormSchema,
   type SaleFormValues,
@@ -41,14 +45,17 @@ const emptyValues: SaleFormValues = {
 
 export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
   const mutations = useSaleMutations()
-  const catalog = useSaleCatalog()
+  const catalog = useSaleCatalog(open)
   const { refetch: refetchCatalog } = catalog
-  const customers = useCustomers({
-    search: '',
-    type: 'all',
-    page: 1,
-    pageSize: 100,
-  })
+  const customers = useCustomers(
+    {
+      search: '',
+      type: 'all',
+      page: 1,
+      pageSize: 100,
+    },
+    open,
+  )
   const [selectedProductId, setSelectedProductId] = useState('')
   const [selectedServiceId, setSelectedServiceId] = useState('')
 
@@ -168,6 +175,10 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
     const quantity = Number(getValues('addQuantity'))
     if (!Number.isFinite(quantity) || quantity <= 0) {
       toast.error('La cantidad debe ser mayor a cero.')
+      return
+    }
+    if (!hasAtMostThreeDecimals(quantity)) {
+      toast.error(QUANTITY_MAX_DECIMALS_MESSAGE)
       return
     }
     if (quantity > product.stock) {
@@ -387,7 +398,9 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
             {fields.map((field, index) => {
               const line = field as SaleLineDraft
               const invalidQuantity =
-                !Number.isFinite(line.quantity) || line.quantity <= 0
+                !Number.isFinite(line.quantity) ||
+                line.quantity <= 0 ||
+                !hasAtMostThreeDecimals(line.quantity)
               return (
                 <div
                   key={field.id}
@@ -406,9 +419,14 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
                     step="0.001"
                     aria-label={`Cantidad de ${line.name}`}
                     value={String(line.quantity)}
-                    onChange={(event) =>
-                      updateQuantity(index, Number(event.target.value))
-                    }
+                    onChange={(event) => {
+                      const nextQuantity = Number(event.target.value)
+                      if (!hasAtMostThreeDecimals(nextQuantity)) {
+                        toast.error(QUANTITY_MAX_DECIMALS_MESSAGE)
+                        return
+                      }
+                      updateQuantity(index, nextQuantity)
+                    }}
                     className={`h-10 w-full rounded-lg border bg-background px-3 text-sm tabular-nums focus-visible:outline-2 focus-visible:outline-ring ${
                       invalidQuantity ? 'border-red-500' : 'border-input'
                     }`}

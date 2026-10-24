@@ -105,82 +105,82 @@ const auditEventByType: Record<MovementType, AuditEventType> = {
 
 export const inventoryRepository = {
   async listExistence(filters: ExistenceFilters) {
-    return databaseService.transaction(async (transaction) => {
-      const where = buildExistenceWhere(filters)
-      const [products, total] = await Promise.all([
-        transaction.product.findMany({
-          select: existenceSelect,
-          where,
-          orderBy: [{ active: 'desc' }, { name: 'asc' }],
-          skip: (filters.page - 1) * filters.pageSize,
-          take: filters.pageSize,
-        }),
-        transaction.product.count({ where }),
-      ])
+    const where = buildExistenceWhere(filters)
+    const [products, total] = await Promise.all([
+      databaseService.client.product.findMany({
+        select: existenceSelect,
+        where,
+        orderBy: [{ active: 'desc' }, { name: 'asc' }],
+        skip: (filters.page - 1) * filters.pageSize,
+        take: filters.pageSize,
+      }),
+      databaseService.client.product.count({ where }),
+    ])
+    if (!products.length) return { items: [], total }
 
-      if (!products.length) return { items: [], total }
-
-      const movements = await transaction.inventoryMovement.findMany({
-        where: { productId: { in: products.map((product) => product.id) } },
-        select: {
-          productId: true,
-          type: true,
-          quantity: true,
-          occurredAt: true,
-        },
-        orderBy: { occurredAt: 'desc' },
+    const productIds = products.map((product) => product.id)
+    const [movements, latestMovements] = await Promise.all([
+      databaseService.client.inventoryMovement.groupBy({
+        by: ['productId', 'type'],
+        where: { productId: { in: productIds } },
+        _sum: { quantity: true },
+      }),
+      databaseService.client.inventoryMovement.groupBy({
+        by: ['productId'],
+        where: { productId: { in: productIds } },
+        _max: { occurredAt: true },
+      }),
+    ])
+    const grouped = new Map<
+      string,
+      Array<{ type: MovementType; quantity: unknown }>
+    >()
+    const lastMovementAt = new Map(
+      latestMovements.flatMap((movement) =>
+        movement._max.occurredAt
+          ? [[movement.productId, movement._max.occurredAt] as const]
+          : [],
+      ),
+    )
+    for (const movement of movements) {
+      const list = grouped.get(movement.productId) ?? []
+      list.push({
+        type: movement.type,
+        quantity: movement._sum.quantity ?? 0,
       })
-
-      const grouped = new Map<
-        string,
-        Array<{ type: MovementType; quantity: unknown }>
-      >()
-      const lastMovementAt = new Map<string, Date>()
-      for (const movement of movements) {
-        const list = grouped.get(movement.productId) ?? []
-        list.push(movement)
-        grouped.set(movement.productId, list)
-        if (!lastMovementAt.has(movement.productId)) {
-          lastMovementAt.set(movement.productId, movement.occurredAt)
-        }
+      grouped.set(movement.productId, list)
+    }
+    const items = products.map((product) => {
+      const stock = computeStock(grouped.get(product.id) ?? [])
+      const minimumStock = Number(product.minimumStock)
+      const latest = lastMovementAt.get(product.id)
+      return {
+        productId: product.id,
+        code: product.code,
+        name: product.name,
+        unit: product.unit,
+        active: product.active,
+        stock,
+        minimumStock,
+        lowStock: product.active && stock <= minimumStock,
+        lastMovementAt: latest ? latest.toISOString() : null,
       }
-
-      const items = products.map((product) => {
-        const stock = computeStock(grouped.get(product.id) ?? [])
-        const minimumStock = Number(product.minimumStock)
-        const latest = lastMovementAt.get(product.id)
-        return {
-          productId: product.id,
-          code: product.code,
-          name: product.name,
-          unit: product.unit,
-          active: product.active,
-          stock,
-          minimumStock,
-          lowStock: product.active && stock <= minimumStock,
-          lastMovementAt: latest ? latest.toISOString() : null,
-        }
-      })
-
-      return { items, total }
     })
+    return { items, total }
   },
 
   listMovements(filters: InventoryMovementFilters) {
     const where = buildMovementWhere(filters)
-    return databaseService.transaction(async (transaction) => {
-      const [items, total] = await Promise.all([
-        transaction.inventoryMovement.findMany({
-          select: movementResponseSelect,
-          where,
-          orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
-          skip: (filters.page - 1) * filters.pageSize,
-          take: filters.pageSize,
-        }),
-        transaction.inventoryMovement.count({ where }),
-      ])
-      return { items, total }
-    })
+    return Promise.all([
+      databaseService.client.inventoryMovement.findMany({
+        select: movementResponseSelect,
+        where,
+        orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+        skip: (filters.page - 1) * filters.pageSize,
+        take: filters.pageSize,
+      }),
+      databaseService.client.inventoryMovement.count({ where }),
+    ]).then(([items, total]) => ({ items, total }))
   },
 
   findUserDisplayNames(ids: string[]) {
@@ -235,11 +235,16 @@ export const inventoryRepository = {
 
       await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:inventory:${input.productId}`}))`
 
-      const confirmed = await transaction.inventoryMovement.findMany({
+      const confirmed = await transaction.inventoryMovement.groupBy({
+        by: ['type'],
         where: { productId: input.productId, status: 'CONFIRMED' },
-        select: { type: true, quantity: true },
+        _sum: { quantity: true },
       })
-      const currentStock = computeStock(confirmed)
+      const stockMovements = confirmed.map((movement) => ({
+        type: movement.type,
+        quantity: movement._sum.quantity ?? 0,
+      }))
+      const currentStock = computeStock(stockMovements)
       const hasInitialMovement = confirmed.some(
         (movement) => movement.type === 'INITIAL',
       )
@@ -268,7 +273,7 @@ export const inventoryRepository = {
       })
 
       const stockAfter = computeStock([
-        ...confirmed,
+        ...stockMovements,
         { type: movement.type, quantity: movement.quantity },
       ])
 

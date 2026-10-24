@@ -70,19 +70,16 @@ function buildWhere(filters: VehicleListFilters): Prisma.VehicleWhereInput {
 export const vehiclesRepository = {
   async list(filters: VehicleListFilters) {
     const where = buildWhere(filters)
-    const [items, total] = await databaseService.transaction(
-      async (transaction) =>
-        Promise.all([
-          transaction.vehicle.findMany({
-            where,
-            include: findUniqueInclude,
-            orderBy: { updatedAt: 'desc' },
-            skip: (filters.page - 1) * filters.pageSize,
-            take: filters.pageSize,
-          }),
-          transaction.vehicle.count({ where }),
-        ]),
-    )
+    const [items, total] = await Promise.all([
+      databaseService.client.vehicle.findMany({
+        where,
+        include: findUniqueInclude,
+        orderBy: { updatedAt: 'desc' },
+        skip: (filters.page - 1) * filters.pageSize,
+        take: filters.pageSize,
+      }),
+      databaseService.client.vehicle.count({ where }),
+    ])
 
     return { items, total }
   },

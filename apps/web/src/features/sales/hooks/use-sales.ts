@@ -26,11 +26,12 @@ export function useSale(id: string) {
   })
 }
 
-export function useSaleCatalog() {
+export function useSaleCatalog(enabled = true) {
   return useQuery({
     queryKey: saleKeys.catalog(),
     queryFn: ({ signal }) => salesService.catalog(signal),
     select: (response) => response.data,
+    enabled,
   })
 }
 

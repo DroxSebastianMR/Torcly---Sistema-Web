@@ -8,7 +8,9 @@ const repository = vi.hoisted(() => ({
   summarizeSales: vi.fn(),
   listSaleAttention: vi.fn(),
   listPendingObligations: vi.fn(),
+  summarizePendingObligations: vi.fn(),
   listLowStockProducts: vi.fn(),
+  countLowStockProducts: vi.fn(),
 }))
 
 vi.mock('../src/modules/operations/operations.repository.js', () => ({
@@ -107,25 +109,15 @@ describe('Servicio de consulta operativa', () => {
     expect(repository.countWorkOrdersByStatus).toHaveBeenCalledWith(null, null)
   })
 
-  it('deriva el saldo pendiente en servidor con las reglas de payments', async () => {
+  it('usa el resumen de saldos del read-model para el Dashboard', async () => {
     repository.summarizeSales.mockResolvedValue({
       confirmedCount: 0,
       confirmedAmount: 0,
     })
-    repository.listPendingObligations.mockResolvedValue([
-      obligation({
-        payments: [
-          { type: 'PAYMENT', amount: 50 },
-          { type: 'COMPENSATION', amount: 10 },
-        ],
-      }),
-      obligation({
-        id: 'sale-2',
-        code: 'VENTA-000002',
-        total: 80,
-        payments: [{ type: 'PAYMENT', amount: 80 }],
-      }),
-    ])
+    repository.summarizePendingObligations.mockResolvedValue({
+      pendingCount: 1,
+      pendingAmount: 90,
+    })
 
     const result = await operationsService.getSummary(
       { from: null, to: null },
@@ -137,19 +129,11 @@ describe('Servicio de consulta operativa', () => {
       pendingCount: 1,
       pendingAmount: 90,
     })
+    expect(repository.listPendingObligations).not.toHaveBeenCalled()
   })
 
   it('cuenta productos con alerta de stock bajo', async () => {
-    repository.listLowStockProducts.mockResolvedValue([
-      {
-        id: 'product-1',
-        code: 'P-001',
-        name: 'Pastilla',
-        stock: 1,
-        minimumStock: 5,
-        unitLabel: 'und',
-      },
-    ])
+    repository.countLowStockProducts.mockResolvedValue(1)
 
     const result = await operationsService.getSummary(
       { from: null, to: null },
@@ -160,6 +144,7 @@ describe('Servicio de consulta operativa', () => {
       section: 'inventory',
       lowStockCount: 1,
     })
+    expect(repository.listLowStockProducts).not.toHaveBeenCalled()
   })
 
   it('rechaza una lista de atención sin permiso de la sección', async () => {

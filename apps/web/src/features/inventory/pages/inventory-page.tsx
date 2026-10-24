@@ -78,8 +78,8 @@ export default function Page() {
     ...existenceFilters,
     search: deferredSearch,
   })
-  const productOptions = useInventoryProductOptions()
-  const movements = useMovements(movementFilters)
+  const productOptions = useInventoryProductOptions(view === 'movements')
+  const movements = useMovements(movementFilters, view === 'movements')
   const items = existenceQuery.data?.data ?? []
   const suggestions = items.map((item) => ({
     value: item.code,

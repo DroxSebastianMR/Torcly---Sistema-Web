@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm, useFormState, useWatch } from 'react-hook-form'
+import { Controller, useForm, useFormState } from 'react-hook-form'
 import { HandCoins } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/smart-select'
 import { usePaymentMutations } from '../hooks/use-payments'
 import {
+  formatPaymentAmount,
+  parsePaymentAmount,
   paymentRegisterSchema,
   type PaymentRegisterFormValues,
 } from '../forms/payment.schema'
@@ -42,16 +44,19 @@ export function PaymentFormModal({
   const mutations = usePaymentMutations()
   const form = useForm<PaymentRegisterFormValues>({
     resolver: zodResolver(paymentRegisterSchema),
-    defaultValues: { amount: 0, method: 'CASH', notes: '' },
+    defaultValues: { amount: '', method: 'CASH', notes: '' },
   })
   const { reset, getValues, setValue } = form
   const formState = useFormState({ control: form.control })
   const busy = mutations.pay.isPending
-  const amount = useWatch({ control: form.control, name: 'amount' })
 
   useEffect(() => {
     if (open)
-      reset({ amount: obligation?.balance ?? 0, method: 'CASH', notes: '' })
+      reset({
+        amount: formatPaymentAmount(obligation?.balance ?? 0),
+        method: 'CASH',
+        notes: '',
+      })
   }, [open, obligation?.balance, reset])
 
   const closeModal = () => {
@@ -67,7 +72,12 @@ export function PaymentFormModal({
       return
     }
     const values = getValues()
-    if (values.amount > obligation.balance) {
+    const amount = parsePaymentAmount(values.amount)
+    if (amount === null) {
+      toast.error('Revisa el importe y el método de pago.')
+      return
+    }
+    if (amount > obligation.balance) {
       toast.error(
         `El importe supera el saldo pendiente (${currencyFormatter.format(
           obligation.balance,
@@ -80,7 +90,7 @@ export function PaymentFormModal({
         saleId: obligation.id,
         input: {
           requestId: crypto.randomUUID(),
-          amount: values.amount,
+          amount,
           method: values.method,
           notes: values.notes?.trim() || undefined,
         },
@@ -148,20 +158,29 @@ export function PaymentFormModal({
           >
             Importe
           </label>
-          <Input
-            id="payment-amount"
-            aria-label="Importe a cobrar"
-            type="number"
-            min="0.01"
-            step="0.01"
-            placeholder="0.00"
-            value={Number.isNaN(amount) ? '' : String(amount)}
-            onChange={(event) =>
-              setValue(
-                'amount',
-                event.target.value === '' ? 0 : Number(event.target.value),
-              )
-            }
+          <Controller
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <Input
+                id="payment-amount"
+                aria-label="Importe a cobrar"
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                placeholder="0.00"
+                name={field.name}
+                ref={field.ref}
+                value={field.value}
+                onChange={(event) => field.onChange(event.target.value)}
+                onBlur={() => {
+                  const parsed = parsePaymentAmount(field.value)
+                  if (parsed !== null) {
+                    field.onChange(formatPaymentAmount(parsed))
+                  }
+                }}
+              />
+            )}
           />
           {formState.errors.amount && (
             <p className="text-xs text-red-600">
@@ -209,11 +228,20 @@ export function PaymentFormModal({
               (opcional)
             </span>
           </label>
-          <Input
-            id="payment-notes"
-            aria-label="Observación del pago"
-            value={form.getValues('notes') ?? ''}
-            onChange={(event) => setValue('notes', event.target.value)}
+          <Controller
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <Input
+                id="payment-notes"
+                aria-label="Observación del pago"
+                name={field.name}
+                ref={field.ref}
+                value={field.value ?? ''}
+                onChange={(event) => field.onChange(event.target.value)}
+                onBlur={field.onBlur}
+              />
+            )}
           />
           {formState.errors.notes && (
             <p className="text-xs text-red-600">

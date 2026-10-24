@@ -187,19 +187,17 @@ async function assertVehicleAvailableInSlot(
 export const appointmentsRepository = {
   async list(filters: AppointmentFilters) {
     const where = buildWhere(filters)
-    return databaseService.transaction(async (transaction) => {
-      const [items, total] = await Promise.all([
-        transaction.appointment.findMany({
-          select: appointmentSummarySelect,
-          where,
-          orderBy: { createdAt: 'desc' },
-          skip: (filters.page - 1) * filters.pageSize,
-          take: filters.pageSize,
-        }),
-        transaction.appointment.count({ where }),
-      ])
-      return { items, total }
-    })
+    const [items, total] = await Promise.all([
+      databaseService.client.appointment.findMany({
+        select: appointmentSummarySelect,
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (filters.page - 1) * filters.pageSize,
+        take: filters.pageSize,
+      }),
+      databaseService.client.appointment.count({ where }),
+    ])
+    return { items, total }
   },
 
   findById(id: string): Promise<AppointmentRecord | null> {
@@ -243,20 +241,27 @@ export const appointmentsRepository = {
   },
 
   async getStats() {
-    return databaseService.transaction(async (transaction) => {
-      const [total, programadas, canceladas, hoy] = await Promise.all([
-        transaction.appointment.count(),
-        transaction.appointment.count({ where: { status: 'PROGRAMADA' } }),
-        transaction.appointment.count({ where: { status: 'CANCELADA' } }),
-        transaction.appointment.count({
-          where: {
-            date: toDateOnly(todayLocalDate()),
-            status: 'PROGRAMADA',
-          },
-        }),
-      ])
-      return { total, programadas, canceladas, hoy }
-    })
+    const [byStatus, hoy] = await Promise.all([
+      databaseService.client.appointment.groupBy({
+        by: ['status'],
+        _count: { _all: true },
+      }),
+      databaseService.client.appointment.count({
+        where: {
+          date: toDateOnly(todayLocalDate()),
+          status: 'PROGRAMADA',
+        },
+      }),
+    ])
+    const counts = new Map(
+      byStatus.map((item) => [item.status, item._count._all]),
+    )
+    return {
+      total: byStatus.reduce((sum, item) => sum + item._count._all, 0),
+      programadas: counts.get('PROGRAMADA') ?? 0,
+      canceladas: counts.get('CANCELADA') ?? 0,
+      hoy,
+    }
   },
 
   async create(

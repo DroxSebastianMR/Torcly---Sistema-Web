@@ -17,18 +17,23 @@ export const replenishmentKeys = {
     [...replenishmentKeys.all, 'run-detail', code ?? '', filters] as const,
 }
 
-export function useEligibility(filters: EligibilityFilters) {
+export function useEligibility(filters: EligibilityFilters, enabled = true) {
   return useQuery({
     queryKey: replenishmentKeys.eligibility(filters),
     queryFn: ({ signal }) =>
       replenishmentService.getEligibility(filters, signal),
+    enabled,
   })
 }
 
-export function useReplenishmentRuns(filters: RunHistoryFilters) {
+export function useReplenishmentRuns(
+  filters: RunHistoryFilters,
+  enabled = true,
+) {
   return useQuery({
     queryKey: replenishmentKeys.runs(filters),
     queryFn: ({ signal }) => replenishmentService.listRuns(filters, signal),
+    enabled,
   })
 }
 

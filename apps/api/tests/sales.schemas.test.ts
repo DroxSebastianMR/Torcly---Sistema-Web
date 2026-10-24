@@ -65,6 +65,26 @@ describe('Validación de ventas', () => {
     expect(parse(-2)).toBe(false)
   })
 
+  it('acepta hasta tres decimales y rechaza cuatro sin redondear', () => {
+    for (const quantity of [1, 1.2, 1.23, 1.234]) {
+      expect(
+        saleInputSchema.safeParse({
+          lines: [{ type: 'PRODUCT', productId, quantity }],
+        }).success,
+      ).toBe(true)
+    }
+
+    const result = saleInputSchema.safeParse({
+      lines: [{ type: 'PRODUCT', productId, quantity: 1.2345 }],
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(
+        'La cantidad admite hasta tres decimales.',
+      )
+    }
+  })
+
   it('rechaza ventas sin líneas y campos desconocidos', () => {
     expect(
       saleInputSchema.safeParse({ customerId: null, lines: [] }).success,

@@ -31,7 +31,7 @@ export function VehicleFormModal({
   onClose,
 }: VehicleFormModalProps) {
   const mutations = useVehicleMutations()
-  const owners = useVehicleOwnerOptions()
+  const owners = useVehicleOwnerOptions(open)
   const isEditing = vehicle !== null
   const isSubmitting = mutations.create.isPending || mutations.update.isPending
   const form = useForm<VehicleFormValues>({

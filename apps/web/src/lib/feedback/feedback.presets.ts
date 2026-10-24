@@ -21,6 +21,7 @@ export const feedbackPresets: Record<FeedbackKind, FeedbackPreset> = {
     icon: ShieldX,
   },
   'not-found': {
+    code: 'Error 404',
     title: 'Página no encontrada',
     description:
       'La dirección que buscas no existe o cambió. Vuelve al inicio para continuar con tus tareas.',

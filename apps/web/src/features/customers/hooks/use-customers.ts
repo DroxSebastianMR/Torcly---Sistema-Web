@@ -13,11 +13,12 @@ export const customerKeys = {
   detail: (id: string) => [...customerKeys.all, 'detail', id] as const,
 }
 
-export function useCustomers(filters: CustomerFilters) {
+export function useCustomers(filters: CustomerFilters, enabled = true) {
   return useQuery({
     queryKey: customerKeys.list(filters),
     queryFn: ({ signal }) => customersService.list(filters, signal),
     placeholderData: (previous) => previous,
+    enabled,
   })
 }
 

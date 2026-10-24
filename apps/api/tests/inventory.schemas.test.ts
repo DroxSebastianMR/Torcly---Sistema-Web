@@ -70,6 +70,37 @@ describe('Validación de movimientos de inventario', () => {
     ).toBe(false)
   })
 
+  it('acepta hasta tres decimales en todos los movimientos y rechaza cuatro', () => {
+    for (const quantity of [1, 1.2, 1.23, 1.234]) {
+      for (const schema of [initialStockSchema, entrySchema, exitSchema]) {
+        expect(schema.safeParse({ ...validMovement, quantity }).success).toBe(
+          true,
+        )
+      }
+      expect(
+        adjustmentSchema.safeParse({ ...validMovement, quantity: -quantity })
+          .success,
+      ).toBe(true)
+    }
+
+    const rejected = entrySchema.safeParse({
+      ...validMovement,
+      quantity: 1.2345,
+    })
+    expect(rejected.success).toBe(false)
+    if (!rejected.success) {
+      expect(rejected.error.issues[0]?.message).toBe(
+        'La cantidad admite hasta tres decimales.',
+      )
+    }
+    expect(
+      adjustmentSchema.safeParse({
+        ...validMovement,
+        quantity: -1.2345,
+      }).success,
+    ).toBe(false)
+  })
+
   it('rechaza movimientos sin producto y con claves desconocidas', () => {
     const withoutProduct = { ...validMovement }
     Reflect.deleteProperty(withoutProduct, 'productId')

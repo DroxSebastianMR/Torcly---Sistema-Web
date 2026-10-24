@@ -101,19 +101,17 @@ export type SaleDetailRecord = Prisma.SaleGetPayload<{
 export const salesRepository = {
   async list(filters: SaleFilters) {
     const where = buildSaleWhere(filters)
-    return databaseService.transaction(async (transaction) => {
-      const [items, total] = await Promise.all([
-        transaction.sale.findMany({
-          select: saleSummarySelect,
-          where,
-          orderBy: { createdAt: 'desc' },
-          skip: (filters.page - 1) * filters.pageSize,
-          take: filters.pageSize,
-        }),
-        transaction.sale.count({ where }),
-      ])
-      return { items, total }
-    })
+    const [items, total] = await Promise.all([
+      databaseService.client.sale.findMany({
+        select: saleSummarySelect,
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (filters.page - 1) * filters.pageSize,
+        take: filters.pageSize,
+      }),
+      databaseService.client.sale.count({ where }),
+    ])
+    return { items, total }
   },
 
   findById(id: string): Promise<SaleDetailRecord | null> {
@@ -323,11 +321,16 @@ export const salesRepository = {
 
         await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:inventory:${productId}`}))`
 
-        const confirmed = await transaction.inventoryMovement.findMany({
+        const confirmed = await transaction.inventoryMovement.groupBy({
+          by: ['type'],
           where: { productId, status: 'CONFIRMED' },
-          select: { type: true, quantity: true },
+          _sum: { quantity: true },
         })
-        const currentStock = computeStock(confirmed)
+        const stockMovements = confirmed.map((movement) => ({
+          type: movement.type,
+          quantity: movement._sum.quantity ?? 0,
+        }))
+        const currentStock = computeStock(stockMovements)
         const hasInitialMovement = confirmed.some(
           (movement) => movement.type === 'INITIAL',
         )
@@ -355,7 +358,7 @@ export const salesRepository = {
         })
 
         const stockAfter = computeStock([
-          ...confirmed,
+          ...stockMovements,
           { type: 'EXIT', quantity: Number(movement.quantity) },
         ])
 
@@ -420,12 +423,13 @@ export const salesRepository = {
 
       let stockByProduct = new Map<string, number>()
       if (products.length) {
-        const movements = await transaction.inventoryMovement.findMany({
+        const movements = await transaction.inventoryMovement.groupBy({
+          by: ['productId', 'type'],
           where: {
             productId: { in: products.map((product) => product.id) },
             status: 'CONFIRMED',
           },
-          select: { productId: true, type: true, quantity: true },
+          _sum: { quantity: true },
         })
         const grouped = new Map<
           string,
@@ -433,7 +437,10 @@ export const salesRepository = {
         >()
         for (const movement of movements) {
           const list = grouped.get(movement.productId) ?? []
-          list.push(movement)
+          list.push({
+            type: movement.type,
+            quantity: movement._sum.quantity ?? 0,
+          })
           grouped.set(movement.productId, list)
         }
         stockByProduct = new Map(

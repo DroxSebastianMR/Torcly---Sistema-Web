@@ -31,12 +31,14 @@ describe('requestTiming middleware', () => {
 
   function createMocks(options: {
     path: string
+    originalUrl?: string
     method?: string
     baseUrl?: string
     routePath?: string
   }) {
     const request = {
       path: options.path,
+      originalUrl: options.originalUrl ?? options.path,
       method: options.method ?? 'GET',
       baseUrl: options.baseUrl ?? '',
       route: options.routePath ? { path: options.routePath } : undefined,
@@ -117,6 +119,19 @@ describe('requestTiming middleware', () => {
 
     const payload = JSON.parse(infoSpy.mock.calls[0][0] as string)
     expect(payload.route).toBe('/api/v1/sales/:id')
+  })
+
+  it('conserva el módulo al finalizar una ruta montada', () => {
+    const { request, response, finish } = createMocks({
+      path: '/me',
+      originalUrl: '/api/v1/auth/me',
+    })
+    requestTiming(request, response, () => undefined)
+    finish()
+
+    const payload = JSON.parse(infoSpy.mock.calls[0][0] as string)
+    expect(payload.route).toBe('/api/v1/auth/me')
+    expect(payload.module).toBe('auth')
   })
 
   it('no registra contraseñas, cookies ni cabeceras', () => {

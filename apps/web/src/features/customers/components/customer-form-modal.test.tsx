@@ -133,6 +133,91 @@ describe('Formulario de clientes', () => {
     expect(onClose).toHaveBeenCalledOnce()
   })
 
+  it('revalida el RUC al corregirlo después del primer error', async () => {
+    renderModal()
+
+    await userEvent.click(screen.getByLabelText(/tipo de cliente/i))
+    await userEvent.click(
+      await screen.findByRole('option', { name: 'Persona jurídica' }),
+    )
+
+    const rucInput = screen.getByLabelText(/^RUC/i)
+    await userEvent.type(rucInput, '2012345678')
+    await userEvent.type(
+      screen.getByLabelText(/razón social/i),
+      'Torcly Repuestos S.A.C.',
+    )
+    await userEvent.type(screen.getByLabelText(/teléfono/i), '+51987654321')
+    await userEvent.tab()
+
+    expect(
+      await screen.findByText('El RUC debe tener 11 dígitos.'),
+    ).toBeTruthy()
+
+    await userEvent.type(rucInput, '9')
+
+    await waitFor(() =>
+      expect(screen.queryByText('El RUC debe tener 11 dígitos.')).toBeNull(),
+    )
+    expect(
+      (screen.getByLabelText(/razón social/i) as HTMLInputElement).value,
+    ).toBe('Torcly Repuestos S.A.C.')
+    expect((screen.getByLabelText(/teléfono/i) as HTMLInputElement).value).toBe(
+      '+51987654321',
+    )
+
+    await userEvent.clear(rucInput)
+    await userEvent.type(rucInput, '123')
+    await userEvent.tab()
+
+    expect(
+      await screen.findByText('El RUC debe tener 11 dígitos.'),
+    ).toBeTruthy()
+  })
+
+  it('retira el error de RUC al corregirlo sin perder los demás campos', async () => {
+    renderModal()
+
+    await userEvent.click(screen.getByLabelText(/tipo de cliente/i))
+    await userEvent.click(
+      await screen.findByRole('option', { name: 'Persona jurídica' }),
+    )
+
+    const rucInput = screen.getByLabelText(/^RUC/i)
+    await userEvent.type(rucInput, '2012345678')
+    await userEvent.type(
+      screen.getByLabelText(/razón social/i),
+      'Torcly Repuestos S.A.C.',
+    )
+    await userEvent.type(screen.getByLabelText(/teléfono/i), '+51987654321')
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Registrar cliente' }),
+    )
+
+    expect(
+      await screen.findByText('El RUC debe tener 11 dígitos.'),
+    ).toBeTruthy()
+
+    await userEvent.type(rucInput, '9')
+
+    await waitFor(() =>
+      expect(screen.queryByText('El RUC debe tener 11 dígitos.')).toBeNull(),
+    )
+    expect(
+      (screen.getByLabelText(/razón social/i) as HTMLInputElement).value,
+    ).toBe('Torcly Repuestos S.A.C.')
+    expect((screen.getByLabelText(/teléfono/i) as HTMLInputElement).value).toBe(
+      '+51987654321',
+    )
+
+    await userEvent.clear(rucInput)
+    await userEvent.type(rucInput, '123')
+
+    expect(
+      await screen.findByText('El RUC debe tener 11 dígitos.'),
+    ).toBeTruthy()
+  })
+
   it('precarga la ficha y envía la actualización', async () => {
     service.update.mockResolvedValue({ data: {} })
     const { onClose } = renderModal({ customer: existingCustomer })

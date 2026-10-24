@@ -146,9 +146,11 @@ function mapPersistenceError(error: unknown): never {
 
 export const appointmentsService = {
   async list(filters: AppointmentFilters) {
-    const result = await appointmentsRepository.list(filters)
+    const [result, stats] = await Promise.all([
+      appointmentsRepository.list(filters),
+      appointmentsRepository.getStats(),
+    ])
     const actorNames = await resolveActorNames(result.items)
-    const stats = await appointmentsRepository.getStats()
     return {
       data: result.items.map((item) => toItem(item, actorNames)),
       pagination: {

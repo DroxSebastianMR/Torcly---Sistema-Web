@@ -342,7 +342,7 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
     expect(pastTime.body.error.code).toBe('APPOINTMENT_PAST_TIME')
   }, 60_000)
 
-  it('aplica la capacidad de 8 citas activas y la libera al cancelar', async () => {
+  it('aplica la capacidad de 8 citas activas a 9 vehículos distintos y la libera al cancelar', async () => {
     const adminAgent = await loginAs(identity.username)
     const payload = {
       customerId: createdIds.customerA,
@@ -350,6 +350,13 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
       date: capacityDate,
       time: capacityTime,
       reason: 'Cita de capacidad',
+    }
+    const distinctPayload = {
+      customerId: createdIds.customerB,
+      vehicleId: createdIds.vehicleB,
+      date: capacityDate,
+      time: capacityTime,
+      reason: 'Cita de capacidad con otro vehículo',
     }
 
     for (let index = 0; index < capacityVehicleIds.length; index += 1) {
@@ -359,7 +366,9 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
       expect(created.status).toBe(201)
     }
 
-    const ninth = await adminAgent.post('/api/v1/appointments').send(payload)
+    const ninth = await adminAgent
+      .post('/api/v1/appointments')
+      .send(distinctPayload)
     expect(ninth.status).toBe(409)
     expect(ninth.body.error.code).toBe('APPOINTMENT_SLOT_FULL')
 
@@ -377,7 +386,7 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
     expect(cancelled.body.data.cancelledBy).toBe(identity.name)
 
     const afterCancel = await adminAgent.post('/api/v1/appointments').send({
-      ...payload,
+      ...distinctPayload,
       reason: 'Cita tras cancelar una',
     })
     expect(afterCancel.status).toBe(201)

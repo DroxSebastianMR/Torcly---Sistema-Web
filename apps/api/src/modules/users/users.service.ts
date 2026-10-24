@@ -1,5 +1,6 @@
 import { Prisma } from '../../generated/prisma/client.js'
 import { AppError } from '../../shared/errors/app-error.js'
+import { authService } from '../auth/auth.service.js'
 import { hashPassword } from '../auth/password.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import { usersRepository, type UserRecord } from './users.repository.js'
@@ -122,8 +123,10 @@ export const usersService = {
     await assertUserExists(id)
 
     try {
+      const user = await usersRepository.update(id, input, context)
+      authService.invalidateUserSessions(user.id)
       return {
-        data: toResponse(await usersRepository.update(id, input, context)),
+        data: toResponse(user),
       }
     } catch (error) {
       return mapPersistenceError(error)
@@ -150,13 +153,13 @@ export const usersService = {
     const toRoleCode = target.code
 
     try {
+      const user = await usersRepository.updateRole(id, roleId, context, {
+        fromRoleCode,
+        toRoleCode,
+      })
+      authService.invalidateUserSessions(user.id)
       return {
-        data: toResponse(
-          await usersRepository.updateRole(id, roleId, context, {
-            fromRoleCode,
-            toRoleCode,
-          }),
-        ),
+        data: toResponse(user),
       }
     } catch (error) {
       return mapPersistenceError(error)
@@ -180,10 +183,10 @@ export const usersService = {
     await assertUserExists(id)
 
     try {
+      const user = await usersRepository.updateStatus(id, active, context)
+      authService.invalidateUserSessions(user.id)
       return {
-        data: toResponse(
-          await usersRepository.updateStatus(id, active, context),
-        ),
+        data: toResponse(user),
       }
     } catch (error) {
       return mapPersistenceError(error)

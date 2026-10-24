@@ -129,9 +129,19 @@ export const authRepository = {
     })
   },
 
-  refreshSession(tokenHash: string, now: Date, expiresAt: Date) {
+  refreshSession(
+    tokenHash: string,
+    now: Date,
+    expiresAt: Date,
+    lastActivityBefore: Date,
+  ) {
     return databaseService.client.authSession.updateMany({
-      where: { tokenHash, revokedAt: null, expiresAt: { gt: now } },
+      where: {
+        tokenHash,
+        revokedAt: null,
+        expiresAt: { gt: now },
+        lastActivityAt: { lte: lastActivityBefore },
+      },
       data: { lastActivityAt: now, expiresAt },
     })
   },

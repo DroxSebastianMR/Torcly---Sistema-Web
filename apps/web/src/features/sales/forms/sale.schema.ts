@@ -1,4 +1,8 @@
 import { z } from 'zod'
+import {
+  hasAtMostThreeDecimals,
+  QUANTITY_MAX_DECIMALS_MESSAGE,
+} from '@/lib/quantity'
 
 export interface SaleLineDraft {
   type: 'PRODUCT' | 'SERVICE'
@@ -22,7 +26,8 @@ export const saleLineDraftSchema = z.object({
   quantity: z
     .number()
     .finite()
-    .min(0.001, 'La cantidad debe ser mayor a cero.'),
+    .min(0.001, 'La cantidad debe ser mayor a cero.')
+    .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE),
 })
 
 export const saleFormSchema = z.object({
@@ -30,7 +35,8 @@ export const saleFormSchema = z.object({
   addQuantity: z
     .number()
     .finite()
-    .min(0.001, 'La cantidad debe ser mayor a cero.'),
+    .min(0.001, 'La cantidad debe ser mayor a cero.')
+    .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE),
   lines: z
     .array(saleLineDraftSchema)
     .min(1, 'Agrega al menos un producto o servicio.'),

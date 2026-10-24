@@ -59,9 +59,18 @@ export function SystemFeedbackScreen({
           <Icon aria-hidden className="size-9 text-primary sm:size-11" />
         </span>
 
+        {preset.code && (
+          <p className="mt-6 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-primary">
+            {preset.code}
+          </p>
+        )}
+
         <h1
           id={titleId}
-          className="mt-6 text-[clamp(1.5rem,3vw,1.9rem)] font-semibold tracking-[-0.035em] text-brand-forest"
+          className={cn(
+            'text-[clamp(1.5rem,3vw,1.9rem)] font-semibold tracking-[-0.035em] text-brand-forest',
+            preset.code ? 'mt-3' : 'mt-6',
+          )}
         >
           {title ?? preset.title}
         </h1>

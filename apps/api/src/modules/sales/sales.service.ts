@@ -167,64 +167,70 @@ function mapPersistenceError(error: unknown): never {
 async function resolveLines(
   lines: SaleLineInput[],
 ): Promise<Prisma.SaleLineCreateManySaleInput[]> {
-  const resolved: Prisma.SaleLineCreateManySaleInput[] = []
-  for (const line of lines) {
-    if (line.type === 'PRODUCT' && line.productId) {
-      const product = await salesRepository.findProductRef(line.productId)
-      if (!product)
-        throw new AppError(404, 'PRODUCT_NOT_FOUND', 'Producto no encontrado.')
-      if (!product.active)
-        throw new AppError(
-          409,
-          'PRODUCT_INACTIVE',
-          'El producto está inactivo.',
-        )
-      const unitPrice = Number(product.salePrice)
-      const quantity = line.quantity ?? 1
-      resolved.push({
-        type: 'PRODUCT',
-        productId: product.id,
-        name: product.name,
-        code: product.code,
-        unitLabel: product.unit.symbol,
-        unitPrice,
-        quantity,
-        subtotal: roundLineSubtotal(unitPrice, quantity),
-      })
-      continue
-    }
+  return Promise.all(
+    lines.map(async (line) => {
+      if (line.type === 'PRODUCT' && line.productId) {
+        const product = await salesRepository.findProductRef(line.productId)
+        if (!product)
+          throw new AppError(
+            404,
+            'PRODUCT_NOT_FOUND',
+            'Producto no encontrado.',
+          )
+        if (!product.active)
+          throw new AppError(
+            409,
+            'PRODUCT_INACTIVE',
+            'El producto está inactivo.',
+          )
+        const unitPrice = Number(product.salePrice)
+        const quantity = line.quantity ?? 1
+        return {
+          type: 'PRODUCT',
+          productId: product.id,
+          name: product.name,
+          code: product.code,
+          unitLabel: product.unit.symbol,
+          unitPrice,
+          quantity,
+          subtotal: roundLineSubtotal(unitPrice, quantity),
+        }
+      }
 
-    if (line.type === 'SERVICE' && line.serviceId) {
-      const service = await salesRepository.findServiceRef(line.serviceId)
-      if (!service)
-        throw new AppError(404, 'SERVICE_NOT_FOUND', 'Servicio no encontrado.')
-      if (!service.active)
-        throw new AppError(
-          409,
-          'SERVICE_INACTIVE',
-          'El servicio está inactivo.',
-        )
-      const unitPrice = Number(service.price)
-      resolved.push({
-        type: 'SERVICE',
-        serviceId: service.id,
-        name: service.name,
-        code: service.code,
-        unitLabel: null,
-        unitPrice,
-        quantity: 1,
-        subtotal: unitPrice,
-      })
-      continue
-    }
+      if (line.type === 'SERVICE' && line.serviceId) {
+        const service = await salesRepository.findServiceRef(line.serviceId)
+        if (!service)
+          throw new AppError(
+            404,
+            'SERVICE_NOT_FOUND',
+            'Servicio no encontrado.',
+          )
+        if (!service.active)
+          throw new AppError(
+            409,
+            'SERVICE_INACTIVE',
+            'El servicio está inactivo.',
+          )
+        const unitPrice = Number(service.price)
+        return {
+          type: 'SERVICE',
+          serviceId: service.id,
+          name: service.name,
+          code: service.code,
+          unitLabel: null,
+          unitPrice,
+          quantity: 1,
+          subtotal: unitPrice,
+        }
+      }
 
-    throw new AppError(
-      400,
-      'SALE_INVALID_LINE',
-      'La línea de venta es inválida.',
-    )
-  }
-  return resolved
+      throw new AppError(
+        400,
+        'SALE_INVALID_LINE',
+        'La línea de venta es inválida.',
+      )
+    }),
+  )
 }
 
 function roundLineSubtotal(unitPrice: number, quantity: number): number {

@@ -1,4 +1,8 @@
 import { z } from 'zod'
+import {
+  hasAtMostThreeDecimals,
+  QUANTITY_MAX_DECIMALS_MESSAGE,
+} from '@/lib/quantity'
 
 export const productFormSchema = z.object({
   code: z
@@ -30,7 +34,8 @@ export const productFormSchema = z.object({
   minimumStock: z.coerce
     .number<number>()
     .finite()
-    .min(1, 'El stock mínimo debe ser mayor que cero.'),
+    .min(1, 'El stock mínimo debe ser mayor que cero.')
+    .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE),
 })
 
 export type ProductFormValues = z.input<typeof productFormSchema>

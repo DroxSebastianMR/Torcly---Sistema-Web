@@ -35,6 +35,7 @@ export function CustomerFormModal({
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerInputSchema),
     defaultValues: emptyCustomer,
+    mode: 'onTouched',
   })
   const { reset } = form
   const customerType = useWatch({ control: form.control, name: 'type' })
@@ -117,10 +118,8 @@ export function CustomerFormModal({
               { value: 'LEGAL', label: 'Persona jurídica' },
             ]}
             onChange={(type) => {
-              form.setValue('type', type as CustomerFormValues['type'], {
-                shouldValidate: true,
-              })
-              form.setValue('documentNumber', '', { shouldValidate: true })
+              form.setValue('type', type as CustomerFormValues['type'])
+              form.setValue('documentNumber', '')
               form.clearErrors([
                 'documentNumber',
                 'firstName',

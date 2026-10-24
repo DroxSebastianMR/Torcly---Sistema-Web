@@ -90,27 +90,16 @@ async function buildSection(
       return { section: 'sales', confirmedCount, confirmedAmount }
     }
     case 'payments': {
-      const obligations = await operationsRepository.listPendingObligations()
-      const pending = obligations
-        .map((obligation) => {
-          const paid = computePaidAmount(obligation.payments)
-          return {
-            balance: computeBalance(obligation.total, paid),
-          }
-        })
-        .filter((obligation) => obligation.balance > 0)
+      const pending = await operationsRepository.summarizePendingObligations()
       return {
         section: 'payments',
-        pendingCount: pending.length,
-        pendingAmount: pending.reduce(
-          (sum, obligation) => sum + obligation.balance,
-          0,
-        ),
+        pendingCount: pending.pendingCount,
+        pendingAmount: pending.pendingAmount,
       }
     }
     case 'inventory': {
-      const products = await operationsRepository.listLowStockProducts()
-      return { section: 'inventory', lowStockCount: products.length }
+      const lowStockCount = await operationsRepository.countLowStockProducts()
+      return { section: 'inventory', lowStockCount }
     }
   }
 }

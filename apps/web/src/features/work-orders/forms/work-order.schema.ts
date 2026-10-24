@@ -1,4 +1,8 @@
 import { z } from 'zod'
+import {
+  hasAtMostThreeDecimals,
+  QUANTITY_MAX_DECIMALS_MESSAGE,
+} from '@/lib/quantity'
 
 export interface WorkOrderLineDraft {
   type: 'PRODUCT' | 'SERVICE'
@@ -28,14 +32,16 @@ export const workOrderLineDraftSchema = z.object({
   quantity: z
     .number()
     .finite()
-    .min(0.001, 'La cantidad debe ser mayor a cero.'),
+    .min(0.001, 'La cantidad debe ser mayor a cero.')
+    .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE),
 })
 
 export const workOrderBudgetSchema = z.object({
   addQuantity: z
     .number()
     .finite()
-    .min(0.001, 'La cantidad debe ser mayor a cero.'),
+    .min(0.001, 'La cantidad debe ser mayor a cero.')
+    .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE),
   lines: z
     .array(workOrderLineDraftSchema)
     .min(1, 'Agrega al menos un producto o servicio.'),
@@ -67,7 +73,8 @@ export const workOrderConsumptionSchema = z.object({
   quantity: z
     .number()
     .finite()
-    .min(0.001, 'La cantidad debe ser mayor a cero.'),
+    .min(0.001, 'La cantidad debe ser mayor a cero.')
+    .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE),
 })
 
 export const workOrderReturnSchema = z.object({
@@ -75,7 +82,8 @@ export const workOrderReturnSchema = z.object({
   quantity: z
     .number()
     .finite()
-    .min(0.001, 'La cantidad debe ser mayor a cero.'),
+    .min(0.001, 'La cantidad debe ser mayor a cero.')
+    .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE),
   notes: z
     .string()
     .trim()

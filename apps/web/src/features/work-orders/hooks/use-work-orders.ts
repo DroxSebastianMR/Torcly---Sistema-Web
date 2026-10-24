@@ -37,11 +37,12 @@ export function useWorkOrder(id: string) {
   })
 }
 
-export function useWorkOrderCatalog() {
+export function useWorkOrderCatalog(enabled = true) {
   return useQuery({
     queryKey: workOrderKeys.catalog,
     queryFn: ({ signal }) => workOrdersService.catalog(signal),
     select: (response) => response.data,
+    enabled,
   })
 }
 

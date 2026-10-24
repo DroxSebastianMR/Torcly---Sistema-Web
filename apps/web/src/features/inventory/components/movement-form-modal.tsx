@@ -42,7 +42,7 @@ export function MovementFormModal({
   onClose,
 }: MovementFormModalProps) {
   const mutations = useMovementMutations()
-  const products = useInventoryProductOptions()
+  const products = useInventoryProductOptions(open)
   const form = useForm<MovementFormValues>({
     resolver: zodResolver(movementFormSchema),
     defaultValues: emptyValues,

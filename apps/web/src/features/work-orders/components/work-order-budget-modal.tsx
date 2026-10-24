@@ -11,6 +11,10 @@ import {
   type SmartSelectOption,
 } from '@/components/ui/smart-select'
 import {
+  hasAtMostThreeDecimals,
+  QUANTITY_MAX_DECIMALS_MESSAGE,
+} from '@/lib/quantity'
+import {
   createWorkOrderLineDraft,
   workOrderBudgetSchema,
   type WorkOrderBudgetFormValues,
@@ -48,7 +52,7 @@ export function WorkOrderBudgetModal({
   onClose,
 }: WorkOrderBudgetModalProps) {
   const mutations = useWorkOrdersMutations()
-  const catalog = useWorkOrderCatalog()
+  const catalog = useWorkOrderCatalog(open)
   const { refetch: refetchCatalog } = catalog
   const [selectedProductId, setSelectedProductId] = useState('')
   const [selectedServiceId, setSelectedServiceId] = useState('')
@@ -147,6 +151,10 @@ export function WorkOrderBudgetModal({
     const quantity = Number(getValues('addQuantity'))
     if (!Number.isFinite(quantity) || quantity <= 0) {
       toast.error('La cantidad debe ser mayor a cero.')
+      return
+    }
+    if (!hasAtMostThreeDecimals(quantity)) {
+      toast.error(QUANTITY_MAX_DECIMALS_MESSAGE)
       return
     }
     append(
@@ -340,7 +348,9 @@ export function WorkOrderBudgetModal({
             {fields.map((field, index) => {
               const line = field as WorkOrderLineDraft
               const invalidQuantity =
-                !Number.isFinite(line.quantity) || line.quantity <= 0
+                !Number.isFinite(line.quantity) ||
+                line.quantity <= 0 ||
+                !hasAtMostThreeDecimals(line.quantity)
               return (
                 <div
                   key={field.id}
@@ -359,9 +369,14 @@ export function WorkOrderBudgetModal({
                     step="0.001"
                     aria-label={`Cantidad de ${line.name}`}
                     value={String(line.quantity)}
-                    onChange={(event) =>
-                      updateQuantity(index, Number(event.target.value))
-                    }
+                    onChange={(event) => {
+                      const nextQuantity = Number(event.target.value)
+                      if (!hasAtMostThreeDecimals(nextQuantity)) {
+                        toast.error(QUANTITY_MAX_DECIMALS_MESSAGE)
+                        return
+                      }
+                      updateQuantity(index, nextQuantity)
+                    }}
                     className={`h-10 w-full rounded-lg border bg-background px-3 text-sm tabular-nums focus-visible:outline-2 focus-visible:outline-ring ${
                       invalidQuantity ? 'border-red-500' : 'border-input'
                     }`}

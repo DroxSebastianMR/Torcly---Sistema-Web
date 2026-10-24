@@ -159,7 +159,7 @@ export function WorkOrderReturnModal({
             aria-label="Repuesto a devolver"
             placeholder="Seleccionar repuesto"
             searchPlaceholder="Buscar repuesto…"
-            emptyMessage="No hay repuestos consumidos para devolver."
+            emptyMessage="No hay repuestos por devolver. Solo aparecen los productos del presupuesto aprobado que se consumieron y aún no se devolvieron."
             options={options}
             disabled={busy}
             onChange={(lineId) => {

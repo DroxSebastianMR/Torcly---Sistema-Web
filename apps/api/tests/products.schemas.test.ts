@@ -38,6 +38,25 @@ describe('Validación de productos', () => {
     ).toBe(false)
   })
 
+  it('acepta stock mínimo con hasta tres decimales y rechaza cuatro', () => {
+    for (const minimumStock of [1, 1.2, 1.23, 1.234]) {
+      expect(
+        productInputSchema.safeParse({ ...validProduct, minimumStock }).success,
+      ).toBe(true)
+    }
+
+    const result = productInputSchema.safeParse({
+      ...validProduct,
+      minimumStock: 1.2345,
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(
+        'La cantidad admite hasta tres decimales.',
+      )
+    }
+  })
+
   it('rechaza campos que intentan escribir stock o movimientos', () => {
     const withoutStock = productInputSchema.safeParse({
       ...validProduct,

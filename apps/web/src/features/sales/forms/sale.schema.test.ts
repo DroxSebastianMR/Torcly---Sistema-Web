@@ -82,6 +82,40 @@ describe('Esquema de ventas (web)', () => {
     expect(negativa.success).toBe(false)
   })
 
+  it('acepta hasta tres decimales y rechaza cuatro en línea y cantidad a agregar', () => {
+    for (const quantity of [1, 1.2, 1.23, 1.234]) {
+      expect(
+        saleLineDraftSchema.safeParse({ ...productLine, quantity }).success,
+      ).toBe(true)
+      expect(
+        saleFormSchema.safeParse({
+          customerId: '',
+          addQuantity: quantity,
+          lines: [productLine],
+        }).success,
+      ).toBe(true)
+    }
+
+    const line = saleLineDraftSchema.safeParse({
+      ...productLine,
+      quantity: 1.2345,
+    })
+    expect(line.success).toBe(false)
+    if (!line.success) {
+      expect(line.error.issues[0]?.message).toBe(
+        'La cantidad admite hasta tres decimales.',
+      )
+    }
+
+    expect(
+      saleFormSchema.safeParse({
+        customerId: '',
+        addQuantity: 1.2345,
+        lines: [productLine],
+      }).success,
+    ).toBe(false)
+  })
+
   it('rechaza un precio de línea negativo', () => {
     const result = saleLineDraftSchema.safeParse({
       ...productLine,

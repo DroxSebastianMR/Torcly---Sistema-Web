@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ComponentType } from 'react'
 import { BarChart3 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -129,27 +129,56 @@ function BlockSegment({
   period: Period
   periodLabel: string
 }) {
-  const block = useReportBlock(meta.block, period)
+  const { ref, enabled } = useBlockVisibility()
+  const block = useReportBlock(meta.block, period, enabled)
   const data = block.data
   const Icon = meta.icon
   return (
-    <BlockCard
-      title={meta.title}
-      icon={<Icon aria-hidden className="size-5 text-primary" />}
-      criteria={data?.descriptor.criteria}
-      source={data?.descriptor.source}
-      periodField={data?.descriptor.periodField}
-      periodLabel={periodLabel}
-      isPending={block.isPending}
-      isFetching={block.isFetching}
-      isError={block.isError}
-      error={block.error}
-      hasData={Boolean(data)}
-      refetch={() => void block.refetch()}
-      modulePath={meta.modulePath}
-      moduleLabel={meta.moduleLabel}
-    >
-      {data && <BlockContent data={data} />}
-    </BlockCard>
+    <div ref={ref}>
+      <BlockCard
+        title={meta.title}
+        icon={<Icon aria-hidden className="size-5 text-primary" />}
+        criteria={data?.descriptor.criteria}
+        source={data?.descriptor.source}
+        periodField={data?.descriptor.periodField}
+        periodLabel={periodLabel}
+        isPending={!enabled || block.isPending}
+        isFetching={block.isFetching}
+        isError={block.isError}
+        error={block.error}
+        hasData={Boolean(data)}
+        refetch={() => void block.refetch()}
+        modulePath={meta.modulePath}
+        moduleLabel={meta.moduleLabel}
+      >
+        {data && <BlockContent data={data} />}
+      </BlockCard>
+    </div>
   )
+}
+
+function useBlockVisibility() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [enabled, setEnabled] = useState(
+    () => typeof window === 'undefined' || !('IntersectionObserver' in window),
+  )
+
+  useEffect(() => {
+    if (enabled) return
+    const element = ref.current
+    if (!element) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return
+        setEnabled(true)
+        observer.disconnect()
+      },
+      { rootMargin: '240px' },
+    )
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [enabled])
+
+  return { ref, enabled }
 }

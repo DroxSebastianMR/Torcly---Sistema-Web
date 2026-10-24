@@ -254,6 +254,7 @@ describe('Página de reabastecimiento', () => {
     await waitFor(() =>
       expect(replenishment.useEligibility).toHaveBeenLastCalledWith(
         expect.objectContaining({ search: 'filtro' }),
+        true,
       ),
     )
   })

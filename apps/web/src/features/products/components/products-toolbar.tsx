@@ -8,6 +8,8 @@ import type { ProductFilters, ProductOptions } from '../types/products.types'
 interface ProductsToolbarProps {
   filters: ProductFilters
   options?: ProductOptions
+  optionsLoading?: boolean
+  onCategoryOpen?: () => void
   onChange: (filters: ProductFilters) => void
   suggestions: readonly SmartSelectOption[]
 }
@@ -15,6 +17,8 @@ interface ProductsToolbarProps {
 export function ProductsToolbar({
   filters,
   options,
+  optionsLoading = false,
+  onCategoryOpen,
   onChange,
   suggestions,
 }: ProductsToolbarProps) {
@@ -24,7 +28,16 @@ export function ProductsToolbar({
     options?.categories.map((category) => ({
       value: category.id,
       label: category.name,
-    })) ?? []
+    })) ??
+    (optionsLoading
+      ? [
+          {
+            value: '__loading__',
+            label: 'Cargando categorías…',
+            disabled: true,
+          },
+        ]
+      : [])
 
   return (
     <div className="flex flex-col gap-3 border-b bg-card px-4 py-4 sm:px-5 xl:flex-row xl:items-center">
@@ -48,6 +61,7 @@ export function ProductsToolbar({
             placeholder="Todas las categorías"
             aria-label="Categoría"
             options={categoryOptions}
+            onOpen={onCategoryOpen}
             onChange={(categoryId) =>
               onChange({ ...filters, categoryId, page: 1 })
             }

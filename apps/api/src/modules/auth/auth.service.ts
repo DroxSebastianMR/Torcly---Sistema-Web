@@ -28,6 +28,28 @@ const invalidRecoveryToken = () =>
   )
 
 const dummyPasswordHashPromise = hashPassword('torcly-dummy-password')
+const sessionActivityRefreshIntervalMs = 60_000
+const authenticationCacheTtlMs = 10_000
+const authenticationCacheLimit = 500
+
+type CachedAuthentication = {
+  tokenHash: string
+  userId: string
+  user: AuthUser
+  expiresAt: Date
+  lastActivityAt: Date
+  cachedAt: number
+}
+
+type AuthSessionRecord = NonNullable<
+  Awaited<ReturnType<typeof authRepository.findSession>>
+>
+
+const authenticationCache = new Map<string, CachedAuthentication>()
+const pendingAuthentications = new Map<
+  string,
+  Promise<CachedAuthentication | null>
+>()
 
 function sessionExpiration(now = new Date()) {
   return new Date(now.getTime() + env.SESSION_IDLE_MINUTES * 60 * 1000)
@@ -46,6 +68,63 @@ function toAuthUser(user: AuthUserRecord): AuthUser {
     email: user.email,
     username: user.username,
     permissions: [...permissions].sort(),
+  }
+}
+
+function rememberAuthentication(
+  tokenHash: string,
+  session: AuthSessionRecord,
+): CachedAuthentication {
+  const entry: CachedAuthentication = {
+    tokenHash,
+    userId: session.userId,
+    user: toAuthUser(session.user),
+    expiresAt: session.expiresAt,
+    lastActivityAt: session.lastActivityAt,
+    cachedAt: Date.now(),
+  }
+  if (authenticationCache.size >= authenticationCacheLimit) {
+    const oldest = authenticationCache.keys().next().value
+    if (oldest) authenticationCache.delete(oldest)
+  }
+  authenticationCache.set(tokenHash, entry)
+  return entry
+}
+
+async function loadAuthentication(
+  tokenHash: string,
+): Promise<CachedAuthentication | null> {
+  const cached = authenticationCache.get(tokenHash)
+  if (cached && Date.now() - cached.cachedAt < authenticationCacheTtlMs) {
+    return cached
+  }
+
+  const pending = pendingAuthentications.get(tokenHash)
+  if (pending) return pending
+
+  const lookup = authRepository
+    .findSession(tokenHash)
+    .then((session) => {
+      if (!session || session.revokedAt || !session.user.active) {
+        authenticationCache.delete(tokenHash)
+        return null
+      }
+      return rememberAuthentication(tokenHash, session)
+    })
+    .finally(() => pendingAuthentications.delete(tokenHash))
+
+  pendingAuthentications.set(tokenHash, lookup)
+  return lookup
+}
+
+function invalidateSession(tokenHash: string) {
+  authenticationCache.delete(tokenHash)
+  pendingAuthentications.delete(tokenHash)
+}
+
+function invalidateUserSessions(userId: string) {
+  for (const [tokenHash, entry] of authenticationCache) {
+    if (entry.userId === userId) authenticationCache.delete(tokenHash)
   }
 }
 
@@ -90,36 +169,57 @@ export const authService = {
       context,
     )
 
+    const tokenHash = hashSessionToken(token)
+    authenticationCache.set(tokenHash, {
+      tokenHash,
+      userId: authenticatedUser.id,
+      user: toAuthUser(authenticatedUser),
+      expiresAt: sessionExpiration(now),
+      lastActivityAt: now,
+      cachedAt: Date.now(),
+    })
+
     return { token, user: toAuthUser(authenticatedUser) }
   },
 
   async authenticate(token: string, context: RequestContext) {
     const tokenHash = hashSessionToken(token)
-    const session = await authRepository.findSession(tokenHash)
-    if (!session || session.revokedAt || !session.user.active) {
+    const session = await loadAuthentication(tokenHash)
+    if (!session) {
       throw new AppError(401, 'AUTH_REQUIRED', 'Debes iniciar sesión.')
     }
 
     const now = new Date()
     if (session.expiresAt <= now) {
+      invalidateSession(tokenHash)
       await authRepository.expireSession(tokenHash, session.userId, context)
       throw new AppError(401, 'AUTH_SESSION_EXPIRED', 'La sesión expiró.')
     }
 
-    const refreshed = await authRepository.refreshSession(
-      tokenHash,
-      now,
-      sessionExpiration(now),
-    )
-    if (refreshed.count !== 1) {
-      throw new AppError(401, 'AUTH_REQUIRED', 'Debes iniciar sesión.')
+    if (
+      now.getTime() - session.lastActivityAt.getTime() >=
+      sessionActivityRefreshIntervalMs
+    ) {
+      await authRepository.refreshSession(
+        tokenHash,
+        now,
+        sessionExpiration(now),
+        new Date(now.getTime() - sessionActivityRefreshIntervalMs),
+      )
+      authenticationCache.set(tokenHash, {
+        ...session,
+        expiresAt: sessionExpiration(now),
+        lastActivityAt: now,
+        cachedAt: Date.now(),
+      })
     }
 
-    return { tokenHash, user: toAuthUser(session.user) }
+    return { tokenHash, user: session.user }
   },
 
   async logout(tokenHash: string, userId: string, context: RequestContext) {
     await authRepository.revokeSession(tokenHash, userId, context)
+    invalidateSession(tokenHash)
   },
 
   async requestPasswordRecovery(
@@ -171,6 +271,14 @@ export const authService = {
       context,
     )
     if (!result.consumed) throw invalidRecoveryToken()
+    invalidateUserSessions(record.userId)
+  },
+
+  invalidateUserSessions,
+
+  clearAuthenticationCacheForTests() {
+    authenticationCache.clear()
+    pendingAuthentications.clear()
   },
 
   async assertPermission(

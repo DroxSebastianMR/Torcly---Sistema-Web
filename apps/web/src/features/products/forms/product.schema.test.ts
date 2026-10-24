@@ -33,6 +33,25 @@ describe('Formulario de productos', () => {
     ).toBe(false)
   })
 
+  it('acepta stock mínimo con hasta tres decimales y rechaza cuatro', () => {
+    for (const minimumStock of [1, 1.2, 1.23, 1.234]) {
+      expect(
+        productFormSchema.safeParse({ ...validForm, minimumStock }).success,
+      ).toBe(true)
+    }
+
+    const result = productFormSchema.safeParse({
+      ...validForm,
+      minimumStock: 1.2345,
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(
+        'La cantidad admite hasta tres decimales.',
+      )
+    }
+  })
+
   it('permite código de barras vacío para digitación opcional', () => {
     expect(
       productFormSchema.safeParse({ ...validForm, barcode: '' }).success,

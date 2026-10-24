@@ -74,6 +74,7 @@ function userRecord(passwordHash: string) {
 describe('Servicio de autenticación', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    authService.clearAuthenticationCacheForTests()
     sent.length = 0
     setPasswordResetNotifier({
       send: async (message) => {
@@ -116,6 +117,63 @@ describe('Servicio de autenticación', () => {
     expect(repository.recordUnknownLoginFailure).toHaveBeenCalledOnce()
   })
 
+  it('usa el mismo error genérico para cuentas inactivas o bloqueadas', async () => {
+    const passwordHash = await hashPassword('Clave-segura-2026')
+    const inactive = { ...userRecord(passwordHash), active: false }
+    const locked = {
+      ...userRecord(passwordHash),
+      failedLoginAttempts: 5,
+      lockedUntil: new Date(Date.now() + 60_000),
+    }
+    const expected = {
+      status: 401,
+      code: 'AUTH_INVALID_CREDENTIALS',
+      message: 'No se pudo iniciar sesión con las credenciales proporcionadas.',
+    }
+
+    for (const user of [inactive, locked]) {
+      repository.findUserByIdentifier.mockResolvedValue(user)
+      await expect(
+        authService.login(
+          { identifier: user.email, password: 'Clave-segura-2026' },
+          context,
+        ),
+      ).rejects.toMatchObject(expected)
+    }
+
+    repository.findUserByIdentifier.mockResolvedValue(null)
+    await expect(
+      authService.login(
+        { identifier: 'nadie', password: 'incorrecta' },
+        context,
+      ),
+    ).rejects.toMatchObject(expected)
+
+    expect(repository.recordRejectedLogin).toHaveBeenCalledTimes(2)
+    expect(repository.recordUnknownLoginFailure).toHaveBeenCalledOnce()
+    expect(repository.createSession).not.toHaveBeenCalled()
+  })
+
+  it('permite iniciar sesión cuando el bloqueo ya expiró', async () => {
+    const user = {
+      ...userRecord(await hashPassword('Clave-segura-2026')),
+      failedLoginAttempts: 5,
+      lockedUntil: new Date(Date.now() - 1000),
+    }
+    repository.findUserByIdentifier.mockResolvedValue(user)
+    repository.createSession.mockResolvedValue(user)
+
+    const result = await authService.login(
+      { identifier: user.email, password: 'Clave-segura-2026' },
+      context,
+    )
+
+    expect(result.token).toBeTruthy()
+    expect(repository.createSession).toHaveBeenCalledOnce()
+    expect(repository.recordRejectedLogin).not.toHaveBeenCalled()
+    expect(repository.recordLoginFailure).not.toHaveBeenCalled()
+  })
+
   it('bloquea durante el quinto intento fallido', async () => {
     const user = {
       ...userRecord(await hashPassword('Clave-segura-2026')),
@@ -154,6 +212,77 @@ describe('Servicio de autenticación', () => {
       authService.authenticate('token', context),
     ).rejects.toMatchObject({ status: 401, code: 'AUTH_SESSION_EXPIRED' })
     expect(repository.expireSession).toHaveBeenCalledOnce()
+  })
+
+  it('evita escribir actividad para solicitudes cercanas y renueva una sesión activa al minuto', async () => {
+    const now = new Date('2026-10-24T12:00:00.000Z')
+    vi.useFakeTimers()
+    vi.setSystemTime(now)
+    const user = userRecord(await hashPassword('Clave-segura-2026'))
+    repository.findSession.mockResolvedValue({
+      tokenHash: 'a'.repeat(64),
+      userId: user.id,
+      expiresAt: new Date(now.getTime() + 30 * 60_000),
+      lastActivityAt: new Date(now.getTime() - 30_000),
+      revokedAt: null,
+      ipAddress: null,
+      userAgent: null,
+      createdAt: now,
+      user,
+    })
+
+    await expect(authService.authenticate('token', context)).resolves.toEqual(
+      expect.objectContaining({
+        user: expect.objectContaining({ id: user.id }),
+      }),
+    )
+    expect(repository.refreshSession).not.toHaveBeenCalled()
+
+    repository.findSession.mockResolvedValue({
+      tokenHash: 'a'.repeat(64),
+      userId: user.id,
+      expiresAt: new Date(now.getTime() + 30 * 60_000),
+      lastActivityAt: new Date(now.getTime() - 61_000),
+      revokedAt: null,
+      ipAddress: null,
+      userAgent: null,
+      createdAt: now,
+      user,
+    })
+    authService.clearAuthenticationCacheForTests()
+    await authService.authenticate('token', context)
+    expect(repository.refreshSession).toHaveBeenCalledWith(
+      expect.any(String),
+      now,
+      expect.any(Date),
+      new Date(now.getTime() - 60_000),
+    )
+    vi.useRealTimers()
+  })
+
+  it('reutiliza el contexto autenticado breve y lo invalida por usuario', async () => {
+    const user = userRecord(await hashPassword('Clave-segura-2026'))
+    repository.findSession.mockResolvedValue({
+      tokenHash: 'a'.repeat(64),
+      userId: user.id,
+      expiresAt: new Date(Date.now() + 30 * 60_000),
+      lastActivityAt: new Date(Date.now()),
+      revokedAt: null,
+      ipAddress: null,
+      userAgent: null,
+      createdAt: new Date(),
+      user,
+    })
+
+    await Promise.all([
+      authService.authenticate('token', context),
+      authService.authenticate('token', context),
+    ])
+    expect(repository.findSession).toHaveBeenCalledTimes(1)
+
+    authService.invalidateUserSessions(user.id)
+    await authService.authenticate('token', context)
+    expect(repository.findSession).toHaveBeenCalledTimes(2)
   })
 
   it('registra y deniega permisos ausentes', async () => {

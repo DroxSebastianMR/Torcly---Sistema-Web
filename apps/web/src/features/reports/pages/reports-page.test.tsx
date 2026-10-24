@@ -216,6 +216,7 @@ describe('Página de reportes', () => {
         from: expect.any(String),
         to: expect.any(String),
       }),
+      true,
     )
   })
 })

@@ -37,12 +37,12 @@ export default function Page() {
     currentUser?.permissions ?? [],
     'products:write',
   )
-  const product = useProduct(id ?? '')
-  const options = useProductOptions()
-  const mutations = useProductMutations()
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const [productToToggle, setProductToToggle] = useState<Product | null>(null)
+  const product = useProduct(id ?? '')
+  const options = useProductOptions(formOpen)
+  const mutations = useProductMutations()
 
   if (product.isPending) {
     return (

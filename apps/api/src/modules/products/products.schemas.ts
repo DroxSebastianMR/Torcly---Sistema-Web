@@ -1,4 +1,8 @@
 import { z } from 'zod'
+import {
+  hasAtMostThreeDecimals,
+  QUANTITY_MAX_DECIMALS_MESSAGE,
+} from '../../shared/validation/quantity.js'
 
 const optionalText = (max: number) =>
   z
@@ -55,7 +59,8 @@ export const productInputSchema = z
       .number()
       .finite()
       .min(1, 'El stock mínimo debe ser mayor que cero.')
-      .max(999_999_999),
+      .max(999_999_999)
+      .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE),
   })
   .strict()
 

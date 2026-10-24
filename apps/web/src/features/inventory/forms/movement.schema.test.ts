@@ -31,6 +31,32 @@ describe('Esquema de movimientos de inventario (web)', () => {
     expect(negative.success).toBe(false)
   })
 
+  it('acepta hasta tres decimales y rechaza cuatro', () => {
+    for (const quantity of [1, 1.2, 1.23, 1.234]) {
+      expect(
+        movementFormSchema.safeParse({
+          productId: 'p1',
+          quantity,
+          sign: 'IN',
+          notes: '',
+        }).success,
+      ).toBe(true)
+    }
+
+    const result = movementFormSchema.safeParse({
+      productId: 'p1',
+      quantity: 1.2345,
+      sign: 'IN',
+      notes: '',
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(
+        'La cantidad admite hasta tres decimales.',
+      )
+    }
+  })
+
   it('exige seleccionar un producto', () => {
     const result = movementFormSchema.safeParse({
       productId: '',

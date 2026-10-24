@@ -1,6 +1,12 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { SaleFormModal } from './sale-form-modal'
@@ -143,6 +149,64 @@ describe('Formulario de ventas', () => {
     expect(toast.error).toHaveBeenCalledWith(
       expect.stringContaining('Stock insuficiente'),
     )
+  })
+
+  it('acepta tres decimales en la cantidad al agregar el producto', async () => {
+    const user = userEvent.setup()
+    const mutations = {
+      create: { isPending: false, mutateAsync: vi.fn().mockResolvedValue({}) },
+      update: { isPending: false, mutateAsync: vi.fn() },
+      confirm: { isPending: false, mutateAsync: vi.fn() },
+    }
+    sales.useSaleMutations.mockReturnValue(mutations)
+    renderModal()
+
+    const quantityInput = screen.getByLabelText('Cantidad del producto')
+    fireEvent.change(quantityInput, { target: { value: '1.234' } })
+    await addProduct(user)
+    await user.click(screen.getByRole('button', { name: 'Guardar borrador' }))
+
+    await waitFor(() =>
+      expect(mutations.create.mutateAsync).toHaveBeenCalledWith({
+        customerId: null,
+        lines: [{ type: 'PRODUCT', productId: 'p1', quantity: 1.234 }],
+      }),
+    )
+  })
+
+  it('rechaza cantidades con cuatro decimales sin agregar la línea', async () => {
+    const user = userEvent.setup()
+    const mutations = {
+      create: { isPending: false, mutateAsync: vi.fn() },
+      update: { isPending: false, mutateAsync: vi.fn() },
+      confirm: { isPending: false, mutateAsync: vi.fn() },
+    }
+    sales.useSaleMutations.mockReturnValue(mutations)
+    renderModal()
+
+    const quantityInput = screen.getByLabelText('Cantidad del producto')
+    fireEvent.change(quantityInput, { target: { value: '1.2345' } })
+    await addProduct(user)
+
+    expect(toast.error).toHaveBeenCalledWith(
+      'La cantidad admite hasta tres decimales.',
+    )
+    await user.click(screen.getByRole('button', { name: 'Guardar borrador' }))
+    expect(mutations.create.mutateAsync).not.toHaveBeenCalled()
+  })
+
+  it('rechaza cuatro decimales al editar una línea y conserva la cantidad previa', () => {
+    renderModal({ sale: existingSale })
+    const quantity = screen.getByLabelText(
+      'Cantidad de Filtro de aceite',
+    ) as HTMLInputElement
+
+    fireEvent.change(quantity, { target: { value: '1.2345' } })
+
+    expect(toast.error).toHaveBeenCalledWith(
+      'La cantidad admite hasta tres decimales.',
+    )
+    expect(quantity.value).toBe('2')
   })
 
   it('registra un borrador con producto y servicio', async () => {

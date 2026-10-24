@@ -11,6 +11,7 @@ export interface FeedbackPreset {
   title: string
   description: string
   icon: LucideIcon
+  code?: string
 }
 
 export interface FeedbackAction {

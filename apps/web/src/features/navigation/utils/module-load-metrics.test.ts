@@ -7,16 +7,19 @@ describe('reportModuleLoad', () => {
   const fetchMock = vi.fn().mockResolvedValue({ ok: true })
 
   beforeEach(() => {
+    vi.useFakeTimers()
     vi.stubGlobal('fetch', fetchMock)
   })
 
   afterEach(() => {
     fetchMock.mockClear()
     vi.unstubAllGlobals()
+    vi.useRealTimers()
   })
 
   it('envía la medición únicamente a la API del proyecto', () => {
     reportModuleLoad('/reports', 1234.5678, 'route-change')
+    vi.runOnlyPendingTimers()
 
     expect(fetchMock).toHaveBeenCalledTimes(1)
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
@@ -27,6 +30,7 @@ describe('reportModuleLoad', () => {
 
   it('reporta solo los campos permitidos y redondea la duración', () => {
     reportModuleLoad('/dashboard', 987.654321, 'initial')
+    vi.runOnlyPendingTimers()
 
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit]
     const body = JSON.parse(String(init.body))
@@ -45,6 +49,8 @@ describe('reportModuleLoad', () => {
 
     expect(() => reportModuleLoad('/sales', 100, 'route-change')).not.toThrow()
 
-    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled())
+    vi.runOnlyPendingTimers()
+    await Promise.resolve()
+    expect(fetchMock).toHaveBeenCalled()
   })
 })

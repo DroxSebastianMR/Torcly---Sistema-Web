@@ -14,8 +14,13 @@ export const useReportSummary = (period: Period) =>
     queryFn: ({ signal }) => reportsService.summary(period, signal),
   })
 
-export const useReportBlock = (block: ReportBlock, period: Period) =>
+export const useReportBlock = (
+  block: ReportBlock,
+  period: Period,
+  enabled = true,
+) =>
   useQuery({
     queryKey: reportKeys.block(block, period),
     queryFn: ({ signal }) => reportsService.block(block, period, signal),
+    enabled,
   })

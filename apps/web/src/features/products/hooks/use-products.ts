@@ -27,10 +27,11 @@ export function useProduct(id: string) {
   })
 }
 
-export function useProductOptions() {
+export function useProductOptions(enabled = true) {
   return useQuery({
     queryKey: productKeys.options(),
     queryFn: ({ signal }) => productsService.options(signal),
+    enabled,
     select: (response) => response.data,
   })
 }

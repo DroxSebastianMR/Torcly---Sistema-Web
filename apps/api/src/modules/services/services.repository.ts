@@ -63,18 +63,16 @@ function buildWhere(filters: ServiceFilters): Prisma.ServiceWhereInput {
 export const servicesRepository = {
   async list(filters: ServiceFilters) {
     const where = buildWhere(filters)
-    return databaseService.transaction(async (transaction) => {
-      const [items, total] = await Promise.all([
-        transaction.service.findMany({
-          where,
-          orderBy: [{ active: 'desc' }, { name: 'asc' }],
-          skip: (filters.page - 1) * filters.pageSize,
-          take: filters.pageSize,
-        }),
-        transaction.service.count({ where }),
-      ])
-      return { items, total }
-    })
+    const [items, total] = await Promise.all([
+      databaseService.client.service.findMany({
+        where,
+        orderBy: [{ active: 'desc' }, { name: 'asc' }],
+        skip: (filters.page - 1) * filters.pageSize,
+        take: filters.pageSize,
+      }),
+      databaseService.client.service.count({ where }),
+    ])
+    return { items, total }
   },
 
   findById(id: string) {

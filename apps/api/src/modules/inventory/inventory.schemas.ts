@@ -1,4 +1,8 @@
 import { z } from 'zod'
+import {
+  hasAtMostThreeDecimals,
+  QUANTITY_MAX_DECIMALS_MESSAGE,
+} from '../../shared/validation/quantity.js'
 
 const optionalText = (max: number) =>
   z
@@ -47,7 +51,8 @@ const movementInputSchema = z.object({
     .number()
     .finite()
     .positive('La cantidad debe ser mayor que cero.')
-    .max(999_999_999, 'La cantidad supera el límite permitido.'),
+    .max(999_999_999, 'La cantidad supera el límite permitido.')
+    .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE),
   idempotencyKey: z
     .string()
     .trim()
@@ -69,7 +74,8 @@ export const adjustmentSchema = movementInputSchema
       .number()
       .finite()
       .refine((value) => value !== 0, 'El ajuste no puede ser cero.')
-      .max(999_999_999, 'El ajuste supera el límite permitido.'),
+      .max(999_999_999, 'El ajuste supera el límite permitido.')
+      .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE),
   })
   .strict()
 

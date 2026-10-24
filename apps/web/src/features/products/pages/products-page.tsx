@@ -40,10 +40,11 @@ export default function Page() {
   const [productFormOpen, setProductFormOpen] = useState(false)
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [productToToggle, setProductToToggle] = useState<Product | null>(null)
+  const [categoryFilterOpened, setCategoryFilterOpened] = useState(false)
   const deferredSearch = useDeferredValue(filters.search)
   const queryFilters = { ...filters, search: deferredSearch }
   const products = useProducts(queryFilters)
-  const options = useProductOptions()
+  const options = useProductOptions(productFormOpen || categoryFilterOpened)
   const mutations = useProductMutations()
   const total = products.data?.pagination.total ?? 0
   const visibleProducts = products.data?.data ?? []
@@ -126,6 +127,8 @@ export default function Page() {
         <ProductsToolbar
           filters={filters}
           options={options.data}
+          optionsLoading={options.isFetching}
+          onCategoryOpen={() => setCategoryFilterOpened(true)}
           onChange={setFilters}
           suggestions={visibleProducts.map((product) => ({
             value: product.code,
