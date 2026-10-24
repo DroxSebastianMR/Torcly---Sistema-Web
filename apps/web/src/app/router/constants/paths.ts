@@ -5,7 +5,6 @@ export const paths = {
   dashboard: '/dashboard',
   products: '/productos',
   productDetail: '/productos/:id',
-  barcodes: '/codigos-de-barras',
   inventory: '/inventario',
   replenishment: '/reabastecimiento',
   services: '/servicios',

@@ -1,7 +1,6 @@
 export const modules = [
   'dashboard',
   'products',
-  'barcodes',
   'inventory',
   'services',
   'purchases',

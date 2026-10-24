@@ -18,6 +18,7 @@ import type {
   AppointmentRescheduleInput,
   AppointmentVehicleRef,
 } from './appointment.types.js'
+import { notificationsService } from '../notifications/notifications.service.js'
 
 type AppointmentActor = { id: string; name: string }
 
@@ -208,6 +209,14 @@ export const appointmentsService = {
         normalizeActor(actor),
         context,
       )
+      await notificationsService.notifyUsersSafely({
+        permission: 'appointments:read',
+        type: 'APPOINTMENT_SCHEDULED',
+        preferenceKey: 'appointmentUpdates',
+        title: 'Nueva cita programada',
+        message: `La cita ${appointment.code} fue programada para el ${input.date} a las ${input.time}.`,
+        link: '/citas',
+      })
       return { data: toItem(appointment) }
     } catch (error) {
       return mapPersistenceError(error)
@@ -227,6 +236,14 @@ export const appointmentsService = {
       normalizeActor(actor),
       context,
     )
+    await notificationsService.notifyUsersSafely({
+      permission: 'appointments:read',
+      type: 'APPOINTMENT_RESCHEDULED',
+      preferenceKey: 'appointmentUpdates',
+      title: 'Cita reprogramada',
+      message: `La cita fue reprogramada para el ${input.date} a las ${input.time}.`,
+      link: '/citas',
+    })
     return { data: toItem(appointment) }
   },
 

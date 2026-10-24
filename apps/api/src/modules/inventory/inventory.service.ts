@@ -1,7 +1,9 @@
 import { Prisma } from '../../generated/prisma/client.js'
+import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import type { RequestContext } from '../auth/auth.types.js'
-import { resolveAdjustmentType } from './inventory.rules.js'
+import { computeStock, resolveAdjustmentType } from './inventory.rules.js'
+import { notificationsService } from '../notifications/notifications.service.js'
 import {
   inventoryRepository,
   type InventoryMovementRecord,
@@ -160,6 +162,42 @@ export const inventoryService = {
         actor,
         context,
       )
+
+      if (type === 'EXIT' || type === 'ADJUSTMENT_OUT') {
+        try {
+          const product = await databaseService.client.product.findUnique({
+            where: { id: movement.productId },
+            select: { minimumStock: true, active: true },
+          })
+          if (product && product.active) {
+            const confirmed =
+              await databaseService.client.inventoryMovement.groupBy({
+                by: ['type'],
+                where: { productId: movement.productId, status: 'CONFIRMED' },
+                _sum: { quantity: true },
+              })
+            const currentStock = computeStock(
+              confirmed.map((m) => ({
+                type: m.type,
+                quantity: m._sum.quantity ?? 0,
+              })),
+            )
+            if (currentStock <= Number(product.minimumStock)) {
+              await notificationsService.notifyUsersSafely({
+                permission: 'inventory:read',
+                type: 'STOCK_LOW',
+                preferenceKey: 'stockLow',
+                title: 'Stock bajo en inventario',
+                message: `El producto ${movement.product.name} (${movement.product.code}) tiene stock bajo (${currentStock} <= ${Number(product.minimumStock)}).`,
+                link: '/inventario',
+              })
+            }
+          }
+        } catch {
+          // fallo seguro
+        }
+      }
+
       return { data: toResponse(movement) }
     } catch (error) {
       const movement = await handleMovementPersistenceError(

@@ -20,6 +20,7 @@ import type {
   PaymentRegisterInput,
   PaymentsResponse,
 } from './payment.types.js'
+import { notificationsService } from '../notifications/notifications.service.js'
 
 type CustomerRefRecord = {
   id: string
@@ -210,6 +211,14 @@ export const paymentsService = {
       actor,
       context,
     )
+    await notificationsService.notifyUsersSafely({
+      permission: 'cash:read',
+      type: 'PAYMENT_COMPENSATED',
+      preferenceKey: 'paymentCompensated',
+      title: 'Pago compensado',
+      message: `Se ha registrado una compensación para la obligación ${row.code}.`,
+      link: '/caja',
+    })
     return { data: toDetail(row) }
   },
 }

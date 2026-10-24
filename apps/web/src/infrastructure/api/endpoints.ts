@@ -107,8 +107,17 @@ export const endpoints = {
     role: (id: string) => `/users/${id}/role`,
     status: (id: string) => `/users/${id}/status`,
   },
-  notifications: '/notifications',
-  profile: '/profile',
+  notifications: {
+    root: '/notifications',
+    unreadCount: '/notifications/unread-count',
+    markRead: (id: string) => `/notifications/${id}/read`,
+    markAllRead: '/notifications/mark-all-read',
+  },
+  profile: {
+    root: '/profile',
+    detail: (id?: string) => (id ? `/profile/${id}` : '/profile'),
+    changePassword: '/profile/change-password',
+  },
   reports: {
     summary: '/reports/summary',
     block: (block: string) => `/reports/blocks/${block}`,
@@ -121,7 +130,6 @@ export const endpoints = {
   audit: {
     root: '/audit',
   },
-  barcodes: '/barcodes',
   dashboard: '/dashboard',
   operations: {
     summary: '/operations/summary',

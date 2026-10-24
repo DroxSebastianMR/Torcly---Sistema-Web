@@ -47,19 +47,6 @@ export const protectedRoutes: RouteObject[] = [
             ],
           },
           {
-            element: <PermissionRoute permission="barcodes:read" />,
-            children: [
-              {
-                path: paths.barcodes,
-                lazy: async () => ({
-                  Component: (
-                    await import('@/features/barcodes/pages/barcodes-page')
-                  ).default,
-                }),
-              },
-            ],
-          },
-          {
             element: <PermissionRoute permission="inventory:read" />,
             children: [
               {

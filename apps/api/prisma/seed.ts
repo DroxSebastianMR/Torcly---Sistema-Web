@@ -18,7 +18,6 @@ const defaultPermissionCodes = [
   'dashboard:read',
   'products:read',
   'products:write',
-  'barcodes:read',
   'inventory:read',
   'inventory:write',
   'services:read',

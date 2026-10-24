@@ -11,6 +11,7 @@ import {
 import { useAppHeader } from '../hooks/use-app-header'
 import { NavigationSearch } from './navigation-search'
 import { HeaderPopover } from './header-popover'
+import { useUnreadNotificationsCount } from '@/features/notifications/hooks/use-notifications'
 
 interface AppHeaderProps {
   sidebarOpen: boolean
@@ -21,6 +22,10 @@ const menuLink =
 
 export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
   const header = useAppHeader()
+  const { data: unreadData } = useUnreadNotificationsCount(
+    Boolean(header.notifications),
+  )
+  const unreadCount = unreadData?.count ?? 0
   return (
     <header className="sticky top-0 z-10 flex min-h-18 items-center gap-2 border-b bg-card/95 px-4 backdrop-blur-sm sm:gap-4 lg:px-8">
       <button
@@ -94,11 +99,16 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
         {header.notifications && (
           <Link
             to={header.notifications.path}
-            aria-label="Notificaciones"
+            aria-label={`Notificaciones${unreadCount > 0 ? ` (${unreadCount} sin leer)` : ''}`}
             title="Notificaciones"
-            className="flex size-10 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-primary"
+            className="relative flex size-10 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-primary"
           >
             <Bell aria-hidden="true" size={18} />
+            {unreadCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex size-4.5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
           </Link>
         )}
         <div className="ml-1 border-l pl-1 sm:pl-3">

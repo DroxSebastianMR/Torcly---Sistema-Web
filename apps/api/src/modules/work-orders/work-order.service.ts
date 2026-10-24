@@ -12,6 +12,7 @@ import {
   computeWorkOrderTotals,
   roundQuantity,
 } from './work-order.rules.js'
+import { notificationsService } from '../notifications/notifications.service.js'
 import type {
   WorkOrderActivityInput,
   WorkOrderActivityResponse,
@@ -748,6 +749,14 @@ export const workOrdersService = {
       normalizeActor(actor),
       context,
     )
+    await notificationsService.notifyUsersSafely({
+      permission: 'workshop:read',
+      type: 'WORK_ORDER_READY',
+      preferenceKey: 'workOrderReady',
+      title: 'Orden lista para entrega',
+      message: `La orden de trabajo ${order.code} está lista para entrega.`,
+      link: '/ordenes-taller',
+    })
     return { data: toDetail(order, await resolveActorNames([order])) }
   },
 

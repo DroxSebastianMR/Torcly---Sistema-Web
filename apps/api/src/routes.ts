@@ -18,11 +18,15 @@ import { replenishmentRouter } from './modules/replenishment/replenishment.route
 import { metricsRouter } from './modules/metrics/metrics.routes.js'
 import { maintenanceRouter } from './modules/maintenance/maintenance.routes.js'
 import { auditRouter } from './modules/audit/audit.routes.js'
+import { profileRouter } from './modules/profile/profile.routes.js'
+import { notificationsRouter } from './modules/notifications/notifications.routes.js'
 
 export const apiRouter = Router()
 
 apiRouter.use('/health', healthRouter)
 apiRouter.use('/auth', authRouter)
+apiRouter.use('/profile', profileRouter)
+apiRouter.use('/notifications', notificationsRouter)
 apiRouter.use('/products', productsRouter)
 apiRouter.use('/users', usersRouter)
 apiRouter.use('/customers', customersRouter)

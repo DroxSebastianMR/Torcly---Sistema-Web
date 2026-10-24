@@ -150,6 +150,10 @@ enum AuditEventType {
   PURCHASE_LINE_ADDED
   PURCHASE_LINE_UPDATED
   PURCHASE_LINE_DELETED
+  PROFILE_UPDATED
+  PASSWORD_CHANGED
+  NOTIFICATION_READ
+  ALL_NOTIFICATIONS_READ
 }
 
 enum PurchaseStatus {
@@ -173,6 +177,8 @@ model User {
   assignedWorkOrders  WorkOrder[]  @relation("WorkOrderTechnician")
   replenishmentRuns   ReplenishmentRun[]
   passwordResetTokens PasswordResetToken[]
+  notificationPreferences Json?         @map("notification_preferences")
+  notifications       Notification[]
   createdAt           DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt           DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
 
@@ -755,4 +761,22 @@ model PurchaseLine {
   @@index([purchaseId])
   @@index([productId])
   @@map("purchase_lines")
+}
+
+model Notification {
+  id                 String    @id @default(uuid()) @db.Uuid
+  userId             String    @map("user_id") @db.Uuid
+  title              String    @db.VarChar(150)
+  message            String    @db.VarChar(500)
+  type               String    @db.VarChar(50)
+  link               String?   @db.VarChar(255)
+  permissionRequired String?   @map("permission_required") @db.VarChar(80)
+  read               Boolean   @default(false)
+  readAt             DateTime? @map("read_at") @db.Timestamptz(3)
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@map("notifications")
 }

@@ -20,6 +20,7 @@ import {
   assertHasPurchaseLines,
   computePurchaseTotal,
 } from './purchases.rules.js'
+import { notificationsService } from '../notifications/notifications.service.js'
 
 function toSupplierSummary(supplier: {
   id: string
@@ -391,6 +392,14 @@ export const purchasesService = {
       actor,
       context,
     )
+    await notificationsService.notifyUsersSafely({
+      permission: 'purchases:read',
+      type: 'PURCHASE_RECEIVED',
+      preferenceKey: 'purchaseReceived',
+      title: 'Compra recibida',
+      message: `La compra ${purchase.code} ha sido recibida y el inventario actualizado.`,
+      link: '/compras',
+    })
     return { data: toDetail(purchase) }
   },
 
