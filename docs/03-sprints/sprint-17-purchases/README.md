@@ -2,7 +2,7 @@
 
 Rama objetivo: `feature/sprint-17-purchases`  
 Base requerida: Sprint 16 implementado y entorno de prueba conocido  
-Estado: **Planificado; no iniciado.**
+Estado: **Implementado; listo para prueba del usuario.**
 
 ## Objetivo
 

@@ -20,7 +20,7 @@ Los sprints son secuenciales y cada uno tiene una rama, alcance cerrado, criteri
 | 14     | `sprint-14-ai-replenishment`       | `feature/sprint-14-ai-replenishment`       | Aprobado              |
 | 15     | `sprint-15-quality-performance`    | `feature/sprint-15-quality-performance`    | Documentado           |
 | 16     | `sprint-16-security-readiness`     | `feature/sprint-16-security-readiness`     | Implementado          |
-| 17     | `sprint-17-purchases`              | `feature/sprint-17-purchases`              | Planificado posterior |
+| 17     | `sprint-17-purchases`              | `feature/sprint-17-purchases`              | Implementado          |
 | 18     | `sprint-18-account-notifications`  | `feature/sprint-18-account-notifications`  | Planificado posterior |
 | 19     | `sprint-19-ai-dashboard-assistant` | `feature/sprint-19-ai-dashboard-assistant` | Planificado posterior |
 

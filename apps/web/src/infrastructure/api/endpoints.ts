@@ -42,7 +42,16 @@ export const endpoints = {
     detail: (id: string) => `/services/${id}`,
     status: (id: string) => `/services/${id}/status`,
   },
-  purchases: '/purchases',
+  purchases: {
+    root: '/purchases',
+    suppliers: '/purchases/suppliers',
+    activeSuppliers: '/purchases/suppliers/activos',
+    supplier: (id: string) => `/purchases/suppliers/${id}`,
+    supplierStatus: (id: string) => `/purchases/suppliers/${id}/status`,
+    detail: (id: string) => `/purchases/${id}`,
+    receive: (id: string) => `/purchases/${id}/receive`,
+    cancel: (id: string) => `/purchases/${id}/cancel`,
+  },
   sales: {
     root: '/sales',
     catalog: '/sales/catalogo',
