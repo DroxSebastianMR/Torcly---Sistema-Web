@@ -36,6 +36,15 @@ const schema = z.object({
     .min(5)
     .max(1440)
     .default(30),
+  GROQ_API_KEY: z.string().min(1).optional(),
+  AI_PROVIDER: z.enum(['groq', 'fake']).optional(),
+  AI_REQUEST_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .min(1000)
+    .max(30000)
+    .default(10000),
+  AI_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(100).default(10),
 })
 
 const isTest = process.env.NODE_ENV === 'test'

@@ -11,4 +11,11 @@
 | S19-07 | Revisar logs y red del navegador.                         | Clave nunca llega a web; logs contienen solo metadata sanitizada.                |
 | S19-08 | Ejecutar fake provider en tests.                          | Casos deterministas cubren contexto, permisos, fallback y contrato de respuesta. |
 
+## Cobertura automatizada implementada
+
+- Esquema: límites de entrada y rango de fechas.
+- Proveedores: fake determinista y conversión segura de cuota `429`.
+- Servicio: contexto agregado limitado a permisos y rechazo de solicitudes mutantes antes de consultar fuentes.
+- Pendiente: ejecución manual con una clave autorizada y revisión de red/logs en el entorno de prueba.
+
 Además: typecheck, lint, tests, build, formato, diff, y prueba manual con proveedor real solo usando una clave de entorno autorizada.

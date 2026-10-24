@@ -2,7 +2,7 @@
 
 Rama objetivo: `feature/sprint-19-ai-dashboard-assistant`  
 Base requerida: Sprint 18 implementado y BI con datos reales  
-Estado: **Planificado; no iniciado.**
+Estado: **Implementado; listo para prueba del usuario.**
 
 ## Objetivo
 
@@ -34,3 +34,14 @@ Incorporar un chat de consulta en el dashboard para explicar indicadores y recom
 - API de consulta asistida, proveedor abstraído, contexto mínimo, rate limiting y auditoría sanitizada.
 - Chat web con historial de sesión, estados accesibles y enlaces a módulos fuente.
 - Configuración documentada sin secretos, pruebas fake y guía de operación/costo.
+
+## Implementación
+
+- API bajo `/api/v1/assistant/chat`, protegido por `assistant:read`, con entrada máxima de 800 caracteres, límite por usuario, timeout y errores seguros para falta de proveedor, cuota e indisponibilidad.
+- `AiProvider` abstrae `GroqProvider` y `FakeProvider`. Groq se invoca desde el servidor por `fetch`; la clave únicamente se lee desde `apps/api/.env`.
+- El contexto procede del read-model de Operaciones y de recomendaciones de reabastecimiento solo si el usuario puede consultar inventario. Contiene agregados, período, fecha de generación y rutas fuente; no incluye clientes, documentos, identificadores internos ni acceso a PostgreSQL.
+- El panel está integrado al Dashboard, es accesible, mantiene respuesta, carga, vacío, error y restricciones de permisos. Muestra procedencia enlazable y rechaza solicitudes operativas.
+
+## Configuración y costo
+
+Definir `GROQ_API_KEY` solo en `apps/api/.env`. Opcionalmente se puede ajustar `AI_REQUEST_TIMEOUT_MS` (por defecto 10 s) y `AI_RATE_LIMIT_PER_MINUTE` (por defecto 10). Para pruebas locales, `AI_PROVIDER=fake` evita cualquier llamada externa. Groq puede devolver cuota `429`; la aplicación no reintenta automáticamente ni expone detalle de proveedor. Consultar y configurar límites/costo directamente en la cuenta autorizada de Groq antes de operar con datos reales.

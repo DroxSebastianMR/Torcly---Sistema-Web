@@ -16,6 +16,7 @@ const seedEnvSchema = z.object({
 
 const defaultPermissionCodes = [
   'dashboard:read',
+  'assistant:read',
   'products:read',
   'products:write',
   'inventory:read',

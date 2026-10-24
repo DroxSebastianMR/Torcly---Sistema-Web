@@ -14,6 +14,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
 import { paths } from '@/app/router/constants/paths'
 import { useOperationsSummary } from '../hooks/use-operations'
+import { AssistantChat } from '@/features/assistant/components/assistant-chat'
 import type { OperationalSection } from '../types/operations.types'
 
 const sections: Array<{
@@ -90,6 +91,7 @@ export default function Page() {
           Los filtros de fecha ajustan la consulta operativa.
         </p>
       </section>
+      <AssistantChat period={period} />
       {summary.isError ? (
         <ErrorState
           title="No se pudo cargar la consulta operativa"

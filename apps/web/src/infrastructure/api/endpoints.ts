@@ -113,6 +113,9 @@ export const endpoints = {
     markRead: (id: string) => `/notifications/${id}/read`,
     markAllRead: '/notifications/mark-all-read',
   },
+  assistant: {
+    chat: '/assistant/chat',
+  },
   profile: {
     root: '/profile',
     detail: (id?: string) => (id ? `/profile/${id}` : '/profile'),

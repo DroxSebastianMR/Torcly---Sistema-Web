@@ -11,6 +11,10 @@ vi.mock('../hooks/use-operations', () => ({
   useOperationsSummary: operations.useOperationsSummary,
 }))
 
+vi.mock('@/features/assistant/components/assistant-chat', () => ({
+  AssistantChat: () => null,
+}))
+
 describe('Dashboard operativo', () => {
   afterEach(() => {
     cleanup()
