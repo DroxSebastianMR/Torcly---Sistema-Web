@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { appNavigation } from '../config/app-navigation'
 import { filterNavigation } from '../utils/filter-navigation'
-import type { NavigationGroup, SidebarAccount } from '../types/navigation.types'
+import type { AccountSummary, NavigationGroup } from '../types/navigation.types'
 
 export function useAppSidebar(
   configuration: readonly NavigationGroup[] = appNavigation,
@@ -12,7 +12,7 @@ export function useAppSidebar(
   const [isSigningOut, setIsSigningOut] = useState(false)
   const pendingLogout = useRef(false)
   const groups = user ? filterNavigation(configuration, user.permissions) : []
-  const account: SidebarAccount = {
+  const account: AccountSummary = {
     name: user?.name ?? '',
     email: user?.email ?? '',
     initials:

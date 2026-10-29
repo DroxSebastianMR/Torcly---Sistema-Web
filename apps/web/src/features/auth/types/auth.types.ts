@@ -3,10 +3,11 @@ export interface User {
   id: string
   name: string
   email: string
+  username: string
   permissions: Permission[]
 }
 export interface LoginInput {
-  email: string
+  identifier: string
   password: string
 }
 

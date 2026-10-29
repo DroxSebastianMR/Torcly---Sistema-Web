@@ -1,0 +1,39 @@
+# Products (web)
+
+Catálogo de productos: alta, búsqueda combinable, detalle en diálogo, actualización y desactivación sin borrado. Acepta código digitado o recibido desde un lector USB tipo teclado.
+
+## Páginas y rutas
+
+- `/productos` — listado con búsqueda (código, nombre, categoría), paginación, estado, detalle en diálogo y acciones de escritura según permiso. El detalle reutiliza los datos ya cargados en la fila, sin disparar otra navegación ni consulta.
+
+## Permisos
+
+- `products:read` — ver listado y detalle.
+- `products:write` — acciones «Registrar», catálogos, edición y activar/desactivar. Sin el permiso no se renderizan las acciones de escritura en tabla, detalle ni menú.
+
+## Catálogos
+
+El modal «Catálogos» administra categorías, marcas y unidades: permite crear, editar y activar/desactivar. No elimina registros, por lo que conserva las relaciones históricas de los productos. Los registros inactivos no se ofrecen al registrar productos nuevos, pero se mantienen visibles en el modal para reactivarlos.
+
+## Stock de solo lectura
+
+El stock proviene de inventory: se muestra como «Existencia disponible» en la ficha y como dato informativo en el modal de edición, siempre de solo lectura. El formulario envía únicamente datos comerciales; nunca el stock.
+
+## Señal de stock bajo (Sprint 15)
+
+El aviso de stock bajo no depende solo del color: en escritorio y en la tarjeta
+móvil aparece el icono de alerta con el texto «Stock bajo», de modo que el estado es
+comprensible sin percibir color.
+
+## Compatibilidad con lector USB
+
+Los campos de código y código de barras evitan el envío implícito al presionar Enter (`stopImplicitSubmit`), de modo que un escáner tipo teclado puede escribir el código completo y la validación se dispara al enfocar el campo (RHF) en lugar de enviar el formulario a mitad de la lectura.
+
+## Pruebas
+
+- `services/products.service.test.ts` — contrato HTTP del servicio (list, get, create, update, status, opciones).
+- `forms/product.schema.test.ts` — validación del formulario web.
+- `pages/products-page.test.tsx` — listado, permisos, búsqueda, detalle en diálogo y confirmación de desactivación.
+- `components/product-form-modal.test.tsx` — validaciones, normalización de código, payload correcto, Enter no envía y stock de solo lectura al editar.
+
+Sprint propietario: 05.

@@ -8,3 +8,10 @@ dist/
 coverage/
 .pnpm-store/
 /apps/api/src/generated/prisma/
+
+# Artefactos locales de automatización, investigación y generación de informes.
+# No forman parte del código fuente ni de la evidencia versionada de Torcly.
+/.playwright-mcp/
+/.playwright-cli/
+/tmp/
+/output/

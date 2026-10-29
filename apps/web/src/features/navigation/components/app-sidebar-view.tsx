@@ -1,15 +1,9 @@
-import { LogOut, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { TorclyLogo } from '@/components/brand/torcly-logo'
 import { SidebarNavigationItem } from './sidebar-navigation-item'
 import type { SidebarViewProps } from '../types/navigation.types'
 
-export function AppSidebarView({
-  groups,
-  account,
-  isSigningOut,
-  onLogout,
-  onNavigate,
-}: SidebarViewProps) {
+export function AppSidebarView({ groups, onNavigate }: SidebarViewProps) {
   return (
     <>
       <header className="flex h-20 shrink-0 items-center justify-between px-6 [@media(max-height:700px)]:h-16">
@@ -44,37 +38,6 @@ export function AppSidebarView({
           </section>
         ))}
       </nav>
-      <footer className="mx-3 shrink-0 border-t border-white/10 py-3 [@media(max-height:700px)]:py-2">
-        <div className="flex items-center gap-3 px-2">
-          <span
-            aria-hidden="true"
-            className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-[11px] font-semibold text-brand-accent"
-          >
-            {account.initials}
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-medium" title={account.name}>
-              {account.name}
-            </p>
-            <p
-              className="mt-1 truncate text-[10px] text-white/50"
-              title={account.email}
-            >
-              {account.email}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onLogout}
-            disabled={isSigningOut}
-            aria-label={isSigningOut ? 'Cerrando sesión' : 'Cerrar sesión'}
-            title="Cerrar sesión"
-            className="flex size-9 shrink-0 items-center justify-center rounded-lg text-white/55 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-brand-accent disabled:opacity-50"
-          >
-            <LogOut aria-hidden="true" size={16} />
-          </button>
-        </div>
-      </footer>
     </>
   )
 }

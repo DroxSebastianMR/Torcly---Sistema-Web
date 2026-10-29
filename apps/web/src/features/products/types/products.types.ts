@@ -4,6 +4,10 @@ export interface CatalogOption {
   symbol?: string
 }
 
+export interface CatalogItem extends CatalogOption {
+  active: boolean
+}
+
 export interface ProductInput {
   code: string
   barcode: string | null
@@ -40,6 +44,12 @@ export interface ProductOptions {
   categories: CatalogOption[]
   brands: CatalogOption[]
   units: Array<CatalogOption & { symbol: string }>
+}
+
+export interface ProductCatalog {
+  categories: CatalogItem[]
+  brands: CatalogItem[]
+  units: Array<CatalogItem & { symbol: string }>
 }
 
 export interface ProductsResponse {

@@ -4,7 +4,7 @@ import {
   EyeOff,
   LoaderCircle,
   LockKeyhole,
-  Mail,
+  UserRound,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { paths } from '@/app/router/constants/paths'
@@ -20,6 +20,8 @@ export function LoginForm() {
     isSubmitting,
     showPassword,
     togglePassword,
+    rememberIdentifier,
+    setRememberIdentifier,
   } = useLoginForm()
 
   return (
@@ -30,18 +32,17 @@ export function LoginForm() {
       className="space-y-5 2xl:space-y-6"
     >
       <AuthInput
-        id="email"
-        label="Correo electrónico"
-        type="email"
-        inputMode="email"
+        id="identifier"
+        label="Usuario o correo electrónico"
+        type="text"
         autoComplete="username"
         autoCapitalize="none"
         spellCheck={false}
-        placeholder="nombre@empresa.com"
-        icon={Mail}
+        placeholder="usuario o nombre@empresa.com"
+        icon={UserRound}
         readOnly={isSubmitting}
-        error={errors.email?.message}
-        {...register('email')}
+        error={errors.identifier?.message}
+        {...register('identifier')}
       />
       <AuthInput
         id="password"
@@ -72,7 +73,17 @@ export function LoginForm() {
           </button>
         }
       />
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-medium text-foreground">
+          <input
+            type="checkbox"
+            checked={rememberIdentifier}
+            disabled={isSubmitting}
+            onChange={(event) => setRememberIdentifier(event.target.checked)}
+            className="size-4 cursor-pointer accent-primary disabled:cursor-not-allowed"
+          />
+          Recordar usuario
+        </label>
         <Link
           className="rounded-sm text-xs font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
           to={paths.forgotPassword}

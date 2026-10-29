@@ -4,10 +4,10 @@ export interface AuthContextValue {
   user: User | null
   loading: boolean
   error: boolean
+  errorDetail?: unknown
   retry: () => void
   login: (input: LoginInput) => Promise<void>
   logout: () => Promise<void>
-  enterDemo: () => void
 }
 export const AuthContext = createContext<AuthContextValue | null>(null)
 export function useAuth() {

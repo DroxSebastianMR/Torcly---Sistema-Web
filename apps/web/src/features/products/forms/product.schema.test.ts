@@ -27,9 +27,58 @@ describe('Formulario de productos', () => {
     expect(result.success).toBe(false)
   })
 
+  it('exige un stock mínimo mayor que cero', () => {
+    expect(
+      productFormSchema.safeParse({ ...validForm, minimumStock: 0 }).success,
+    ).toBe(false)
+  })
+
+  it('acepta stock mínimo con hasta tres decimales y rechaza cuatro', () => {
+    for (const minimumStock of [1, 1.2, 1.23, 1.234]) {
+      expect(
+        productFormSchema.safeParse({ ...validForm, minimumStock }).success,
+      ).toBe(true)
+    }
+
+    const result = productFormSchema.safeParse({
+      ...validForm,
+      minimumStock: 1.2345,
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe(
+        'La cantidad admite hasta tres decimales.',
+      )
+    }
+  })
+
   it('permite código de barras vacío para digitación opcional', () => {
     expect(
       productFormSchema.safeParse({ ...validForm, barcode: '' }).success,
     ).toBe(true)
+  })
+
+  it('rechaza códigos demasiado cortos o con caracteres inválidos', () => {
+    expect(
+      productFormSchema.safeParse({ ...validForm, code: 'A' }).success,
+    ).toBe(false)
+    expect(
+      productFormSchema.safeParse({ ...validForm, code: 'REP_001*' }).success,
+    ).toBe(false)
+  })
+
+  it('rechaza un código de barras mal formado', () => {
+    expect(
+      productFormSchema.safeParse({ ...validForm, barcode: '12' }).success,
+    ).toBe(false)
+  })
+
+  it('exige categoría y unidad para el registro', () => {
+    expect(
+      productFormSchema.safeParse({ ...validForm, categoryId: '' }).success,
+    ).toBe(false)
+    expect(
+      productFormSchema.safeParse({ ...validForm, unitId: '' }).success,
+    ).toBe(false)
   })
 })

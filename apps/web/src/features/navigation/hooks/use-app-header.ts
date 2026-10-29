@@ -23,6 +23,5 @@ export function useAppHeader() {
     isSigningOut,
     onLogout,
     profile: links.find((item) => item.id === 'profile'),
-    notifications: links.find((item) => item.id === 'notifications'),
   }
 }

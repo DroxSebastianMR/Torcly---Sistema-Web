@@ -65,6 +65,9 @@ export const errorHandler: ErrorRequestHandler = (
       code,
       message,
       requestId: response.locals.requestId,
+      ...(error instanceof AppError && error.details
+        ? { details: error.details }
+        : {}),
       ...(validationError
         ? {
             fields: error.issues.map((issue) => ({

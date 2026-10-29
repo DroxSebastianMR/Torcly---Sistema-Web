@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
+import { SmartSelect } from '@/components/ui/smart-select'
 import {
   productFormSchema,
   type ProductFormValues,
@@ -39,7 +40,7 @@ const emptyValues: ProductFormValues = {
   brandId: '',
   unitId: '',
   salePrice: 0,
-  minimumStock: 0,
+  minimumStock: 1,
 }
 
 export function ProductFormModal({
@@ -55,10 +56,14 @@ export function ProductFormModal({
     resolver: zodResolver(productFormSchema),
     defaultValues: emptyValues,
   })
+  const categoryId = useWatch({ control: form.control, name: 'categoryId' })
+  const brandId = useWatch({ control: form.control, name: 'brandId' })
+  const unitId = useWatch({ control: form.control, name: 'unitId' })
+  const { reset: resetForm } = form
 
   useEffect(() => {
     if (!open) return
-    form.reset(
+    resetForm(
       product
         ? {
             code: product.code,
@@ -73,7 +78,7 @@ export function ProductFormModal({
           }
         : emptyValues,
     )
-  }, [form, open, product])
+  }, [open, product, resetForm])
 
   const submit = form.handleSubmit(async (values) => {
     const input: ProductInput = {
@@ -104,6 +109,14 @@ export function ProductFormModal({
   const fieldError = (name: keyof ProductFormValues) => {
     const message = form.formState.errors[name]?.message
     return message ? String(message) : undefined
+  }
+
+  const stopImplicitSubmit: React.KeyboardEventHandler<HTMLInputElement> = (
+    event,
+  ) => {
+    if (event.key !== 'Enter') return
+    event.preventDefault()
+    event.stopPropagation()
   }
 
   return (
@@ -156,6 +169,16 @@ export function ProductFormModal({
       <form
         id="product-form"
         onSubmit={submit}
+        onKeyDownCapture={(event) => {
+          const target = event.target as HTMLInputElement
+          if (
+            event.key === 'Enter' &&
+            (target.name === 'code' || target.name === 'barcode')
+          ) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+        }}
         noValidate
         className="space-y-5"
       >
@@ -170,6 +193,7 @@ export function ProductFormModal({
               autoComplete="off"
               placeholder="Ej. REP-001"
               className="uppercase"
+              onKeyDown={stopImplicitSubmit}
             />
           </Field>
           <Field
@@ -182,6 +206,7 @@ export function ProductFormModal({
               autoComplete="off"
               inputMode="numeric"
               placeholder="Escanea o digita el código"
+              onKeyDown={stopImplicitSubmit}
             />
           </Field>
         </div>
@@ -208,34 +233,61 @@ export function ProductFormModal({
 
         <div className="grid gap-4 sm:grid-cols-3">
           <Field label="Categoría" error={fieldError('categoryId')} required>
-            <select {...form.register('categoryId')} className={inputClass}>
-              <option value="">Seleccionar</option>
-              {options?.categories.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.name}
-                </option>
-              ))}
-            </select>
+            <SmartSelect
+              value={categoryId}
+              placeholder="Seleccionar categoría"
+              aria-label="Categoría"
+              options={
+                options?.categories.map((option) => ({
+                  value: option.id,
+                  label: option.name,
+                })) ?? []
+              }
+              onChange={(categoryId) =>
+                form.setValue('categoryId', categoryId, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
+            />
           </Field>
           <Field label="Marca" error={fieldError('brandId')} hint="Opcional">
-            <select {...form.register('brandId')} className={inputClass}>
-              <option value="">Sin marca</option>
-              {options?.brands.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.name}
-                </option>
-              ))}
-            </select>
+            <SmartSelect
+              value={brandId}
+              placeholder="Sin marca"
+              aria-label="Marca"
+              options={
+                options?.brands.map((option) => ({
+                  value: option.id,
+                  label: option.name,
+                })) ?? []
+              }
+              onChange={(brandId) =>
+                form.setValue('brandId', brandId, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
+            />
           </Field>
           <Field label="Unidad" error={fieldError('unitId')} required>
-            <select {...form.register('unitId')} className={inputClass}>
-              <option value="">Seleccionar</option>
-              {options?.units.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.name} ({option.symbol})
-                </option>
-              ))}
-            </select>
+            <SmartSelect
+              value={unitId}
+              placeholder="Seleccionar unidad"
+              aria-label="Unidad"
+              options={
+                options?.units.map((option) => ({
+                  value: option.id,
+                  label: `${option.name} (${option.symbol})`,
+                })) ?? []
+              }
+              onChange={(unitId) =>
+                form.setValue('unitId', unitId, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
+            />
           </Field>
         </div>
 
@@ -267,7 +319,7 @@ export function ProductFormModal({
             <Input
               {...form.register('minimumStock', { valueAsNumber: true })}
               type="number"
-              min="0"
+              min="1"
               step="0.001"
             />
           </Field>

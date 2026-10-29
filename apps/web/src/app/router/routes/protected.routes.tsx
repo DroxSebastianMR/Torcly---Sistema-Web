@@ -24,6 +24,21 @@ export const protectedRoutes: RouteObject[] = [
             ],
           },
           {
+            element: <PermissionRoute permission="assistant:read" />,
+            children: [
+              {
+                path: paths.assistantHistory,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/assistant/pages/assistant-history-page'
+                    )
+                  ).default,
+                }),
+              },
+            ],
+          },
+          {
             element: <PermissionRoute permission="products:read" />,
             children: [
               {
@@ -37,19 +52,6 @@ export const protectedRoutes: RouteObject[] = [
             ],
           },
           {
-            element: <PermissionRoute permission="barcodes:read" />,
-            children: [
-              {
-                path: paths.barcodes,
-                lazy: async () => ({
-                  Component: (
-                    await import('@/features/barcodes/pages/barcodes-page')
-                  ).default,
-                }),
-              },
-            ],
-          },
-          {
             element: <PermissionRoute permission="inventory:read" />,
             children: [
               {
@@ -57,6 +59,19 @@ export const protectedRoutes: RouteObject[] = [
                 lazy: async () => ({
                   Component: (
                     await import('@/features/inventory/pages/inventory-page')
+                  ).default,
+                }),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute permission="services:read" />,
+            children: [
+              {
+                path: paths.services,
+                lazy: async () => ({
+                  Component: (
+                    await import('@/features/services/pages/services-page')
                   ).default,
                 }),
               },
@@ -88,6 +103,46 @@ export const protectedRoutes: RouteObject[] = [
             ],
           },
           {
+            element: <PermissionRoute permission="appointments:read" />,
+            children: [
+              {
+                path: paths.appointments,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/appointments/pages/appointments-page'
+                    )
+                  ).default,
+                }),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute permission="workshop:read" />,
+            children: [
+              {
+                path: paths.workOrders,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/work-orders/pages/work-orders-page'
+                    )
+                  ).default,
+                }),
+              },
+              {
+                path: paths.technicians,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/technicians/pages/technicians-page'
+                    )
+                  ).default,
+                }),
+              },
+            ],
+          },
+          {
             element: <PermissionRoute permission="customers:read" />,
             children: [
               {
@@ -95,6 +150,39 @@ export const protectedRoutes: RouteObject[] = [
                 lazy: async () => ({
                   Component: (
                     await import('@/features/customers/pages/customers-page')
+                  ).default,
+                }),
+              },
+              {
+                path: paths.customerDetail,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/customers/pages/customer-detail-page'
+                    )
+                  ).default,
+                }),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute permission="vehicles:read" />,
+            children: [
+              {
+                path: paths.vehicles,
+                lazy: async () => ({
+                  Component: (
+                    await import('@/features/vehicles/pages/vehicles-page')
+                  ).default,
+                }),
+              },
+              {
+                path: paths.vehicleDetail,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/vehicles/pages/vehicle-detail-page'
+                    )
                   ).default,
                 }),
               },
@@ -125,21 +213,6 @@ export const protectedRoutes: RouteObject[] = [
             ],
           },
           {
-            element: <PermissionRoute permission="notifications:read" />,
-            children: [
-              {
-                path: paths.notifications,
-                lazy: async () => ({
-                  Component: (
-                    await import(
-                      '@/features/notifications/pages/notifications-page'
-                    )
-                  ).default,
-                }),
-              },
-            ],
-          },
-          {
             element: <PermissionRoute permission="profile:read" />,
             children: [
               {
@@ -161,6 +234,33 @@ export const protectedRoutes: RouteObject[] = [
                   Component: (
                     await import('@/features/reports/pages/reports-page')
                   ).default,
+                }),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute permission="maintenance:read" />,
+            children: [
+              {
+                path: paths.maintenance,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/maintenance/pages/maintenance-page'
+                    )
+                  ).default,
+                }),
+              },
+            ],
+          },
+          {
+            element: <PermissionRoute permission="audit:read" />,
+            children: [
+              {
+                path: paths.audit,
+                lazy: async () => ({
+                  Component: (await import('@/features/audit/pages/audit-page'))
+                    .default,
                 }),
               },
             ],

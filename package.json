@@ -21,6 +21,7 @@
     "db:pull": "pnpm --filter @torcly/api db:pull",
     "db:migrate:dev": "pnpm --filter @torcly/api db:migrate:dev",
     "db:migrate:deploy": "pnpm --filter @torcly/api db:migrate:deploy",
+    "db:seed": "pnpm --filter @torcly/api db:seed",
     "db:studio": "pnpm --filter @torcly/api db:studio",
     "format": "prettier --write apps docs package.json pnpm-workspace.yaml README.md",
     "format:check": "prettier --check apps docs package.json pnpm-workspace.yaml README.md",

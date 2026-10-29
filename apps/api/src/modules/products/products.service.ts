@@ -1,5 +1,6 @@
 import { Prisma } from '../../generated/prisma/client.js'
 import { AppError } from '../../shared/errors/app-error.js'
+import type { RequestContext } from '../auth/auth.types.js'
 import {
   productsRepository,
   type ProductRecord,
@@ -94,26 +95,46 @@ export const productsService = {
     return { data: toResponse(product) }
   },
 
-  async create(input: ProductInput) {
-    try {
-      return { data: toResponse(await productsRepository.create(input)) }
-    } catch (error) {
-      return mapPersistenceError(error)
-    }
-  },
-
-  async update(id: string, input: ProductInput) {
-    try {
-      return { data: toResponse(await productsRepository.update(id, input)) }
-    } catch (error) {
-      return mapPersistenceError(error)
-    }
-  },
-
-  async updateStatus(id: string, active: boolean) {
+  async create(input: ProductInput, actorId: string, context: RequestContext) {
     try {
       return {
-        data: toResponse(await productsRepository.updateStatus(id, active)),
+        data: toResponse(
+          await productsRepository.create(input, actorId, context),
+        ),
+      }
+    } catch (error) {
+      return mapPersistenceError(error)
+    }
+  },
+
+  async update(
+    id: string,
+    input: ProductInput,
+    actorId: string,
+    context: RequestContext,
+  ) {
+    try {
+      return {
+        data: toResponse(
+          await productsRepository.update(id, input, actorId, context),
+        ),
+      }
+    } catch (error) {
+      return mapPersistenceError(error)
+    }
+  },
+
+  async updateStatus(
+    id: string,
+    active: boolean,
+    actorId: string,
+    context: RequestContext,
+  ) {
+    try {
+      return {
+        data: toResponse(
+          await productsRepository.updateStatus(id, active, actorId, context),
+        ),
       }
     } catch (error) {
       return mapPersistenceError(error)
@@ -122,6 +143,10 @@ export const productsService = {
 
   async getOptions() {
     return { data: await productsRepository.getOptions() }
+  },
+
+  async getCatalog() {
+    return { data: await productsRepository.getCatalog() }
   },
 
   async createCategory(name: string) {
@@ -143,6 +168,54 @@ export const productsService = {
   async createUnit(name: string, symbol: string) {
     try {
       return { data: await productsRepository.createUnit(name, symbol) }
+    } catch (error) {
+      return mapPersistenceError(error)
+    }
+  },
+
+  async updateCategory(id: string, name: string) {
+    try {
+      return { data: await productsRepository.updateCategory(id, name) }
+    } catch (error) {
+      return mapPersistenceError(error)
+    }
+  },
+
+  async updateBrand(id: string, name: string) {
+    try {
+      return { data: await productsRepository.updateBrand(id, name) }
+    } catch (error) {
+      return mapPersistenceError(error)
+    }
+  },
+
+  async updateUnit(id: string, name: string, symbol: string) {
+    try {
+      return { data: await productsRepository.updateUnit(id, name, symbol) }
+    } catch (error) {
+      return mapPersistenceError(error)
+    }
+  },
+
+  async updateCategoryStatus(id: string, active: boolean) {
+    try {
+      return { data: await productsRepository.updateCategoryStatus(id, active) }
+    } catch (error) {
+      return mapPersistenceError(error)
+    }
+  },
+
+  async updateBrandStatus(id: string, active: boolean) {
+    try {
+      return { data: await productsRepository.updateBrandStatus(id, active) }
+    } catch (error) {
+      return mapPersistenceError(error)
+    }
+  },
+
+  async updateUnitStatus(id: string, active: boolean) {
+    try {
+      return { data: await productsRepository.updateUnitStatus(id, active) }
     } catch (error) {
       return mapPersistenceError(error)
     }

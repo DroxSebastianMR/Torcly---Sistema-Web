@@ -1,22 +1,27 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { paths } from '../constants/paths'
-import { Button } from '@/components/ui/button'
+import { LoadingScreen } from '@/components/ui/loading-screen'
+import { SystemFeedbackScreen } from '@/components/ui/system-feedback-screen'
+import { getFeedbackKindFromError } from '@/lib/feedback/feedback-from-error'
+
 export function ProtectedRoute() {
-  const { user, loading, error, retry } = useAuth()
+  const { user, loading, error, errorDetail, retry } = useAuth()
   const location = useLocation()
   if (loading)
     return (
-      <p role="status" className="p-8">
-        Verificando sesión…
-      </p>
+      <LoadingScreen
+        title="Verificando tu sesión"
+        description="Estamos validando tu acceso seguro a Torcly."
+      />
     )
   if (error)
     return (
-      <div role="alert" className="p-8">
-        <p>No se pudo verificar la sesión. Comprueba la conexión con la API.</p>
-        <Button onClick={retry}>Reintentar</Button>
-      </div>
+      <SystemFeedbackScreen
+        kind={getFeedbackKindFromError(errorDetail)}
+        primaryAction={{ label: 'Reintentar', onClick: retry }}
+        busy={loading}
+      />
     )
   return user ? (
     <Outlet />

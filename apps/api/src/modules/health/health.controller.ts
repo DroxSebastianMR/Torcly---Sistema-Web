@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express'
-import { getDatabaseHealth, getHealth } from './health.service.js'
+import { getDatabaseHealth, getHealth, getReadiness } from './health.service.js'
 
 export const healthController: RequestHandler = (_request, response) => {
   response.setHeader('Cache-Control', 'no-store')
@@ -12,4 +12,13 @@ export const databaseHealthController: RequestHandler = async (
 ) => {
   response.setHeader('Cache-Control', 'no-store')
   response.json(await getDatabaseHealth())
+}
+
+export const readinessController: RequestHandler = async (
+  _request,
+  response,
+) => {
+  response.setHeader('Cache-Control', 'no-store')
+  const readiness = await getReadiness()
+  response.status(readiness.status === 'ok' ? 200 : 503).json(readiness)
 }
