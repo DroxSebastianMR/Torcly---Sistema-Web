@@ -88,8 +88,7 @@ describe('Servicio de vehículos', () => {
     })
   })
 
-  it('crea el vehículo normalizando la placa y verificando al propietario', async () => {
-    repository.findCustomerById.mockResolvedValue(OWNER)
+  it('crea el vehículo normalizando la placa', async () => {
     repository.create.mockResolvedValue(record())
 
     const result = await vehiclesService.create(
@@ -104,7 +103,6 @@ describe('Servicio de vehículos', () => {
       context,
     )
 
-    expect(repository.findCustomerById).toHaveBeenCalledWith('c1')
     expect(repository.create).toHaveBeenCalledWith(
       {
         plate: 'ABC123',
@@ -120,7 +118,12 @@ describe('Servicio de vehículos', () => {
   })
 
   it('informa un propietario inexistente al crear', async () => {
-    repository.findCustomerById.mockResolvedValue(null)
+    repository.create.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('Propietario inexistente', {
+        code: 'P2003',
+        clientVersion: '7.10.0',
+      }),
+    )
 
     await expect(
       vehiclesService.create(
@@ -138,11 +141,10 @@ describe('Servicio de vehículos', () => {
       status: 404,
       code: 'CUSTOMER_NOT_FOUND',
     })
-    expect(repository.create).not.toHaveBeenCalled()
+    expect(repository.create).toHaveBeenCalledOnce()
   })
 
   it('mapea una placa duplicada equivalente a un error accionable', async () => {
-    repository.findCustomerById.mockResolvedValue(OWNER)
     repository.create.mockRejectedValue(
       new Prisma.PrismaClientKnownRequestError('Duplicado', {
         code: 'P2002',
@@ -182,7 +184,12 @@ describe('Servicio de vehículos', () => {
   })
 
   it('informa un vehículo inexistente al actualizar', async () => {
-    repository.findById.mockResolvedValue(null)
+    repository.update.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('Vehículo inexistente', {
+        code: 'P2025',
+        clientVersion: '7.10.0',
+      }),
+    )
 
     await expect(
       vehiclesService.update(

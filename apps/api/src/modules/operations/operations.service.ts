@@ -3,6 +3,7 @@ import {
   computeBalance,
   computePaidAmount,
 } from '../payments/payment.rules.js'
+import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import { operationsRepository } from './operations.repository.js'
 import {
   assertSectionAccess,
@@ -55,9 +56,9 @@ async function buildSection(
 ): Promise<OperationalSectionSummary> {
   switch (section) {
     case 'appointments': {
-      const byStatus = await operationsRepository.countAppointmentsByStatus(
-        from,
-        to,
+      const byStatus = await databaseService.measure(
+        'operations.summary.appointments',
+        () => operationsRepository.countAppointmentsByStatus(from, to),
       )
       return {
         section: 'appointments',
@@ -67,9 +68,9 @@ async function buildSection(
       }
     }
     case 'workOrders': {
-      const byStatus = await operationsRepository.countWorkOrdersByStatus(
-        from,
-        to,
+      const byStatus = await databaseService.measure(
+        'operations.summary.work_orders',
+        () => operationsRepository.countWorkOrdersByStatus(from, to),
       )
       const total = Object.values(byStatus).reduce(
         (sum, value) => sum + value,
@@ -85,12 +86,17 @@ async function buildSection(
       return { section: 'workOrders', byStatus, total, attentionCount }
     }
     case 'sales': {
-      const { confirmedCount, confirmedAmount } =
-        await operationsRepository.summarizeSales(from, to)
+      const { confirmedCount, confirmedAmount } = await databaseService.measure(
+        'operations.summary.sales',
+        () => operationsRepository.summarizeSales(from, to),
+      )
       return { section: 'sales', confirmedCount, confirmedAmount }
     }
     case 'payments': {
-      const pending = await operationsRepository.summarizePendingObligations()
+      const pending = await databaseService.measure(
+        'operations.summary.payments',
+        () => operationsRepository.summarizePendingObligations(),
+      )
       return {
         section: 'payments',
         pendingCount: pending.pendingCount,
@@ -98,7 +104,10 @@ async function buildSection(
       }
     }
     case 'inventory': {
-      const lowStockCount = await operationsRepository.countLowStockProducts()
+      const lowStockCount = await databaseService.measure(
+        'operations.summary.inventory',
+        () => operationsRepository.countLowStockProducts(),
+      )
       return { section: 'inventory', lowStockCount }
     }
   }

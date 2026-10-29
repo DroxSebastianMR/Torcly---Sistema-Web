@@ -149,7 +149,12 @@ describe('Servicio de clientes', () => {
   })
 
   it('informa un cliente inexistente al actualizar', async () => {
-    repository.findById.mockResolvedValue(null)
+    repository.update.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('Cliente inexistente', {
+        code: 'P2025',
+        clientVersion: '7.10.0',
+      }),
+    )
 
     await expect(
       customersService.update(

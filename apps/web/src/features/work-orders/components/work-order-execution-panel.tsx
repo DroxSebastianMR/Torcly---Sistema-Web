@@ -3,7 +3,6 @@ import type { WorkOrderExecution } from '../types/work-orders.types'
 import {
   dateTimeFormatter,
   quantityFormatter,
-  workOrderActivityStatusLabel,
 } from '../utils/work-order-formatters'
 
 interface WorkOrderExecutionPanelProps {
@@ -83,7 +82,7 @@ export function WorkOrderExecutionPanel({
           <div className="hidden divide-y md:block" />
           <div className="hidden md:block">
             <table className="w-full text-left text-sm">
-              <thead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
                 <tr>
                   <th className="px-4 py-2">Repuesto</th>
                   <th className="px-4 py-2 text-right">Ppto.</th>
@@ -165,28 +164,12 @@ export function WorkOrderExecutionPanel({
                   className="mt-0.5 shrink-0 text-muted-foreground"
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="min-w-0 text-sm font-medium break-words">
-                      {activity.description}
-                    </p>
-                    <span
-                      className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                        activity.status === 'COMPLETADA'
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-amber-50 text-amber-700'
-                      }`}
-                    >
-                      {workOrderActivityStatusLabel[activity.status]}
-                    </span>
-                  </div>
+                  <p className="min-w-0 text-sm font-medium break-words">
+                    {activity.description}
+                  </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {activity.performedBy} ·{' '}
                     {dateTimeFormatter.format(new Date(activity.occurredAt))}
-                    {activity.completedAt
-                      ? ` · completada ${dateTimeFormatter.format(
-                          new Date(activity.completedAt),
-                        )}`
-                      : ''}
                   </p>
                 </div>
               </li>

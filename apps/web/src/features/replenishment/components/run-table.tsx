@@ -32,7 +32,7 @@ export function RunTable({ runs, loading, onOpenDetail }: RunTableProps) {
     <>
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[760px] border-collapse text-left text-sm">
-          <thead className="bg-[#f8faf9] text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
             <tr>
               <th className="px-5 py-3">Corrida</th>
               <th className="px-4 py-3">Fecha y hora</th>

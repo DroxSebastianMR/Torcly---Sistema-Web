@@ -236,7 +236,6 @@ describe('Página de órdenes de taller', () => {
       screen.getAllByText('ABC-123 · Toyota Hilux').length,
     ).toBeGreaterThan(0)
     expect(screen.getAllByText('En diagnóstico').length).toBeGreaterThan(0)
-    expect(screen.getByText('en diagnóstico')).toBeTruthy()
   })
 
   it('envía la búsqueda a la consulta al escribir en el selector', async () => {

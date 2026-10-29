@@ -5,9 +5,14 @@ const dateValue = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
   message: 'Selecciona una fecha.',
 })
 
-const timeValue = z.string().regex(/^\d{2}:\d{2}$/, {
-  message: 'Selecciona una hora.',
-})
+const timeValue = z
+  .string()
+  .regex(/^\d{2}:\d{2}$/, {
+    message: 'Selecciona una hora.',
+  })
+  .refine((time) => time >= '08:00' && time <= '16:00', {
+    message: 'La hora debe estar entre las 08:00 y las 16:00.',
+  })
 
 export const appointmentFormSchema = z
   .object({

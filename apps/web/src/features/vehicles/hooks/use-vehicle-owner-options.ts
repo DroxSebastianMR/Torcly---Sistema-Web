@@ -12,6 +12,7 @@ export function useVehicleOwnerOptions(enabled = true) {
       pageSize: 100,
     },
     enabled,
+    5 * 60_000,
   )
 
   const options = useMemo<SmartSelectOption[]>(

@@ -12,6 +12,8 @@ export const useReportSummary = (period: Period) =>
   useQuery({
     queryKey: reportKeys.summary(period),
     queryFn: ({ signal }) => reportsService.summary(period, signal),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   })
 
 export const useReportBlock = (
@@ -23,4 +25,6 @@ export const useReportBlock = (
     queryKey: reportKeys.block(block, period),
     queryFn: ({ signal }) => reportsService.block(block, period, signal),
     enabled,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   })

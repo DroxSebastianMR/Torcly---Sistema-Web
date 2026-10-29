@@ -50,13 +50,17 @@ export const customersRepository = {
   async list(filters: CustomerListFilters) {
     const where = buildWhere(filters)
     const [items, total] = await Promise.all([
-      databaseService.client.customer.findMany({
-        where,
-        orderBy: { updatedAt: 'desc' },
-        skip: (filters.page - 1) * filters.pageSize,
-        take: filters.pageSize,
-      }),
-      databaseService.client.customer.count({ where }),
+      databaseService.measure('customers.list.records', () =>
+        databaseService.client.customer.findMany({
+          where,
+          orderBy: { updatedAt: 'desc' },
+          skip: (filters.page - 1) * filters.pageSize,
+          take: filters.pageSize,
+        }),
+      ),
+      databaseService.measure('customers.list.total', () =>
+        databaseService.client.customer.count({ where }),
+      ),
     ])
 
     return { items, total }
@@ -72,16 +76,21 @@ export const customersRepository = {
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const customer = await transaction.customer.create({ data: input })
-      await transaction.auditLog.create({
-        data: auditData(
-          'CUSTOMER_CREATED',
-          actorId,
-          customer.documentNumber,
-          context,
-          { customerId: customer.id },
-        ),
-      })
+      const customer = await databaseService.measure(
+        'customers.create.record',
+        () => transaction.customer.create({ data: input }),
+      )
+      await databaseService.measure('customers.create.audit', () =>
+        transaction.auditLog.create({
+          data: auditData(
+            'CUSTOMER_CREATED',
+            actorId,
+            customer.documentNumber,
+            context,
+            { customerId: customer.id },
+          ),
+        }),
+      )
       return customer
     })
   },
@@ -93,19 +102,25 @@ export const customersRepository = {
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const customer = await transaction.customer.update({
-        where: { id },
-        data: input,
-      })
-      await transaction.auditLog.create({
-        data: auditData(
-          'CUSTOMER_UPDATED',
-          actorId,
-          customer.documentNumber,
-          context,
-          { customerId: customer.id },
-        ),
-      })
+      const customer = await databaseService.measure(
+        'customers.update.record',
+        () =>
+          transaction.customer.update({
+            where: { id },
+            data: input,
+          }),
+      )
+      await databaseService.measure('customers.update.audit', () =>
+        transaction.auditLog.create({
+          data: auditData(
+            'CUSTOMER_UPDATED',
+            actorId,
+            customer.documentNumber,
+            context,
+            { customerId: customer.id },
+          ),
+        }),
+      )
       return customer
     })
   },

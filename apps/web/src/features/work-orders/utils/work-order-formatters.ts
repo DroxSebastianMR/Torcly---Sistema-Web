@@ -44,11 +44,8 @@ export function isWorkOrderTechnicianEditable(status: WorkOrderStatus) {
   return technicianEditableStatuses.includes(status)
 }
 
-export function canStartWorkOrderExecution(
-  status: WorkOrderStatus,
-  hasTechnician: boolean,
-) {
-  return status === 'APROBADA' && hasTechnician
+export function canStartWorkOrderExecution(status: WorkOrderStatus) {
+  return status === 'APROBADA'
 }
 
 export function canManageWorkOrderExecution(status: WorkOrderStatus) {

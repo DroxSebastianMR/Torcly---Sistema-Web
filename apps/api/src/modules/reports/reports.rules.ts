@@ -39,7 +39,7 @@ export const BLOCK_DESCRIPTORS: Record<ReportBlock, ReportDescriptor> = {
     source: 'sales',
     periodField: 'confirmedAt',
     criteria:
-      'Ventas con estado confirmado (CONFIRMED) cuya confirmación ocurrió dentro del período. Importe = total de la venta confirmada; ticket promedio = importe entre cantidad de ventas.',
+      'Muestra las ventas finalizadas en el período seleccionado. El importe es el total vendido y el ticket promedio indica cuánto se vende, en promedio, por cada venta.',
     trendMeasure: 'Ventas e importe',
     permissions: [...BLOCK_PERMISSIONS.sales],
   },
@@ -49,7 +49,7 @@ export const BLOCK_DESCRIPTORS: Record<ReportBlock, ReportDescriptor> = {
     source: 'payments',
     periodField: 'occurredAt (cobrado); instantánea (saldos)',
     criteria:
-      'Cobrado del período = pagos (PAYMENT) menos compensaciones (COMPENSATION) registrados dentro del período. Saldo pendiente = instantánea actual de ventas confirmadas con saldo mayor a cero calculada con la regla de pagos; el período no altera la instantánea.',
+      'Resume lo cobrado durante el período. El saldo pendiente muestra lo que aún falta cobrar hoy, por lo que no cambia al modificar las fechas.',
     trendMeasure: 'Cobrado neto',
     permissions: [...BLOCK_PERMISSIONS.payments],
   },
@@ -59,7 +59,7 @@ export const BLOCK_DESCRIPTORS: Record<ReportBlock, ReportDescriptor> = {
     source: 'inventory_movements',
     periodField: 'occurredAt (movimientos); instantánea (stock bajo)',
     criteria:
-      'Movimientos confirmados (CONFIRMED) dentro del período. Cantidad neta según la regla de stock confirmado. Stock bajo = instantánea actual de productos activos con stock menor o igual al mínimo; el período no aplica.',
+      'Muestra las entradas y salidas registradas en el período. El stock bajo refleja los productos que hoy requieren reposición.',
     trendMeasure: 'Movimientos y cantidad neta',
     permissions: [...BLOCK_PERMISSIONS.inventory],
   },
@@ -69,7 +69,7 @@ export const BLOCK_DESCRIPTORS: Record<ReportBlock, ReportDescriptor> = {
     source: 'sale_lines (SERVICE) y services',
     periodField: 'confirmedAt (venta de la línea)',
     criteria:
-      'Líneas de tipo servicio (SERVICE) de ventas confirmadas cuya confirmación ocurrió dentro del período. Importe = subtotal de cada línea; unidades = cantidad de cada línea.',
+      'Muestra los servicios vendidos en el período. El importe corresponde a lo facturado y las unidades a la cantidad de servicios realizados.',
     trendMeasure: 'Unidades e importe',
     permissions: [...BLOCK_PERMISSIONS.services],
   },
@@ -79,7 +79,7 @@ export const BLOCK_DESCRIPTORS: Record<ReportBlock, ReportDescriptor> = {
     source: 'work_orders y appointments',
     periodField: 'createdAt (órdenes); deliveredAt (entregas); date (citas)',
     criteria:
-      'Órdenes de taller creadas dentro del período por etapa. Entregas: órdenes ENTREGADA con entrega dentro del período y tiempo promedio entre creación y entrega en horas. Citas dentro del período por estado.',
+      'Resume las órdenes y citas del taller en el período. También muestra las entregas realizadas y el tiempo promedio que tomó completar una orden.',
     trendMeasure: 'Órdenes y entregas',
     permissions: [...BLOCK_PERMISSIONS.workshop],
   },
@@ -168,7 +168,7 @@ export function resolveGranularity(
   to: string,
 ): ReportGranularity {
   const days = daysBetween(from, to)
-  if (days <= 31) return 'day'
+  if (days <= 15) return 'day'
   if (days <= 186) return 'week'
   return 'month'
 }

@@ -41,7 +41,7 @@ const serviceMock = {
 function response(overrides: Partial<ServicesResponse> = {}): ServicesResponse {
   return {
     data: [],
-    pagination: { page: 1, pageSize: 20, total: 0, totalPages: 1 },
+    pagination: { page: 1, pageSize: 10, total: 0, totalPages: 1 },
     ...overrides,
   }
 }
@@ -134,7 +134,7 @@ describe('Página de servicios', () => {
     services.useServices.mockReturnValue({
       data: response({
         data: [serviceMock],
-        pagination: { page: 1, pageSize: 20, total: 1, totalPages: 1 },
+        pagination: { page: 1, pageSize: 10, total: 1, totalPages: 1 },
       }),
       isPending: false,
       isFetching: false,
@@ -166,7 +166,7 @@ describe('Página de servicios', () => {
     services.useServices.mockReturnValue({
       data: response({
         data: [serviceMock],
-        pagination: { page: 1, pageSize: 20, total: 1, totalPages: 1 },
+        pagination: { page: 1, pageSize: 10, total: 1, totalPages: 1 },
       }),
       isPending: false,
       isFetching: false,

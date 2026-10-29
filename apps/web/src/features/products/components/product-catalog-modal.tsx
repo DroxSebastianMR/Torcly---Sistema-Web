@@ -194,7 +194,7 @@ export function ProductCatalogModal({
         </Button>
       </div>
 
-      <div className="mt-5 max-h-72 overflow-y-auto rounded-xl border">
+      <div className="mt-5 max-h-72 overflow-y-auto rounded-xl border [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {visibleItems?.length ? (
           <ul className="divide-y">
             {visibleItems.map((item) => (

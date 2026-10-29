@@ -22,6 +22,10 @@ vi.mock('../components/vehicle-form-modal', () => ({
   VehicleFormModal: () => null,
 }))
 
+vi.mock('@/features/customers/components/customer-detail-modal', () => ({
+  CustomerDetailModal: () => <div>Ficha del cliente</div>,
+}))
+
 const vehicleMock = {
   id: 'v1',
   plate: 'ABC123',
@@ -136,7 +140,7 @@ describe('Página de vehículos', () => {
     expect(screen.getByRole('button', { name: 'Reintentar' })).toBeTruthy()
   })
 
-  it('lista vehículos y navega a la ficha y al propietario', async () => {
+  it('lista vehículos y abre su ficha en un diálogo', async () => {
     auth.useAuth.mockReturnValue({ user: { permissions: ['vehicles:read'] } })
     vehicles.useVehicles.mockReturnValue({
       data: response({
@@ -157,7 +161,7 @@ describe('Página de vehículos', () => {
     expect(screen.getByText(/DNI\s+12345678/)).toBeTruthy()
 
     await userEvent.click(screen.getByRole('button', { name: 'ABC123' }))
-    expect(screen.getByText('Ficha de vehículo')).toBeTruthy()
+    expect(screen.getByRole('dialog', { name: 'ABC123' })).toBeTruthy()
   })
 
   it('ejecuta la búsqueda y la reenvía a la consulta', async () => {
@@ -189,7 +193,7 @@ describe('Página de vehículos', () => {
     )
   })
 
-  it('navega al propietario desde la tarjeta móvil', async () => {
+  it('incluye acceso a la ficha del propietario en la tarjeta móvil', () => {
     auth.useAuth.mockReturnValue({ user: { permissions: ['vehicles:read'] } })
     vehicles.useVehicles.mockReturnValue({
       data: response({
@@ -204,7 +208,6 @@ describe('Página de vehículos', () => {
 
     renderPage()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Propietario' }))
-    expect(screen.getByText('Ficha de cliente')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Propietario' })).toBeTruthy()
   })
 })

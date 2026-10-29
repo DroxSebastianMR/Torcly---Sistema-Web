@@ -9,9 +9,13 @@ const repository = vi.hoisted(() => ({
   registerMovement: vi.fn(),
   findByKey: vi.fn(),
 }))
+const notifications = vi.hoisted(() => ({ notifyUsersSafely: vi.fn() }))
 
 vi.mock('../src/modules/inventory/inventory.repository.js', () => ({
   inventoryRepository: repository,
+}))
+vi.mock('../src/modules/notifications/notifications.service.js', () => ({
+  notificationsService: notifications,
 }))
 
 import { inventoryService } from '../src/modules/inventory/inventory.service.js'
@@ -44,9 +48,21 @@ function movement(overrides: Record<string, unknown> = {}) {
   }
 }
 
+function registration(overrides: Record<string, unknown> = {}) {
+  return {
+    movement: movement(),
+    stockAfter: 10,
+    minimumStock: 4,
+    lowStock: false,
+    replayed: false,
+    ...overrides,
+  }
+}
+
 describe('Servicio de inventario', () => {
   beforeEach(() => {
     for (const mock of Object.values(repository)) mock.mockReset()
+    notifications.notifyUsersSafely.mockReset().mockResolvedValue(undefined)
   })
 
   it('lista existencias con paginación', async () => {
@@ -140,7 +156,9 @@ describe('Servicio de inventario', () => {
   })
 
   it('registra stock inicial, entrada y salida con actor y contexto', async () => {
-    repository.registerMovement.mockResolvedValue(movement({ type: 'INITIAL' }))
+    repository.registerMovement.mockResolvedValue(
+      registration({ movement: movement({ type: 'INITIAL' }) }),
+    )
 
     const result = await inventoryService.registerInitial(
       {
@@ -164,7 +182,7 @@ describe('Servicio de inventario', () => {
     )
     expect(result.data.type).toBe('INITIAL')
 
-    repository.registerMovement.mockResolvedValue(movement())
+    repository.registerMovement.mockResolvedValue(registration())
     await inventoryService.registerEntry(
       {
         productId: 'p1',
@@ -198,9 +216,38 @@ describe('Servicio de inventario', () => {
     )
   })
 
+  it('notifica stock bajo usando el saldo calculado, sin releer inventario', async () => {
+    repository.registerMovement.mockResolvedValue(
+      registration({
+        movement: movement({ type: 'EXIT', quantity: 1 }),
+        stockAfter: 3,
+        minimumStock: 4,
+        lowStock: true,
+      }),
+    )
+
+    await inventoryService.registerExit(
+      {
+        productId: 'p1',
+        quantity: 1,
+        idempotencyKey: 'key-exit-low-stock',
+      },
+      actor,
+      context,
+    )
+
+    expect(notifications.notifyUsersSafely).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'STOCK_LOW',
+        link: '/inventario',
+        message: expect.stringContaining('3 <= 4'),
+      }),
+    )
+  })
+
   it('resuelve el tipo del ajuste por el signo y normaliza la magnitud', async () => {
     repository.registerMovement.mockReset()
-    repository.registerMovement.mockResolvedValue(movement())
+    repository.registerMovement.mockResolvedValue(registration())
 
     await inventoryService.registerAdjustment(
       {

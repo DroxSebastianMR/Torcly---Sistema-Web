@@ -18,6 +18,7 @@ interface DatePickerProps {
   max?: string
   className?: string
   'aria-label'?: string
+  'aria-invalid'?: boolean
 }
 
 const weekDays = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do']
@@ -54,6 +55,7 @@ export function DatePicker({
   max,
   className,
   'aria-label': ariaLabel,
+  'aria-invalid': ariaInvalid,
 }: DatePickerProps) {
   const selectedDate = toDate(value)
   const [open, setOpen] = useState(false)
@@ -106,9 +108,10 @@ export function DatePicker({
         type="button"
         disabled={disabled}
         aria-label={ariaLabel}
+        aria-invalid={ariaInvalid}
         aria-haspopup="dialog"
         aria-expanded={open}
-        className="flex h-11 w-full items-center gap-3 rounded-lg border border-input bg-background px-3 text-left text-sm transition-colors hover:border-primary/45 focus-visible:outline-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50"
+        className="flex min-h-11 w-full items-center gap-3 rounded-[10px] border border-input bg-card px-[13px] text-left text-sm transition-[border-color,background-color] duration-150 ease-out hover:bg-background focus-visible:border-primary/70 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
         onClick={() => {
           setVisibleMonth(selectedDate ?? new Date())
           setOpen((current) => !current)
@@ -138,13 +141,13 @@ export function DatePicker({
         <div
           role="dialog"
           aria-label="Calendario"
-          className="absolute z-30 mt-2 w-[19rem] rounded-xl border border-border/80 bg-card p-4 shadow-[0_18px_40px_rgba(7,28,22,0.16)]"
+          className="absolute z-30 mt-2 w-[16rem] rounded-2xl border border-border bg-card p-2.5 shadow-[0_24px_60px_rgb(16_44_37_/_18%)]"
         >
-          <div className="mb-4 flex items-center justify-between gap-2">
+          <div className="mb-3 flex items-center justify-between gap-2">
             <button
               type="button"
               aria-label="Mes anterior"
-              className="flex size-8 items-center justify-center rounded-lg hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary"
+              className="flex size-8 items-center justify-center rounded-lg text-primary hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary"
               onClick={() =>
                 setVisibleMonth(
                   (current) =>
@@ -154,13 +157,13 @@ export function DatePicker({
             >
               <ChevronLeft className="size-4" />
             </button>
-            <p className="capitalize text-sm font-semibold text-brand-forest">
+            <p className="font-heading capitalize text-sm font-semibold text-brand-forest">
               {monthLabel}
             </p>
             <button
               type="button"
               aria-label="Mes siguiente"
-              className="flex size-8 items-center justify-center rounded-lg hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary"
+              className="flex size-8 items-center justify-center rounded-lg text-primary hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary"
               onClick={() =>
                 setVisibleMonth(
                   (current) =>
@@ -171,11 +174,11 @@ export function DatePicker({
               <ChevronRight className="size-4" />
             </button>
           </div>
-          <div className="grid grid-cols-7 gap-1 text-center">
+          <div className="grid grid-cols-7 gap-0.5 text-center">
             {weekDays.map((day) => (
               <span
                 key={day}
-                className="py-1 text-xs font-medium text-muted-foreground"
+                className="py-1 text-[11px] font-medium text-muted-foreground"
               >
                 {day}
               </span>
@@ -198,7 +201,7 @@ export function DatePicker({
                   disabled={blocked}
                   aria-pressed={Boolean(selected)}
                   className={cn(
-                    'mx-auto flex size-9 items-center justify-center rounded-full text-sm transition-colors hover:bg-primary/10 hover:text-primary focus-visible:outline-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-30',
+                    'mx-auto flex size-8 items-center justify-center rounded-[8px] text-[13px] transition-colors hover:bg-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-30',
                     selected &&
                       'bg-primary text-primary-foreground hover:bg-primary',
                   )}

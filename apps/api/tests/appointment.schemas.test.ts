@@ -69,6 +69,25 @@ describe('Validación de citas', () => {
     ).toBe(false)
   })
 
+  it('solo permite horarios del taller entre las 08:00 y las 16:00', () => {
+    expect(
+      appointmentInputSchema.safeParse({ ...validAppointment, time: '07:30' })
+        .success,
+    ).toBe(false)
+    expect(
+      appointmentInputSchema.safeParse({ ...validAppointment, time: '16:30' })
+        .success,
+    ).toBe(false)
+    expect(
+      appointmentInputSchema.safeParse({ ...validAppointment, time: '08:00' })
+        .success,
+    ).toBe(true)
+    expect(
+      appointmentInputSchema.safeParse({ ...validAppointment, time: '16:00' })
+        .success,
+    ).toBe(true)
+  })
+
   it('rechaza identificadores inválidos y campos desconocidos', () => {
     expect(
       appointmentInputSchema.safeParse({
@@ -106,6 +125,7 @@ describe('Validación de citas', () => {
 
   it('valida paginación, filtros y estado en la consulta', () => {
     expect(appointmentQuerySchema.parse({}).status).toBe('all')
+    expect(appointmentQuerySchema.parse({}).pageSize).toBe(10)
     expect(appointmentQuerySchema.parse({ status: 'PROGRAMADA' }).status).toBe(
       'PROGRAMADA',
     )

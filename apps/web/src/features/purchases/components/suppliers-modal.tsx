@@ -4,7 +4,9 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
+import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
+import { SmartSelect } from '@/components/ui/smart-select'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { usePurchaseMutations, useSuppliers } from '../hooks/use-purchases'
@@ -76,7 +78,7 @@ export function SuppliersModal({ open, onClose }: SuppliersModalProps) {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 aria-hidden
               />
-              <input
+              <Input
                 type="search"
                 placeholder="Buscar por razón social, documento o contacto…"
                 value={filters.search}
@@ -87,28 +89,29 @@ export function SuppliersModal({ open, onClose }: SuppliersModalProps) {
                     page: 1,
                   }))
                 }
-                className="h-9 w-full rounded-lg border bg-background pl-9 pr-3 text-xs outline-none focus:ring-2 focus:ring-ring"
+                className="h-9 pl-9 pr-3 text-xs"
                 aria-label="Buscar proveedores"
               />
             </div>
 
             <div className="flex items-center gap-2">
-              <select
+              <SmartSelect
                 value={filters.active}
-                onChange={(e) =>
+                onChange={(value) =>
                   setFilters((prev) => ({
                     ...prev,
-                    active: e.target.value as SupplierFilters['active'],
+                    active: value as SupplierFilters['active'],
                     page: 1,
                   }))
                 }
-                className="h-9 rounded-lg border bg-background px-3 text-xs outline-none focus:ring-2 focus:ring-ring"
                 aria-label="Filtrar por estado del proveedor"
-              >
-                <option value="all">Todos los estados</option>
-                <option value="true">Activos</option>
-                <option value="false">Inactivos</option>
-              </select>
+                options={[
+                  { value: 'all', label: 'Todos los estados' },
+                  { value: 'true', label: 'Activos' },
+                  { value: 'false', label: 'Inactivos' },
+                ]}
+                className="w-44"
+              />
 
               {canWrite && (
                 <Button
@@ -123,8 +126,13 @@ export function SuppliersModal({ open, onClose }: SuppliersModalProps) {
           </div>
 
           {suppliersQuery.isLoading && (
-            <div className="flex min-h-40 items-center justify-center">
-              <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <div className="space-y-2" aria-label="Cargando proveedores">
+              {Array.from({ length: 4 }, (_, index) => (
+                <div
+                  key={index}
+                  className="h-12 animate-pulse rounded-lg bg-muted"
+                />
+              ))}
             </div>
           )}
 
@@ -157,7 +165,7 @@ export function SuppliersModal({ open, onClose }: SuppliersModalProps) {
             suppliers.length > 0 && (
               <div className="overflow-x-auto rounded-xl border">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-[#f8faf9] text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
                     <tr>
                       <th className="px-4 py-2.5">Razón Social</th>
                       <th className="px-3 py-2.5">Documento</th>

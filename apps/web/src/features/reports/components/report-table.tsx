@@ -33,14 +33,14 @@ export function ReportTable<TRow>({
         <caption className="text-left text-sm font-semibold text-brand-forest">
           {caption}
         </caption>
-        <thead>
-          <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
+        <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+          <tr className="text-left">
             {columns.map((column) => (
               <th
                 key={column.key}
                 scope="col"
                 className={cn(
-                  'py-1.5 pr-2 font-medium',
+                  'px-3 py-2.5 font-bold first:pl-4 last:pr-4',
                   column.align === 'right' && 'text-right',
                 )}
               >

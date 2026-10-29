@@ -24,6 +24,21 @@ export const protectedRoutes: RouteObject[] = [
             ],
           },
           {
+            element: <PermissionRoute permission="assistant:read" />,
+            children: [
+              {
+                path: paths.assistantHistory,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/assistant/pages/assistant-history-page'
+                    )
+                  ).default,
+                }),
+              },
+            ],
+          },
+          {
             element: <PermissionRoute permission="products:read" />,
             children: [
               {
@@ -31,16 +46,6 @@ export const protectedRoutes: RouteObject[] = [
                 lazy: async () => ({
                   Component: (
                     await import('@/features/products/pages/products-page')
-                  ).default,
-                }),
-              },
-              {
-                path: paths.productDetail,
-                lazy: async () => ({
-                  Component: (
-                    await import(
-                      '@/features/products/pages/product-detail-page'
-                    )
                   ).default,
                 }),
               },
@@ -54,16 +59,6 @@ export const protectedRoutes: RouteObject[] = [
                 lazy: async () => ({
                   Component: (
                     await import('@/features/inventory/pages/inventory-page')
-                  ).default,
-                }),
-              },
-              {
-                path: paths.replenishment,
-                lazy: async () => ({
-                  Component: (
-                    await import(
-                      '@/features/replenishment/pages/replenishment-page'
-                    )
                   ).default,
                 }),
               },
@@ -131,6 +126,16 @@ export const protectedRoutes: RouteObject[] = [
                   Component: (
                     await import(
                       '@/features/work-orders/pages/work-orders-page'
+                    )
+                  ).default,
+                }),
+              },
+              {
+                path: paths.technicians,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/technicians/pages/technicians-page'
                     )
                   ).default,
                 }),
@@ -203,21 +208,6 @@ export const protectedRoutes: RouteObject[] = [
                 lazy: async () => ({
                   Component: (await import('@/features/users/pages/users-page'))
                     .default,
-                }),
-              },
-            ],
-          },
-          {
-            element: <PermissionRoute permission="notifications:read" />,
-            children: [
-              {
-                path: paths.notifications,
-                lazy: async () => ({
-                  Component: (
-                    await import(
-                      '@/features/notifications/pages/notifications-page'
-                    )
-                  ).default,
                 }),
               },
             ],

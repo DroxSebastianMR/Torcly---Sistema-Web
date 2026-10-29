@@ -46,6 +46,15 @@ export interface WorkOrderLine {
   subtotal: number
 }
 
+export interface WorkOrderBilling {
+  saleId: string
+  saleCode: string
+  total: number
+  paid: number
+  balance: number
+  status: 'PENDING' | 'PARTIALLY_PAID' | 'PAID'
+}
+
 export interface WorkOrderSummary {
   id: string
   code: string
@@ -57,6 +66,7 @@ export interface WorkOrderSummary {
   technician: string | null
   subtotal: number
   total: number
+  billing?: WorkOrderBilling | null
   lineCount: number
   performedBy: string
   diagnosisUpdatedBy: string | null
@@ -80,6 +90,11 @@ export interface WorkOrderSummary {
 export interface WorkOrderDetail extends WorkOrderSummary {
   diagnosis: string | null
   lines: WorkOrderLine[]
+}
+
+export interface WorkOrderCreated {
+  id: string
+  code: string
 }
 
 export interface WorkOrderStats {
@@ -171,6 +186,10 @@ export interface WorkOrderReturnItem {
 export interface WorkOrderReturnInput {
   requestId: string
   items: WorkOrderReturnItem[]
+}
+
+export interface WorkOrderFinalizeInput {
+  confirmPendingProducts?: boolean
 }
 
 export interface WorkOrderDeliveryInput {

@@ -71,14 +71,18 @@ export const vehiclesRepository = {
   async list(filters: VehicleListFilters) {
     const where = buildWhere(filters)
     const [items, total] = await Promise.all([
-      databaseService.client.vehicle.findMany({
-        where,
-        include: findUniqueInclude,
-        orderBy: { updatedAt: 'desc' },
-        skip: (filters.page - 1) * filters.pageSize,
-        take: filters.pageSize,
-      }),
-      databaseService.client.vehicle.count({ where }),
+      databaseService.measure('vehicles.list.records', () =>
+        databaseService.client.vehicle.findMany({
+          where,
+          include: findUniqueInclude,
+          orderBy: { updatedAt: 'desc' },
+          skip: (filters.page - 1) * filters.pageSize,
+          take: filters.pageSize,
+        }),
+      ),
+      databaseService.measure('vehicles.list.total', () =>
+        databaseService.client.vehicle.count({ where }),
+      ),
     ])
 
     return { items, total }
@@ -101,16 +105,22 @@ export const vehiclesRepository = {
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const vehicle = await transaction.vehicle.create({
-        data: input,
-        include: findUniqueInclude,
-      })
-      await transaction.auditLog.create({
-        data: auditData('VEHICLE_CREATED', actorId, vehicle.plate, context, {
-          vehicleId: vehicle.id,
-          customerId: vehicle.customerId,
+      const vehicle = await databaseService.measure(
+        'vehicles.create.record',
+        () =>
+          transaction.vehicle.create({
+            data: input,
+            include: findUniqueInclude,
+          }),
+      )
+      await databaseService.measure('vehicles.create.audit', () =>
+        transaction.auditLog.create({
+          data: auditData('VEHICLE_CREATED', actorId, vehicle.plate, context, {
+            vehicleId: vehicle.id,
+            customerId: vehicle.customerId,
+          }),
         }),
-      })
+      )
       return vehicle
     })
   },
@@ -122,17 +132,23 @@ export const vehiclesRepository = {
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const vehicle = await transaction.vehicle.update({
-        where: { id },
-        data: input,
-        include: findUniqueInclude,
-      })
-      await transaction.auditLog.create({
-        data: auditData('VEHICLE_UPDATED', actorId, vehicle.plate, context, {
-          vehicleId: vehicle.id,
-          customerId: vehicle.customerId,
+      const vehicle = await databaseService.measure(
+        'vehicles.update.record',
+        () =>
+          transaction.vehicle.update({
+            where: { id },
+            data: input,
+            include: findUniqueInclude,
+          }),
+      )
+      await databaseService.measure('vehicles.update.audit', () =>
+        transaction.auditLog.create({
+          data: auditData('VEHICLE_UPDATED', actorId, vehicle.plate, context, {
+            vehicleId: vehicle.id,
+            customerId: vehicle.customerId,
+          }),
         }),
-      })
+      )
       return vehicle
     })
   },

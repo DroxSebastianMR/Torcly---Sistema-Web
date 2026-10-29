@@ -1,7 +1,10 @@
-import { useDeferredValue, useState } from 'react'
-import { Plus, ShoppingCart } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Plus } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ErrorState } from '@/components/ui/error-state'
+import { ModuleMetrics } from '@/components/ui/module-metrics'
+import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { SaleDetailModal } from '../components/sale-detail-modal'
@@ -18,6 +21,17 @@ const initialFilters: SaleFilters = {
   pageSize: 20,
 }
 
+function useDebouncedValue<T>(value: T, delay = 280) {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setDebouncedValue(value), delay)
+    return () => window.clearTimeout(timeoutId)
+  }, [delay, value])
+
+  return debouncedValue
+}
+
 export default function Page() {
   const { user: currentUser } = useAuth()
   const canWrite = hasPermission(currentUser?.permissions ?? [], 'sales:write')
@@ -25,9 +39,10 @@ export default function Page() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const [editingSale, setEditingSale] = useState<SaleDetail | null>(null)
-  const deferredSearch = useDeferredValue(filters.search)
-  const queryFilters = { ...filters, search: deferredSearch }
+  const debouncedSearch = useDebouncedValue(filters.search)
+  const queryFilters = { ...filters, search: debouncedSearch }
   const sales = useSales(queryFilters)
+  const searchToastId = useRef<string | number | undefined>(undefined)
   const detail = useSale(selectedId ?? '')
   const total = sales.data?.pagination.total ?? 0
   const visibleSales = sales.data?.data ?? []
@@ -37,6 +52,32 @@ export default function Page() {
   const confirmedCount = visibleSales.filter(
     (sale) => sale.status === 'CONFIRMED',
   ).length
+
+  useEffect(() => {
+    const isFiltering = Boolean(
+      debouncedSearch.trim() || filters.status !== 'all',
+    )
+
+    if (sales.isFetching && isFiltering) {
+      searchToastId.current = toast.loading('Buscando ventas…', {
+        id: 'sales-search',
+      })
+      return
+    }
+
+    if (searchToastId.current !== undefined) {
+      toast.dismiss(searchToastId.current)
+      searchToastId.current = undefined
+    }
+  }, [debouncedSearch, filters.status, sales.isFetching])
+
+  useEffect(
+    () => () => {
+      if (searchToastId.current !== undefined)
+        toast.dismiss(searchToastId.current)
+    },
+    [],
+  )
 
   const openCreate = () => {
     setEditingSale(null)
@@ -58,7 +99,7 @@ export default function Page() {
       <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <ShoppingCart size={15} /> Punto de venta
+            Punto de venta
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
             Ventas
@@ -75,44 +116,32 @@ export default function Page() {
         )}
       </header>
 
-      <section className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-b px-4 py-4 sm:px-5">
-          <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <ShoppingCart size={17} />
-            </span>
-            <div>
-              <p className="text-xl font-semibold tabular-nums">{total}</p>
-              <p className="text-xs text-muted-foreground">
-                ventas encontradas
-              </p>
-            </div>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div>
-            <p className="text-xl font-semibold tabular-nums text-amber-600">
-              {draftCount}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              borradores en esta página
-            </p>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div>
-            <p className="text-xl font-semibold tabular-nums text-emerald-700">
-              {confirmedCount}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              confirmadas en esta página
-            </p>
-          </div>
-          {sales.isFetching && !sales.isPending && (
-            <span className="ml-auto text-xs text-muted-foreground">
-              Actualizando…
-            </span>
-          )}
-        </div>
+      <ModuleMetrics
+        items={[
+          {
+            label: 'Ventas',
+            value: total,
+            valueLabel: 'encontradas',
+          },
+          {
+            label: 'Borradores',
+            value: draftCount,
+            valueLabel: 'en esta página',
+            tone: 'warning',
+          },
+          {
+            label: 'Confirmadas',
+            value: confirmedCount,
+            valueLabel: 'en esta página',
+            tone: 'success',
+          },
+        ]}
+      />
 
+      <section
+        aria-label="Filtros de ventas"
+        className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
+      >
         <SalesToolbar
           filters={filters}
           onChange={setFilters}
@@ -126,7 +155,12 @@ export default function Page() {
             ],
           }))}
         />
+      </section>
 
+      <section
+        aria-label="Resultados de ventas"
+        className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]"
+      >
         {sales.isError ? (
           <ErrorState
             title="No se pudo cargar las ventas"
@@ -140,43 +174,19 @@ export default function Page() {
         ) : (
           <SalesTable
             sales={visibleSales}
-            loading={sales.isPending}
+            loading={sales.isFetching}
             onOpen={(sale) => openDetail(sale.id)}
           />
         )}
 
-        {sales.data && sales.data.pagination.totalPages > 1 && (
-          <footer className="flex items-center justify-between border-t px-4 py-4 text-sm sm:px-5">
-            <span className="text-muted-foreground">
-              Página {filters.page} de {sales.data.pagination.totalPages}
-            </span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                disabled={filters.page === 1}
-                onClick={() =>
-                  setFilters((current) => ({
-                    ...current,
-                    page: current.page - 1,
-                  }))
-                }
-              >
-                Anterior
-              </Button>
-              <Button
-                variant="outline"
-                disabled={filters.page >= sales.data.pagination.totalPages}
-                onClick={() =>
-                  setFilters((current) => ({
-                    ...current,
-                    page: current.page + 1,
-                  }))
-                }
-              >
-                Siguiente
-              </Button>
-            </div>
-          </footer>
+        {sales.data && (
+          <Pagination
+            page={filters.page}
+            totalPages={sales.data.pagination.totalPages}
+            onPageChange={(page) =>
+              setFilters((current) => ({ ...current, page }))
+            }
+          />
         )}
       </section>
 

@@ -1,7 +1,7 @@
 import { useDeferredValue, useState } from 'react'
-import { Banknote } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { ErrorState } from '@/components/ui/error-state'
+import { ModuleMetrics } from '@/components/ui/module-metrics'
+import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { PaymentsToolbar } from '../components/payments-toolbar'
@@ -52,7 +52,7 @@ export default function Page() {
       <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <Banknote size={15} /> Caja
+            Caja
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
             Cobros
@@ -64,34 +64,37 @@ export default function Page() {
         </div>
       </header>
 
-      <section className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]">
-        <div className="grid grid-cols-1 gap-3 border-b px-4 py-4 sm:grid-cols-3 sm:px-5">
-          <SummaryChip
-            label="Ventas pendientes de pago"
-            value={
-              summary
-                ? String(summary.pendingCount)
-                : payments.isPending
-                  ? '…'
-                  : '0'
-            }
-          />
-          <SummaryChip
-            label="Saldo pendiente"
-            value={
-              summary ? currencyFormatter.format(summary.pendingAmount) : '…'
-            }
-            tone="amber"
-          />
-          <SummaryChip
-            label="Cobrado en el período"
-            value={
-              summary ? currencyFormatter.format(summary.collectedAmount) : '…'
-            }
-            tone="emerald"
-          />
-        </div>
+      <ModuleMetrics
+        items={[
+          {
+            label: 'Ventas pendientes de pago',
+            value: summary
+              ? String(summary.pendingCount)
+              : payments.isPending
+                ? '…'
+                : '0',
+          },
+          {
+            label: 'Saldo pendiente',
+            value: summary
+              ? currencyFormatter.format(summary.pendingAmount)
+              : '…',
+            tone: 'warning',
+          },
+          {
+            label: 'Cobrado en el período',
+            value: summary
+              ? currencyFormatter.format(summary.collectedAmount)
+              : '…',
+            tone: 'success',
+          },
+        ]}
+      />
 
+      <section
+        aria-label="Filtros de cobros"
+        className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
+      >
         <PaymentsToolbar
           filters={filters}
           onChange={setFilters}
@@ -107,7 +110,12 @@ export default function Page() {
             ],
           }))}
         />
+      </section>
 
+      <section
+        aria-label="Resultados de cobros"
+        className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]"
+      >
         {payments.isError ? (
           <ErrorState
             title="No se pudo cargar los cobros"
@@ -128,38 +136,14 @@ export default function Page() {
           />
         )}
 
-        {payments.data && payments.data.pagination.totalPages > 1 && (
-          <footer className="flex items-center justify-between border-t px-4 py-4 text-sm sm:px-5">
-            <span className="text-muted-foreground">
-              Página {filters.page} de {payments.data.pagination.totalPages}
-            </span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                disabled={filters.page === 1}
-                onClick={() =>
-                  setFilters((current) => ({
-                    ...current,
-                    page: current.page - 1,
-                  }))
-                }
-              >
-                Anterior
-              </Button>
-              <Button
-                variant="outline"
-                disabled={filters.page >= payments.data.pagination.totalPages}
-                onClick={() =>
-                  setFilters((current) => ({
-                    ...current,
-                    page: current.page + 1,
-                  }))
-                }
-              >
-                Siguiente
-              </Button>
-            </div>
-          </footer>
+        {payments.data && (
+          <Pagination
+            page={filters.page}
+            totalPages={payments.data.pagination.totalPages}
+            onPageChange={(page) =>
+              setFilters((current) => ({ ...current, page }))
+            }
+          />
         )}
       </section>
 
@@ -181,31 +165,6 @@ export default function Page() {
         event={compensationEvent}
         onClose={() => setCompensationEvent(null)}
       />
-    </div>
-  )
-}
-
-function SummaryChip({
-  label,
-  value,
-  tone,
-}: {
-  label: string
-  value: string
-  tone?: 'amber' | 'emerald'
-}) {
-  const toneClass =
-    tone === 'amber'
-      ? 'text-amber-600'
-      : tone === 'emerald'
-        ? 'text-emerald-700'
-        : 'text-brand-forest'
-  return (
-    <div className="rounded-xl bg-muted/60 px-4 py-3">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={`mt-1 text-2xl font-bold tabular-nums ${toneClass}`}>
-        {value}
-      </p>
     </div>
   )
 }

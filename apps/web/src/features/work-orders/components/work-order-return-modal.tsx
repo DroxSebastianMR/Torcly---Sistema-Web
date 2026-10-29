@@ -28,6 +28,7 @@ interface WorkOrderReturnModalProps {
   open: boolean
   order: WorkOrderDetail | null
   execution: WorkOrderExecution | null
+  executionLoading?: boolean
   onClose: () => void
 }
 
@@ -35,6 +36,7 @@ export function WorkOrderReturnModal({
   open,
   order,
   execution,
+  executionLoading = false,
   onClose,
 }: WorkOrderReturnModalProps) {
   const mutations = useWorkOrdersMutations()
@@ -140,7 +142,11 @@ export function WorkOrderReturnModal({
           <Button type="button" variant="outline" onClick={closeModal}>
             Cancelar
           </Button>
-          <Button type="button" disabled={busy} onClick={() => void submit()}>
+          <Button
+            type="button"
+            disabled={busy || executionLoading}
+            onClick={() => void submit()}
+          >
             {busy ? 'Registrando…' : 'Registrar devolución'}
           </Button>
         </div>
@@ -159,9 +165,13 @@ export function WorkOrderReturnModal({
             aria-label="Repuesto a devolver"
             placeholder="Seleccionar repuesto"
             searchPlaceholder="Buscar repuesto…"
-            emptyMessage="No hay repuestos por devolver. Solo aparecen los productos del presupuesto aprobado que se consumieron y aún no se devolvieron."
+            emptyMessage={
+              executionLoading
+                ? 'Cargando los repuestos disponibles para devolución…'
+                : 'No hay repuestos por devolver. Solo aparecen los productos del presupuesto aprobado que se consumieron y aún no se devolvieron.'
+            }
             options={options}
-            disabled={busy}
+            disabled={busy || executionLoading}
             onChange={(lineId) => {
               setSelectedLineId(lineId)
               setValue('lineId', lineId)

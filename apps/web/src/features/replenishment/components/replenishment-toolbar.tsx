@@ -47,7 +47,7 @@ export function ReplenishmentToolbar({
       })
 
     return (
-      <div className="flex flex-col gap-3 border-b bg-card px-4 py-4 sm:px-5">
+      <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="w-full sm:w-80">
             <DateRangePicker
@@ -151,7 +151,7 @@ export function ReplenishmentToolbar({
     Boolean(historyFilters.from) || Boolean(historyFilters.to)
 
   return (
-    <div className="flex flex-col gap-3 border-b bg-card px-4 py-4 sm:px-5 lg:flex-row lg:items-center">
+    <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
       <div className="w-full sm:w-80">
         <DateRangePicker
           value={{ from: historyFilters.from, to: historyFilters.to }}

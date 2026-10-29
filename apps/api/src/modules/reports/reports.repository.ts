@@ -117,8 +117,8 @@ function confirmedSaleLinesPeriod(
 
 export const reportsRepository = {
   async listSalesInPeriod(from: string, to: string): Promise<SaleTrendRow[]> {
-    return databaseService.transaction(async (transaction) => {
-      const rows = await transaction.sale.findMany({
+    return databaseService.measure('reports.sales.records', async () => {
+      const rows = await databaseService.client.sale.findMany({
         where: { status: 'CONFIRMED', ...confirmedAtPeriod(from, to) },
         select: { total: true, confirmedAt: true },
         orderBy: { confirmedAt: 'asc' },
@@ -134,8 +134,8 @@ export const reportsRepository = {
     from: string,
     to: string,
   ): Promise<SaleLineRow[]> {
-    return databaseService.transaction(async (transaction) => {
-      const grouped = await transaction.saleLine.groupBy({
+    return databaseService.measure('reports.sales.lines', async () => {
+      const grouped = await databaseService.client.saleLine.groupBy({
         by: ['type', 'code', 'name'],
         where: confirmedSaleLinesPeriod(from, to),
         _sum: { quantity: true, subtotal: true },
@@ -155,8 +155,8 @@ export const reportsRepository = {
     from: string,
     to: string,
   ): Promise<PaymentTrendRow[]> {
-    return databaseService.transaction(async (transaction) => {
-      const rows = await transaction.payment.findMany({
+    return databaseService.measure('reports.payments.records', async () => {
+      const rows = await databaseService.client.payment.findMany({
         where: { ...occurredAtPeriod(from, to) },
         select: { type: true, amount: true, occurredAt: true },
         orderBy: { occurredAt: 'asc' },
@@ -173,8 +173,8 @@ export const reportsRepository = {
     from: string,
     to: string,
   ): Promise<MovementTrendRow[]> {
-    return databaseService.transaction(async (transaction) => {
-      const rows = await transaction.inventoryMovement.findMany({
+    return databaseService.measure('reports.inventory.movements', async () => {
+      const rows = await databaseService.client.inventoryMovement.findMany({
         where: { status: 'CONFIRMED', ...occurredAtPeriod(from, to) },
         select: { type: true, quantity: true, occurredAt: true },
         orderBy: { occurredAt: 'asc' },
@@ -191,8 +191,8 @@ export const reportsRepository = {
     from: string,
     to: string,
   ): Promise<ServiceLineRow[]> {
-    return databaseService.transaction(async (transaction) => {
-      const rows = await transaction.saleLine.findMany({
+    return databaseService.measure('reports.services.lines', async () => {
+      const rows = await databaseService.client.saleLine.findMany({
         where: {
           type: 'SERVICE',
           sale: {
@@ -226,8 +226,8 @@ export const reportsRepository = {
     from: string,
     to: string,
   ): Promise<WorkOrderRow[]> {
-    return databaseService.transaction(async (transaction) => {
-      const rows = await transaction.workOrder.findMany({
+    return databaseService.measure('reports.workshop.orders', async () => {
+      const rows = await databaseService.client.workOrder.findMany({
         where: { ...createdAtPeriod(from, to) },
         select: { status: true, createdAt: true, deliveredAt: true },
         orderBy: { createdAt: 'asc' },
@@ -244,8 +244,8 @@ export const reportsRepository = {
     from: string,
     to: string,
   ): Promise<WorkOrderRow[]> {
-    return databaseService.transaction(async (transaction) => {
-      const rows = await transaction.workOrder.findMany({
+    return databaseService.measure('reports.workshop.deliveries', async () => {
+      const rows = await databaseService.client.workOrder.findMany({
         where: { status: 'ENTREGADA', ...deliveredAtPeriod(from, to) },
         select: { status: true, createdAt: true, deliveredAt: true },
         orderBy: { deliveredAt: 'asc' },
@@ -262,20 +262,23 @@ export const reportsRepository = {
     from: string,
     to: string,
   ): Promise<Record<AppointmentStatus, number>> {
-    return databaseService.transaction(async (transaction) => {
-      const grouped = await transaction.appointment.groupBy({
-        by: ['status'],
-        where: { ...datePeriodWhere(from, to) },
-        _count: { _all: true },
-      })
-      const result: Record<AppointmentStatus, number> = {
-        PROGRAMADA: 0,
-        CANCELADA: 0,
-        ATENDIDA: 0,
-      }
-      for (const item of grouped) result[item.status] = item._count._all
-      return result
-    })
+    return databaseService.measure(
+      'reports.workshop.appointments',
+      async () => {
+        const grouped = await databaseService.client.appointment.groupBy({
+          by: ['status'],
+          where: { ...datePeriodWhere(from, to) },
+          _count: { _all: true },
+        })
+        const result: Record<AppointmentStatus, number> = {
+          PROGRAMADA: 0,
+          CANCELADA: 0,
+          ATENDIDA: 0,
+        }
+        for (const item of grouped) result[item.status] = item._count._all
+        return result
+      },
+    )
   },
 
   listPendingObligations:

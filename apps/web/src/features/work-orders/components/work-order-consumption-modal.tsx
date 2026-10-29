@@ -28,6 +28,7 @@ interface WorkOrderConsumptionModalProps {
   open: boolean
   order: WorkOrderDetail | null
   execution: WorkOrderExecution | null
+  executionLoading?: boolean
   onClose: () => void
 }
 
@@ -35,6 +36,7 @@ export function WorkOrderConsumptionModal({
   open,
   order,
   execution,
+  executionLoading = false,
   onClose,
 }: WorkOrderConsumptionModalProps) {
   const mutations = useWorkOrdersMutations()
@@ -133,7 +135,11 @@ export function WorkOrderConsumptionModal({
           <Button type="button" variant="outline" onClick={closeModal}>
             Cancelar
           </Button>
-          <Button type="button" disabled={busy} onClick={() => void submit()}>
+          <Button
+            type="button"
+            disabled={busy || executionLoading}
+            onClick={() => void submit()}
+          >
             {busy ? 'Registrando…' : 'Registrar consumo'}
           </Button>
         </div>
@@ -152,9 +158,13 @@ export function WorkOrderConsumptionModal({
             aria-label="Repuesto a consumir"
             placeholder="Seleccionar repuesto"
             searchPlaceholder="Buscar repuesto…"
-            emptyMessage="No hay repuestos pendientes. Solo aparecen los productos del presupuesto aprobado que aún tienen cantidad por consumir."
+            emptyMessage={
+              executionLoading
+                ? 'Cargando los repuestos pendientes…'
+                : 'No hay repuestos pendientes. Solo aparecen los productos del presupuesto aprobado que aún tienen cantidad por consumir.'
+            }
             options={options}
-            disabled={busy}
+            disabled={busy || executionLoading}
             onChange={(lineId) => {
               setSelectedLineId(lineId)
               setValue('lineId', lineId)

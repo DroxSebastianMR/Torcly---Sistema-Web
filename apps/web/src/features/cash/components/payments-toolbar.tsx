@@ -1,5 +1,5 @@
 import { Trash2 } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { DateRangePicker } from '@/components/ui/date-range-picker'
 import {
   SmartSelect,
   type SmartSelectOption,
@@ -28,7 +28,7 @@ export function PaymentsToolbar({
     onChange({ ...filters, ...patch, page: 1 })
 
   return (
-    <div className="flex flex-col gap-3 border-b bg-card px-4 py-4 sm:px-5">
+    <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
       <div className="min-w-0 flex-1">
         <SmartSelect
           value={filters.search}
@@ -42,8 +42,8 @@ export function PaymentsToolbar({
           onChange={(search) => update({ search })}
         />
       </div>
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-        <div className="w-full lg:w-48">
+      <div className="flex flex-wrap gap-3 xl:shrink-0">
+        <div className="w-full sm:w-48">
           <SmartSelect
             value={filters.status}
             aria-label="Estado de cobro"
@@ -58,7 +58,7 @@ export function PaymentsToolbar({
             }
           />
         </div>
-        <div className="w-full lg:w-48">
+        <div className="w-full sm:w-48">
           <SmartSelect
             value={filters.method}
             aria-label="Método de pago"
@@ -74,26 +74,14 @@ export function PaymentsToolbar({
             }
           />
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <label className="flex flex-1 items-center gap-2 text-xs text-muted-foreground">
-            Desde
-            <Input
-              type="date"
-              aria-label="Fecha inicial"
-              value={filters.from ?? ''}
-              onChange={(event) => update({ from: event.target.value || null })}
-            />
-          </label>
-          <label className="flex flex-1 items-center gap-2 text-xs text-muted-foreground">
-            Hasta
-            <Input
-              type="date"
-              aria-label="Fecha final"
-              value={filters.to ?? ''}
-              onChange={(event) => update({ to: event.target.value || null })}
-            />
-          </label>
-        </div>
+        <DateRangePicker
+          aria-label="Filtrar cobros por período"
+          value={{ from: filters.from ?? '', to: filters.to ?? '' }}
+          onChange={(range) =>
+            update({ from: range.from || null, to: range.to || null })
+          }
+          className="w-full sm:w-72"
+        />
         {hasFilters && (
           <button
             type="button"

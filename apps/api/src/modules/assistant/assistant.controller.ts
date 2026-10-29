@@ -1,5 +1,8 @@
 import type { RequestHandler } from 'express'
-import { assistantChatSchema } from './assistant.schemas.js'
+import {
+  assistantChatSchema,
+  assistantConversationParamsSchema,
+} from './assistant.schemas.js'
 import { assistantService } from './assistant.service.js'
 
 export const askAssistant: RequestHandler = async (request, response) => {
@@ -13,4 +16,19 @@ export const askAssistant: RequestHandler = async (request, response) => {
       },
     ),
   )
+}
+
+export const listAssistantConversations: RequestHandler = async (
+  request,
+  response,
+) => {
+  response.json(await assistantService.listConversations(request.auth!.id))
+}
+
+export const getAssistantConversation: RequestHandler = async (
+  request,
+  response,
+) => {
+  const { id } = assistantConversationParamsSchema.parse(request.params)
+  response.json(await assistantService.getConversation(request.auth!.id, id))
 }

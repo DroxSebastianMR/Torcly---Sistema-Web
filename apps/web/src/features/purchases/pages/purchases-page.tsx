@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { Building2, Plus, ShoppingBag } from 'lucide-react'
+import { Building2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ErrorState } from '@/components/ui/error-state'
+import { ModuleMetrics } from '@/components/ui/module-metrics'
+import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { PurchaseDetailModal } from '../components/purchase-detail-modal'
@@ -62,7 +64,7 @@ export default function Page() {
       <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <ShoppingBag size={15} /> Abastecimiento
+            Abastecimiento
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
             Compras
@@ -90,31 +92,42 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Stats summary */}
-      <div className="flex flex-wrap gap-4 text-sm">
-        <div className="flex items-center gap-1.5 text-muted-foreground">
-          <span className="h-2 w-2 rounded-full bg-amber-400" aria-hidden />
-          {visiblePurchases.filter((p) => p.status === 'DRAFT').length}{' '}
-          borradores
-        </div>
-        <div className="flex items-center gap-1.5 text-muted-foreground">
-          <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
-          {visiblePurchases.filter((p) => p.status === 'RECEIVED').length}{' '}
-          recibidas
-        </div>
-        <span className="ml-auto text-muted-foreground">
-          {total} {total === 1 ? 'compra registrada' : 'compras registradas'}
-        </span>
-      </div>
+      <ModuleMetrics
+        items={[
+          { label: 'Compras registradas', value: total },
+          {
+            label: 'Borradores',
+            value: visiblePurchases.filter(
+              (purchase) => purchase.status === 'DRAFT',
+            ).length,
+            valueLabel: 'en esta página',
+            tone: 'warning',
+          },
+          {
+            label: 'Recibidas',
+            value: visiblePurchases.filter(
+              (purchase) => purchase.status === 'RECEIVED',
+            ).length,
+            valueLabel: 'en esta página',
+            tone: 'success',
+          },
+        ]}
+      />
 
-      <section className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-b px-4 py-4 sm:px-5">
-          <PurchasesToolbar
-            filters={filters}
-            onFilterChange={handleFilterChange}
-          />
-        </div>
+      <section
+        aria-label="Filtros de compras"
+        className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
+      >
+        <PurchasesToolbar
+          filters={filters}
+          onFilterChange={handleFilterChange}
+        />
+      </section>
 
+      <section
+        aria-label="Resultados de compras"
+        className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]"
+      >
         {purchases.isError ? (
           <ErrorState
             title="No se pudieron cargar las compras"
@@ -131,31 +144,11 @@ export default function Page() {
           />
         )}
 
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t px-5 py-3 text-sm text-muted-foreground">
-            <span>
-              Página {filters.page} de {totalPages}
-            </span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="h-8 px-3 text-xs"
-                disabled={filters.page <= 1}
-                onClick={() => handleFilterChange({ page: filters.page - 1 })}
-              >
-                Anterior
-              </Button>
-              <Button
-                variant="outline"
-                className="h-8 px-3 text-xs"
-                disabled={filters.page >= totalPages}
-                onClick={() => handleFilterChange({ page: filters.page + 1 })}
-              >
-                Siguiente
-              </Button>
-            </div>
-          </div>
-        )}
+        <Pagination
+          page={filters.page}
+          totalPages={totalPages}
+          onPageChange={(page) => handleFilterChange({ page })}
+        />
       </section>
 
       <PurchaseDetailModal

@@ -7,10 +7,8 @@ import { isForbidden } from '../utils/report-formatters'
 
 interface BlockCardProps {
   title: string
-  icon: ReactNode
+  icon?: ReactNode
   criteria?: string
-  source?: string
-  periodField?: string
   periodLabel: string
   isPending: boolean
   isFetching: boolean
@@ -27,8 +25,6 @@ export function BlockCard({
   title,
   icon,
   criteria,
-  source,
-  periodField,
   periodLabel,
   isPending,
   isFetching,
@@ -48,7 +44,7 @@ export function BlockCard({
       <header className="mb-4 flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            {icon}
+            {icon && <span aria-hidden>{icon}</span>}
             <h2 className="text-lg font-bold text-brand-forest">{title}</h2>
             {isFetching && !isError && (
               <LoaderCircle
@@ -70,13 +66,16 @@ export function BlockCard({
       </header>
 
       {pending ? (
-        <p
+        <div
           role="status"
           aria-label={`Cargando ${title}`}
-          className="py-10 text-center text-sm text-muted-foreground"
+          className="space-y-4 py-4"
         >
-          Cargando {title}…
-        </p>
+          <div className="h-5 w-36 animate-pulse rounded bg-muted" />
+          <div className="h-44 animate-pulse rounded-xl bg-muted" />
+          <div className="h-4 w-full animate-pulse rounded bg-muted" />
+          <div className="h-4 w-4/5 animate-pulse rounded bg-muted" />
+        </div>
       ) : forbidden ? (
         <div
           role="alert"
@@ -105,20 +104,14 @@ export function BlockCard({
         children
       )}
 
-      {(criteria || source || periodField) && (
+      {criteria && (
         <footer
           className={cn(
             'mt-4 rounded-xl border border-border/60 bg-muted/40 p-3 text-xs leading-5 text-muted-foreground',
             pending && 'opacity-0',
           )}
         >
-          {criteria && <p>{criteria}</p>}
-          {(source || periodField) && (
-            <p className="mt-1">
-              {source && <span>Fuente: {source}.</span>}{' '}
-              {periodField && <span>Período: {periodField}.</span>}
-            </p>
-          )}
+          <p>{criteria}</p>
         </footer>
       )}
     </section>

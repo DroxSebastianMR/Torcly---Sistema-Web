@@ -17,6 +17,7 @@ export interface AssistantContext {
 }
 
 export interface AssistantAnswer {
+  conversationId: string
   message: string
   generatedAt: string
   period: AssistantPeriod
@@ -24,9 +25,30 @@ export interface AssistantAnswer {
   disclaimer: string
 }
 
+export interface AssistantConversationSummary {
+  id: string
+  title: string
+  updatedAt: string
+  preview: string | null
+}
+
+export interface AssistantConversationDetail {
+  id: string
+  title: string
+  createdAt: string
+  updatedAt: string
+  messages: Array<{
+    id: string
+    role: 'USER' | 'ASSISTANT'
+    content: string
+    createdAt: string
+  }>
+}
+
 export interface AiCompletionInput {
   message: string
   context: AssistantContext
+  history: Array<{ role: 'USER' | 'ASSISTANT'; content: string }>
 }
 
 export interface AiProvider {

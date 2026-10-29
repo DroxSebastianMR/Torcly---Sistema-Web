@@ -112,7 +112,7 @@ export function DateRangePicker({
           setMonth(parse(value.from) ?? new Date())
           setOpen((current) => !current)
         }}
-        className="flex h-11 w-full items-center gap-3 rounded-lg border border-input bg-background px-3 text-left text-sm hover:border-primary/45 focus-visible:outline-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50"
+        className="flex min-h-11 w-full items-center gap-3 rounded-[10px] border border-input bg-card px-[13px] text-left text-sm transition-[border-color,background-color] duration-150 ease-out hover:bg-background focus-visible:border-primary/70 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
       >
         <CalendarDays aria-hidden className="size-4 text-muted-foreground" />
         <span
@@ -132,7 +132,7 @@ export function DateRangePicker({
         <div
           role="dialog"
           aria-label="Seleccionar rango de fechas"
-          className="absolute z-30 mt-2 w-[min(34rem,calc(100vw-2rem))] rounded-xl border border-border/80 bg-card p-4 shadow-[0_18px_40px_rgba(7,28,22,0.16)] sm:flex sm:gap-4"
+          className="absolute z-30 mt-2 w-[min(34rem,calc(100vw-2rem))] rounded-2xl border border-border bg-card p-3 shadow-[0_24px_60px_rgb(16_44_37_/_18%)] sm:flex sm:gap-4"
         >
           <div className="min-w-0 flex-1">
             <div className="mb-3 flex items-center justify-between">
@@ -149,11 +149,11 @@ export function DateRangePicker({
                       ),
                   )
                 }
-                className="rounded-lg p-2 hover:bg-muted"
+                className="rounded-lg p-2 text-primary hover:bg-muted"
               >
                 <ChevronLeft className="size-4" />
               </button>
-              <strong className="capitalize text-sm text-brand-forest">
+              <strong className="font-heading capitalize text-[15px] text-brand-forest">
                 {monthLabel}
               </strong>
               <button
@@ -169,7 +169,7 @@ export function DateRangePicker({
                       ),
                   )
                 }
-                className="rounded-lg p-2 hover:bg-muted"
+                className="rounded-lg p-2 text-primary hover:bg-muted"
               >
                 <ChevronRight className="size-4" />
               </button>
@@ -200,8 +200,8 @@ export function DateRangePicker({
                     aria-pressed={Boolean(selected)}
                     onClick={() => choose(date)}
                     className={cn(
-                      'mx-auto flex size-9 items-center justify-center rounded-full text-sm hover:bg-primary/10',
-                      between && 'rounded-none bg-primary/10 text-primary',
+                      'mx-auto flex size-9 items-center justify-center rounded-[9px] text-sm hover:bg-muted hover:text-primary',
+                      between && 'rounded-[9px] bg-primary/10 text-primary',
                       selected &&
                         'bg-primary text-primary-foreground hover:bg-primary',
                     )}
@@ -219,15 +219,15 @@ export function DateRangePicker({
             <div className="grid gap-1">
               {[
                 [7, 'Últimos 7 días'],
-                [14, 'Últimos 14 días'],
-                [31, 'Últimos 31 días'],
+                [15, 'Últimos 15 días'],
+                [30, 'Últimos 30 días'],
                 ['month', 'Este mes'],
               ].map(([amount, text]) => (
                 <button
                   key={String(amount)}
                   type="button"
                   onClick={() => preset(amount as number | 'month')}
-                  className="rounded-lg px-3 py-2 text-left text-sm hover:bg-muted hover:text-primary"
+                  className="min-h-9 rounded-lg px-3 py-2 text-left text-sm hover:bg-muted hover:text-primary"
                 >
                   {text}
                 </button>

@@ -8,6 +8,16 @@ describe('Esquema del asistente', () => {
     ).toMatchObject({ message: '¿Cómo está el stock?' })
   })
 
+  it('acepta el período vacío que envía el dashboard inicialmente', () => {
+    expect(
+      assistantChatSchema.parse({
+        message: '¿Cuántas citas tenemos hoy?',
+        from: null,
+        to: null,
+      }),
+    ).toMatchObject({ from: null, to: null })
+  })
+
   it('rechaza mensajes largos y periodos invertidos', () => {
     expect(() =>
       assistantChatSchema.parse({ message: 'x'.repeat(801) }),

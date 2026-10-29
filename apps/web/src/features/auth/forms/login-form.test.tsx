@@ -8,9 +8,9 @@ import { AuthContext } from '@/features/auth/hooks/auth-context'
 import type { AuthContextValue } from '@/features/auth/hooks/auth-context'
 import { LoginForm } from './login-form'
 
-const toastError = vi.hoisted(() => vi.fn())
+const toastAdd = vi.hoisted(() => vi.fn())
 
-vi.mock('sonner', () => ({ toast: { error: toastError } }))
+vi.mock('@/components/ui/toast-manager', () => ({ toast: { add: toastAdd } }))
 
 function renderForm(
   login: AuthContextValue['login'],
@@ -94,7 +94,13 @@ describe('Formulario de acceso', () => {
       screen.getByRole('button', { name: /iniciar sesión/i }),
     )
 
-    await waitFor(() => expect(toastError).toHaveBeenCalledOnce())
+    await waitFor(() => expect(toastAdd).toHaveBeenCalledOnce())
+    expect(toastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'error',
+        title: 'No se pudo iniciar sesión',
+      }),
+    )
     expect(screen.getByRole('button', { name: /iniciar sesión/i })).toBeTruthy()
   })
 })

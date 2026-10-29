@@ -30,7 +30,7 @@ export function CustomersToolbar({
   const hasFilters = filters.search || filters.type !== 'all'
 
   return (
-    <div className="flex flex-col gap-3 border-b bg-card px-4 py-4 sm:px-5 xl:flex-row xl:items-center">
+    <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
       <div className="min-w-0 flex-1">
         <SmartSelect
           value={filters.search}

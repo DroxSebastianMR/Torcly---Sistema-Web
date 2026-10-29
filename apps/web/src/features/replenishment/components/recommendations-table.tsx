@@ -8,11 +8,13 @@ import { PriorityBadge } from './priority-badge'
 interface RecommendationsTableProps {
   recommendations: readonly ReplenishmentRecommendation[]
   loading: boolean
+  minDemandPoints?: number
 }
 
 export function RecommendationsTable({
   recommendations,
   loading,
+  minDemandPoints = 3,
 }: RecommendationsTableProps) {
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set())
 
@@ -44,7 +46,7 @@ export function RecommendationsTable({
     <>
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[820px] border-collapse text-left text-sm">
-          <thead className="bg-[#f8faf9] text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
             <tr>
               <th className="px-5 py-3">Producto</th>
               <th className="px-4 py-3">Estado</th>
@@ -65,6 +67,7 @@ export function RecommendationsTable({
                 <RecommendationRow
                   key={recommendation.code}
                   recommendation={recommendation}
+                  minDemandPoints={minDemandPoints}
                   isExpanded={isExpanded}
                   onToggle={() => toggle(recommendation.code)}
                 />
@@ -81,6 +84,7 @@ export function RecommendationsTable({
             <RecommendationCard
               key={recommendation.code}
               recommendation={recommendation}
+              minDemandPoints={minDemandPoints}
               isExpanded={isExpanded}
               onToggle={() => toggle(recommendation.code)}
             />
@@ -93,10 +97,12 @@ export function RecommendationsTable({
 
 function RecommendationCard({
   recommendation,
+  minDemandPoints,
   isExpanded,
   onToggle,
 }: {
   recommendation: ReplenishmentRecommendation
+  minDemandPoints: number
   isExpanded: boolean
   onToggle: () => void
 }) {
@@ -112,17 +118,10 @@ function RecommendationCard({
         <PriorityBadge priority={recommendation.priority} />
       </div>
       <div className="mt-3">
-        {recommendation.eligible ? (
-          <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-            Elegible
-          </span>
-        ) : (
-          <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
-            {recommendation.reason === 'INACTIVE_PRODUCT'
-              ? 'Producto inactivo'
-              : 'Datos insuficientes'}
-          </span>
-        )}
+        <EligibilityBadge
+          recommendation={recommendation}
+          minDemandPoints={minDemandPoints}
+        />
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
         <Info
@@ -202,10 +201,12 @@ function Info({ label, value }: { label: string; value: string }) {
 
 function RecommendationRow({
   recommendation,
+  minDemandPoints,
   isExpanded,
   onToggle,
 }: {
   recommendation: ReplenishmentRecommendation
+  minDemandPoints: number
   isExpanded: boolean
   onToggle: () => void
 }) {
@@ -222,17 +223,10 @@ function RecommendationRow({
           </p>
         </td>
         <td className="px-4 py-4">
-          {recommendation.eligible ? (
-            <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-              Elegible
-            </span>
-          ) : (
-            <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
-              {recommendation.reason === 'INACTIVE_PRODUCT'
-                ? 'Producto inactivo'
-                : 'Datos insuficientes'}
-            </span>
-          )}
+          <EligibilityBadge
+            recommendation={recommendation}
+            minDemandPoints={minDemandPoints}
+          />
         </td>
         <td className="px-4 py-4 text-right tabular-nums">
           {recommendation.stockCurrent === null
@@ -295,6 +289,37 @@ function RecommendationRow({
         </tr>
       )}
     </>
+  )
+}
+
+function EligibilityBadge({
+  recommendation,
+  minDemandPoints,
+}: {
+  recommendation: ReplenishmentRecommendation
+  minDemandPoints: number
+}) {
+  if (recommendation.eligible) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+        Elegible
+      </span>
+    )
+  }
+
+  const label =
+    recommendation.reason === 'INACTIVE_PRODUCT'
+      ? 'Producto inactivo'
+      : recommendation.reason === 'INSUFFICIENT_DATA'
+        ? 'Datos insuficientes'
+        : recommendation.demandPoints === 0
+          ? 'Sin demanda confirmada'
+          : `${recommendation.demandPoints} de ${minDemandPoints} registros`
+
+  return (
+    <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
+      {label}
+    </span>
   )
 }
 

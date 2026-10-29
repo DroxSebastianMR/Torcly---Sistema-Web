@@ -2,9 +2,8 @@ import { env } from '../../config/env.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import { authorizedSections } from '../operations/operations.rules.js'
 import { operationsService } from '../operations/operations.service.js'
-import { replenishmentService } from '../replenishment/replenishment.service.js'
-import { REPLENISHMENT_DEFAULT_COVERAGE_DAYS } from '../replenishment/replenishment.types.js'
 import { FakeProvider, GroqProvider } from './ai.provider.js'
+import { assistantRepository } from './assistant.repository.js'
 import type {
   AiProvider,
   AssistantAnswer,
@@ -22,7 +21,6 @@ const sourcePaths: Record<string, { label: string; path: string }> = {
   sales: { label: 'Ventas', path: '/ventas' },
   payments: { label: 'Caja', path: '/caja' },
   inventory: { label: 'Inventario', path: '/inventario' },
-  replenishment: { label: 'Reabastecimiento', path: '/reabastecimiento' },
 }
 
 function assertReadOnly(message: string): void {
@@ -57,7 +55,12 @@ function provider(): AiProvider | null {
   if (env.AI_PROVIDER === 'fake' || env.NODE_ENV === 'test')
     return new FakeProvider()
   if (!env.GROQ_API_KEY) return null
-  return new GroqProvider(env.GROQ_API_KEY, env.AI_REQUEST_TIMEOUT_MS)
+  return new GroqProvider(
+    env.GROQ_API_KEY,
+    env.AI_REQUEST_TIMEOUT_MS,
+    env.GROQ_MODEL,
+    env.AI_MAX_OUTPUT_TOKENS,
+  )
 }
 
 async function buildContext(
@@ -65,34 +68,33 @@ async function buildContext(
   permissions: readonly string[],
 ): Promise<AssistantContext> {
   const summary = await operationsService.getSummary(filters, permissions)
-  const facts: Record<string, unknown> = { operations: summary.sections }
-  const sources: AssistantSource[] = authorizedSections(permissions).map(
-    (section) => ({
-      module: section,
-      ...sourcePaths[section],
+  const sections = authorizedSections(permissions)
+  const attentionEntries = await Promise.all(
+    sections.map(async (section) => {
+      const response = await operationsService.getAttention(
+        section,
+        { ...filters, page: 1, pageSize: 10 },
+        permissions,
+      )
+      return [section, response.data] as const
     }),
   )
+  const attention = Object.fromEntries(attentionEntries)
+  const facts: Record<string, unknown> = {
+    operations: {
+      summary: summary.sections,
+      attention,
+    },
+  }
+  const sources: AssistantSource[] = sections.map((section) => ({
+    module: section,
+    ...sourcePaths[section],
+  }))
   if (permissions.includes('inventory:read')) {
-    const eligibility = await replenishmentService.getEligibility({
-      ...filters,
-      search: null,
-      priority: null,
-      eligible: true,
-      page: 1,
-      pageSize: 5,
-      coverageDays: REPLENISHMENT_DEFAULT_COVERAGE_DAYS,
-    })
-    facts.replenishment = {
-      counts: eligibility.counts,
-      items: eligibility.items.map((item) => ({
-        code: item.code,
-        stockCurrent: item.stockCurrent,
-        minimumStock: item.minimumStock,
-        suggestedQuantity: item.suggestedQuantity,
-        priority: item.priority,
-      })),
+    facts.inventory = {
+      summary: summary.sections.inventory,
+      lowStockItems: attention.inventory ?? [],
     }
-    sources.push({ module: 'replenishment', ...sourcePaths.replenishment })
   }
   return {
     generatedAt: summary.generatedAt,
@@ -104,7 +106,12 @@ async function buildContext(
 
 export const assistantService = {
   async ask(
-    input: { message: string; from: string | null; to: string | null },
+    input: {
+      message: string
+      from: string | null
+      to: string | null
+      conversationId?: string
+    },
     actor: { id: string; permissions: readonly string[] },
   ): Promise<AssistantAnswer> {
     assertReadOnly(input.message)
@@ -121,11 +128,39 @@ export const assistantService = {
       { from: input.from, to: input.to },
       actor.permissions,
     )
+    const history = input.conversationId
+      ? await assistantRepository.getRecentMessages(
+          actor.id,
+          input.conversationId,
+        )
+      : []
+    if (history === null) {
+      throw new AppError(
+        404,
+        'ASSISTANT_CONVERSATION_NOT_FOUND',
+        'No se encontró la conversación solicitada.',
+      )
+    }
     const message = await activeProvider.complete({
       message: input.message,
       context,
+      history,
     })
+    const conversationId = await assistantRepository.saveExchange({
+      userId: actor.id,
+      conversationId: input.conversationId,
+      question: input.message,
+      answer: message,
+    })
+    if (!conversationId) {
+      throw new AppError(
+        404,
+        'ASSISTANT_CONVERSATION_NOT_FOUND',
+        'No se encontró la conversación solicitada.',
+      )
+    }
     return {
+      conversationId,
       message,
       generatedAt: context.generatedAt,
       period: context.period,
@@ -136,5 +171,33 @@ export const assistantService = {
   },
   resetRateLimits() {
     rateWindows.clear()
+  },
+  async listConversations(userId: string) {
+    const conversations = await assistantRepository.listConversations(userId)
+    return conversations.map((conversation) => ({
+      id: conversation.id,
+      title: conversation.title,
+      updatedAt: conversation.updatedAt.toISOString(),
+      preview: conversation.messages[0]?.content ?? null,
+    }))
+  },
+  async getConversation(userId: string, id: string) {
+    const conversation = await assistantRepository.getConversation(userId, id)
+    if (!conversation) {
+      throw new AppError(
+        404,
+        'ASSISTANT_CONVERSATION_NOT_FOUND',
+        'No se encontró la conversación solicitada.',
+      )
+    }
+    return {
+      ...conversation,
+      createdAt: conversation.createdAt.toISOString(),
+      updatedAt: conversation.updatedAt.toISOString(),
+      messages: conversation.messages.map((message) => ({
+        ...message,
+        createdAt: message.createdAt.toISOString(),
+      })),
+    }
   },
 }

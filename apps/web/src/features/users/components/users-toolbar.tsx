@@ -1,7 +1,4 @@
-import { useState } from 'react'
-import { SlidersHorizontal, Trash2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Modal } from '@/components/ui/modal'
+import { Trash2 } from 'lucide-react'
 import {
   SmartSelect,
   type SmartSelectOption,
@@ -20,16 +17,8 @@ export function UsersToolbar({
   suggestions,
 }: UsersToolbarProps) {
   const hasFilters = filters.search || filters.status !== 'all'
-  const [filtersOpen, setFiltersOpen] = useState(false)
-  const [draftStatus, setDraftStatus] = useState(filters.status)
-
-  const openFilters = () => {
-    setDraftStatus(filters.status)
-    setFiltersOpen(true)
-  }
-
   return (
-    <div className="flex flex-col gap-3 border-b bg-card px-4 py-4 sm:px-5 xl:flex-row xl:items-center">
+    <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
       <div className="min-w-0 flex-1">
         <SmartSelect
           value={filters.search}
@@ -80,53 +69,6 @@ export function UsersToolbar({
           </button>
         )}
       </div>
-      <button
-        type="button"
-        aria-label="Abrir filtros de usuarios"
-        onClick={openFilters}
-        className="inline-flex size-11 items-center justify-center rounded-lg border border-input text-muted-foreground transition-colors hover:border-primary/45 hover:bg-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
-      >
-        <SlidersHorizontal aria-hidden size={17} />
-      </button>
-      <Modal
-        open={filtersOpen}
-        onClose={() => setFiltersOpen(false)}
-        title="Filtros de usuarios"
-        description="Refina el listado sin perder la búsqueda actual."
-        className="max-w-md"
-        footer={
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setFiltersOpen(false)}>
-              Cancelar
-            </Button>
-            <Button
-              onClick={() => {
-                onChange({ ...filters, status: draftStatus, page: 1 })
-                setFiltersOpen(false)
-              }}
-            >
-              Aplicar filtros
-            </Button>
-          </div>
-        }
-      >
-        <label className="block text-sm font-medium text-brand-forest">
-          Estado de la cuenta
-          <SmartSelect
-            value={draftStatus}
-            aria-label="Estado de la cuenta"
-            className="mt-2"
-            options={[
-              { value: 'all', label: 'Todos los estados' },
-              { value: 'active', label: 'Activos' },
-              { value: 'inactive', label: 'Inactivos' },
-            ]}
-            onChange={(status) =>
-              setDraftStatus(status as UserFilters['status'])
-            }
-          />
-        </label>
-      </Modal>
     </div>
   )
 }

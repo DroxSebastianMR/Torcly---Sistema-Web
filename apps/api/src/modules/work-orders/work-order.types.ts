@@ -67,6 +67,15 @@ export interface WorkOrderLineResponse {
   subtotal: number
 }
 
+export interface WorkOrderBillingSummary {
+  saleId: string
+  saleCode: string
+  total: number
+  paid: number
+  balance: number
+  status: 'PENDING' | 'PARTIALLY_PAID' | 'PAID'
+}
+
 export interface WorkOrderSummary {
   id: string
   code: string
@@ -78,6 +87,7 @@ export interface WorkOrderSummary {
   technician: string | null
   subtotal: number
   total: number
+  billing: WorkOrderBillingSummary | null
   lineCount: number
   performedBy: string
   diagnosisUpdatedBy: string | null
@@ -164,6 +174,11 @@ export interface WorkOrderReturnItem {
 export interface WorkOrderReturnInput {
   requestId: string
   items: WorkOrderReturnItem[]
+}
+
+export interface WorkOrderFinalizeInput {
+  /** Confirmación explícita para cerrar sin descontar los repuestos aún pendientes. */
+  confirmPendingProducts?: boolean
 }
 
 export interface WorkOrderDeliveryInput {

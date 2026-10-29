@@ -3,7 +3,7 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import type { ProductsResponse } from '../types/products.types'
 import Page from './products-page'
 
@@ -72,10 +72,7 @@ function options() {
 function renderPage() {
   return render(
     <MemoryRouter initialEntries={['/productos']}>
-      <Routes>
-        <Route path="/productos" element={<Page />} />
-        <Route path="/productos/:id" element={<div>Ficha de producto</div>} />
-      </Routes>
+      <Page />
     </MemoryRouter>,
   )
 }
@@ -161,7 +158,7 @@ describe('Página de productos', () => {
     expect(screen.getByRole('button', { name: 'Reintentar' })).toBeTruthy()
   })
 
-  it('lista productos y navega a la ficha al abrir el detalle', async () => {
+  it('abre el detalle en un diálogo sin navegar fuera del listado', async () => {
     auth.useAuth.mockReturnValue({
       user: { permissions: ['products:read', 'products:write'] },
     })
@@ -187,7 +184,10 @@ describe('Página de productos', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'Abrir ficha de Filtro de aceite' }),
     )
-    expect(screen.getByText('Ficha de producto')).toBeTruthy()
+    expect(
+      screen.getByRole('dialog', { name: 'Filtro de aceite' }),
+    ).toBeTruthy()
+    expect(screen.getByText('Existencia disponible')).toBeTruthy()
   })
 
   it('omite acciones de escritura de la tabla sin permiso', () => {

@@ -272,17 +272,25 @@ export const operationsRepository = {
     pendingCount: number
     pendingAmount: number
   }> {
-    const sales = await databaseService.client.sale.findMany({
-      where: { status: 'CONFIRMED', total: { gt: 0 } },
-      select: { id: true, total: true },
-    })
+    const sales = await databaseService.measure(
+      'operations.payments.confirmed_sales',
+      () =>
+        databaseService.client.sale.findMany({
+          where: { status: 'CONFIRMED', total: { gt: 0 } },
+          select: { id: true, total: true },
+        }),
+    )
     if (!sales.length) return { pendingCount: 0, pendingAmount: 0 }
 
-    const grouped = await databaseService.client.payment.groupBy({
-      by: ['saleId', 'type'],
-      where: { saleId: { in: sales.map((sale) => sale.id) } },
-      _sum: { amount: true },
-    })
+    const grouped = await databaseService.measure(
+      'operations.payments.grouped_events',
+      () =>
+        databaseService.client.payment.groupBy({
+          by: ['saleId', 'type'],
+          where: { saleId: { in: sales.map((sale) => sale.id) } },
+          _sum: { amount: true },
+        }),
+    )
     const paidBySale = new Map<string, number>()
     for (const item of grouped) {
       const current = paidBySale.get(item.saleId) ?? 0
@@ -351,15 +359,19 @@ export const operationsRepository = {
 
   async countLowStockProducts(): Promise<number> {
     const [products, grouped] = await Promise.all([
-      databaseService.client.product.findMany({
-        where: { active: true },
-        select: { id: true, minimumStock: true },
-      }),
-      databaseService.client.inventoryMovement.groupBy({
-        by: ['productId', 'type'],
-        where: { status: 'CONFIRMED' },
-        _sum: { quantity: true },
-      }),
+      databaseService.measure('operations.inventory.active_products', () =>
+        databaseService.client.product.findMany({
+          where: { active: true },
+          select: { id: true, minimumStock: true },
+        }),
+      ),
+      databaseService.measure('operations.inventory.grouped_movements', () =>
+        databaseService.client.inventoryMovement.groupBy({
+          by: ['productId', 'type'],
+          where: { status: 'CONFIRMED' },
+          _sum: { quantity: true },
+        }),
+      ),
     ])
 
     const movementsByProduct = new Map<

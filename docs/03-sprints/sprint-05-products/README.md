@@ -39,9 +39,9 @@ Stock editable desde catálogo; existencias provienen exclusivamente de movimien
 
 ### Web
 
-- Ruta pública de catálogo `/productos` y ficha `/productos/:id` bajo `PermissionRoute products:read`.
-- Acciones de escritura (registrar, catálogos, editar, activar/desactivar) gated por `products:write`; ocultas sin permiso en tabla, ficha y menú.
-- Ficha de detalle (`product-detail-page.tsx`): datos comerciales, precio, stock de solo lectura («las existencias se administran desde Inventario»), edición y desactivación con diálogo de confirmación.
+- Ruta pública de catálogo `/productos` bajo `PermissionRoute products:read`.
+- Acciones de escritura (registrar, catálogos, editar, activar/desactivar) gated por `products:write`; ocultas sin permiso en tabla, detalle y menú.
+- Detalle (`product-detail-modal.tsx`): datos comerciales, precio, stock de solo lectura («las existencias se administran desde Inventario»), edición y desactivación con diálogo de confirmación. Reutiliza los datos ya visibles en el listado y evita una segunda consulta remota.
 - Lectura USB: los campos de código y código de barras evitan el envío implícito con Enter (`stopImplicitSubmit`).
 - Modal Catálogos: edición en línea y activación/desactivación de categorías, marcas y unidades, con estado visible.
 

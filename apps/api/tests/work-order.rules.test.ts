@@ -17,6 +17,7 @@ import {
   roundMoney,
   roundQuantity,
   shouldMoveToDiagnosis,
+  workOrderOperationKey,
 } from '../src/modules/work-orders/work-order.rules.js'
 
 describe('Reglas de órdenes de taller', () => {
@@ -143,19 +144,17 @@ describe('Reglas de órdenes de taller', () => {
     expect(shouldMoveToDiagnosis('APROBADA')).toBe('APROBADA')
   })
 
-  it('inicia la ejecución solo sobre órdenes aprobadas con técnico', () => {
+  it('inicia la ejecución solo sobre órdenes aprobadas, con técnico opcional', () => {
     expect(() =>
       assertCanStartExecution({
         code: 'OT-000001',
         status: 'APROBADA',
-        technicianId: 'a0000000-0000-4000-8000-000000000001',
       }),
     ).not.toThrow()
     expect(() =>
       assertCanStartExecution({
         code: 'OT-000002',
         status: 'EN_DIAGNOSTICO',
-        technicianId: 'a0000000-0000-4000-8000-000000000001',
       }),
     ).toThrowError(
       expect.objectContaining({
@@ -164,17 +163,8 @@ describe('Reglas de órdenes de taller', () => {
       }),
     )
     expect(() =>
-      assertCanStartExecution({
-        code: 'OT-000003',
-        status: 'APROBADA',
-        technicianId: null,
-      }),
-    ).toThrowError(
-      expect.objectContaining({
-        status: 409,
-        code: 'WORK_ORDER_TECHNICIAN_REQUIRED',
-      }),
-    )
+      assertCanStartExecution({ code: 'OT-000003', status: 'APROBADA' }),
+    ).not.toThrow()
   })
 
   it('exige estar en ejecución para actividades, consumos y finalización', () => {
@@ -231,5 +221,20 @@ describe('Reglas de órdenes de taller', () => {
       ]),
     ).toBe(2)
     expect(computeNetConsumed([])).toBe(0)
+  })
+
+  it('genera claves de idempotencia compactas y deterministas para movimientos', () => {
+    const orderId = 'a0000000-0000-4000-8000-000000000001'
+    const lineId = 'b0000000-0000-4000-8000-000000000002'
+    const requestId = 'c0000000-0000-4000-8000-000000000003'
+    const key = workOrderOperationKey('wo-consume', orderId, lineId, requestId)
+
+    expect(key).toBe(
+      workOrderOperationKey('wo-consume', orderId, lineId, requestId),
+    )
+    expect(key).not.toBe(
+      workOrderOperationKey('wo-consume', orderId, 'other-line', requestId),
+    )
+    expect(key.length).toBeLessThanOrEqual(100)
   })
 })

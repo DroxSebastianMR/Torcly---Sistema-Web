@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { ErrorState } from '@/components/ui/error-state'
+import { ModuleMetrics } from '@/components/ui/module-metrics'
+import { Pagination } from '@/components/ui/pagination'
 import { NotificationsList } from '../components/notifications-list'
 import { NotificationsToolbar } from '../components/notifications-toolbar'
 import {
@@ -77,62 +78,63 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      <NotificationsToolbar
-        filters={filters}
-        unreadCount={unreadCount}
-        isMarkingAll={mutations.markAllAsRead.isPending}
-        onFilterChange={handleFilterChange}
-        onMarkAllAsRead={handleMarkAllAsRead}
+      <ModuleMetrics
+        items={[
+          {
+            label: 'Notificaciones',
+            value: pagination?.total ?? 0,
+          },
+          {
+            label: 'Sin leer',
+            value: unreadCount,
+            tone: unreadCount > 0 ? 'warning' : 'success',
+          },
+        ]}
       />
 
-      {isError ? (
-        <ErrorState
-          title="No se pudieron cargar las notificaciones"
-          description="Ocurrió un inconveniente al consultar tu bandeja de avisos."
-          action={{
-            label: 'Reintentar',
-            onClick: () => refetch(),
-          }}
+      <section
+        aria-label="Filtros de notificaciones"
+        className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
+      >
+        <NotificationsToolbar
+          filters={filters}
+          unreadCount={unreadCount}
+          isMarkingAll={mutations.markAllAsRead.isPending}
+          onFilterChange={handleFilterChange}
+          onMarkAllAsRead={handleMarkAllAsRead}
         />
-      ) : (
-        <NotificationsList
-          notifications={notifications}
-          loading={isLoading}
-          onMarkAsRead={handleMarkAsRead}
-          isMarking={mutations.markAsRead.isPending}
-        />
-      )}
+      </section>
 
-      {/* Pagination */}
-      {pagination && pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between border-t pt-4 text-xs text-muted-foreground">
-          <span>
-            Página {pagination.page} de {pagination.totalPages} (
-            {pagination.total}{' '}
-            {pagination.total === 1 ? 'notificación' : 'notificaciones'})
-          </span>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              disabled={pagination.page <= 1}
-              onClick={() =>
-                handleFilterChange({ page: Math.max(1, pagination.page - 1) })
-              }
-              className="h-8 px-3 text-xs"
-            >
-              Anterior
-            </Button>
-            <Button
-              variant="outline"
-              disabled={pagination.page >= pagination.totalPages}
-              onClick={() => handleFilterChange({ page: pagination.page + 1 })}
-              className="h-8 px-3 text-xs"
-            >
-              Siguiente
-            </Button>
-          </div>
-        </div>
-      )}
+      <section
+        aria-label="Resultados de notificaciones"
+        className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]"
+      >
+        {isError ? (
+          <ErrorState
+            title="No se pudieron cargar las notificaciones"
+            description="Ocurrió un inconveniente al consultar tu bandeja de avisos."
+            action={{
+              label: 'Reintentar',
+              onClick: () => refetch(),
+            }}
+          />
+        ) : (
+          <NotificationsList
+            notifications={notifications}
+            loading={isLoading}
+            onMarkAsRead={handleMarkAsRead}
+            isMarking={mutations.markAsRead.isPending}
+          />
+        )}
+
+        {pagination && (
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            onPageChange={(page) => handleFilterChange({ page })}
+          />
+        )}
+      </section>
     </div>
   )
 }

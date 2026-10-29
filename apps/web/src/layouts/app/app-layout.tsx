@@ -5,28 +5,14 @@ import { AppHeader } from '@/features/navigation/components/app-header'
 import { AppSidebar } from './components/app-sidebar'
 import { MaintenanceBanner } from '@/features/maintenance/components/maintenance-banner'
 import { reportModuleLoad } from '@/features/navigation/utils/module-load-metrics'
-import { toast } from '@/components/ui/toast-manager'
-import { useAuth } from '@/features/auth/hooks/auth-context'
 
 export function AppLayout() {
   const [open, setOpen] = useState(false)
-  const { user } = useAuth()
   const location = useLocation()
   const navigation = useNavigation()
   const startedAt = useRef<number | null>(null)
   const previousState = useRef(navigation.state)
   const reportedInitial = useRef(false)
-
-  useEffect(() => {
-    if (!user || sessionStorage.getItem(`torcly:welcome:${user.id}`)) return
-    sessionStorage.setItem(`torcly:welcome:${user.id}`, 'shown')
-    toast.add({
-      type: 'success',
-      title: `Bienvenido, ${user.name}`,
-      description: 'Tu espacio de trabajo está listo.',
-      timeout: 4_000,
-    })
-  }, [user])
 
   useEffect(() => {
     const startedAtMs = startedAt.current ?? performance.now()

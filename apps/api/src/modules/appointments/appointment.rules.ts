@@ -2,6 +2,22 @@ import { AppError } from '../../shared/errors/app-error.js'
 import type { AppointmentStatus } from './appointment.types.js'
 
 export const APPOINTMENT_SLOT_CAPACITY = 8
+export const APPOINTMENT_START_TIME = '08:00'
+export const APPOINTMENT_END_TIME = '16:00'
+
+export function isAppointmentTimeAllowed(time: string): boolean {
+  return time >= APPOINTMENT_START_TIME && time <= APPOINTMENT_END_TIME
+}
+
+export function assertAppointmentTimeAllowed(time: string): void {
+  if (!isAppointmentTimeAllowed(time)) {
+    throw new AppError(
+      400,
+      'APPOINTMENT_TIME_OUTSIDE_BUSINESS_HOURS',
+      `La hora de la cita debe estar entre las ${APPOINTMENT_START_TIME} y las ${APPOINTMENT_END_TIME}.`,
+    )
+  }
+}
 
 export function isValidDateString(value: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false

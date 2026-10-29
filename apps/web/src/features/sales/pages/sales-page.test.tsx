@@ -111,6 +111,28 @@ describe('Página de ventas', () => {
     expect(screen.getByLabelText('Cargando ventas')).toBeTruthy()
   })
 
+  it('reemplaza solo la tabla por skeleton mientras actualiza un filtro', () => {
+    auth.useAuth.mockReturnValue({ user: { permissions: ['sales:read'] } })
+    sales.useSales.mockReturnValue({
+      data: response({
+        data: [saleMock],
+        pagination: { page: 1, pageSize: 20, total: 1, totalPages: 1 },
+      }),
+      isPending: false,
+      isFetching: true,
+      isError: false,
+      refetch: vi.fn(),
+    })
+    sales.useSale.mockReturnValue({ data: undefined, isPending: false })
+
+    renderPage()
+
+    expect(screen.getByLabelText('Cargando ventas')).toBeTruthy()
+    expect(
+      screen.getByRole('heading', { name: 'Ventas', level: 1 }),
+    ).toBeTruthy()
+  })
+
   it('muestra el estado de error con reintento', () => {
     auth.useAuth.mockReturnValue({ user: { permissions: ['sales:read'] } })
     sales.useSales.mockReturnValue({

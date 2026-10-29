@@ -12,8 +12,16 @@ const repository = vi.hoisted(() => ({
   cancel: vi.fn(),
 }))
 
+const notifications = vi.hoisted(() => ({
+  notifyUsersSafely: vi.fn().mockResolvedValue(undefined),
+}))
+
 vi.mock('../src/modules/appointments/appointment.repository.js', () => ({
   appointmentsRepository: repository,
+}))
+
+vi.mock('../src/modules/notifications/notifications.service.js', () => ({
+  notificationsService: notifications,
 }))
 
 import { appointmentsService } from '../src/modules/appointments/appointment.service.js'

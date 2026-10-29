@@ -1,13 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const operations = vi.hoisted(() => ({ getSummary: vi.fn() }))
-const replenishment = vi.hoisted(() => ({ getEligibility: vi.fn() }))
+const operations = vi.hoisted(() => ({
+  getSummary: vi.fn(),
+  getAttention: vi.fn(),
+}))
+const conversations = vi.hoisted(() => ({
+  saveExchange: vi.fn(),
+  listConversations: vi.fn(),
+  getConversation: vi.fn(),
+  getRecentMessages: vi.fn(),
+}))
 
 vi.mock('../src/modules/operations/operations.service.js', () => ({
   operationsService: operations,
 }))
-vi.mock('../src/modules/replenishment/replenishment.service.js', () => ({
-  replenishmentService: replenishment,
+vi.mock('../src/modules/assistant/assistant.repository.js', () => ({
+  assistantRepository: conversations,
 }))
 
 import { assistantService } from '../src/modules/assistant/assistant.service.js'
@@ -19,16 +27,11 @@ beforeEach(() => {
     period: { from: null, to: null },
     sections: { sales: { confirmedCount: 2, confirmedAmount: 100 } },
   })
-  replenishment.getEligibility.mockReset().mockResolvedValue({
-    counts: {
-      total: 0,
-      eligible: 0,
-      notEligible: 0,
-      critical: 0,
-      advisable: 0,
-    },
-    items: [],
-  })
+  conversations.saveExchange.mockReset().mockResolvedValue('conversation-1')
+  conversations.listConversations.mockReset()
+  conversations.getConversation.mockReset()
+  conversations.getRecentMessages.mockReset().mockResolvedValue([])
+  operations.getAttention.mockReset().mockResolvedValue({ data: [] })
 })
 
 describe('Servicio del asistente', () => {
@@ -41,11 +44,42 @@ describe('Servicio del asistente', () => {
       { from: null, to: null },
       ['sales:read'],
     )
-    expect(replenishment.getEligibility).not.toHaveBeenCalled()
+    expect(operations.getAttention).toHaveBeenCalledWith(
+      'sales',
+      { from: null, to: null, page: 1, pageSize: 10 },
+      ['sales:read'],
+    )
     expect(result.sources).toEqual([
       { module: 'sales', label: 'Ventas', path: '/ventas' },
     ])
+    expect(result.conversationId).toBe('conversation-1')
     expect(result.message).toContain('Ventas')
+  })
+
+  it('incluye los elementos operativos relevantes de cada sección permitida', async () => {
+    await assistantService.ask(
+      { message: '¿Qué necesita atención?', from: null, to: null },
+      {
+        id: 'user-1',
+        permissions: ['appointments:read', 'workshop:read', 'inventory:read'],
+      },
+    )
+
+    expect(operations.getAttention).toHaveBeenCalledWith(
+      'appointments',
+      { from: null, to: null, page: 1, pageSize: 10 },
+      ['appointments:read', 'workshop:read', 'inventory:read'],
+    )
+    expect(operations.getAttention).toHaveBeenCalledWith(
+      'workOrders',
+      { from: null, to: null, page: 1, pageSize: 10 },
+      ['appointments:read', 'workshop:read', 'inventory:read'],
+    )
+    expect(operations.getAttention).toHaveBeenCalledWith(
+      'inventory',
+      { from: null, to: null, page: 1, pageSize: 10 },
+      ['appointments:read', 'workshop:read', 'inventory:read'],
+    )
   })
 
   it('rechaza pedidos mutantes antes de consultar datos o proveedor', async () => {

@@ -651,7 +651,7 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     })
   }, 60_000)
 
-  it('inicia la ejecución solo sobre órdenes aprobadas con técnico', async () => {
+  it('inicia la ejecución sobre órdenes aprobadas con técnico opcional', async () => {
     const adminAgent = await loginAs(identity.username)
 
     const unassigned = await adminAgent
@@ -662,23 +662,10 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     const withoutTechnician = await adminAgent.post(
       `/api/v1/work-orders/${state.order1Id}/execution/start`,
     )
-    expect(withoutTechnician.status).toBe(409)
-    expect(withoutTechnician.body.error.code).toBe(
-      'WORK_ORDER_TECHNICIAN_REQUIRED',
-    )
-
-    const assigned = await adminAgent
-      .put(`/api/v1/work-orders/${state.order1Id}/technician`)
-      .send({ technicianId: technicianUserId.id })
-    expect(assigned.status).toBe(200)
-
-    const started = await adminAgent.post(
-      `/api/v1/work-orders/${state.order1Id}/execution/start`,
-    )
-    expect(started.status).toBe(200)
-    expect(started.body.data.status).toBe('EN_EJECUCION')
-    expect(started.body.data.executionStartedBy).toBe(identity.name)
-    expect(started.body.data.executionStartedAt).toBeTruthy()
+    expect(withoutTechnician.status).toBe(200)
+    expect(withoutTechnician.body.data.status).toBe('EN_EJECUCION')
+    expect(withoutTechnician.body.data.executionStartedBy).toBe(identity.name)
+    expect(withoutTechnician.body.data.executionStartedAt).toBeTruthy()
 
     const repeated = await adminAgent.post(
       `/api/v1/work-orders/${state.order1Id}/execution/start`,
@@ -871,21 +858,8 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     expect(response.body.data.registrations).toHaveLength(1)
   }, 60_000)
 
-  it('finaliza solo con todas las actividades completadas', async () => {
+  it('finaliza sin exigir actividades completadas', async () => {
     const adminAgent = await loginAs(identity.username)
-
-    const pending = await adminAgent.post(
-      `/api/v1/work-orders/${state.order1Id}/finalize`,
-    )
-    expect(pending.status).toBe(409)
-    expect(pending.body.error.code).toBe('WORK_ORDER_ACTIVITIES_PENDING')
-
-    for (const activityId of state.activities) {
-      const completed = await adminAgent.post(
-        `/api/v1/work-orders/${state.order1Id}/activities/${activityId}/complete`,
-      )
-      expect(completed.status).toBe(200)
-    }
 
     const execution = await adminAgent.get(
       `/api/v1/work-orders/${state.order1Id}/execution`,
@@ -912,7 +886,7 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     expect(finished.body.data.readyForDeliveryAt).toBeTruthy()
   }, 60_000)
 
-  it('exige al menos una actividad y entrega solo listas', async () => {
+  it('finaliza sin actividades y entrega solo órdenes listas', async () => {
     const adminAgent = await loginAs(identity.username)
 
     await adminAgent
@@ -925,10 +899,6 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     await adminAgent
       .post(`/api/v1/work-orders/${state.order3Id}/decision`)
       .send({ decision: 'APPROVED' })
-    const assigned = await adminAgent
-      .put(`/api/v1/work-orders/${state.order3Id}/technician`)
-      .send({ technicianId: technicianUserId.id })
-    expect(assigned.status).toBe(200)
     const started = await adminAgent.post(
       `/api/v1/work-orders/${state.order3Id}/execution/start`,
     )
@@ -937,8 +907,8 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     const noActivities = await adminAgent.post(
       `/api/v1/work-orders/${state.order3Id}/finalize`,
     )
-    expect(noActivities.status).toBe(409)
-    expect(noActivities.body.error.code).toBe('WORK_ORDER_NO_ACTIVITIES')
+    expect(noActivities.status).toBe(200)
+    expect(noActivities.body.data.status).toBe('LISTA_PARA_ENTREGA')
 
     const notReady = await adminAgent
       .post(`/api/v1/work-orders/${state.order2Id}/delivery`)
@@ -954,6 +924,22 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     expect(delivered.body.data.deliveredBy).toBe(identity.name)
     expect(delivered.body.data.deliveredAt).toBeTruthy()
     expect(delivered.body.data.deliveryNotes).toBe('Cliente retiró el vehículo')
+    expect(delivered.body.data.billing).toEqual(
+      expect.objectContaining({
+        total: expect.any(Number),
+        paid: 0,
+        status: 'PENDING',
+      }),
+    )
+
+    const generatedSale = await databaseService.client.sale.findFirst({
+      where: { workOrderId: state.order1Id },
+      select: { id: true, status: true, total: true },
+    })
+    expect(generatedSale).toEqual(
+      expect.objectContaining({ status: 'CONFIRMED' }),
+    )
+    expect(Number(generatedSale?.total)).toBeGreaterThan(0)
 
     const double = await adminAgent
       .post(`/api/v1/work-orders/${state.order1Id}/delivery`)

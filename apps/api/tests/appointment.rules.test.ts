@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   APPOINTMENT_SLOT_CAPACITY,
+  assertAppointmentTimeAllowed,
   assertActiveSlotCount,
   assertIsProgramada,
   assertNotPast,
@@ -58,6 +59,17 @@ describe('Reglas de citas', () => {
 
   it('acepta fechas y horas futuras', () => {
     expect(() => assertNotPast(isoInDays(5), '10:00')).not.toThrow()
+  })
+
+  it('solo acepta las horas de atención del taller', () => {
+    expect(() => assertAppointmentTimeAllowed('08:00')).not.toThrow()
+    expect(() => assertAppointmentTimeAllowed('16:00')).not.toThrow()
+    expect(() => assertAppointmentTimeAllowed('07:30')).toThrowError(
+      expect.objectContaining({
+        status: 400,
+        code: 'APPOINTMENT_TIME_OUTSIDE_BUSINESS_HOURS',
+      }),
+    )
   })
 
   it('aplica la capacidad de 8 citas activas por horario', () => {

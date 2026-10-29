@@ -56,6 +56,41 @@ export interface SeedInput {
   permissionCodes?: readonly string[]
 }
 
+const demoTechnicians = [
+  {
+    code: 'TEC-000001',
+    fullName: 'Carlos Mendoza Ramos',
+    document: '73124568',
+    phone: '987654321',
+    email: 'carlos.mendoza@torcly.demo',
+    specialties: 'Mantenimiento preventivo y lubricación',
+  },
+  {
+    code: 'TEC-000002',
+    fullName: 'Lucía Herrera Flores',
+    document: '74235679',
+    phone: '986543210',
+    email: 'lucia.herrera@torcly.demo',
+    specialties: 'Frenos y suspensión',
+  },
+  {
+    code: 'TEC-000003',
+    fullName: 'Diego Salazar Peña',
+    document: '75346780',
+    phone: '985432109',
+    email: 'diego.salazar@torcly.demo',
+    specialties: 'Diagnóstico eléctrico y electrónico',
+  },
+  {
+    code: 'TEC-000004',
+    fullName: 'María Paredes Cruz',
+    document: '76457891',
+    phone: '984321098',
+    email: 'maria.paredes@torcly.demo',
+    specialties: 'Motor y transmisión',
+  },
+]
+
 export async function seedDatabase(database: PrismaClient, input: SeedInput) {
   const permissionCodes = input.permissionCodes ?? defaultPermissionCodes
   const roleCode = input.roleCode ?? 'administrator'
@@ -113,6 +148,24 @@ export async function seedDatabase(database: PrismaClient, input: SeedInput) {
     update: {},
     create: { userId: administrator.id, roleId: administratorRole.id },
   })
+
+  for (const technician of demoTechnicians) {
+    await database.technician.upsert({
+      where: { code: technician.code },
+      update: { ...technician, active: true, updatedBy: administrator.id },
+      create: {
+        ...technician,
+        createdBy: administrator.id,
+        updatedBy: administrator.id,
+      },
+    })
+  }
+
+  // La creación operativa usa la secuencia para generar TEC-000001, etc.
+  // El seed avanza la secuencia para no colisionar con sus cuatro registros.
+  await database.$executeRawUnsafe(
+    `SELECT setval('technicians_code_seq', GREATEST((SELECT COALESCE(MAX(CAST(SUBSTRING(code FROM 5) AS INTEGER)), 0) FROM technicians), 1), true)`,
+  )
 
   console.info(`Seed completado para ${administrator.email}.`)
   return administrator

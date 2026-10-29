@@ -123,8 +123,6 @@ export const customersService = {
     actorId: string,
     context: RequestContext,
   ) {
-    await assertCustomerExists(id)
-
     try {
       return {
         data: toResponse(

@@ -9,6 +9,7 @@ El backlog base de Torcly concluye con 92 historias. Los sprints de este documen
 | 17     | `feature/sprint-17-purchases`              | Compras a proveedor y recepción trazable de existencias.                           | Productos e inventario.                        |
 | 18     | `feature/sprint-18-account-notifications`  | Perfil propio, notificaciones operativas y retiro del módulo de códigos de barras. | Auth, auditoría y navegación.                  |
 | 19     | `feature/sprint-19-ai-dashboard-assistant` | Asistente conversacional de lectura para consultas y recomendaciones explicables.  | BI, reabastecimiento, permisos y datos reales. |
+| 20     | `feature/sprint-20-technicians`            | Catálogo operativo de técnicos y asignación opcional de órdenes de taller.         | Órdenes de taller, auditoría y administrador.  |
 
 ## Decisiones transversales
 
@@ -18,6 +19,7 @@ El backlog base de Torcly concluye con 92 historias. Los sprints de este documen
 4. Perfil y notificaciones no reemplazan la administración de usuarios ni exponen información de otros usuarios.
 5. El asistente IA es solo lectura. No crea ventas, citas, pagos, compras, movimientos de inventario ni usuarios; tampoco recibe secretos, tokens, contraseñas, documentos completos ni PII innecesaria.
 6. Las claves de proveedor permanecen exclusivamente en `apps/api/.env`; jamás se publican como `VITE_*`, se registran en logs o se agregan al repositorio.
+7. Los técnicos no son usuarios de Torcly: no tienen cuenta, contraseña, sesión ni permisos. Una orden puede quedar sin técnico y solo puede asignarse a un técnico activo del catálogo operativo.
 
 ## Proveedor IA recomendado para el MVP
 

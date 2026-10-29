@@ -31,7 +31,7 @@ export const requireAuth: RequestHandler = async (request, response, next) => {
     )
     request.auth = authenticated.user
     request.sessionTokenHash = authenticated.tokenHash
-    setSessionCookie(response, token)
+    setSessionCookie(response, authenticated.renewedToken ?? token)
     next()
   } catch (error) {
     if (token) clearSessionCookie(response)

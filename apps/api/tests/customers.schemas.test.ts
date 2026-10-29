@@ -80,10 +80,9 @@ describe('Schemas de clientes', () => {
 
   it('aplica valores por defecto al listado', () => {
     expect(customerQuerySchema.parse({})).toEqual({
-      search: undefined,
       type: 'all',
       page: 1,
-      pageSize: 20,
+      pageSize: 10,
     })
   })
 })

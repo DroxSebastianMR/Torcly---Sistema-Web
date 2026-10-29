@@ -90,4 +90,8 @@ describe('Validación de productos', () => {
       productQuerySchema.safeParse({ categoryId: 'invalid' }).success,
     ).toBe(false)
   })
+
+  it('entrega diez productos por defecto en los listados', () => {
+    expect(productQuerySchema.parse({}).pageSize).toBe(10)
+  })
 })

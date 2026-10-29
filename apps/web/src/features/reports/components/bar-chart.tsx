@@ -44,12 +44,12 @@ export function BarChart({
   const hasData = rows.some((row) => row[primary] !== 0)
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('space-y-1.5', className)}>
       <h3 className="text-sm font-semibold text-brand-forest">{label}</h3>
       <div
         role="img"
         aria-label={`${ariaLabel} ${hasData ? '' : emptyMessage}`}
-        className="flex h-44 items-end gap-1.5 border-b border-border/70 pb-1 sm:gap-2"
+        className="flex h-24 items-end gap-1.5 border-b border-border/70 pb-1 sm:h-28 sm:gap-2"
       >
         {!hasData ? (
           <p className="w-full text-center text-sm text-muted-foreground">
@@ -90,15 +90,15 @@ export function BarChart({
       </div>
       <table className="w-full text-sm">
         <caption className="sr-only">{caption}</caption>
-        <thead>
-          <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
-            <th scope="col" className="py-1.5 font-medium">
+        <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+          <tr className="text-left">
+            <th scope="col" className="px-3 py-2.5 font-bold first:pl-4">
               Período
             </th>
-            <th scope="col" className="py-1.5 text-right font-medium">
+            <th scope="col" className="px-3 py-2.5 text-right font-bold">
               {countLabel}
             </th>
-            <th scope="col" className="py-1.5 text-right font-medium">
+            <th scope="col" className="px-3 py-2.5 pr-4 text-right font-bold">
               {amountLabel}
             </th>
           </tr>

@@ -1,16 +1,15 @@
 # Products (web)
 
-Catálogo de productos: alta, búsqueda combinable, ficha de detalle, actualización y desactivación sin borrado. Acepta código digitado o recibido desde un lector USB tipo teclado.
+Catálogo de productos: alta, búsqueda combinable, detalle en diálogo, actualización y desactivación sin borrado. Acepta código digitado o recibido desde un lector USB tipo teclado.
 
 ## Páginas y rutas
 
-- `/productos` — listado con búsqueda (código, nombre, categoría), paginación, estado y acciones de escritura según permiso.
-- `/productos/:id` — ficha de detalle: datos comerciales, precio, stock de solo lectura y acciones de edición/desactivación. Ruta protegida bajo `PermissionRoute` con `products:read`.
+- `/productos` — listado con búsqueda (código, nombre, categoría), paginación, estado, detalle en diálogo y acciones de escritura según permiso. El detalle reutiliza los datos ya cargados en la fila, sin disparar otra navegación ni consulta.
 
 ## Permisos
 
-- `products:read` — ver listado y ficha.
-- `products:write` — acciones «Registrar», catálogos, edición y activar/desactivar. Sin el permiso no se renderizan las acciones de escritura en tabla, ficha ni menú.
+- `products:read` — ver listado y detalle.
+- `products:write` — acciones «Registrar», catálogos, edición y activar/desactivar. Sin el permiso no se renderizan las acciones de escritura en tabla, detalle ni menú.
 
 ## Catálogos
 
@@ -34,8 +33,7 @@ Los campos de código y código de barras evitan el envío implícito al presion
 
 - `services/products.service.test.ts` — contrato HTTP del servicio (list, get, create, update, status, opciones).
 - `forms/product.schema.test.ts` — validación del formulario web.
-- `pages/products-page.test.tsx` — listado, permisos, búsqueda, navegación y confirmación de desactivación.
-- `pages/product-detail-page.test.tsx` — carga de ficha, datos, stock de solo lectura, edición y desactivación (con `useProductMutations` mockeado).
+- `pages/products-page.test.tsx` — listado, permisos, búsqueda, detalle en diálogo y confirmación de desactivación.
 - `components/product-form-modal.test.tsx` — validaciones, normalización de código, payload correcto, Enter no envía y stock de solo lectura al editar.
 
 Sprint propietario: 05.

@@ -51,25 +51,30 @@ function buildSaleWhere(
   filters: Pick<SaleFilters, 'search' | 'status'>,
 ): Prisma.SaleWhereInput {
   const search = filters.search?.trim()
+  const isExactSaleCode = Boolean(search && /^VENTA-\d{6,}$/i.test(search))
   return {
     ...(filters.status === 'all' ? {} : { status: filters.status }),
-    ...(search
-      ? {
-          OR: [
-            { code: { contains: search, mode: 'insensitive' } },
-            {
-              customer: {
-                OR: [
-                  { firstName: { contains: search, mode: 'insensitive' } },
-                  { lastName: { contains: search, mode: 'insensitive' } },
-                  { legalName: { contains: search, mode: 'insensitive' } },
-                  { documentNumber: { contains: search, mode: 'insensitive' } },
-                ],
+    ...(isExactSaleCode
+      ? { code: search!.toUpperCase() }
+      : search
+        ? {
+            OR: [
+              { code: { contains: search, mode: 'insensitive' } },
+              {
+                customer: {
+                  OR: [
+                    { firstName: { contains: search, mode: 'insensitive' } },
+                    { lastName: { contains: search, mode: 'insensitive' } },
+                    { legalName: { contains: search, mode: 'insensitive' } },
+                    {
+                      documentNumber: { contains: search, mode: 'insensitive' },
+                    },
+                  ],
+                },
               },
-            },
-          ],
-        }
-      : {}),
+            ],
+          }
+        : {}),
   }
 }
 

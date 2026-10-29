@@ -9,6 +9,7 @@ import {
   workOrderConsumptionSchema,
   workOrderDecisionSchema,
   workOrderDeliverySchema,
+  workOrderFinalizeSchema,
   workOrderDiagnosisSchema,
   workOrderIdSchema,
   workOrderQuerySchema,
@@ -220,10 +221,10 @@ export const returnWorkOrderProduct: RequestHandler = async (
 
 export const finalizeWorkOrder: RequestHandler = async (request, response) => {
   const { id } = workOrderIdSchema.parse(request.params)
-  workOrderStartExecutionSchema.parse(request.body)
   response.json(
     await workOrdersService.finalize(
       id,
+      workOrderFinalizeSchema.parse(request.body),
       actor(request),
       getRequestContext(request, response),
     ),

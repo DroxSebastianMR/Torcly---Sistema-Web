@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { AppError } from '../../shared/errors/app-error.js'
 import type {
   WorkOrderConsumptionType,
@@ -95,20 +96,12 @@ export function assertCanDecide(order: {
 export function assertCanStartExecution(order: {
   code: string
   status: WorkOrderStatus
-  technicianId: string | null
 }): void {
   if (order.status !== 'APROBADA') {
     throw new AppError(
       409,
       'WORK_ORDER_STATUS_INVALID',
       `La orden ${order.code} solo puede iniciar su ejecución cuando está aprobada.`,
-    )
-  }
-  if (!order.technicianId) {
-    throw new AppError(
-      409,
-      'WORK_ORDER_TECHNICIAN_REQUIRED',
-      `Asigna un técnico a la orden ${order.code} antes de iniciar la ejecución.`,
     )
   }
 }
@@ -176,6 +169,19 @@ export function assertCanDeliver(order: {
 
 export function roundQuantity(value: number): number {
   return Math.round((value + Number.EPSILON) * 1000) / 1000
+}
+
+/**
+ * Mantiene las claves de idempotencia por debajo del límite VARCHAR(100) sin
+ * perder su determinismo. Los UUID de orden, línea, producto y solicitud
+ * juntos superaban ese límite en consumos y devoluciones.
+ */
+export function workOrderOperationKey(
+  namespace: string,
+  ...parts: readonly string[]
+): string {
+  const digest = createHash('sha256').update(parts.join('\u0000')).digest('hex')
+  return `${namespace}:${digest}`
 }
 
 export function computeNetConsumed(

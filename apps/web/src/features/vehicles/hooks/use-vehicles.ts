@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { vehiclesService } from '../services/vehicles.service'
 import type {
   VehicleCreateInput,
@@ -13,11 +14,13 @@ export const vehicleKeys = {
   detail: (id: string) => [...vehicleKeys.all, 'detail', id] as const,
 }
 
-export function useVehicles(filters: VehicleFilters) {
+export function useVehicles(filters: VehicleFilters, enabled = true) {
   return useQuery({
     queryKey: vehicleKeys.list(filters),
     queryFn: ({ signal }) => vehiclesService.list(filters, signal),
     placeholderData: (previous) => previous,
+    enabled,
+    staleTime: 15_000,
   })
 }
 
@@ -36,19 +39,31 @@ export function useVehiclesByCustomer(customerId: string, pageSize = 50) {
 
 export function useVehicleMutations() {
   const queryClient = useQueryClient()
-  const refreshVehicles = async () => {
-    await queryClient.invalidateQueries({ queryKey: vehicleKeys.all })
+  const refreshVehicles = () => {
+    void queryClient.invalidateQueries({
+      queryKey: [...vehicleKeys.all, 'list'],
+    })
+    void queryClient.invalidateQueries({
+      queryKey: [...vehicleKeys.all, 'detail'],
+      refetchType: 'none',
+    })
   }
 
   return {
     create: useMutation({
       mutationFn: (input: VehicleCreateInput) => vehiclesService.create(input),
+      onMutate: () => ({ toastId: startActionToast('Registrando vehículo…') }),
       onSuccess: refreshVehicles,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     update: useMutation({
       mutationFn: ({ id, input }: { id: string; input: VehicleUpdateInput }) =>
         vehiclesService.update(id, input),
+      onMutate: () => ({ toastId: startActionToast('Actualizando vehículo…') }),
       onSuccess: refreshVehicles,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
   }
 }

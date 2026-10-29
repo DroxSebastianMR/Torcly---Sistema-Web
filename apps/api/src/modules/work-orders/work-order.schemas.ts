@@ -101,6 +101,12 @@ export const workOrderSendBudgetSchema = z.object({}).strict()
 
 export const workOrderStartExecutionSchema = z.object({}).strict()
 
+export const workOrderFinalizeSchema = z
+  .object({
+    confirmPendingProducts: z.boolean().optional(),
+  })
+  .strict()
+
 export const workOrderActivitySchema = z
   .object({
     description: z
@@ -197,6 +203,7 @@ export type WorkOrderTechnicianDto = z.infer<typeof workOrderTechnicianSchema>
 export type WorkOrderActivityDto = z.infer<typeof workOrderActivitySchema>
 export type WorkOrderConsumptionDto = z.infer<typeof workOrderConsumptionSchema>
 export type WorkOrderReturnDto = z.infer<typeof workOrderReturnSchema>
+export type WorkOrderFinalizeDto = z.infer<typeof workOrderFinalizeSchema>
 export type WorkOrderDeliveryDto = z.infer<typeof workOrderDeliverySchema>
 export type WorkOrderVehicleHistoryQueryDto = z.infer<
   typeof workOrderVehicleHistoryQuerySchema

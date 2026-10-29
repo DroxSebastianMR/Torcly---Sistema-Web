@@ -1,4 +1,4 @@
-import { CalendarRange, RotateCcw } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 import type { Period } from '../types/reports.types'
@@ -12,7 +12,6 @@ interface PeriodToolbarProps {
 export function PeriodToolbar({ value, onChange }: PeriodToolbarProps) {
   return (
     <section className="flex flex-wrap items-center gap-3 rounded-2xl border bg-card p-4">
-      <CalendarRange aria-hidden className="size-5 text-muted-foreground" />
       <DateRangePicker
         aria-label="Filtrar reportes por período"
         value={{ from: value.from ?? '', to: value.to ?? '' }}

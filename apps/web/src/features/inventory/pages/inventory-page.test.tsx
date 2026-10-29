@@ -238,6 +238,7 @@ describe('Página de inventario', () => {
     await waitFor(() =>
       expect(inventory.useExistence).toHaveBeenLastCalledWith(
         expect.objectContaining({ search: 'filtro' }),
+        true,
       ),
     )
 
@@ -248,6 +249,7 @@ describe('Página de inventario', () => {
     await waitFor(() =>
       expect(inventory.useExistence).toHaveBeenLastCalledWith(
         expect.objectContaining({ search: '' }),
+        true,
       ),
     )
   })

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { purchasesService } from '../services/purchases.service'
 import type {
   PurchaseFilters,
@@ -69,36 +70,63 @@ export function usePurchaseMutations() {
     createPurchase: useMutation({
       mutationFn: (input: PurchaseInput) =>
         purchasesService.createPurchase(input),
+      onMutate: () => ({ toastId: startActionToast('Guardando compra…') }),
       onSuccess: refreshPurchases,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     updatePurchase: useMutation({
       mutationFn: ({ id, input }: { id: string; input: PurchaseInput }) =>
         purchasesService.updatePurchase(id, input),
+      onMutate: () => ({ toastId: startActionToast('Actualizando compra…') }),
       onSuccess: refreshPurchases,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     receivePurchase: useMutation({
       mutationFn: ({ id, requestId }: { id: string; requestId: string }) =>
         purchasesService.receivePurchase(id, requestId),
+      onMutate: () => ({ toastId: startActionToast('Recibiendo compra…') }),
       onSuccess: refreshPurchases,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     cancelPurchase: useMutation({
       mutationFn: (id: string) => purchasesService.cancelPurchase(id),
+      onMutate: () => ({ toastId: startActionToast('Cancelando compra…') }),
       onSuccess: refreshPurchases,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     createSupplier: useMutation({
       mutationFn: (input: SupplierInput) =>
         purchasesService.createSupplier(input),
+      onMutate: () => ({ toastId: startActionToast('Registrando proveedor…') }),
       onSuccess: refreshSuppliers,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     updateSupplier: useMutation({
       mutationFn: ({ id, input }: { id: string; input: SupplierInput }) =>
         purchasesService.updateSupplier(id, input),
+      onMutate: () => ({
+        toastId: startActionToast('Actualizando proveedor…'),
+      }),
       onSuccess: refreshSuppliers,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     toggleSupplierStatus: useMutation({
       mutationFn: ({ id, active }: { id: string; active: boolean }) =>
         purchasesService.toggleSupplierStatus(id, active),
+      onMutate: ({ active }) => ({
+        toastId: startActionToast(
+          active ? 'Activando proveedor…' : 'Desactivando proveedor…',
+        ),
+      }),
       onSuccess: refreshSuppliers,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
   }
 }

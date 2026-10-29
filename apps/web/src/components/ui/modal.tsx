@@ -117,7 +117,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-[#071c16]/55 p-0 backdrop-blur-[2px] sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-[#071c16]/45 p-0 backdrop-blur-[3px] sm:items-center sm:p-6"
       onMouseDown={(event) => {
         if (busy) return
         if (event.target === event.currentTarget) onClose()
@@ -132,7 +132,7 @@ export function Modal({
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
         className={cn(
-          'flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-[1.35rem] border border-border/80 bg-card shadow-[0_24px_80px_rgba(7,28,22,0.24)] outline-none sm:rounded-[1.35rem]',
+          'flex max-h-[calc(100dvh-3rem)] w-full max-w-2xl flex-col overflow-hidden rounded-t-[18px] border border-border bg-card shadow-[0_24px_60px_rgb(16_44_37_/_18%)] outline-none sm:rounded-[18px]',
           className,
         )}
       >
@@ -143,14 +143,14 @@ export function Modal({
             aria-label={closeButtonLabel}
             disabled={busy}
             onClick={onClose}
-            className="absolute top-5 right-5 flex size-9 items-center justify-center rounded-lg border border-border/80 bg-background text-muted-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-40 sm:top-6 sm:right-6"
+            className="absolute top-5 right-5 flex size-10 items-center justify-center rounded-[10px] text-muted-foreground transition-[color,background-color,transform] duration-150 hover:-translate-y-px hover:bg-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-40 sm:top-6 sm:right-6"
           >
             <X size={18} />
           </button>
           <div className={cn('pr-12', visual && 'mt-5')}>
             <h2
               id={titleId}
-              className="text-lg font-semibold tracking-[-0.015em] text-brand-forest"
+              className="text-xl font-semibold tracking-[-0.015em] text-brand-forest"
             >
               {title}
             </h2>
@@ -170,7 +170,7 @@ export function Modal({
           </div>
         )}
         {footer && (
-          <footer className="mt-5 bg-muted/55 px-5 py-4 sm:px-6">
+          <footer className="mt-5 border-t bg-background px-5 py-4 sm:px-6">
             {footer}
           </footer>
         )}

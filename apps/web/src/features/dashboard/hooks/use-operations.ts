@@ -5,6 +5,8 @@ export const useOperationsSummary = (period: Period) =>
   useQuery({
     queryKey: ['operations', 'summary', period],
     queryFn: ({ signal }) => operationsService.summary(period, signal),
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
   })
 export const useOperationsAttention = (
   section: OperationalSection,
@@ -14,4 +16,6 @@ export const useOperationsAttention = (
     queryKey: ['operations', 'attention', section, period],
     queryFn: ({ signal }) =>
       operationsService.attention(section, period, signal),
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
   })

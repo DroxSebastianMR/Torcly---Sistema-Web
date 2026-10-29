@@ -88,10 +88,8 @@ describe('Schemas de vehículos', () => {
 
   it('aplica valores por defecto al listado', () => {
     expect(vehicleQuerySchema.parse({})).toEqual({
-      search: undefined,
-      customerId: undefined,
       page: 1,
-      pageSize: 20,
+      pageSize: 10,
     })
   })
 })

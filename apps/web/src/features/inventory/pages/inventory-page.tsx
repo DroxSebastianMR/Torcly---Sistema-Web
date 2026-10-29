@@ -7,11 +7,12 @@ import {
   ListChecks,
   PlusCircle,
   Scale,
-  Warehouse,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ErrorState } from '@/components/ui/error-state'
+import { ModuleMetrics } from '@/components/ui/module-metrics'
+import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { ExistenceTable } from '../components/existence-table'
@@ -36,7 +37,7 @@ type InventoryView = 'existence' | 'movements'
 const initialExistenceFilters: InventoryFilters = {
   search: '',
   page: 1,
-  pageSize: 20,
+  pageSize: 10,
 }
 
 const initialMovementFilters: MovementFilters = {
@@ -45,7 +46,7 @@ const initialMovementFilters: MovementFilters = {
   from: '',
   to: '',
   page: 1,
-  pageSize: 20,
+  pageSize: 10,
 }
 
 const movementActions: Array<{
@@ -74,10 +75,13 @@ export default function Page() {
   )
   const [dialogKind, setDialogKind] = useState<MovementFormKind | null>(null)
   const deferredSearch = useDeferredValue(existenceFilters.search)
-  const existenceQuery = useExistence({
-    ...existenceFilters,
-    search: deferredSearch,
-  })
+  const existenceQuery = useExistence(
+    {
+      ...existenceFilters,
+      search: deferredSearch,
+    },
+    view === 'existence',
+  )
   const productOptions = useInventoryProductOptions(view === 'movements')
   const movements = useMovements(movementFilters, view === 'movements')
   const items = existenceQuery.data?.data ?? []
@@ -102,26 +106,27 @@ export default function Page() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
+      <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div className="max-w-[33rem]">
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <Warehouse size={15} /> Almacén y kardex
+            Almacén y kardex
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
             Inventario
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+          <p className="mt-1.5 text-sm leading-5 text-muted-foreground">
             Consulta el stock disponible, detecta alertas de stock bajo y
             registra movimientos con trazabilidad completa.
           </p>
         </div>
         {canWrite && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex shrink-0 gap-2">
             {movementActions.map(({ kind, label, icon: Icon }) => (
               <Button
                 key={kind}
                 variant={kind === 'INITIAL' ? 'default' : 'outline'}
                 onClick={() => openDialog(kind)}
+                className="whitespace-nowrap px-3 sm:px-4"
               >
                 <Icon size={16} /> {label}
               </Button>
@@ -130,51 +135,41 @@ export default function Page() {
         )}
       </header>
 
-      <section className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-b px-4 py-4 sm:px-5">
-          <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <ListChecks size={17} />
-            </span>
-            <div>
-              <p className="text-xl font-semibold tabular-nums">
-                {view === 'existence'
-                  ? totalProducts
-                  : (movements.data?.pagination.total ?? 0)}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {view === 'existence'
-                  ? 'productos con existencias'
-                  : 'movimientos encontrados'}
-              </p>
-            </div>
-          </div>
-          {view === 'existence' && (
-            <>
-              <div className="h-8 w-px bg-border" />
-              <div>
-                <p className="text-xl font-semibold tabular-nums">
-                  {numberFormatter.format(totalStock)}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  unidades en esta página
-                </p>
-              </div>
-              <div className="h-8 w-px bg-border" />
-              <div>
-                <p className="text-xl font-semibold tabular-nums text-amber-700">
-                  {lowStockCount}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  con stock bajo en esta página
-                </p>
-              </div>
-            </>
-          )}
+      <ModuleMetrics
+        items={
+          view === 'existence'
+            ? [
+                { label: 'Productos con existencias', value: totalProducts },
+                {
+                  label: 'Unidades disponibles',
+                  value: numberFormatter.format(totalStock),
+                  valueLabel: 'en esta página',
+                },
+                {
+                  label: 'Stock bajo',
+                  value: lowStockCount,
+                  valueLabel: 'en esta página',
+                  tone: 'warning',
+                },
+              ]
+            : [
+                {
+                  label: 'Movimientos encontrados',
+                  value: movements.data?.pagination.total ?? 0,
+                },
+              ]
+        }
+      />
+
+      <section
+        aria-label="Filtros de inventario"
+        className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
+      >
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
           <div
             role="tablist"
             aria-label="Secciones de inventario"
-            className="ml-auto flex rounded-xl bg-muted p-1"
+            className="flex self-end rounded-xl bg-muted p-1 xl:order-2 xl:ml-auto xl:self-auto"
           >
             {(
               [
@@ -203,24 +198,30 @@ export default function Page() {
               </button>
             ))}
           </div>
+          <div className="min-w-0 flex-1">
+            <InventoryToolbar
+              view={view}
+              existenceFilters={existenceFilters}
+              movementFilters={movementFilters}
+              products={productOptions.data ?? []}
+              existenceSuggestions={suggestions}
+              onExistenceChange={(filters) => {
+                setExistenceFilters(filters)
+                setView('existence')
+              }}
+              onMovementsChange={(filters) => {
+                setMovementFilters(filters)
+                setView('movements')
+              }}
+            />
+          </div>
         </div>
+      </section>
 
-        <InventoryToolbar
-          view={view}
-          existenceFilters={existenceFilters}
-          movementFilters={movementFilters}
-          products={productOptions.data ?? []}
-          existenceSuggestions={suggestions}
-          onExistenceChange={(filters) => {
-            setExistenceFilters(filters)
-            setView('existence')
-          }}
-          onMovementsChange={(filters) => {
-            setMovementFilters(filters)
-            setView('movements')
-          }}
-        />
-
+      <section
+        aria-label="Resultados de inventario"
+        className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]"
+      >
         {view === 'existence' ? (
           existenceQuery.isError ? (
             <ErrorState
@@ -233,7 +234,10 @@ export default function Page() {
               }}
             />
           ) : (
-            <ExistenceTable items={items} loading={existenceQuery.isPending} />
+            <ExistenceTable
+              items={items}
+              loading={existenceQuery.isPending || existenceQuery.isFetching}
+            />
           )
         ) : movements.isError ? (
           <ErrorState
@@ -248,7 +252,7 @@ export default function Page() {
         ) : (
           <MovementsTable
             movements={movements.data?.data ?? []}
-            loading={movements.isPending}
+            loading={movements.isPending || movements.isFetching}
           />
         )}
 
@@ -256,76 +260,21 @@ export default function Page() {
           view === 'existence' ? existenceQuery.data : movements.data,
         ) &&
           (view === 'existence' ? (
-            <footer className="flex items-center justify-between border-t px-4 py-4 text-sm sm:px-5">
-              <span className="text-muted-foreground">
-                Página {existenceFilters.page} de{' '}
-                {existenceQuery.data?.pagination.totalPages}
-              </span>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  disabled={existenceFilters.page === 1}
-                  onClick={() =>
-                    setExistenceFilters((current) => ({
-                      ...current,
-                      page: current.page - 1,
-                    }))
-                  }
-                >
-                  Anterior
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={
-                    existenceFilters.page >=
-                    (existenceQuery.data?.pagination.totalPages ?? 1)
-                  }
-                  onClick={() =>
-                    setExistenceFilters((current) => ({
-                      ...current,
-                      page: current.page + 1,
-                    }))
-                  }
-                >
-                  Siguiente
-                </Button>
-              </div>
-            </footer>
+            <Pagination
+              page={existenceFilters.page}
+              totalPages={existenceQuery.data?.pagination.totalPages ?? 1}
+              onPageChange={(page) =>
+                setExistenceFilters((current) => ({ ...current, page }))
+              }
+            />
           ) : movements.data ? (
-            <footer className="flex items-center justify-between border-t px-4 py-4 text-sm sm:px-5">
-              <span className="text-muted-foreground">
-                Página {movementFilters.page} de{' '}
-                {movements.data.pagination.totalPages}
-              </span>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  disabled={movementFilters.page === 1}
-                  onClick={() =>
-                    setMovementFilters((current) => ({
-                      ...current,
-                      page: current.page - 1,
-                    }))
-                  }
-                >
-                  Anterior
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={
-                    movementFilters.page >= movements.data.pagination.totalPages
-                  }
-                  onClick={() =>
-                    setMovementFilters((current) => ({
-                      ...current,
-                      page: current.page + 1,
-                    }))
-                  }
-                >
-                  Siguiente
-                </Button>
-              </div>
-            </footer>
+            <Pagination
+              page={movementFilters.page}
+              totalPages={movements.data.pagination.totalPages}
+              onPageChange={(page) =>
+                setMovementFilters((current) => ({ ...current, page }))
+              }
+            />
           ) : null)}
       </section>
 

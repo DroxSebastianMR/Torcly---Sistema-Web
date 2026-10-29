@@ -48,6 +48,10 @@ function mapPersistenceError(error: unknown): never {
     if (error.code === 'P2025') {
       throw new AppError(404, 'VEHICLE_NOT_FOUND', 'Vehículo no encontrado.')
     }
+
+    if (error.code === 'P2003') {
+      throw new AppError(404, 'CUSTOMER_NOT_FOUND', 'Cliente no encontrado.')
+    }
   }
 
   throw error
@@ -84,11 +88,6 @@ export const vehiclesService = {
     actorId: string,
     context: RequestContext,
   ) {
-    const customer = await vehiclesRepository.findCustomerById(input.customerId)
-    if (!customer) {
-      throw new AppError(404, 'CUSTOMER_NOT_FOUND', 'Cliente no encontrado.')
-    }
-
     try {
       return {
         data: toResponse(
@@ -110,8 +109,6 @@ export const vehiclesService = {
     actorId: string,
     context: RequestContext,
   ) {
-    await assertVehicleExists(id)
-
     try {
       return {
         data: toResponse(

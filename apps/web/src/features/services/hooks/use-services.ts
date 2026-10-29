@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { servicesService } from '../services/services.service'
 import type { ServiceFilters, ServiceInput } from '../types/services.types'
 
@@ -14,6 +15,8 @@ export function useServices(filters: ServiceFilters) {
   return useQuery({
     queryKey: serviceKeys.list(filters),
     queryFn: ({ signal }) => servicesService.list(filters, signal),
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -44,17 +47,30 @@ export function useServiceMutations() {
   return {
     create: useMutation({
       mutationFn: (input: ServiceInput) => servicesService.create(input),
+      onMutate: () => ({ toastId: startActionToast('Registrando servicio…') }),
       onSuccess: refreshServices,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     update: useMutation({
       mutationFn: ({ id, input }: { id: string; input: ServiceInput }) =>
         servicesService.update(id, input),
+      onMutate: () => ({ toastId: startActionToast('Actualizando servicio…') }),
       onSuccess: refreshServices,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     status: useMutation({
       mutationFn: ({ id, active }: { id: string; active: boolean }) =>
         servicesService.updateStatus(id, active),
+      onMutate: ({ active }) => ({
+        toastId: startActionToast(
+          active ? 'Activando servicio…' : 'Desactivando servicio…',
+        ),
+      }),
       onSuccess: refreshServices,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
   }
 }

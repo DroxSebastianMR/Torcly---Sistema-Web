@@ -123,10 +123,12 @@ export const authRepository = {
   },
 
   findSession(tokenHash: string) {
-    return databaseService.client.authSession.findUnique({
-      where: { tokenHash },
-      include: { user: { include: authUserInclude } },
-    })
+    return databaseService.measure('auth.session.lookup', () =>
+      databaseService.client.authSession.findUnique({
+        where: { tokenHash },
+        include: { user: { include: authUserInclude } },
+      }),
+    )
   },
 
   refreshSession(
@@ -135,15 +137,39 @@ export const authRepository = {
     expiresAt: Date,
     lastActivityBefore: Date,
   ) {
-    return databaseService.client.authSession.updateMany({
-      where: {
-        tokenHash,
-        revokedAt: null,
-        expiresAt: { gt: now },
-        lastActivityAt: { lte: lastActivityBefore },
-      },
-      data: { lastActivityAt: now, expiresAt },
-    })
+    return databaseService.measure('auth.session.refresh', () =>
+      databaseService.client.authSession.updateMany({
+        where: {
+          tokenHash,
+          revokedAt: null,
+          expiresAt: { gt: now },
+          lastActivityAt: { lte: lastActivityBefore },
+        },
+        data: { lastActivityAt: now, expiresAt },
+      }),
+    )
+  },
+
+  renewSession(
+    tokenHash: string,
+    renewedTokenHash: string,
+    now: Date,
+    expiresAt: Date,
+  ) {
+    return databaseService.measure('auth.session.renew', () =>
+      databaseService.client.authSession.updateMany({
+        where: {
+          tokenHash,
+          revokedAt: null,
+          expiresAt: { gt: now },
+        },
+        data: {
+          tokenHash: renewedTokenHash,
+          lastActivityAt: now,
+          expiresAt,
+        },
+      }),
+    )
   },
 
   expireSession(tokenHash: string, userId: string, context: RequestContext) {

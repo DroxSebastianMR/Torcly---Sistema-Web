@@ -9,9 +9,10 @@ import {
   Wrench,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
+import { DateRangePicker } from '@/components/ui/date-range-picker'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
+import { KpiCard } from '@/components/ui/kpi-card'
 import { paths } from '@/app/router/constants/paths'
 import { useOperationsSummary } from '../hooks/use-operations'
 import { AssistantChat } from '@/features/assistant/components/assistant-chat'
@@ -42,7 +43,7 @@ export default function Page() {
     <div className="space-y-6">
       <header>
         <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-          <Activity size={15} /> Consulta operativa
+          Consulta operativa
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-brand-forest">
           Dashboard
@@ -52,41 +53,15 @@ export default function Page() {
           módulo de origen.
         </p>
       </header>
-      <section className="flex flex-wrap gap-3 rounded-2xl border bg-card p-4">
-        <label className="text-sm">
-          Desde
-          <input
-            className="ml-2 rounded border p-2"
-            type="date"
-            value={period.from ?? ''}
-            onChange={(e) =>
-              setPeriod((current) => ({
-                ...current,
-                from: e.target.value || null,
-              }))
-            }
-          />
-        </label>
-        <label className="text-sm">
-          Hasta
-          <input
-            className="ml-2 rounded border p-2"
-            type="date"
-            value={period.to ?? ''}
-            onChange={(e) =>
-              setPeriod((current) => ({
-                ...current,
-                to: e.target.value || null,
-              }))
-            }
-          />
-        </label>
-        <Button
-          variant="outline"
-          onClick={() => setPeriod({ from: null, to: null })}
-        >
-          Limpiar
-        </Button>
+      <section className="flex flex-wrap items-center gap-3 rounded-2xl border bg-card p-4">
+        <DateRangePicker
+          aria-label="Filtrar dashboard por período"
+          value={{ from: period.from ?? '', to: period.to ?? '' }}
+          onChange={(range) =>
+            setPeriod({ from: range.from || null, to: range.to || null })
+          }
+          className="w-full sm:w-80"
+        />
         <p className="w-full text-xs text-muted-foreground sm:w-auto sm:self-center">
           Los filtros de fecha ajustan la consulta operativa.
         </p>
@@ -101,15 +76,7 @@ export default function Page() {
           }}
         />
       ) : !summary.data ? (
-        <div
-          role="status"
-          aria-live="polite"
-          className="rounded-2xl border bg-card p-6"
-        >
-          <p className="text-sm text-muted-foreground">
-            Cargando resumen operativo…
-          </p>
-        </div>
+        <DashboardSkeleton />
       ) : visibleSections.length === 0 ? (
         <EmptyState
           icon={Inbox}
@@ -129,6 +96,31 @@ export default function Page() {
           ))}
         </section>
       )}
+    </div>
+  )
+}
+
+function DashboardSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-label="Cargando resumen operativo"
+      aria-live="polite"
+      className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+    >
+      {Array.from({ length: 5 }, (_, index) => (
+        <div key={index} className="rounded-2xl border bg-card p-5">
+          <div className="flex items-center gap-3">
+            <div className="size-11 animate-pulse rounded-xl bg-muted" />
+            <div className="space-y-2">
+              <div className="h-3 w-24 animate-pulse rounded bg-muted" />
+              <div className="h-7 w-12 animate-pulse rounded bg-muted" />
+            </div>
+          </div>
+          <div className="mt-5 h-3 w-40 animate-pulse rounded bg-muted" />
+          <div className="mt-5 h-3 w-24 animate-pulse rounded bg-muted" />
+        </div>
+      ))}
     </div>
   )
 }
@@ -165,29 +157,26 @@ function SummaryCard({
             ? summary.confirmedCount
             : 0
   return (
-    <article className="rounded-2xl border bg-card p-5">
-      <div className="flex items-center gap-3">
-        <span className="rounded-xl bg-muted p-3 text-primary">
-          <Icon size={20} />
-        </span>
-        <div>
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <p className="text-2xl font-bold">{summary ? total : '…'}</p>
-        </div>
+    <article className="rounded-2xl border bg-card shadow-[0_8px_24px_rgb(16_44_37_/_6%)]">
+      <KpiCard
+        className="border-0 bg-transparent shadow-none"
+        icon={<Icon size={24} />}
+        label={label}
+        value={summary ? total : '…'}
+        detail={
+          attentionCount > 0
+            ? `${attentionCount} elemento(s) requieren atención.`
+            : 'Sin elementos que requieran atención.'
+        }
+      />
+      <div className="px-6 pb-5">
+        <Link
+          className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition-transform duration-150 hover:translate-x-0.5"
+          to={path}
+        >
+          Ver módulo <ArrowRight size={15} />
+        </Link>
       </div>
-      <div className="mt-4 text-sm text-muted-foreground">
-        {attentionCount > 0 ? (
-          <p>{attentionCount} elemento(s) requieren atención.</p>
-        ) : (
-          <p>Sin elementos que requieran atención.</p>
-        )}
-      </div>
-      <Link
-        className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary"
-        to={path}
-      >
-        Ver módulo <ArrowRight size={15} />
-      </Link>
     </article>
   )
 }

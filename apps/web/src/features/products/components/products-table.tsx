@@ -42,7 +42,7 @@ export function ProductsTable({
     <>
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full border-collapse text-left text-sm">
-          <thead className="bg-[#f8faf9] text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
             <tr>
               <th className="px-5 py-3">Producto</th>
               <th className="px-4 py-3">Categoría / Marca</th>

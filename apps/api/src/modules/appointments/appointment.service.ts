@@ -6,6 +6,7 @@ import {
   type AppointmentRecord,
 } from './appointment.repository.js'
 import {
+  assertAppointmentTimeAllowed,
   assertNotPast,
   dateToString,
   timeToString,
@@ -178,16 +179,15 @@ export const appointmentsService = {
     actor: AppointmentActor | string,
     context: RequestContext,
   ) {
-    const customer = await appointmentsRepository.findCustomerRef(
-      input.customerId,
-    )
+    const [customer, vehicle] = await Promise.all([
+      appointmentsRepository.findCustomerRef(input.customerId),
+      appointmentsRepository.findVehicleOfCustomer(
+        input.vehicleId,
+        input.customerId,
+      ),
+    ])
     if (!customer)
       throw new AppError(404, 'CUSTOMER_NOT_FOUND', 'Cliente no encontrado.')
-
-    const vehicle = await appointmentsRepository.findVehicleOfCustomer(
-      input.vehicleId,
-      input.customerId,
-    )
     if (!vehicle)
       throw new AppError(
         400,
@@ -195,6 +195,7 @@ export const appointmentsService = {
         'El vehículo seleccionado no pertenece al cliente.',
       )
 
+    assertAppointmentTimeAllowed(input.time)
     assertNotPast(input.date, input.time)
 
     try {
@@ -229,6 +230,7 @@ export const appointmentsService = {
     actor: AppointmentActor | string,
     context: RequestContext,
   ) {
+    assertAppointmentTimeAllowed(input.time)
     assertNotPast(input.date, input.time)
     const appointment = await appointmentsRepository.reschedule(
       id,

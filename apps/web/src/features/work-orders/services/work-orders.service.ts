@@ -8,10 +8,12 @@ import type {
   WorkOrderCatalog,
   WorkOrderConsumptionInput,
   WorkOrderConsumptionMutationResult,
+  WorkOrderCreated,
   WorkOrderDecisionInput,
   WorkOrderDeliveryInput,
   WorkOrderDetail,
   WorkOrderExecution,
+  WorkOrderFinalizeInput,
   WorkOrderFilters,
   WorkOrderReturnInput,
   WorkOrderTechnician,
@@ -57,7 +59,7 @@ export const workOrdersService = {
     )
   },
   createFromAppointment(appointmentId: string) {
-    return api.post<DataResponse<WorkOrderDetail>>(endpoints.workOrders.root, {
+    return api.post<DataResponse<WorkOrderCreated>>(endpoints.workOrders.root, {
       appointmentId,
     })
   },
@@ -126,10 +128,10 @@ export const workOrdersService = {
       input,
     )
   },
-  finalize(id: string) {
+  finalize(id: string, input: WorkOrderFinalizeInput = {}) {
     return api.post<DataResponse<WorkOrderDetail>>(
       endpoints.workOrders.finalize(id),
-      {},
+      input,
     )
   },
   deliver(id: string, input: WorkOrderDeliveryInput) {

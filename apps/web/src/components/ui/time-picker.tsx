@@ -6,6 +6,8 @@ interface TimePickerProps {
   value: string
   onChange: (value: string) => void
   interval?: number
+  minTime?: string
+  maxTime?: string
   placeholder?: string
   disabled?: boolean
   name?: string
@@ -14,13 +16,15 @@ interface TimePickerProps {
   'aria-label'?: string
 }
 
-function buildTimes(interval: number) {
+function buildTimes(interval: number, minTime?: string, maxTime?: string) {
   return Array.from(
     { length: Math.floor((24 * 60) / interval) },
     (_, index) => {
       const minutes = index * interval
       return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`
     },
+  ).filter(
+    (time) => (!minTime || time >= minTime) && (!maxTime || time <= maxTime),
   )
 }
 
@@ -28,6 +32,8 @@ export function TimePicker({
   value,
   onChange,
   interval = 30,
+  minTime,
+  maxTime,
   placeholder = 'Seleccionar hora',
   disabled = false,
   name,
@@ -37,7 +43,10 @@ export function TimePicker({
 }: TimePickerProps) {
   const [open, setOpen] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
-  const times = useMemo(() => buildTimes(Math.max(1, interval)), [interval])
+  const times = useMemo(
+    () => buildTimes(Math.max(1, interval), minTime, maxTime),
+    [interval, maxTime, minTime],
+  )
 
   useEffect(() => {
     if (!open) return
@@ -59,7 +68,7 @@ export function TimePicker({
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex h-11 w-full items-center gap-3 rounded-lg border border-input bg-background px-3 text-left text-sm transition-colors hover:border-primary/45 focus-visible:outline-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50"
+        className="flex min-h-11 w-full items-center gap-3 rounded-[10px] border border-input bg-card px-[13px] text-left text-sm transition-[border-color,background-color] duration-150 ease-out hover:bg-background focus-visible:border-primary/70 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
         onClick={() => setOpen((current) => !current)}
       >
         <Clock3 aria-hidden className="size-4 shrink-0 text-muted-foreground" />
@@ -78,7 +87,7 @@ export function TimePicker({
         <ul
           role="listbox"
           aria-label={ariaLabel}
-          className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-xl border border-border/80 bg-card p-2 shadow-[0_18px_40px_rgba(7,28,22,0.16)]"
+          className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-[10px] border border-border bg-card p-2 shadow-[0_24px_60px_rgb(16_44_37_/_18%)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {times.map((time) => {
             const selected = time === value
@@ -88,7 +97,7 @@ export function TimePicker({
                   type="button"
                   role="option"
                   aria-selected={selected}
-                  className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm hover:bg-muted focus-visible:bg-muted focus-visible:outline-2 focus-visible:outline-primary"
+                  className="flex min-h-[42px] w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm hover:bg-muted hover:text-primary focus-visible:bg-muted focus-visible:outline-2 focus-visible:outline-primary"
                   onClick={() => {
                     onChange(time)
                     setOpen(false)

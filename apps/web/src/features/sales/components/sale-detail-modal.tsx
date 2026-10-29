@@ -86,7 +86,7 @@ export function SaleDetailModal({
           <div className="overflow-hidden rounded-xl border">
             <div className="hidden divide-y md:block">
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#f8faf9] text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
                   <tr>
                     <th className="px-4 py-3">Descripción</th>
                     <th className="px-4 py-3 text-right">Precio</th>

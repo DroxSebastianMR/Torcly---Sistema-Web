@@ -95,6 +95,14 @@ type MovementRecord = Prisma.InventoryMovementGetPayload<{
   select: typeof movementResponseSelect
 }>
 
+export type InventoryMovementRegistration = {
+  movement: MovementRecord
+  stockAfter: number | null
+  minimumStock: number | null
+  lowStock: boolean
+  replayed: boolean
+}
+
 const auditEventByType: Record<MovementType, AuditEventType> = {
   INITIAL: 'INVENTORY_STOCK_INITIALIZED',
   ENTRY: 'INVENTORY_ENTRY_REGISTERED',
@@ -107,41 +115,37 @@ export const inventoryRepository = {
   async listExistence(filters: ExistenceFilters) {
     const where = buildExistenceWhere(filters)
     const [products, total] = await Promise.all([
-      databaseService.client.product.findMany({
-        select: existenceSelect,
-        where,
-        orderBy: [{ active: 'desc' }, { name: 'asc' }],
-        skip: (filters.page - 1) * filters.pageSize,
-        take: filters.pageSize,
-      }),
-      databaseService.client.product.count({ where }),
+      databaseService.measure('inventory.existence.records', () =>
+        databaseService.client.product.findMany({
+          select: existenceSelect,
+          where,
+          orderBy: [{ active: 'desc' }, { name: 'asc' }],
+          skip: (filters.page - 1) * filters.pageSize,
+          take: filters.pageSize,
+        }),
+      ),
+      databaseService.measure('inventory.existence.total', () =>
+        databaseService.client.product.count({ where }),
+      ),
     ])
     if (!products.length) return { items: [], total }
 
     const productIds = products.map((product) => product.id)
-    const [movements, latestMovements] = await Promise.all([
-      databaseService.client.inventoryMovement.groupBy({
-        by: ['productId', 'type'],
-        where: { productId: { in: productIds } },
-        _sum: { quantity: true },
-      }),
-      databaseService.client.inventoryMovement.groupBy({
-        by: ['productId'],
-        where: { productId: { in: productIds } },
-        _max: { occurredAt: true },
-      }),
-    ])
+    const movements = await databaseService.measure(
+      'inventory.existence.stock_summary',
+      () =>
+        databaseService.client.inventoryMovement.groupBy({
+          by: ['productId', 'type'],
+          where: { productId: { in: productIds } },
+          _sum: { quantity: true },
+          _max: { occurredAt: true },
+        }),
+    )
     const grouped = new Map<
       string,
       Array<{ type: MovementType; quantity: unknown }>
     >()
-    const lastMovementAt = new Map(
-      latestMovements.flatMap((movement) =>
-        movement._max.occurredAt
-          ? [[movement.productId, movement._max.occurredAt] as const]
-          : [],
-      ),
-    )
+    const lastMovementAt = new Map<string, Date>()
     for (const movement of movements) {
       const list = grouped.get(movement.productId) ?? []
       list.push({
@@ -149,6 +153,11 @@ export const inventoryRepository = {
         quantity: movement._sum.quantity ?? 0,
       })
       grouped.set(movement.productId, list)
+      const occurredAt = movement._max.occurredAt
+      const latest = lastMovementAt.get(movement.productId)
+      if (occurredAt && (!latest || occurredAt > latest)) {
+        lastMovementAt.set(movement.productId, occurredAt)
+      }
     }
     const items = products.map((product) => {
       const stock = computeStock(grouped.get(product.id) ?? [])
@@ -172,22 +181,28 @@ export const inventoryRepository = {
   listMovements(filters: InventoryMovementFilters) {
     const where = buildMovementWhere(filters)
     return Promise.all([
-      databaseService.client.inventoryMovement.findMany({
-        select: movementResponseSelect,
-        where,
-        orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
-        skip: (filters.page - 1) * filters.pageSize,
-        take: filters.pageSize,
-      }),
-      databaseService.client.inventoryMovement.count({ where }),
+      databaseService.measure('inventory.history.records', () =>
+        databaseService.client.inventoryMovement.findMany({
+          select: movementResponseSelect,
+          where,
+          orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+          skip: (filters.page - 1) * filters.pageSize,
+          take: filters.pageSize,
+        }),
+      ),
+      databaseService.measure('inventory.history.total', () =>
+        databaseService.client.inventoryMovement.count({ where }),
+      ),
     ]).then(([items, total]) => ({ items, total }))
   },
 
   findUserDisplayNames(ids: string[]) {
-    return databaseService.client.user.findMany({
-      where: { id: { in: ids } },
-      select: { id: true, displayName: true },
-    })
+    return databaseService.measure('inventory.history.actors', () =>
+      databaseService.client.user.findMany({
+        where: { id: { in: ids } },
+        select: { id: true, displayName: true },
+      }),
+    )
   },
 
   findByKey(idempotencyKey: string) {
@@ -202,44 +217,73 @@ export const inventoryRepository = {
     type: MovementType,
     actor: { id: string; name: string },
     context: RequestContext,
-  ): Promise<MovementRecord> {
-    return databaseService.transaction(async (transaction) => {
-      const product = await transaction.product.findUnique({
-        where: { id: input.productId },
-        select: { id: true, code: true, name: true, active: true },
-      })
-      if (!product)
-        throw new AppError(404, 'PRODUCT_NOT_FOUND', 'Producto no encontrado.')
-      if (!product.active)
+  ): Promise<InventoryMovementRegistration> {
+    const [product, existing] = await Promise.all([
+      databaseService.measure('inventory.movement.preflight.product', () =>
+        databaseService.client.product.findUnique({
+          where: { id: input.productId },
+          select: {
+            id: true,
+            code: true,
+            name: true,
+            active: true,
+            minimumStock: true,
+          },
+        }),
+      ),
+      input.idempotencyKey
+        ? databaseService.measure(
+            'inventory.movement.preflight.idempotency',
+            () =>
+              databaseService.client.inventoryMovement.findUnique({
+                where: { idempotencyKey: input.idempotencyKey },
+                select: { ...movementResponseSelect },
+              }),
+          )
+        : Promise.resolve(null),
+    ])
+
+    if (!product)
+      throw new AppError(404, 'PRODUCT_NOT_FOUND', 'Producto no encontrado.')
+    if (!product.active)
+      throw new AppError(
+        409,
+        'PRODUCT_INACTIVE',
+        'El producto está inactivo y no admite movimientos.',
+      )
+
+    if (existing) {
+      if (existing.productId !== input.productId || existing.type !== type)
         throw new AppError(
           409,
-          'PRODUCT_INACTIVE',
-          'El producto está inactivo y no admite movimientos.',
+          'INVENTORY_IDEMPOTENCY_CONFLICT',
+          'La clave de idempotencia ya corresponde a otra operación.',
         )
-
-      if (input.idempotencyKey) {
-        const existing = await transaction.inventoryMovement.findUnique({
-          where: { idempotencyKey: input.idempotencyKey },
-          select: { ...movementResponseSelect },
-        })
-        if (existing) {
-          if (existing.productId !== input.productId || existing.type !== type)
-            throw new AppError(
-              409,
-              'INVENTORY_IDEMPOTENCY_CONFLICT',
-              'La clave de idempotencia ya corresponde a otra operación.',
-            )
-          return existing
-        }
+      return {
+        movement: existing,
+        stockAfter: null,
+        minimumStock: null,
+        lowStock: false,
+        replayed: true,
       }
+    }
 
-      await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:inventory:${input.productId}`}))`
+    return databaseService.transaction(async (transaction) => {
+      await databaseService.measure(
+        'inventory.movement.lock',
+        () =>
+          transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:inventory:${input.productId}`}))`,
+      )
 
-      const confirmed = await transaction.inventoryMovement.groupBy({
-        by: ['type'],
-        where: { productId: input.productId, status: 'CONFIRMED' },
-        _sum: { quantity: true },
-      })
+      const confirmed = await databaseService.measure(
+        'inventory.movement.stock_before',
+        () =>
+          transaction.inventoryMovement.groupBy({
+            by: ['type'],
+            where: { productId: input.productId, status: 'CONFIRMED' },
+            _sum: { quantity: true },
+          }),
+      )
       const stockMovements = confirmed.map((movement) => ({
         type: movement.type,
         quantity: movement._sum.quantity ?? 0,
@@ -255,45 +299,59 @@ export const inventoryRepository = {
         hasInitialMovement,
       })
 
-      const movement = await transaction.inventoryMovement.create({
-        data: {
-          productId: input.productId,
-          type,
-          status: 'CONFIRMED',
-          quantity: input.quantity,
-          idempotencyKey: input.idempotencyKey || null,
-          notes: input.notes || null,
-          performedBy: actor.name,
-          occurredAt:
-            input.occurredAt instanceof Date ? input.occurredAt : new Date(),
-          referenceType: input.referenceType || null,
-          referenceId: input.referenceId || null,
-        },
-        select: movementResponseSelect,
-      })
+      const movement = await databaseService.measure(
+        'inventory.movement.create',
+        () =>
+          transaction.inventoryMovement.create({
+            data: {
+              productId: input.productId,
+              type,
+              status: 'CONFIRMED',
+              quantity: input.quantity,
+              idempotencyKey: input.idempotencyKey || null,
+              notes: input.notes || null,
+              performedBy: actor.name,
+              occurredAt:
+                input.occurredAt instanceof Date
+                  ? input.occurredAt
+                  : new Date(),
+              referenceType: input.referenceType || null,
+              referenceId: input.referenceId || null,
+            },
+            select: movementResponseSelect,
+          }),
+      )
 
       const stockAfter = computeStock([
         ...stockMovements,
         { type: movement.type, quantity: movement.quantity },
       ])
 
-      await transaction.auditLog.create({
-        data: auditData(
-          auditEventByType[type],
-          actor.id,
-          product.code,
-          context,
-          {
-            productId: product.id,
-            movementId: movement.id,
-            type: movement.type,
-            quantity: Number(movement.quantity),
-            stockAfter,
-          },
-        ),
-      })
+      await databaseService.measure('inventory.movement.audit', () =>
+        transaction.auditLog.create({
+          data: auditData(
+            auditEventByType[type],
+            actor.id,
+            product.code,
+            context,
+            {
+              productId: product.id,
+              movementId: movement.id,
+              type: movement.type,
+              quantity: Number(movement.quantity),
+              stockAfter,
+            },
+          ),
+        }),
+      )
 
-      return movement
+      return {
+        movement,
+        stockAfter,
+        minimumStock: Number(product.minimumStock),
+        lowStock: stockAfter <= Number(product.minimumStock),
+        replayed: false,
+      }
     })
   },
 }

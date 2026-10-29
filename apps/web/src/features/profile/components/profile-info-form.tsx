@@ -10,6 +10,35 @@ interface ProfileInfoFormProps {
   profile: ProfileData
 }
 
+const permissionLabels: Record<string, string> = {
+  dashboard: 'Dashboard',
+  assistant: 'Asistente operativo',
+  products: 'Productos',
+  inventory: 'Inventario',
+  services: 'Servicios',
+  purchases: 'Compras',
+  sales: 'Ventas',
+  customers: 'Clientes',
+  vehicles: 'Vehículos',
+  appointments: 'Citas',
+  workshop: 'Taller',
+  cash: 'Caja',
+  users: 'Usuarios',
+  notifications: 'Notificaciones',
+  profile: 'Mi perfil',
+  reports: 'Reportes',
+  audit: 'Auditoría',
+  maintenance: 'Mantenimiento',
+}
+
+function permissionLabel(permission: string) {
+  const [module, action] = permission.split(':')
+  const label = permissionLabels[module ?? ''] ?? module ?? permission
+  if (action === 'read') return `Consultar ${label}`
+  if (action === 'write') return `Gestionar ${label}`
+  return label
+}
+
 export function ProfileInfoForm({ profile }: ProfileInfoFormProps) {
   const [displayName, setDisplayName] = useState(profile.displayName)
   const [error, setError] = useState<string | null>(null)
@@ -154,7 +183,7 @@ export function ProfileInfoForm({ profile }: ProfileInfoFormProps) {
                   className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
                 >
                   <User size={12} />
-                  {role.name} ({role.code})
+                  {role.name}
                 </span>
               ))}
               {!profile.roles.length && (
@@ -169,14 +198,14 @@ export function ProfileInfoForm({ profile }: ProfileInfoFormProps) {
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Permisos habilitados ({profile.permissions.length})
             </span>
-            <div className="mt-2 flex flex-wrap gap-1.5 max-h-36 overflow-y-auto rounded-lg border bg-muted/20 p-2.5">
+            <div className="mt-2 flex max-h-36 flex-wrap gap-1.5 overflow-y-auto rounded-lg border bg-muted/20 p-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {profile.permissions.map((perm) => (
                 <span
                   key={perm}
-                  className="inline-flex items-center gap-1 rounded bg-background px-2 py-0.5 font-mono text-[11px] border text-muted-foreground"
+                  className="inline-flex items-center gap-1 rounded border bg-background px-2 py-0.5 text-[11px] text-muted-foreground"
                 >
                   <Check size={10} className="text-emerald-500" />
-                  {perm}
+                  {permissionLabel(perm)}
                 </span>
               ))}
             </div>

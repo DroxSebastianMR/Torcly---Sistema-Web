@@ -23,7 +23,7 @@ export interface NavigationGroup {
   items: readonly NavigationItem[]
 }
 
-export interface SidebarAccount {
+export interface AccountSummary {
   name: string
   email: string
   initials: string
@@ -31,8 +31,5 @@ export interface SidebarAccount {
 
 export interface SidebarViewProps {
   groups: readonly NavigationGroup[]
-  account: SidebarAccount
-  isSigningOut: boolean
-  onLogout: () => Promise<void>
   onNavigate: () => void
 }

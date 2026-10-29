@@ -61,11 +61,10 @@ describe('Formateadores de órdenes de taller (web)', () => {
     expect(canDecideWorkOrder('APROBADA')).toBe(false)
   })
 
-  it('inicio de ejecución solo aprobada con técnico asignado', () => {
-    expect(canStartWorkOrderExecution('APROBADA', true)).toBe(true)
-    expect(canStartWorkOrderExecution('APROBADA', false)).toBe(false)
-    expect(canStartWorkOrderExecution('EN_EJECUCION', true)).toBe(false)
-    expect(canStartWorkOrderExecution('PENDIENTE_APROBACION', true)).toBe(false)
+  it('inicio de ejecución solo aprobada, con técnico opcional', () => {
+    expect(canStartWorkOrderExecution('APROBADA')).toBe(true)
+    expect(canStartWorkOrderExecution('EN_EJECUCION')).toBe(false)
+    expect(canStartWorkOrderExecution('PENDIENTE_APROBACION')).toBe(false)
   })
 
   it('gestión de ejecución, finalización y entrega según estado', () => {

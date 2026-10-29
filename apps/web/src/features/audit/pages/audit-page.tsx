@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { ScrollText } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { DataTable } from '@/components/ui/data-table'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Input } from '@/components/ui/input'
+import { ModuleMetrics } from '@/components/ui/module-metrics'
+import { Pagination } from '@/components/ui/pagination'
 import { SmartSelect } from '@/components/ui/smart-select'
 import { useAuditLogs } from '../hooks/use-audit'
 import type { AuditFilters } from '../types/audit.types'
@@ -39,7 +40,7 @@ export default function Page() {
     <div className="space-y-6">
       <header>
         <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-          <ScrollText size={15} /> Seguridad y trazabilidad
+          Seguridad y trazabilidad
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-brand-forest">
           Auditoría
@@ -50,51 +51,66 @@ export default function Page() {
         </p>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:max-w-3xl">
-        <label className="space-y-1 text-sm">
-          <span className="font-medium text-foreground">Evento</span>
-          <SmartSelect
-            aria-label="Filtrar por evento"
-            options={eventFilterOptions}
-            value={event}
-            onChange={(value) => {
-              setEvent(value)
-              setPage(1)
-            }}
-          />
-        </label>
-        <label className="space-y-1 text-sm">
-          <span className="font-medium text-foreground">Identificador</span>
-          <Input
-            type="search"
-            value={identifier}
-            placeholder="Correo, usuario o RUC"
-            onChange={(event) => {
-              setIdentifier(event.target.value)
-              setPage(1)
-            }}
-          />
-        </label>
-      </div>
+      <ModuleMetrics
+        items={[{ label: 'Registros encontrados', value: total }]}
+      />
 
-      {logs.isError ? (
-        <EmptyState
-          title="No se pudo cargar la auditoría"
-          description="Revisa tu conexión y vuelve a intentarlo."
-          action={{ label: 'Reintentar', onClick: () => void logs.refetch() }}
-        />
-      ) : logs.isLoading ? (
-        <AuditSkeleton />
-      ) : items.length === 0 ? (
-        <EmptyState
-          title="Sin registros para mostrar"
-          description="No encontramos eventos con los filtros seleccionados."
-        />
-      ) : (
-        <>
-          <div className="hidden overflow-x-auto rounded-2xl border border-border bg-card shadow-sm md:block">
-            <table className="w-full min-w-[820px] border-collapse text-left text-sm">
-              <thead className="bg-[#f8faf9] text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+      <section
+        aria-label="Filtros de auditoría"
+        className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
+      >
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:max-w-3xl">
+          <label className="space-y-1 text-sm">
+            <span className="font-medium text-foreground">Evento</span>
+            <SmartSelect
+              aria-label="Filtrar por evento"
+              options={eventFilterOptions}
+              value={event}
+              onChange={(value) => {
+                setEvent(value)
+                setPage(1)
+              }}
+            />
+          </label>
+          <label className="space-y-1 text-sm">
+            <span className="font-medium text-foreground">Identificador</span>
+            <Input
+              type="search"
+              value={identifier}
+              placeholder="Correo, usuario o RUC"
+              onChange={(event) => {
+                setIdentifier(event.target.value)
+                setPage(1)
+              }}
+            />
+          </label>
+        </div>
+      </section>
+
+      <section
+        aria-label="Resultados de auditoría"
+        className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]"
+      >
+        {logs.isError ? (
+          <EmptyState
+            title="No se pudo cargar la auditoría"
+            description="Revisa tu conexión y vuelve a intentarlo."
+            action={{ label: 'Reintentar', onClick: () => void logs.refetch() }}
+          />
+        ) : logs.isLoading ? (
+          <AuditSkeleton />
+        ) : items.length === 0 ? (
+          <EmptyState
+            title="Sin registros para mostrar"
+            description="No encontramos eventos con los filtros seleccionados."
+          />
+        ) : (
+          <>
+            <DataTable
+              wrapperClassName="hidden md:block"
+              className="min-w-[820px]"
+            >
+              <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
                 <tr>
                   <th className="px-5 py-3">Fecha y hora</th>
                   <th className="px-4 py-3">Evento</th>
@@ -130,58 +146,37 @@ export default function Page() {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+            </DataTable>
 
-          <div className="divide-y rounded-2xl border border-border bg-card shadow-sm md:hidden">
-            {items.map((item) => (
-              <article key={item.id} className="space-y-2 px-4 py-4">
-                <div className="flex items-start justify-between gap-3">
-                  <p className="font-medium text-foreground">
-                    {formatAuditEvent(item.event)}
+            <div className="divide-y rounded-2xl border border-border bg-card shadow-sm md:hidden">
+              {items.map((item) => (
+                <article key={item.id} className="space-y-2 px-4 py-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-medium text-foreground">
+                      {formatAuditEvent(item.event)}
+                    </p>
+                    <span className="whitespace-nowrap text-xs text-muted-foreground">
+                      {formatAuditDate(item.createdAt)}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {item.actorName ?? '—'} · {item.identifier ?? '—'}
                   </p>
-                  <span className="whitespace-nowrap text-xs text-muted-foreground">
-                    {formatAuditDate(item.createdAt)}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {item.actorName ?? '—'} · {item.identifier ?? '—'}
-                </p>
-                <p className="font-mono text-xs text-muted-foreground">
-                  {item.requestId ?? '—'}
-                </p>
-              </article>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">
-              {total} registro{total === 1 ? '' : 's'} · página {page} de{' '}
-              {totalPages}
-            </p>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={page <= 1 || logs.isFetching}
-                onClick={() => setPage((current) => Math.max(1, current - 1))}
-              >
-                Anterior
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={page >= totalPages || logs.isFetching}
-                onClick={() =>
-                  setPage((current) => Math.min(totalPages, current + 1))
-                }
-              >
-                Siguiente
-              </Button>
+                  <p className="font-mono text-xs text-muted-foreground">
+                    {item.requestId ?? '—'}
+                  </p>
+                </article>
+              ))}
             </div>
-          </div>
-        </>
-      )}
+
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+            />
+          </>
+        )}
+      </section>
     </div>
   )
 }

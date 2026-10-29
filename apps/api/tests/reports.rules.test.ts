@@ -113,7 +113,7 @@ describe('Reglas de reportes', () => {
   })
 
   it('ajusta la granularidad según el rango del período', () => {
-    expect(resolveGranularity('2026-10-01', '2026-10-31')).toBe('day')
+    expect(resolveGranularity('2026-10-01', '2026-10-31')).toBe('week')
     expect(resolveGranularity('2026-10-01', '2026-11-01')).toBe('week')
     expect(resolveGranularity('2026-01-01', '2026-12-31')).toBe('month')
     expect(resolveGranularity('2026-01-01', '2027-07-05')).toBe('month')

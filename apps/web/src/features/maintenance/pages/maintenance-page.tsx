@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import { CalendarClock, Plus, Wrench, X } from 'lucide-react'
+import { CalendarClock, Plus, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Input } from '@/components/ui/input'
-import { LoadingScreen } from '@/components/ui/loading-screen'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import {
@@ -32,10 +31,21 @@ export default function Page() {
 
   if (windows.isLoading) {
     return (
-      <LoadingScreen
-        title="Cargando mantenimiento"
-        description="Consultando las ventanas programadas."
-      />
+      <div className="space-y-6" aria-label="Cargando mantenimiento">
+        <div className="space-y-3">
+          <div className="h-3 w-40 animate-pulse rounded bg-muted" />
+          <div className="h-9 w-72 animate-pulse rounded bg-muted" />
+          <div className="h-4 w-full max-w-xl animate-pulse rounded bg-muted" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {Array.from({ length: 2 }, (_, index) => (
+            <div
+              key={index}
+              className="h-40 animate-pulse rounded-2xl border border-border bg-muted/50"
+            />
+          ))}
+        </div>
+      </div>
     )
   }
 
@@ -82,7 +92,7 @@ export default function Page() {
     <div className="space-y-6">
       <header>
         <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-          <Wrench size={15} /> Continuidad operativa
+          Continuidad operativa
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-brand-forest">
           Mantenimiento planificado

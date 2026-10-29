@@ -10,6 +10,7 @@ const repository = vi.hoisted(() => ({
   createSession: vi.fn(),
   findSession: vi.fn(),
   refreshSession: vi.fn(),
+  renewSession: vi.fn(),
   expireSession: vi.fn(),
   revokeSession: vi.fn(),
   recordAccessDenied: vi.fn(),
@@ -117,7 +118,7 @@ describe('Servicio de autenticación', () => {
     expect(repository.recordUnknownLoginFailure).toHaveBeenCalledOnce()
   })
 
-  it('usa el mismo error genérico para cuentas inactivas o bloqueadas', async () => {
+  it('mantiene el error genérico para cuentas inactivas y reporta un bloqueo vigente', async () => {
     const passwordHash = await hashPassword('Clave-segura-2026')
     const inactive = { ...userRecord(passwordHash), active: false }
     const locked = {
@@ -125,21 +126,30 @@ describe('Servicio de autenticación', () => {
       failedLoginAttempts: 5,
       lockedUntil: new Date(Date.now() + 60_000),
     }
-    const expected = {
+    const genericExpected = {
       status: 401,
       code: 'AUTH_INVALID_CREDENTIALS',
       message: 'No se pudo iniciar sesión con las credenciales proporcionadas.',
     }
 
-    for (const user of [inactive, locked]) {
-      repository.findUserByIdentifier.mockResolvedValue(user)
-      await expect(
-        authService.login(
-          { identifier: user.email, password: 'Clave-segura-2026' },
-          context,
-        ),
-      ).rejects.toMatchObject(expected)
-    }
+    repository.findUserByIdentifier.mockResolvedValue(inactive)
+    await expect(
+      authService.login(
+        { identifier: inactive.email, password: 'Clave-segura-2026' },
+        context,
+      ),
+    ).rejects.toMatchObject(genericExpected)
+
+    repository.findUserByIdentifier.mockResolvedValue(locked)
+    await expect(
+      authService.login(
+        { identifier: locked.email, password: 'Clave-segura-2026' },
+        context,
+      ),
+    ).rejects.toMatchObject({
+      status: 429,
+      code: 'AUTH_LOGIN_LOCKED',
+    })
 
     repository.findUserByIdentifier.mockResolvedValue(null)
     await expect(
@@ -147,7 +157,7 @@ describe('Servicio de autenticación', () => {
         { identifier: 'nadie', password: 'incorrecta' },
         context,
       ),
-    ).rejects.toMatchObject(expected)
+    ).rejects.toMatchObject(genericExpected)
 
     expect(repository.recordRejectedLogin).toHaveBeenCalledTimes(2)
     expect(repository.recordUnknownLoginFailure).toHaveBeenCalledOnce()
@@ -180,18 +190,56 @@ describe('Servicio de autenticación', () => {
       failedLoginAttempts: 4,
     }
     repository.findUserByIdentifier.mockResolvedValue(user)
+    repository.recordLoginFailure.mockResolvedValue({
+      failedLoginAttempts: 5,
+      locked: true,
+    })
 
     await expect(
       authService.login(
         { identifier: user.email, password: 'incorrecta' },
         context,
       ),
-    ).rejects.toMatchObject({ code: 'AUTH_INVALID_CREDENTIALS' })
+    ).rejects.toMatchObject({
+      status: 429,
+      code: 'AUTH_LOGIN_LOCKED',
+      details: expect.objectContaining({
+        lockMinutes: 15,
+        maximumAttempts: 5,
+      }),
+    })
 
     const call = repository.recordLoginFailure.mock.calls[0]
     expect(call[2]).toBe(5)
     expect(call[3]).toBeInstanceOf(Date)
     expect(call[3].getTime()).toBeGreaterThan(Date.now() + 14 * 60 * 1000)
+  })
+
+  it('informa los intentos restantes antes de aplicar el bloqueo', async () => {
+    const user = {
+      ...userRecord(await hashPassword('Clave-segura-2026')),
+      failedLoginAttempts: 2,
+    }
+    repository.findUserByIdentifier.mockResolvedValue(user)
+    repository.recordLoginFailure.mockResolvedValue({
+      failedLoginAttempts: 3,
+      locked: false,
+    })
+
+    await expect(
+      authService.login(
+        { identifier: user.email, password: 'incorrecta' },
+        context,
+      ),
+    ).rejects.toMatchObject({
+      status: 401,
+      code: 'AUTH_INVALID_CREDENTIALS',
+      details: {
+        attemptsRemaining: 2,
+        maximumAttempts: 5,
+        lockMinutes: 15,
+      },
+    })
   })
 
   it('rechaza y revoca una sesión expirada', async () => {
@@ -214,7 +262,7 @@ describe('Servicio de autenticación', () => {
     expect(repository.expireSession).toHaveBeenCalledOnce()
   })
 
-  it('evita escribir actividad para solicitudes cercanas y renueva una sesión activa al minuto', async () => {
+  it('evita escribir actividad para solicitudes cercanas y renueva una sesión activa cada cinco minutos', async () => {
     const now = new Date('2026-10-24T12:00:00.000Z')
     vi.useFakeTimers()
     vi.setSystemTime(now)
@@ -223,7 +271,7 @@ describe('Servicio de autenticación', () => {
       tokenHash: 'a'.repeat(64),
       userId: user.id,
       expiresAt: new Date(now.getTime() + 30 * 60_000),
-      lastActivityAt: new Date(now.getTime() - 30_000),
+      lastActivityAt: new Date(now.getTime() - 4 * 60_000),
       revokedAt: null,
       ipAddress: null,
       userAgent: null,
@@ -242,7 +290,7 @@ describe('Servicio de autenticación', () => {
       tokenHash: 'a'.repeat(64),
       userId: user.id,
       expiresAt: new Date(now.getTime() + 30 * 60_000),
-      lastActivityAt: new Date(now.getTime() - 61_000),
+      lastActivityAt: new Date(now.getTime() - 5 * 60_000 - 1),
       revokedAt: null,
       ipAddress: null,
       userAgent: null,
@@ -255,7 +303,7 @@ describe('Servicio de autenticación', () => {
       expect.any(String),
       now,
       expect.any(Date),
-      new Date(now.getTime() - 60_000),
+      new Date(now.getTime() - 5 * 60_000),
     )
     vi.useRealTimers()
   })
@@ -283,6 +331,56 @@ describe('Servicio de autenticación', () => {
     authService.invalidateUserSessions(user.id)
     await authService.authenticate('token', context)
     expect(repository.findSession).toHaveBeenCalledTimes(2)
+  })
+
+  it('renueva el identificador de una sesión activa tras cuatro horas', async () => {
+    const now = new Date('2026-10-24T12:00:00.000Z')
+    vi.useFakeTimers()
+    vi.setSystemTime(now)
+    const user = userRecord(await hashPassword('Clave-segura-2026'))
+    repository.findSession.mockResolvedValue({
+      tokenHash: 'a'.repeat(64),
+      userId: user.id,
+      expiresAt: new Date(now.getTime() + 30 * 60_000),
+      lastActivityAt: now,
+      revokedAt: null,
+      ipAddress: null,
+      userAgent: null,
+      createdAt: new Date(now.getTime() - 4 * 60 * 60_000 - 1),
+      user,
+    })
+    repository.renewSession.mockResolvedValue({ count: 1 })
+
+    const result = await authService.authenticate('token', context)
+
+    expect(result.renewedToken).toBeTruthy()
+    expect(result.tokenHash).not.toBe('a'.repeat(64))
+    expect(repository.renewSession).toHaveBeenCalledOnce()
+    vi.useRealTimers()
+  })
+
+  it('revoca una sesión que excede el límite absoluto de ocho horas', async () => {
+    const now = new Date('2026-10-24T12:00:00.000Z')
+    vi.useFakeTimers()
+    vi.setSystemTime(now)
+    const user = userRecord(await hashPassword('Clave-segura-2026'))
+    repository.findSession.mockResolvedValue({
+      tokenHash: 'a'.repeat(64),
+      userId: user.id,
+      expiresAt: new Date(now.getTime() + 30 * 60_000),
+      lastActivityAt: now,
+      revokedAt: null,
+      ipAddress: null,
+      userAgent: null,
+      createdAt: new Date(now.getTime() - 8 * 60 * 60_000 - 1),
+      user,
+    })
+
+    await expect(
+      authService.authenticate('token', context),
+    ).rejects.toMatchObject({ status: 401, code: 'AUTH_SESSION_EXPIRED' })
+    expect(repository.expireSession).toHaveBeenCalledOnce()
+    vi.useRealTimers()
   })
 
   it('registra y deniega permisos ausentes', async () => {

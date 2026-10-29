@@ -1,10 +1,9 @@
 import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm, useFormState } from 'react-hook-form'
-import { Info } from 'lucide-react'
+import { Controller, useForm, useFormState } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Modal } from '@/components/ui/modal'
 import { useWorkOrdersMutations } from '../hooks/use-work-orders'
 import {
@@ -33,7 +32,7 @@ export function WorkOrderActivityModal({
     resolver: zodResolver(workOrderActivitySchema),
     defaultValues: { description: '', occurredAt: '' },
   })
-  const { reset, register, trigger } = form
+  const { reset, register, trigger, control } = form
   const formState = useFormState({ control: form.control })
   const busy = mutations.createActivity.isPending
 
@@ -124,18 +123,20 @@ export function WorkOrderActivityModal({
               (opcional, hoy si se omite)
             </span>
           </label>
-          <Input
-            id="activity-occurred-at"
-            aria-label="Fecha de ejecución de la actividad"
-            type="date"
-            {...register('occurredAt')}
+          <Controller
+            control={control}
+            name="occurredAt"
+            render={({ field }) => (
+              <DatePicker
+                id="activity-occurred-at"
+                aria-label="Fecha de ejecución de la actividad"
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                placeholder="Seleccionar fecha"
+              />
+            )}
           />
         </div>
-        <p className="flex items-start gap-2 rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
-          <Info aria-hidden size={14} className="mt-0.5 shrink-0" />
-          Las actividades quedan pendientes hasta que las completes desde la
-          ficha de la orden.
-        </p>
       </div>
     </Modal>
   )

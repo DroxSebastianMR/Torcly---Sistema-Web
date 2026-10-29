@@ -316,6 +316,7 @@ export function AppointmentFormModal({
                 value={rescheduleDate}
                 aria-label="Nueva fecha de la cita"
                 min={todayISO()}
+                className="sm:max-w-[16rem]"
                 onChange={(date) => rescheduleForm.setValue('date', date)}
               />
             </Field>
@@ -324,14 +325,16 @@ export function AppointmentFormModal({
                 value={rescheduleTime}
                 aria-label="Nueva hora de la cita"
                 interval={30}
+                minTime="08:00"
+                maxTime="16:00"
                 onChange={(time) => rescheduleForm.setValue('time', time)}
               />
             </Field>
           </div>
           <p className="flex items-start gap-2 rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
             <Info aria-hidden size={14} className="mt-0.5 shrink-0" />
-            Hasta 8 citas activas por fecha y hora; si el horario está completo,
-            el sistema rechazará el cambio.
+            Horario disponible: 08:00 a 16:00. Hasta 8 citas activas por fecha y
+            hora; si el horario está completo, el sistema rechazará el cambio.
           </p>
         </div>
       ) : (
@@ -378,6 +381,7 @@ export function AppointmentFormModal({
                 value={createDate}
                 aria-label="Fecha de la cita"
                 min={todayISO()}
+                className="sm:max-w-[16rem]"
                 onChange={(date) => createForm.setValue('date', date)}
               />
             </Field>
@@ -386,6 +390,8 @@ export function AppointmentFormModal({
                 value={createTime}
                 aria-label="Hora de la cita"
                 interval={30}
+                minTime="08:00"
+                maxTime="16:00"
                 onChange={(time) => createForm.setValue('time', time)}
               />
             </Field>
@@ -406,8 +412,8 @@ export function AppointmentFormModal({
           </Field>
           <p className="flex items-start gap-2 rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
             <Info aria-hidden size={14} className="mt-0.5 shrink-0" />
-            Hasta 8 citas activas por fecha y hora; si el horario está completo,
-            el sistema rechazará la cita.
+            Horario disponible: 08:00 a 16:00. Hasta 8 citas activas por fecha y
+            hora; si el horario está completo, el sistema rechazará la cita.
           </p>
         </div>
       )}

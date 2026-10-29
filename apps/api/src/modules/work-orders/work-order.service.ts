@@ -13,10 +13,16 @@ import {
   roundQuantity,
 } from './work-order.rules.js'
 import { notificationsService } from '../notifications/notifications.service.js'
+import {
+  collectionStatusFromBalance,
+  computeBalance,
+  computePaidAmount,
+} from '../payments/payment.rules.js'
 import type {
   WorkOrderActivityInput,
   WorkOrderActivityResponse,
   WorkOrderBudgetInput,
+  WorkOrderBillingSummary,
   WorkOrderConsumptionInput,
   WorkOrderConsumptionType,
   WorkOrderCustomerRef,
@@ -24,6 +30,7 @@ import type {
   WorkOrderDeliveryInput,
   WorkOrderDetail,
   WorkOrderExecutionResponse,
+  WorkOrderFinalizeInput,
   WorkOrderFilters,
   WorkOrderLineInput,
   WorkOrderLineResponse,
@@ -109,9 +116,15 @@ function toSummary(
     customer: WorkOrderRecord['customer']
     vehicle: WorkOrderRecord['vehicle']
     status: WorkOrderSummary['status']
-    technician: { id: string; displayName: string } | null
+    technician: { id: string; fullName: string } | null
     subtotal: unknown
     total: unknown
+    sale?: {
+      id: string
+      code: string
+      total: unknown
+      payments: Array<{ type: 'PAYMENT' | 'COMPENSATION'; amount: unknown }>
+    } | null
     performedBy: string
     diagnosisUpdatedBy: string | null
     diagnosisUpdatedAt: Date | null
@@ -135,6 +148,20 @@ function toSummary(
   actorNames = new Map<string, string>(),
 ): WorkOrderSummary {
   const lineCount = order._count?.lines ?? order.lines?.length ?? 0
+  const billing: WorkOrderBillingSummary | null = order.sale
+    ? (() => {
+        const paid = computePaidAmount(order.sale.payments)
+        const balance = computeBalance(order.sale.total, paid)
+        return {
+          saleId: order.sale.id,
+          saleCode: order.sale.code,
+          total: Number(order.sale.total),
+          paid,
+          balance,
+          status: collectionStatusFromBalance(paid, balance),
+        }
+      })()
+    : null
   return {
     id: order.id,
     code: order.code,
@@ -143,9 +170,10 @@ function toSummary(
     vehicle: toVehicleRef(order.vehicle),
     status: order.status,
     technicianId: order.technician?.id ?? null,
-    technician: order.technician?.displayName ?? null,
+    technician: order.technician?.fullName ?? null,
     subtotal: Number(order.subtotal),
     total: Number(order.total),
+    billing,
     lineCount,
     performedBy: actorNames.get(order.performedBy) ?? order.performedBy,
     diagnosisUpdatedBy: order.diagnosisUpdatedBy
@@ -289,7 +317,7 @@ function toVehicleHistoryItem(order: {
   performedBy: string
   deliveredBy: string | null
   deliveredAt: Date | null
-  technician: { id: string; displayName: string } | null
+  technician: { id: string; fullName: string } | null
   activities: Array<{
     id: string
     description: string
@@ -346,7 +374,7 @@ function toVehicleHistoryItem(order: {
     code: order.code,
     diagnosis: order.diagnosis,
     technicianId: order.technician?.id ?? null,
-    technician: order.technician?.displayName ?? null,
+    technician: order.technician?.fullName ?? null,
     performedBy: order.performedBy,
     deliveredBy: order.deliveredBy,
     deliveredAt: order.deliveredAt ? order.deliveredAt.toISOString() : null,
@@ -528,7 +556,14 @@ export const workOrdersService = {
   },
 
   async getTechnicians() {
-    return { data: await workOrdersRepository.listTechnicians() }
+    return {
+      data: (await workOrdersRepository.listTechnicians()).map(
+        (technician) => ({
+          id: technician.id,
+          displayName: technician.fullName,
+        }),
+      ),
+    }
   },
 
   async createFromAppointment(
@@ -536,18 +571,13 @@ export const workOrdersService = {
     actor: WorkOrderActor | string,
     context: RequestContext,
   ) {
-    const appointment =
-      await workOrdersRepository.findAppointmentToAttend(appointmentId)
-    if (!appointment)
-      throw new AppError(404, 'APPOINTMENT_NOT_FOUND', 'Cita no encontrada.')
-
     try {
       const order = await workOrdersRepository.createFromAppointment(
         appointmentId,
         normalizeActor(actor),
         context,
       )
-      return { data: toDetail(order) }
+      return { data: order }
     } catch (error) {
       return mapPersistenceError(error)
     }
@@ -741,11 +771,13 @@ export const workOrdersService = {
 
   async finalize(
     id: string,
+    input: WorkOrderFinalizeInput,
     actor: WorkOrderActor | string,
     context: RequestContext,
   ) {
     const order = await workOrdersRepository.finalize(
       id,
+      input,
       normalizeActor(actor),
       context,
     )

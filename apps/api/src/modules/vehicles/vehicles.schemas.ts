@@ -43,7 +43,7 @@ export const vehicleQuerySchema = z.object({
   search: z.string().trim().max(120).optional(),
   customerId: z.uuid('Cliente inválido.').optional(),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(5).max(100).default(20),
+  pageSize: z.coerce.number().int().min(5).max(100).default(10),
 })
 
 export const vehicleInputSchema = z.object({

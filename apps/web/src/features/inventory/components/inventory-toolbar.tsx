@@ -32,7 +32,7 @@ export function InventoryToolbar({
 }: InventoryToolbarProps) {
   if (view === 'existence') {
     return (
-      <div className="flex gap-3 border-b bg-card px-4 py-4 sm:px-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="min-w-0 flex-1">
           <SmartSelect
             value={existenceFilters.search}
@@ -76,7 +76,7 @@ export function InventoryToolbar({
     Boolean(movementFilters.to)
 
   return (
-    <div className="flex flex-col gap-3 border-b bg-card px-4 py-4 sm:px-5 xl:flex-row xl:items-center">
+    <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
       <div className="w-full xl:w-72">
         <SmartSelect
           value={movementFilters.productId}

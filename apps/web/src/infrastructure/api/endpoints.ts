@@ -31,6 +31,8 @@ export const endpoints = {
     exits: '/inventory/salidas',
     adjustments: '/inventory/ajustes',
   },
+  // Conservado mientras el código histórico del módulo permanece en el repositorio.
+  // No existe una ruta web ni un endpoint API público que lo consuma.
   replenishment: {
     eligibility: '/replenishment/eligibility',
     runs: '/replenishment/runs',
@@ -86,6 +88,12 @@ export const endpoints = {
     vehicleHistory: (vehicleId: string) =>
       `/work-orders/vehicles/${vehicleId}/history`,
   },
+  technicians: {
+    root: '/technicians',
+    options: '/technicians/options',
+    detail: (id: string) => `/technicians/${id}`,
+    status: (id: string) => `/technicians/${id}/status`,
+  },
   customers: {
     root: '/customers',
     detail: (id: string) => `/customers/${id}`,
@@ -115,6 +123,7 @@ export const endpoints = {
   },
   assistant: {
     chat: '/assistant/chat',
+    conversations: '/assistant/conversations',
   },
   profile: {
     root: '/profile',

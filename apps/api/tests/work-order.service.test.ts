@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
   findById: vi.fn(),
-  findAppointmentToAttend: vi.fn(),
   findProductRef: vi.fn(),
   findServiceRef: vi.fn(),
   findTechnicianRef: vi.fn(),
@@ -116,6 +115,7 @@ function record(overrides: Record<string, unknown> = {}) {
     customer: customerRef,
     vehicle: vehicleRef,
     technician: null,
+    sale: null,
     _count: { lines: 0 },
     lines: [],
     ...overrides,
@@ -171,6 +171,7 @@ describe('Servicio de órdenes de taller', () => {
           technician: null,
           subtotal: 0,
           total: 0,
+          billing: null,
           lineCount: 0,
           performedBy: 'user-1',
           diagnosisUpdatedBy: null,
@@ -223,8 +224,12 @@ describe('Servicio de órdenes de taller', () => {
     )
   })
 
-  it('lanza 404 cuando la cita no existe al atender', async () => {
-    repository.findAppointmentToAttend.mockResolvedValue(null)
+  it('propaga el 404 transaccional cuando la cita no existe al atender', async () => {
+    const error = Object.assign(new Error('Cita no encontrada.'), {
+      status: 404,
+      code: 'APPOINTMENT_NOT_FOUND',
+    })
+    repository.createFromAppointment.mockRejectedValue(error)
     await expect(
       workOrdersService.createFromAppointment(appointmentId, actor, context),
     ).rejects.toThrowError(
@@ -233,19 +238,14 @@ describe('Servicio de órdenes de taller', () => {
         code: 'APPOINTMENT_NOT_FOUND',
       }),
     )
-    expect(repository.createFromAppointment).not.toHaveBeenCalled()
+    expect(repository.createFromAppointment).toHaveBeenCalledWith(
+      appointmentId,
+      actor,
+      context,
+    )
   })
 
   it('crea una orden a partir de la cita atendida', async () => {
-    repository.findAppointmentToAttend.mockResolvedValue({
-      id: appointmentId,
-      code: 'CITA-000001',
-      status: 'PROGRAMADA',
-      customerId,
-      vehicleId,
-      customer: customerRef,
-      vehicle: vehicleRef,
-    })
     repository.createFromAppointment.mockResolvedValue(record())
 
     const result = await workOrdersService.createFromAppointment(
@@ -438,12 +438,12 @@ describe('Servicio de órdenes de taller', () => {
     repository.findTechnicianRef.mockResolvedValue({
       id: technicianId,
       active: true,
-      displayName: 'Luis Torres',
+      fullName: 'Luis Torres',
     })
     repository.updateTechnician.mockResolvedValue(
       record({
         technicianId,
-        technician: { id: technicianId, displayName: 'Luis Torres' },
+        technician: { id: technicianId, fullName: 'Luis Torres' },
       }),
     )
 
@@ -482,7 +482,7 @@ describe('Servicio de órdenes de taller', () => {
     repository.findTechnicianRef.mockResolvedValue({
       id: technicianId,
       active: false,
-      displayName: 'Luis Torres',
+      fullName: 'Luis Torres',
     })
     await expect(
       workOrdersService.updateTechnician(
@@ -774,12 +774,14 @@ describe('Servicio de órdenes de taller', () => {
 
     const result = await workOrdersService.finalize(
       'work-order-1',
+      {},
       actor,
       context,
     )
 
     expect(repository.finalize).toHaveBeenCalledWith(
       'work-order-1',
+      {},
       actor,
       context,
     )
@@ -816,6 +818,37 @@ describe('Servicio de órdenes de taller', () => {
     expect(result.data.deliveryNotes).toBe('Cliente retiró el vehículo')
   })
 
+  it('expone el cobro pendiente de la venta vinculada a una orden entregada', async () => {
+    repository.deliver.mockResolvedValue(
+      record({
+        status: 'ENTREGADA',
+        sale: {
+          id: 'sale-1',
+          code: 'VENTA-000010',
+          total: 649.9,
+          confirmedAt: new Date('2026-09-27T00:00:00.000Z'),
+          payments: [],
+        },
+      }),
+    )
+
+    const result = await workOrdersService.deliver(
+      'work-order-1',
+      {},
+      actor,
+      context,
+    )
+
+    expect(result.data.billing).toEqual({
+      saleId: 'sale-1',
+      saleCode: 'VENTA-000010',
+      total: 649.9,
+      paid: 0,
+      balance: 649.9,
+      status: 'PENDING',
+    })
+  })
+
   it('devuelve el historial del vehículo con repuestos netos', async () => {
     repository.listVehicleHistory.mockResolvedValue({
       items: [
@@ -828,7 +861,7 @@ describe('Servicio de órdenes de taller', () => {
           performedBy: 'Ana Pérez',
           deliveredBy: 'Ana Pérez',
           deliveredAt: new Date('2026-09-27T00:00:00.000Z'),
-          technician: { id: technicianId, displayName: 'Luis Torres' },
+          technician: { id: technicianId, fullName: 'Luis Torres' },
           activities: [
             {
               id: 'activity-1',

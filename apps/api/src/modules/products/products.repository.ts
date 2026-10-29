@@ -1,4 +1,8 @@
-import { type AuditEventType, Prisma } from '../../generated/prisma/client.js'
+import {
+  type AuditEventType,
+  type InventoryMovementType,
+  Prisma,
+} from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import type { ProductFilters, ProductInput } from './products.types.js'
@@ -37,9 +41,26 @@ function auditData(
   }
 }
 
-type ProductWithRelations = Prisma.ProductGetPayload<typeof productSelect>
+type ProductListRecord = Prisma.ProductGetPayload<typeof productListSelect>
+type MovementSummary = {
+  type: InventoryMovementType
+  quantity: Prisma.Decimal
+}
 
-function productAuditMetadata(product: ProductWithRelations) {
+function productAuditMetadata(
+  product: Pick<
+    ProductListRecord,
+    | 'id'
+    | 'code'
+    | 'name'
+    | 'categoryId'
+    | 'brandId'
+    | 'unitId'
+    | 'salePrice'
+    | 'minimumStock'
+    | 'active'
+  >,
+) {
   return {
     productId: product.id,
     code: product.code,
@@ -51,6 +72,33 @@ function productAuditMetadata(product: ProductWithRelations) {
     minimumStock: Number(product.minimumStock),
     active: product.active,
   }
+}
+
+async function getConfirmedMovementSummaries(
+  transaction: Prisma.TransactionClient,
+  productId: string,
+): Promise<MovementSummary[]> {
+  const movements = await databaseService.measure(
+    'products.mutation.stock',
+    () =>
+      transaction.inventoryMovement.groupBy({
+        by: ['type'],
+        where: { productId, status: 'CONFIRMED' },
+        _sum: { quantity: true },
+      }),
+  )
+
+  return movements.map((movement) => ({
+    type: movement.type,
+    quantity: movement._sum.quantity ?? new Prisma.Decimal(0),
+  }))
+}
+
+function withMovementSummaries(
+  product: ProductListRecord,
+  inventoryMovements: MovementSummary[],
+): ProductRecord {
+  return { ...product, inventoryMovements }
 }
 
 function buildWhere(filters: ProductFilters): Prisma.ProductWhereInput {
@@ -80,33 +128,33 @@ export const productsRepository = {
   async list(filters: ProductFilters) {
     const where = buildWhere(filters)
     const [items, total] = await Promise.all([
-      databaseService.client.product.findMany({
-        ...productListSelect,
-        where,
-        orderBy: [{ active: 'desc' }, { name: 'asc' }],
-        skip: (filters.page - 1) * filters.pageSize,
-        take: filters.pageSize,
-      }),
-      databaseService.client.product.count({ where }),
+      databaseService.measure('products.list.records', () =>
+        databaseService.client.product.findMany({
+          ...productListSelect,
+          where,
+          orderBy: [{ active: 'desc' }, { name: 'asc' }],
+          skip: (filters.page - 1) * filters.pageSize,
+          take: filters.pageSize,
+        }),
+      ),
+      databaseService.measure('products.list.total', () =>
+        databaseService.client.product.count({ where }),
+      ),
     ])
 
     if (!items.length) return { items: [], total }
 
-    const grouped = await databaseService.client.inventoryMovement.groupBy({
-      by: ['productId', 'type'],
-      where: {
-        status: 'CONFIRMED',
-        productId: { in: items.map((item) => item.id) },
-      },
-      _sum: { quantity: true },
-    })
-    const movementsByProduct = new Map<
-      string,
-      Array<{
-        type: (typeof grouped)[number]['type']
-        quantity: Prisma.Decimal
-      }>
-    >()
+    const grouped = await databaseService.measure('products.list.stock', () =>
+      databaseService.client.inventoryMovement.groupBy({
+        by: ['productId', 'type'],
+        where: {
+          status: 'CONFIRMED',
+          productId: { in: items.map((item) => item.id) },
+        },
+        _sum: { quantity: true },
+      }),
+    )
+    const movementsByProduct = new Map<string, MovementSummary[]>()
     for (const movement of grouped) {
       const movements = movementsByProduct.get(movement.productId) ?? []
       movements.push({
@@ -134,20 +182,26 @@ export const productsRepository = {
 
   create(input: ProductInput, actorId: string, context: RequestContext) {
     return databaseService.transaction(async (transaction) => {
-      const product = await transaction.product.create({
-        ...productSelect,
-        data: input,
-      })
-      await transaction.auditLog.create({
-        data: auditData(
-          'PRODUCT_CREATED',
-          actorId,
-          product.code,
-          context,
-          productAuditMetadata(product),
-        ),
-      })
-      return product
+      const product = await databaseService.measure(
+        'products.create.record',
+        () =>
+          transaction.product.create({
+            ...productListSelect,
+            data: input,
+          }),
+      )
+      await databaseService.measure('products.create.audit', () =>
+        transaction.auditLog.create({
+          data: auditData(
+            'PRODUCT_CREATED',
+            actorId,
+            product.code,
+            context,
+            productAuditMetadata(product),
+          ),
+        }),
+      )
+      return withMovementSummaries(product, [])
     })
   },
 
@@ -158,21 +212,30 @@ export const productsRepository = {
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const product = await transaction.product.update({
-        ...productSelect,
-        where: { id },
-        data: input,
-      })
-      await transaction.auditLog.create({
-        data: auditData(
-          'PRODUCT_UPDATED',
-          actorId,
-          product.code,
-          context,
-          productAuditMetadata(product),
-        ),
-      })
-      return product
+      const product = await databaseService.measure(
+        'products.update.record',
+        () =>
+          transaction.product.update({
+            ...productListSelect,
+            where: { id },
+            data: input,
+          }),
+      )
+      await databaseService.measure('products.update.audit', () =>
+        transaction.auditLog.create({
+          data: auditData(
+            'PRODUCT_UPDATED',
+            actorId,
+            product.code,
+            context,
+            productAuditMetadata(product),
+          ),
+        }),
+      )
+      return withMovementSummaries(
+        product,
+        await getConfirmedMovementSummaries(transaction, product.id),
+      )
     })
   },
 
@@ -183,41 +246,56 @@ export const productsRepository = {
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const product = await transaction.product.update({
-        ...productSelect,
-        where: { id },
-        data: { active },
-      })
-      await transaction.auditLog.create({
-        data: auditData(
-          active ? 'PRODUCT_ACTIVATED' : 'PRODUCT_DEACTIVATED',
-          actorId,
-          product.code,
-          context,
-          productAuditMetadata(product),
-        ),
-      })
-      return product
+      const product = await databaseService.measure(
+        'products.status.record',
+        () =>
+          transaction.product.update({
+            ...productListSelect,
+            where: { id },
+            data: { active },
+          }),
+      )
+      await databaseService.measure('products.status.audit', () =>
+        transaction.auditLog.create({
+          data: auditData(
+            active ? 'PRODUCT_ACTIVATED' : 'PRODUCT_DEACTIVATED',
+            actorId,
+            product.code,
+            context,
+            productAuditMetadata(product),
+          ),
+        }),
+      )
+      return withMovementSummaries(
+        product,
+        await getConfirmedMovementSummaries(transaction, product.id),
+      )
     })
   },
 
   async getOptions() {
     const [categories, brands, units] = await Promise.all([
-      databaseService.client.productCategory.findMany({
-        where: { active: true },
-        select: { id: true, name: true },
-        orderBy: { name: 'asc' },
-      }),
-      databaseService.client.productBrand.findMany({
-        where: { active: true },
-        select: { id: true, name: true },
-        orderBy: { name: 'asc' },
-      }),
-      databaseService.client.productUnit.findMany({
-        where: { active: true },
-        select: { id: true, name: true, symbol: true },
-        orderBy: { name: 'asc' },
-      }),
+      databaseService.measure('products.options.categories', () =>
+        databaseService.client.productCategory.findMany({
+          where: { active: true },
+          select: { id: true, name: true },
+          orderBy: { name: 'asc' },
+        }),
+      ),
+      databaseService.measure('products.options.brands', () =>
+        databaseService.client.productBrand.findMany({
+          where: { active: true },
+          select: { id: true, name: true },
+          orderBy: { name: 'asc' },
+        }),
+      ),
+      databaseService.measure('products.options.units', () =>
+        databaseService.client.productUnit.findMany({
+          where: { active: true },
+          select: { id: true, name: true, symbol: true },
+          orderBy: { name: 'asc' },
+        }),
+      ),
     ])
 
     return { categories, brands, units }
@@ -225,18 +303,24 @@ export const productsRepository = {
 
   async getCatalog() {
     const [categories, brands, units] = await Promise.all([
-      databaseService.client.productCategory.findMany({
-        select: { id: true, name: true, active: true },
-        orderBy: { name: 'asc' },
-      }),
-      databaseService.client.productBrand.findMany({
-        select: { id: true, name: true, active: true },
-        orderBy: { name: 'asc' },
-      }),
-      databaseService.client.productUnit.findMany({
-        select: { id: true, name: true, symbol: true, active: true },
-        orderBy: { name: 'asc' },
-      }),
+      databaseService.measure('products.catalog.categories', () =>
+        databaseService.client.productCategory.findMany({
+          select: { id: true, name: true, active: true },
+          orderBy: { name: 'asc' },
+        }),
+      ),
+      databaseService.measure('products.catalog.brands', () =>
+        databaseService.client.productBrand.findMany({
+          select: { id: true, name: true, active: true },
+          orderBy: { name: 'asc' },
+        }),
+      ),
+      databaseService.measure('products.catalog.units', () =>
+        databaseService.client.productUnit.findMany({
+          select: { id: true, name: true, symbol: true, active: true },
+          orderBy: { name: 'asc' },
+        }),
+      ),
     ])
 
     return { categories, brands, units }
@@ -312,6 +396,6 @@ export const productsRepository = {
   },
 }
 
-export type ProductRecord = NonNullable<
-  Awaited<ReturnType<typeof productsRepository.findById>>
->
+export type ProductRecord = ProductListRecord & {
+  inventoryMovements: MovementSummary[]
+}

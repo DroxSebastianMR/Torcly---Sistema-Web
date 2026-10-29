@@ -37,10 +37,11 @@ interface SmartSelectProps {
   filterOption?: (option: SmartSelectOption, query: string) => boolean
   onOpen?: () => void
   'aria-label'?: string
+  'aria-invalid'?: boolean
 }
 
 const controlClass =
-  'flex h-11 w-full items-center justify-between gap-2 rounded-lg border border-input bg-background px-3 text-left text-sm transition-colors hover:border-primary/45 focus-visible:outline-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50'
+  'flex min-h-11 w-full items-center justify-between gap-2 rounded-[10px] border border-input bg-card px-[13px] text-left text-sm transition-[border-color,background-color] duration-150 ease-out hover:bg-background focus-visible:border-primary/70 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
 
 export function SmartSelect({
   options,
@@ -60,6 +61,7 @@ export function SmartSelect({
   filterOption,
   onOpen,
   'aria-label': ariaLabel,
+  'aria-invalid': ariaInvalid,
 }: SmartSelectProps) {
   const listId = useId()
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -160,6 +162,7 @@ export function SmartSelect({
         type="button"
         disabled={disabled}
         aria-label={ariaLabel}
+        aria-invalid={ariaInvalid}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
@@ -216,7 +219,7 @@ export function SmartSelect({
                 closeMenu(true)
               }
             }}
-            className="fixed z-[60] flex flex-col overflow-hidden rounded-xl border border-border/80 bg-card p-2 shadow-[0_18px_40px_rgba(7,28,22,0.16)]"
+            className="fixed z-[60] flex flex-col overflow-hidden rounded-[10px] border border-border bg-card p-2 shadow-[0_24px_60px_rgb(16_44_37_/_18%)]"
           >
             {showsSearchInput && (
               <div className="relative mb-2 w-full shrink-0">
@@ -240,7 +243,7 @@ export function SmartSelect({
                     }
                   }}
                   placeholder={searchPlaceholder}
-                  className="h-10 w-full rounded-lg border border-input bg-background py-2 pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="h-10 w-full rounded-lg border border-input bg-background py-2 pr-3 pl-9 text-sm outline-none focus-visible:border-primary/70"
                 />
               </div>
             )}
@@ -248,7 +251,7 @@ export function SmartSelect({
               id={listId}
               role="listbox"
               aria-label={ariaLabel}
-              className="min-h-0 w-full flex-1 overflow-y-auto py-1"
+              className="min-h-0 w-full flex-1 overflow-y-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               {filteredOptions.map((option) => {
                 const isSelected = option.value === value
@@ -259,7 +262,7 @@ export function SmartSelect({
                       role="option"
                       aria-selected={isSelected}
                       disabled={option.disabled}
-                      className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-45"
+                      className="flex min-h-[42px] w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-muted hover:text-primary focus-visible:bg-muted focus-visible:outline-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-45"
                       onClick={() => {
                         onChange(option.value)
                         closeMenu(true)

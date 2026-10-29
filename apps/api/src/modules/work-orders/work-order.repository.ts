@@ -22,6 +22,7 @@ import {
   computeNetConsumed,
   roundQuantity,
   shouldMoveToDiagnosis,
+  workOrderOperationKey,
 } from './work-order.rules.js'
 import type {
   WorkOrderConsumptionType,
@@ -76,7 +77,7 @@ const workOrderSummarySelect = {
     },
   },
   technician: {
-    select: { id: true, displayName: true },
+    select: { id: true, fullName: true },
   },
   _count: { select: { lines: true } },
 } satisfies Prisma.WorkOrderSelect
@@ -104,7 +105,16 @@ const workOrderDetailInclude = {
     },
   },
   technician: {
-    select: { id: true, displayName: true },
+    select: { id: true, fullName: true },
+  },
+  sale: {
+    select: {
+      id: true,
+      code: true,
+      total: true,
+      confirmedAt: true,
+      payments: { select: { type: true, amount: true } },
+    },
   },
   lines: { orderBy: { createdAt: 'asc' } },
 } satisfies Prisma.WorkOrderInclude
@@ -112,6 +122,11 @@ const workOrderDetailInclude = {
 export type WorkOrderRecord = Prisma.WorkOrderGetPayload<{
   include: typeof workOrderDetailInclude
 }>
+
+export type CreatedWorkOrderRecord = {
+  id: string
+  code: string
+}
 
 type WorkOrderOrderRow = Prisma.WorkOrderGetPayload<{
   select: { id: true; code: true; status: true }
@@ -288,37 +303,6 @@ export const workOrdersRepository = {
     })
   },
 
-  findAppointmentToAttend(appointmentId: string) {
-    return databaseService.client.appointment.findUnique({
-      where: { id: appointmentId },
-      select: {
-        id: true,
-        code: true,
-        status: true,
-        customerId: true,
-        vehicleId: true,
-        customer: {
-          select: {
-            id: true,
-            documentNumber: true,
-            firstName: true,
-            lastName: true,
-            legalName: true,
-          },
-        },
-        vehicle: {
-          select: {
-            id: true,
-            plate: true,
-            brand: true,
-            model: true,
-            year: true,
-          },
-        },
-      },
-    })
-  },
-
   findProductRef(id: string) {
     return databaseService.client.product.findUnique({
       where: { id },
@@ -347,9 +331,9 @@ export const workOrdersRepository = {
   },
 
   findTechnicianRef(id: string) {
-    return databaseService.client.user.findUnique({
+    return databaseService.client.technician.findUnique({
       where: { id },
-      select: { id: true, active: true, displayName: true },
+      select: { id: true, active: true, fullName: true },
     })
   },
 
@@ -418,10 +402,10 @@ export const workOrdersRepository = {
   },
 
   listTechnicians() {
-    return databaseService.client.user.findMany({
+    return databaseService.client.technician.findMany({
       where: { active: true },
-      select: { id: true, displayName: true },
-      orderBy: { displayName: 'asc' },
+      select: { id: true, fullName: true },
+      orderBy: { fullName: 'asc' },
     })
   },
 
@@ -429,7 +413,7 @@ export const workOrdersRepository = {
     appointmentId: string,
     actor: { id: string; name: string },
     context: RequestContext,
-  ): Promise<WorkOrderRecord> {
+  ): Promise<CreatedWorkOrderRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockAppointment(transaction, appointmentId)
 
@@ -490,7 +474,7 @@ export const workOrdersRepository = {
           status: 'RECEPCIONADA',
           performedBy: actor.name,
         },
-        include: workOrderDetailInclude,
+        select: { id: true, code: true },
       })
 
       await transaction.appointment.update({
@@ -502,35 +486,29 @@ export const workOrdersRepository = {
         },
       })
 
-      await transaction.auditLog.create({
-        data: auditData(
-          'APPOINTMENT_ATTENDED',
-          actor.id,
-          appointment.code,
-          context,
-          {
-            appointmentId: appointment.id,
-            code: appointment.code,
-            workOrderId: workOrder.id,
-            workOrderCode: workOrder.code,
-          },
-        ),
-      })
-      await transaction.auditLog.create({
-        data: auditData(
-          'WORK_ORDER_CREATED',
-          actor.id,
-          workOrder.code,
-          context,
-          {
+      await transaction.auditLog.createMany({
+        data: [
+          auditData(
+            'APPOINTMENT_ATTENDED',
+            actor.id,
+            appointment.code,
+            context,
+            {
+              appointmentId: appointment.id,
+              code: appointment.code,
+              workOrderId: workOrder.id,
+              workOrderCode: workOrder.code,
+            },
+          ),
+          auditData('WORK_ORDER_CREATED', actor.id, workOrder.code, context, {
             workOrderId: workOrder.id,
             code: workOrder.code,
             appointmentId: appointment.id,
             appointmentCode: appointment.code,
-            customerId: workOrder.customerId,
-            vehicleId: workOrder.vehicleId,
-          },
-        ),
+            customerId: appointment.customerId,
+            vehicleId: appointment.vehicleId,
+          }),
+        ],
       })
 
       return workOrder
@@ -776,7 +754,7 @@ export const workOrdersRepository = {
       await lockOrder(transaction, orderId)
       const order = await transaction.workOrder.findUnique({
         where: { id: orderId },
-        select: { id: true, code: true, status: true, technicianId: true },
+        select: { id: true, code: true, status: true },
       })
       if (!order)
         throw new AppError(
@@ -830,8 +808,11 @@ export const workOrdersRepository = {
         data: {
           workOrderId: orderId,
           description: input.description,
+          status: 'COMPLETADA',
           performedBy: actor.name,
           occurredAt,
+          completedBy: actor.name,
+          completedAt: new Date(),
         },
         select: {
           id: true,
@@ -1023,7 +1004,12 @@ export const workOrdersRepository = {
             `El consumo no puede superar lo presupuestado: quedan ${pending} disponibles y se solicitan ${quantity}.`,
           )
 
-        const idempotencyKey = `work-order:consume:${orderId}:${line.id}:${input.requestId}`
+        const idempotencyKey = workOrderOperationKey(
+          'wo-consume',
+          orderId,
+          line.id,
+          input.requestId,
+        )
         const replay = await transaction.workOrderConsumption.findUnique({
           where: { idempotencyKey },
           select: { workOrderLineId: true },
@@ -1066,7 +1052,12 @@ export const workOrdersRepository = {
             type: 'EXIT',
             status: 'CONFIRMED',
             quantity,
-            idempotencyKey: `work-order-consume:${orderId}:${productId}:${input.requestId}`,
+            idempotencyKey: workOrderOperationKey(
+              'inventory-exit',
+              orderId,
+              productId,
+              input.requestId,
+            ),
             notes: `Consumo en ${order.code}`,
             performedBy: actor.name,
             occurredAt: new Date(),
@@ -1246,7 +1237,12 @@ export const workOrdersRepository = {
             `La devolución no puede superar el neto consumido de la línea: se han consumido ${netConsumed} y se devuelven ${quantity}.`,
           )
 
-        const idempotencyKey = `work-order:return:${orderId}:${line.id}:${input.requestId}`
+        const idempotencyKey = workOrderOperationKey(
+          'wo-return',
+          orderId,
+          line.id,
+          input.requestId,
+        )
         const replay = await transaction.workOrderConsumption.findUnique({
           where: { idempotencyKey },
           select: { workOrderLineId: true },
@@ -1279,7 +1275,12 @@ export const workOrdersRepository = {
             type: 'ADJUSTMENT_IN',
             status: 'CONFIRMED',
             quantity,
-            idempotencyKey: `work-order-return:${orderId}:${productId}:${input.requestId}`,
+            idempotencyKey: workOrderOperationKey(
+              'inventory-return',
+              orderId,
+              productId,
+              input.requestId,
+            ),
             notes: `Devolución en ${order.code}`,
             performedBy: actor.name,
             occurredAt: new Date(),
@@ -1365,6 +1366,7 @@ export const workOrdersRepository = {
 
   async finalize(
     orderId: string,
+    input: { confirmPendingProducts?: boolean },
     actor: { id: string; name: string },
     context: RequestContext,
   ): Promise<WorkOrderRecord> {
@@ -1373,22 +1375,31 @@ export const workOrdersRepository = {
       const order = await requireOrder(transaction, orderId)
       assertCanFinalize(order)
 
-      const activities = await transaction.workOrderActivity.findMany({
-        where: { workOrderId: orderId },
-        select: { status: true },
+      const productLines = await transaction.workOrderLine.findMany({
+        where: { workOrderId: orderId, type: 'PRODUCT' },
+        select: {
+          id: true,
+          name: true,
+          quantity: true,
+          consumptions: { select: { type: true, quantity: true } },
+        },
       })
-      if (!activities.length)
+      const pendingProducts = productLines
+        .map((line) => ({
+          lineId: line.id,
+          name: line.name,
+          quantity: roundQuantity(
+            Number(line.quantity) - computeNetConsumed(line.consumptions),
+          ),
+        }))
+        .filter((line) => line.quantity > 0)
+      if (pendingProducts.length && !input.confirmPendingProducts) {
         throw new AppError(
           409,
-          'WORK_ORDER_NO_ACTIVITIES',
-          'Registra al menos una actividad antes de finalizar la orden.',
+          'WORK_ORDER_PENDING_PRODUCTS',
+          'Confirma si los repuestos pendientes no fueron utilizados antes de finalizar la orden.',
         )
-      if (activities.some((activity) => activity.status === 'PENDIENTE'))
-        throw new AppError(
-          409,
-          'WORK_ORDER_ACTIVITIES_PENDING',
-          'Completa todas las actividades antes de finalizar la orden.',
-        )
+      }
 
       await transaction.workOrder.update({
         where: { id: orderId },
@@ -1400,7 +1411,13 @@ export const workOrdersRepository = {
           actor.id,
           order.code,
           context,
-          { workOrderId: orderId, code: order.code },
+          {
+            workOrderId: orderId,
+            code: order.code,
+            pendingProducts: pendingProducts.length
+              ? pendingProducts
+              : undefined,
+          },
         ),
       })
 
@@ -1423,6 +1440,84 @@ export const workOrdersRepository = {
       const order = await requireOrder(transaction, orderId)
       assertCanDeliver(order)
 
+      const billingSource = await transaction.workOrder.findUnique({
+        where: { id: orderId },
+        select: {
+          customerId: true,
+          lines: {
+            orderBy: { createdAt: 'asc' },
+            select: {
+              type: true,
+              productId: true,
+              serviceId: true,
+              name: true,
+              code: true,
+              unitLabel: true,
+              unitPrice: true,
+              quantity: true,
+              consumptions: {
+                select: { type: true, quantity: true },
+              },
+            },
+          },
+        },
+      })
+      if (!billingSource) {
+        throw new AppError(404, 'WORK_ORDER_NOT_FOUND', 'Orden no encontrada.')
+      }
+
+      const billableLines = billingSource.lines.flatMap((line) => {
+        const quantity =
+          line.type === 'PRODUCT'
+            ? computeNetConsumed(line.consumptions)
+            : Number(line.quantity)
+        if (quantity <= 0) return []
+        const subtotal =
+          Math.round(Number(line.unitPrice) * quantity * 100) / 100
+        return [
+          {
+            type: line.type,
+            productId: line.productId,
+            serviceId: line.serviceId,
+            name: line.name,
+            code: line.code,
+            unitLabel: line.unitLabel,
+            unitPrice: line.unitPrice,
+            quantity,
+            subtotal,
+          },
+        ]
+      })
+      const billableTotal =
+        Math.round(
+          billableLines.reduce((sum, line) => sum + line.subtotal, 0) * 100,
+        ) / 100
+
+      let sale: { id: string; code: string } | null = null
+      if (billableTotal > 0) {
+        const rows = await transaction.$queryRaw<
+          Array<{ seq: number | string }>
+        >`
+          SELECT nextval('"sales_code_seq"') AS seq
+        `
+        const code = `VENTA-${String(Number(rows[0].seq)).padStart(6, '0')}`
+        sale = await transaction.sale.create({
+          data: {
+            code,
+            customerId: billingSource.customerId,
+            workOrderId: orderId,
+            status: 'CONFIRMED',
+            subtotal: billableTotal,
+            total: billableTotal,
+            performedBy: actor.name,
+            confirmedBy: actor.name,
+            confirmedAt: new Date(),
+            lines: { create: billableLines },
+          },
+          select: { id: true, code: true },
+        })
+      }
+
       await transaction.workOrder.update({
         where: { id: orderId },
         data: {
@@ -1432,12 +1527,35 @@ export const workOrdersRepository = {
           deliveryNotes: notes,
         },
       })
-      await transaction.auditLog.create({
-        data: auditData('WORK_ORDER_DELIVERED', actor.id, order.code, context, {
-          workOrderId: orderId,
-          code: order.code,
-          notes: notes ?? undefined,
-        }),
+      await transaction.auditLog.createMany({
+        data: [
+          auditData('WORK_ORDER_DELIVERED', actor.id, order.code, context, {
+            workOrderId: orderId,
+            code: order.code,
+            notes: notes ?? undefined,
+            saleId: sale?.id,
+            saleCode: sale?.code,
+          }),
+          ...(sale
+            ? [
+                auditData('SALE_CREATED', actor.id, sale.code, context, {
+                  saleId: sale.id,
+                  code: sale.code,
+                  workOrderId: orderId,
+                  workOrderCode: order.code,
+                  source: 'WORK_ORDER_DELIVERY',
+                }),
+                auditData('SALE_CONFIRMED', actor.id, sale.code, context, {
+                  saleId: sale.id,
+                  code: sale.code,
+                  workOrderId: orderId,
+                  workOrderCode: order.code,
+                  source: 'WORK_ORDER_DELIVERY',
+                  inventoryMovement: 'SKIPPED_ALREADY_MANAGED_BY_WORK_ORDER',
+                }),
+              ]
+            : []),
+        ],
       })
 
       const workOrder = await transaction.workOrder.findUnique({
@@ -1490,9 +1608,7 @@ export const workOrdersRepository = {
             performedBy: true,
             deliveredBy: true,
             deliveredAt: true,
-            technician: {
-              select: { id: true, displayName: true },
-            },
+            technician: { select: { id: true, fullName: true } },
             activities: {
               orderBy: { createdAt: 'asc' },
               select: {

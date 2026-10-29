@@ -26,7 +26,7 @@ export function WorkOrdersToolbar({
     filters.status !== 'all'
 
   return (
-    <div className="flex min-w-0 flex-col gap-3 px-4 py-3 sm:px-5">
+    <div className="flex min-w-0 flex-col gap-3 xl:flex-row xl:items-center">
       <div className="min-w-0 flex-1">
         <SmartSelect
           value={filters.search}
@@ -40,7 +40,7 @@ export function WorkOrdersToolbar({
           onChange={(search) => onChange({ ...filters, search, page: 1 })}
         />
       </div>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 xl:shrink-0">
         <div className="w-full sm:w-52">
           <SmartSelect
             value={filters.status}

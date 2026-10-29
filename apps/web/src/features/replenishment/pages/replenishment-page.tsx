@@ -1,7 +1,8 @@
 import { useDeferredValue, useState } from 'react'
-import { History, ListChecks, PackagePlus, Sparkles } from 'lucide-react'
+import { History, ListChecks, PackagePlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ErrorState } from '@/components/ui/error-state'
+import { ModuleMetrics } from '@/components/ui/module-metrics'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { RecommendationsTable } from '../components/recommendations-table'
@@ -89,7 +90,7 @@ export default function Page() {
       <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <Sparkles size={15} /> Reabastecimiento asistido
+            Reabastecimiento asistido
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
             Reabastecimiento
@@ -107,47 +108,43 @@ export default function Page() {
         )}
       </header>
 
-      <section className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-b px-4 py-4 sm:px-5">
-          {view === 'recommendations' && counts ? (
-            <>
-              <CountItem
-                label="Productos analizados"
-                value={formatCount(counts.total)}
-              />
-              <div className="h-8 w-px bg-border" />
-              <CountItem
-                label="Elegibles"
-                value={formatCount(counts.eligible)}
-                tone="text-emerald-700"
-              />
-              <div className="h-8 w-px bg-border" />
-              <CountItem
-                label="Críticas"
-                value={formatCount(counts.critical)}
-                tone="text-rose-700"
-              />
-              <div className="h-8 w-px bg-border" />
-              <CountItem
-                label="Aconsejables"
-                value={formatCount(counts.advisable)}
-                tone="text-amber-700"
-              />
-              <p className="w-full text-xs text-muted-foreground">
-                Productos por prioridad de todo el período; los filtros solo
-                acotan la tabla.
-              </p>
-            </>
-          ) : (
-            <CountItem
-              label="Corridas encontradas"
-              value={formatCount(runTotal)}
-            />
-          )}
+      <ModuleMetrics
+        items={
+          view === 'recommendations'
+            ? [
+                {
+                  label: 'Productos analizados',
+                  value: formatCount(counts?.total ?? 0),
+                },
+                {
+                  label: 'Elegibles',
+                  value: formatCount(counts?.eligible ?? 0),
+                  tone: 'success',
+                },
+                {
+                  label: 'Críticas',
+                  value: formatCount(counts?.critical ?? 0),
+                  tone: 'danger',
+                },
+                {
+                  label: 'Aconsejables',
+                  value: formatCount(counts?.advisable ?? 0),
+                  tone: 'warning',
+                },
+              ]
+            : [{ label: 'Corridas encontradas', value: formatCount(runTotal) }]
+        }
+      />
+
+      <section
+        aria-label="Filtros de reabastecimiento"
+        className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
+      >
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-start">
           <div
             role="tablist"
             aria-label="Secciones de reabastecimiento"
-            className="ml-auto flex rounded-xl bg-muted p-1"
+            className="flex self-end rounded-xl bg-muted p-1 xl:order-2 xl:ml-auto xl:self-auto"
           >
             {(
               [
@@ -176,23 +173,29 @@ export default function Page() {
               </button>
             ))}
           </div>
+          <div className="min-w-0 flex-1">
+            <ReplenishmentToolbar
+              view={view}
+              eligibilityFilters={eligibilityFilters}
+              historyFilters={historyFilters}
+              suggestions={suggestions}
+              onEligibilityChange={(filters) => {
+                setEligibilityFilters(filters)
+                setView('recommendations')
+              }}
+              onHistoryChange={(filters) => {
+                setHistoryFilters(filters)
+                setView('history')
+              }}
+            />
+          </div>
         </div>
+      </section>
 
-        <ReplenishmentToolbar
-          view={view}
-          eligibilityFilters={eligibilityFilters}
-          historyFilters={historyFilters}
-          suggestions={suggestions}
-          onEligibilityChange={(filters) => {
-            setEligibilityFilters(filters)
-            setView('recommendations')
-          }}
-          onHistoryChange={(filters) => {
-            setHistoryFilters(filters)
-            setView('history')
-          }}
-        />
-
+      <section
+        aria-label="Resultados de reabastecimiento"
+        className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]"
+      >
         {view === 'recommendations' ? (
           <>
             <div className="border-b px-4 py-3 text-sm sm:px-5">
@@ -216,6 +219,7 @@ export default function Page() {
               <RecommendationsTable
                 recommendations={recommendations}
                 loading={eligibility.isPending}
+                minDemandPoints={eligibility.data?.minDemandPoints ?? 3}
               />
             )}
             {eligibility.data && eligibility.data.pagination.totalPages > 1 && (
@@ -324,23 +328,6 @@ export default function Page() {
         code={detailCode}
         onClose={() => setDetailCode(null)}
       />
-    </div>
-  )
-}
-
-function CountItem({
-  label,
-  value,
-  tone = 'text-foreground',
-}: {
-  label: string
-  value: string
-  tone?: string
-}) {
-  return (
-    <div>
-      <p className={`text-xl font-semibold tabular-nums ${tone}`}>{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
     </div>
   )
 }

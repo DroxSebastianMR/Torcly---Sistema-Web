@@ -26,6 +26,30 @@ class PrismaService {
     await this.client.$queryRaw`SELECT 1`
   }
 
+  async measure<T>(operation: string, run: () => Promise<T>): Promise<T> {
+    const startedAt = performance.now()
+
+    try {
+      return await run()
+    } finally {
+      if (process.env.NODE_ENV !== 'test') {
+        const context = requestMetricsContext.getStore()
+        console.info(
+          JSON.stringify({
+            level: 'info',
+            event: 'database_operation_completed',
+            requestId: context?.requestId ?? null,
+            module: context?.route.split('/').filter(Boolean).at(2) ?? 'system',
+            operation,
+            method: context?.method ?? null,
+            route: context?.route ?? null,
+            durationMs: Number((performance.now() - startedAt).toFixed(2)),
+          }),
+        )
+      }
+    }
+  }
+
   async transaction<T>(
     operation: (transaction: Prisma.TransactionClient) => Promise<T>,
   ): Promise<T> {

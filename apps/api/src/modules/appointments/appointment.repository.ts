@@ -188,14 +188,18 @@ export const appointmentsRepository = {
   async list(filters: AppointmentFilters) {
     const where = buildWhere(filters)
     const [items, total] = await Promise.all([
-      databaseService.client.appointment.findMany({
-        select: appointmentSummarySelect,
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip: (filters.page - 1) * filters.pageSize,
-        take: filters.pageSize,
-      }),
-      databaseService.client.appointment.count({ where }),
+      databaseService.measure('appointments.list.records', () =>
+        databaseService.client.appointment.findMany({
+          select: appointmentSummarySelect,
+          where,
+          orderBy: { createdAt: 'desc' },
+          skip: (filters.page - 1) * filters.pageSize,
+          take: filters.pageSize,
+        }),
+      ),
+      databaseService.measure('appointments.list.total', () =>
+        databaseService.client.appointment.count({ where }),
+      ),
     ])
     return { items, total }
   },

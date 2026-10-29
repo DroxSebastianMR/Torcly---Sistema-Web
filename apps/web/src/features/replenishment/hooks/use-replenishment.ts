@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { replenishmentService } from '../services/replenishment.service'
 import type {
   EligibilityFilters,
@@ -52,9 +53,14 @@ export function useCreateReplenishmentRun() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (input: RunInput) => replenishmentService.createRun(input),
+    onMutate: () => ({
+      toastId: startActionToast('Calculando recomendaciones…'),
+    }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: replenishmentKeys.all })
     },
+    onSettled: (_data, _error, _variables, context) =>
+      finishActionToast(context?.toastId),
   })
 }
 

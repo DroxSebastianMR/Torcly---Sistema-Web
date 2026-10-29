@@ -78,6 +78,19 @@ describe('Esquema de citas (web)', () => {
     expect(largo.success).toBe(false)
   })
 
+  it('rechaza horas fuera del horario de atención', () => {
+    expect(
+      appointmentFormSchema.safeParse({ ...validCreate, time: '07:30' })
+        .success,
+    ).toBe(false)
+    expect(
+      appointmentRescheduleFormSchema.safeParse({
+        date: '2099-06-15',
+        time: '16:30',
+      }).success,
+    ).toBe(false)
+  })
+
   it('rechaza una cita en una fecha pasada', () => {
     const result = appointmentFormSchema.safeParse({
       ...validCreate,

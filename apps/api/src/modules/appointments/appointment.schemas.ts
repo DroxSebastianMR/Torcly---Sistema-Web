@@ -1,5 +1,8 @@
 import { z } from 'zod'
-import { isValidDateString } from './appointment.rules.js'
+import {
+  isAppointmentTimeAllowed,
+  isValidDateString,
+} from './appointment.rules.js'
 
 export const appointmentIdSchema = z.object({
   id: z.uuid('Cita inválida.'),
@@ -18,7 +21,7 @@ export const appointmentQuerySchema = z.object({
   customerId: z.uuid('Cliente inválido.').optional(),
   status: z.enum(['all', 'PROGRAMADA', 'CANCELADA', 'ATENDIDA']).default('all'),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(5).max(100).default(20),
+  pageSize: z.coerce.number().int().min(5).max(100).default(10),
 })
 
 const appointmentScheduleSchema = z
@@ -27,7 +30,13 @@ const appointmentScheduleSchema = z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha inválida.')
       .refine(isValidDateString, 'Fecha inválida.'),
-    time: z.string().regex(timePattern, 'Hora inválida.'),
+    time: z
+      .string()
+      .regex(timePattern, 'Hora inválida.')
+      .refine(
+        isAppointmentTimeAllowed,
+        'La hora debe estar entre las 08:00 y las 16:00.',
+      ),
   })
   .strict()
 

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { salesService } from '../services/sales.service'
 import type { SaleFilters, SaleInput } from '../types/sales.types'
 
@@ -44,16 +45,25 @@ export function useSaleMutations() {
   return {
     create: useMutation({
       mutationFn: (input: SaleInput) => salesService.create(input),
+      onMutate: () => ({ toastId: startActionToast('Guardando venta…') }),
       onSuccess: refreshSales,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     update: useMutation({
       mutationFn: ({ id, input }: { id: string; input: SaleInput }) =>
         salesService.update(id, input),
+      onMutate: () => ({ toastId: startActionToast('Actualizando venta…') }),
       onSuccess: refreshSales,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     confirm: useMutation({
       mutationFn: (id: string) => salesService.confirm(id),
+      onMutate: () => ({ toastId: startActionToast('Confirmando venta…') }),
       onSuccess: refreshSales,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
   }
 }

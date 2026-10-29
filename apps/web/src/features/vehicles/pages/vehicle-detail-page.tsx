@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
+import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { paths } from '@/app/router/constants/paths'
@@ -208,34 +209,13 @@ export default function Page() {
                   <HistoryEntry key={entry.id} entry={entry} />
                 ))}
               </div>
-              {vehicleHistory.data &&
-                vehicleHistory.data.pagination.totalPages > 1 && (
-                  <footer className="flex items-center justify-between border-t px-5 py-4 text-sm">
-                    <span className="text-muted-foreground">
-                      Página {historyPage} de{' '}
-                      {vehicleHistory.data.pagination.totalPages}
-                    </span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        disabled={historyPage === 1}
-                        onClick={() => setHistoryPage((current) => current - 1)}
-                      >
-                        Anterior
-                      </Button>
-                      <Button
-                        variant="outline"
-                        disabled={
-                          historyPage >=
-                          vehicleHistory.data.pagination.totalPages
-                        }
-                        onClick={() => setHistoryPage((current) => current + 1)}
-                      >
-                        Siguiente
-                      </Button>
-                    </div>
-                  </footer>
-                )}
+              {vehicleHistory.data && (
+                <Pagination
+                  page={historyPage}
+                  totalPages={vehicleHistory.data.pagination.totalPages}
+                  onPageChange={setHistoryPage}
+                />
+              )}
             </>
           )}
         </section>

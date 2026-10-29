@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { appointmentsService } from '../services/appointments.service'
 import type {
   AppointmentFilters,
@@ -18,6 +19,8 @@ export function useAppointments(filters: AppointmentFilters) {
     queryKey: appointmentKeys.list(filters),
     queryFn: ({ signal }) => appointmentsService.list(filters, signal),
     placeholderData: (previous) => previous,
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -39,7 +42,10 @@ export function useAppointmentMutations() {
     create: useMutation({
       mutationFn: (input: AppointmentInput) =>
         appointmentsService.create(input),
+      onMutate: () => ({ toastId: startActionToast('Agendando cita…') }),
       onSuccess: refreshAppointments,
+      onSettled: (_data, _error, _input, context) =>
+        finishActionToast(context?.toastId),
     }),
     reschedule: useMutation({
       mutationFn: ({
@@ -49,11 +55,17 @@ export function useAppointmentMutations() {
         id: string
         input: AppointmentRescheduleInput
       }) => appointmentsService.reschedule(id, input),
+      onMutate: () => ({ toastId: startActionToast('Reprogramando cita…') }),
       onSuccess: refreshAppointments,
+      onSettled: (_data, _error, _input, context) =>
+        finishActionToast(context?.toastId),
     }),
     cancel: useMutation({
       mutationFn: (id: string) => appointmentsService.cancel(id),
+      onMutate: () => ({ toastId: startActionToast('Cancelando cita…') }),
       onSuccess: refreshAppointments,
+      onSettled: (_data, _error, _input, context) =>
+        finishActionToast(context?.toastId),
     }),
   }
 }

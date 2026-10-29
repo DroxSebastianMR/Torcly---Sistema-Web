@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { paymentsService } from '../services/payments.service'
 import type {
   PaymentCompensateInput,
@@ -45,7 +46,10 @@ export function usePaymentMutations() {
         saleId: string
         input: PaymentRegisterInput
       }) => paymentsService.pay(saleId, input),
+      onMutate: () => ({ toastId: startActionToast('Registrando pago…') }),
       onSuccess: refreshPayments,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     compensate: useMutation({
       mutationFn: ({
@@ -55,7 +59,12 @@ export function usePaymentMutations() {
         paymentId: string
         input: PaymentCompensateInput
       }) => paymentsService.compensate(paymentId, input),
+      onMutate: () => ({
+        toastId: startActionToast('Registrando compensación…'),
+      }),
       onSuccess: refreshPayments,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
   }
 }

@@ -1,9 +1,10 @@
 import { useDeferredValue, useMemo, useState } from 'react'
-import { BadgeCheck, ClipboardList, Wrench } from 'lucide-react'
+import { BadgeCheck, Wrench } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { ErrorState } from '@/components/ui/error-state'
+import { ModuleMetrics } from '@/components/ui/module-metrics'
+import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { WorkOrderActivityModal } from '../components/work-order-activity-modal'
@@ -86,6 +87,13 @@ export default function Page() {
   const execution = useWorkOrderExecution(selectedId ?? '', {
     enabled: showExecution,
   })
+  const consumptionExecution = useWorkOrderExecution(
+    consumptionTarget?.id ?? '',
+    { enabled: Boolean(consumptionTarget) },
+  )
+  const returnExecution = useWorkOrderExecution(returnTarget?.id ?? '', {
+    enabled: Boolean(returnTarget),
+  })
   const technicians = useQuery({
     queryKey: [...workOrderKeys.all, 'technicians'],
     queryFn: ({ signal }) => workOrdersService.technicians(signal),
@@ -153,6 +161,7 @@ export default function Page() {
     if (!startOrder) return
     try {
       await mutations.startExecution.mutateAsync(startOrder.id)
+      toast.success('Ejecución de la orden iniciada correctamente.')
       setStartOrder(null)
     } catch (error) {
       toast.error(getWorkOrderErrorMessage(error))
@@ -163,7 +172,14 @@ export default function Page() {
   const confirmFinalize = async () => {
     if (!finalizeOrder) return
     try {
-      await mutations.finalize.mutateAsync(finalizeOrder.id)
+      const hasPendingProducts = Boolean(
+        execution.data?.productLines.some((line) => line.pending > 0),
+      )
+      await mutations.finalize.mutateAsync({
+        id: finalizeOrder.id,
+        input: { confirmPendingProducts: hasPendingProducts },
+      })
+      toast.success('Orden finalizada y lista para entrega.')
       setFinalizeOrder(null)
     } catch (error) {
       toast.error(getWorkOrderErrorMessage(error))
@@ -176,7 +192,7 @@ export default function Page() {
       <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <ClipboardList size={15} /> Operación de taller
+            Operación de taller
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
             Órdenes de taller
@@ -189,83 +205,60 @@ export default function Page() {
         </div>
       </header>
 
-      <section className="relative rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-b px-4 py-4 sm:px-5">
-          <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <ClipboardList size={17} />
-            </span>
-            <div>
-              <p className="text-xl font-semibold tabular-nums">{total}</p>
-              <p className="text-xs text-muted-foreground">
-                órdenes encontradas
-              </p>
-            </div>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div>
-            <p className="text-xl font-semibold tabular-nums text-stone-700">
-              {summary?.recepcionadas ?? 0}
-            </p>
-            <p className="text-xs text-muted-foreground">recepcionadas</p>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div>
-            <p className="text-xl font-semibold tabular-nums text-amber-600">
-              {summary?.enDiagnostico ?? 0}
-            </p>
-            <p className="text-xs text-muted-foreground">en diagnóstico</p>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div>
-            <p className="text-xl font-semibold tabular-nums text-sky-600">
-              {summary?.pendientesAprobacion ?? 0}
-            </p>
-            <p className="text-xs text-muted-foreground">pte. aprobación</p>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div>
-            <p className="text-xl font-semibold tabular-nums text-emerald-700">
-              {summary?.aprobadas ?? 0}
-            </p>
-            <p className="text-xs text-muted-foreground">aprobadas</p>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div>
-            <p className="text-xl font-semibold tabular-nums text-violet-700">
-              {summary?.enEjecucion ?? 0}
-            </p>
-            <p className="text-xs text-muted-foreground">en ejecución</p>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div>
-            <p className="text-xl font-semibold tabular-nums text-indigo-700">
-              {summary?.listasParaEntrega ?? 0}
-            </p>
-            <p className="text-xs text-muted-foreground">pta. entrega</p>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div>
-            <p className="text-xl font-semibold tabular-nums text-teal-700">
-              {summary?.entregadas ?? 0}
-            </p>
-            <p className="text-xs text-muted-foreground">entregadas</p>
-          </div>
-          {orders.isFetching && !orders.isPending && (
-            <span className="ml-auto text-xs text-muted-foreground">
-              Actualizando…
-            </span>
-          )}
-        </div>
+      <ModuleMetrics
+        items={[
+          { label: 'Órdenes encontradas', value: total },
+          { label: 'Recepcionadas', value: summary?.recepcionadas ?? 0 },
+          {
+            label: 'En diagnóstico',
+            value: summary?.enDiagnostico ?? 0,
+            tone: 'warning',
+          },
+          {
+            label: 'Pendientes de aprobación',
+            value: summary?.pendientesAprobacion ?? 0,
+            tone: 'info',
+          },
+          {
+            label: 'Aprobadas',
+            value: summary?.aprobadas ?? 0,
+            tone: 'success',
+          },
+          {
+            label: 'En ejecución',
+            value: summary?.enEjecucion ?? 0,
+            tone: 'info',
+          },
+          {
+            label: 'Listas para entrega',
+            value: summary?.listasParaEntrega ?? 0,
+            tone: 'info',
+          },
+          {
+            label: 'Entregadas',
+            value: summary?.entregadas ?? 0,
+            tone: 'success',
+          },
+        ]}
+      />
 
+      <section
+        aria-label="Filtros de órdenes de taller"
+        className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
+      >
         <WorkOrdersToolbar
           filters={filters}
           onChange={setFilters}
           suggestions={suggestions}
           technicians={technicians.data ?? []}
         />
+      </section>
 
-        <div className="relative z-0 overflow-hidden rounded-b-2xl">
+      <section
+        aria-label="Resultados de órdenes de taller"
+        className="relative overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]"
+      >
+        <div className="relative z-0 overflow-hidden">
           {orders.isError ? (
             <ErrorState
               title="No se pudo cargar las órdenes"
@@ -284,38 +277,14 @@ export default function Page() {
             />
           )}
 
-          {orders.data && orders.data.pagination.totalPages > 1 && (
-            <footer className="flex items-center justify-between border-t px-4 py-4 text-sm sm:px-5">
-              <span className="text-muted-foreground">
-                Página {filters.page} de {orders.data.pagination.totalPages}
-              </span>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  disabled={filters.page === 1}
-                  onClick={() =>
-                    setFilters((current) => ({
-                      ...current,
-                      page: current.page - 1,
-                    }))
-                  }
-                >
-                  Anterior
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={filters.page >= orders.data.pagination.totalPages}
-                  onClick={() =>
-                    setFilters((current) => ({
-                      ...current,
-                      page: current.page + 1,
-                    }))
-                  }
-                >
-                  Siguiente
-                </Button>
-              </div>
-            </footer>
+          {orders.data && (
+            <Pagination
+              page={filters.page}
+              totalPages={orders.data.pagination.totalPages}
+              onPageChange={(page) =>
+                setFilters((current) => ({ ...current, page }))
+              }
+            />
           )}
         </div>
       </section>
@@ -367,13 +336,15 @@ export default function Page() {
       <WorkOrderConsumptionModal
         open={Boolean(consumptionTarget)}
         order={consumptionTarget}
-        execution={execution.data ?? null}
+        execution={consumptionExecution.data ?? null}
+        executionLoading={consumptionExecution.isPending}
         onClose={() => setConsumptionTarget(null)}
       />
       <WorkOrderReturnModal
         open={Boolean(returnTarget)}
         order={returnTarget}
-        execution={execution.data ?? null}
+        execution={returnExecution.data ?? null}
+        executionLoading={returnExecution.isPending}
         onClose={() => setReturnTarget(null)}
       />
       <WorkOrderDeliveryModal
@@ -401,12 +372,18 @@ export default function Page() {
         title="Finalizar la orden"
         description={
           finalizeOrder
-            ? `La orden ${finalizeOrder.code} pasará a lista para entrega y ya no admitirá más consumos ni actividades.`
+            ? execution.data?.productLines.some((line) => line.pending > 0)
+              ? 'Hay repuestos presupuestados aún sin consumo. Si finalizas, se considerarán no utilizados: no descontarán stock ni se incluirán en la venta. Cancela si necesitas registrarlos primero.'
+              : `La orden ${finalizeOrder.code} pasará a lista para entrega y ya no admitirá más consumos ni actividades.`
             : undefined
         }
         variant="info"
         icon={BadgeCheck}
-        confirmLabel="Finalizar orden"
+        confirmLabel={
+          execution.data?.productLines.some((line) => line.pending > 0)
+            ? 'Finalizar sin repuestos pendientes'
+            : 'Finalizar orden'
+        }
         pending={mutations.finalize.isPending}
         onConfirm={() => void confirmFinalize()}
         onCancel={() => setFinalizeOrder(null)}

@@ -43,7 +43,7 @@ export const customerQuerySchema = z.object({
   search: z.string().trim().max(120).optional(),
   type: z.enum(['all', 'NATURAL', 'LEGAL']).default('all'),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(5).max(100).default(20),
+  pageSize: z.coerce.number().int().min(5).max(100).default(10),
 })
 
 export const customerInputSchema = z.discriminatedUnion('type', [

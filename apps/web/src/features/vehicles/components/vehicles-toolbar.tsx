@@ -27,7 +27,7 @@ export function VehiclesToolbar({
   suggestions,
 }: VehiclesToolbarProps) {
   return (
-    <div className="flex items-start gap-3 border-b bg-card px-4 py-4 sm:px-5">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <div className="min-w-0 flex-1">
         <SmartSelect
           value={filters.search}

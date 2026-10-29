@@ -64,13 +64,17 @@ export const servicesRepository = {
   async list(filters: ServiceFilters) {
     const where = buildWhere(filters)
     const [items, total] = await Promise.all([
-      databaseService.client.service.findMany({
-        where,
-        orderBy: [{ active: 'desc' }, { name: 'asc' }],
-        skip: (filters.page - 1) * filters.pageSize,
-        take: filters.pageSize,
-      }),
-      databaseService.client.service.count({ where }),
+      databaseService.measure('services.list.records', () =>
+        databaseService.client.service.findMany({
+          where,
+          orderBy: [{ active: 'desc' }, { name: 'asc' }],
+          skip: (filters.page - 1) * filters.pageSize,
+          take: filters.pageSize,
+        }),
+      ),
+      databaseService.measure('services.list.total', () =>
+        databaseService.client.service.count({ where }),
+      ),
     ])
     return { items, total }
   },

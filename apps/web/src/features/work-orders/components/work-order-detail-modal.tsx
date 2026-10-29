@@ -70,9 +70,7 @@ export function WorkOrderDetailModal({
   onDeliver,
 }: WorkOrderDetailModalProps) {
   const canStart = Boolean(
-    order &&
-      canEdit &&
-      canStartWorkOrderExecution(order.status, Boolean(order.technician)),
+    order && canEdit && canStartWorkOrderExecution(order.status),
   )
   const inExecution = Boolean(
     order && canEdit && canManageWorkOrderExecution(order.status),
@@ -179,9 +177,6 @@ export function WorkOrderDetailModal({
               <UserRound size={16} /> Asignar técnico
             </Button>
           )}
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cerrar
-          </Button>
         </div>
       }
     >
@@ -218,6 +213,26 @@ export function WorkOrderDetailModal({
             />
           </div>
 
+          {order.billing && (
+            <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-wider text-emerald-800">
+                Cobro de la orden
+              </p>
+              <div className="mt-1 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <p className="text-sm font-semibold">
+                  Venta {order.billing.saleCode}
+                </p>
+                <p className="text-sm text-emerald-900">
+                  {order.billing.status === 'PAID'
+                    ? 'Pagada'
+                    : order.billing.status === 'PARTIALLY_PAID'
+                      ? `Saldo pendiente: ${currencyFormatter.format(order.billing.balance)}`
+                      : `Pendiente de cobro: ${currencyFormatter.format(order.billing.balance)}`}
+                </p>
+              </div>
+            </div>
+          )}
+
           {order.diagnosis && (
             <div className="rounded-xl border border-border/80 bg-muted/40 px-4 py-3">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -240,7 +255,7 @@ export function WorkOrderDetailModal({
           <div className="overflow-hidden rounded-xl border">
             <div className="hidden divide-y md:block">
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#f8faf9] text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
                   <tr>
                     <th className="px-4 py-3">Descripción</th>
                     <th className="px-4 py-3 text-right">Precio</th>

@@ -1,11 +1,12 @@
 import { useDeferredValue, useState } from 'react'
-import { Plus, UsersRound } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ErrorState } from '@/components/ui/error-state'
+import { ModuleMetrics } from '@/components/ui/module-metrics'
+import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
-import { paths } from '@/app/router/constants/paths'
+import { CustomerDetailModal } from '../components/customer-detail-modal'
 import { CustomerFormModal } from '../components/customer-form-modal'
 import { CustomersTable } from '../components/customers-table'
 import { CustomersToolbar } from '../components/customers-toolbar'
@@ -17,7 +18,7 @@ const initialFilters: CustomerFilters = {
   search: '',
   type: 'all',
   page: 1,
-  pageSize: 20,
+  pageSize: 10,
 }
 
 export default function Page() {
@@ -26,10 +27,9 @@ export default function Page() {
     currentUser?.permissions ?? [],
     'customers:write',
   )
-  const navigate = useNavigate()
-
   const [filters, setFilters] = useState(initialFilters)
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
+  const [detailCustomer, setDetailCustomer] = useState<Customer | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const deferredSearch = useDeferredValue(filters.search)
   const queryFilters = { ...filters, search: deferredSearch }
@@ -42,7 +42,7 @@ export default function Page() {
       <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <UsersRound size={15} /> Catálogo de clientes
+            Catálogo de clientes
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
             Clientes
@@ -64,38 +64,26 @@ export default function Page() {
         )}
       </header>
 
-      <section className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-b px-4 py-4 sm:px-5">
-          <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <UsersRound size={17} />
-            </span>
-            <div>
-              <p className="text-xl font-semibold tabular-nums">{total}</p>
-              <p className="text-xs text-muted-foreground">
-                {total === 1 ? 'cliente encontrado' : 'clientes encontrados'}
-              </p>
-            </div>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div>
-            <p className="text-xl font-semibold tabular-nums text-emerald-700">
-              {
-                visibleCustomers.filter((customer) => customer.type === 'LEGAL')
-                  .length
-              }
-            </p>
-            <p className="text-xs text-muted-foreground">
-              personas jurídicas en esta página
-            </p>
-          </div>
-          {customers.isFetching && !customers.isPending && (
-            <span className="ml-auto text-xs text-muted-foreground">
-              Actualizando…
-            </span>
-          )}
-        </div>
+      <ModuleMetrics
+        items={[
+          {
+            label: total === 1 ? 'Cliente encontrado' : 'Clientes encontrados',
+            value: total,
+          },
+          {
+            label: 'Personas jurídicas en esta página',
+            value: visibleCustomers.filter(
+              (customer) => customer.type === 'LEGAL',
+            ).length,
+            tone: 'success',
+          },
+        ]}
+      />
 
+      <section
+        aria-label="Filtros de clientes"
+        className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
+      >
         <CustomersToolbar
           filters={filters}
           onChange={setFilters}
@@ -109,7 +97,12 @@ export default function Page() {
             ],
           }))}
         />
+      </section>
 
+      <section
+        aria-label="Resultados de clientes"
+        className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]"
+      >
         {customers.isError ? (
           <ErrorState
             title="No se pudo cargar los clientes"
@@ -123,11 +116,9 @@ export default function Page() {
         ) : (
           <CustomersTable
             customers={visibleCustomers}
-            loading={customers.isPending}
+            loading={customers.isPending || customers.isFetching}
             canWrite={canWrite}
-            onOpenDetail={(customer) =>
-              navigate(`${paths.customers}/${customer.id}`)
-            }
+            onOpenDetail={setDetailCustomer}
             onEdit={(customer) => {
               setEditingCustomer(customer)
               setFormOpen(true)
@@ -136,37 +127,13 @@ export default function Page() {
         )}
 
         {customers.data && customers.data.pagination.totalPages > 1 && (
-          <footer className="flex items-center justify-between border-t px-4 py-4 text-sm sm:px-5">
-            <span className="text-muted-foreground">
-              Página {filters.page} de {customers.data.pagination.totalPages}
-            </span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                disabled={filters.page === 1}
-                onClick={() =>
-                  setFilters((current) => ({
-                    ...current,
-                    page: current.page - 1,
-                  }))
-                }
-              >
-                Anterior
-              </Button>
-              <Button
-                variant="outline"
-                disabled={filters.page >= customers.data.pagination.totalPages}
-                onClick={() =>
-                  setFilters((current) => ({
-                    ...current,
-                    page: current.page + 1,
-                  }))
-                }
-              >
-                Siguiente
-              </Button>
-            </div>
-          </footer>
+          <Pagination
+            page={filters.page}
+            totalPages={customers.data.pagination.totalPages}
+            onPageChange={(page) =>
+              setFilters((current) => ({ ...current, page }))
+            }
+          />
         )}
       </section>
 
@@ -175,6 +142,19 @@ export default function Page() {
         customer={editingCustomer}
         onClose={() => setFormOpen(false)}
       />
+      {detailCustomer && (
+        <CustomerDetailModal
+          open
+          customer={detailCustomer}
+          canWrite={canWrite}
+          onClose={() => setDetailCustomer(null)}
+          onEdit={(customer) => {
+            setDetailCustomer(null)
+            setEditingCustomer(customer)
+            setFormOpen(true)
+          }}
+        />
+      )}
     </div>
   )
 }

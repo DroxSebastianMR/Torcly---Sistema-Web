@@ -23,6 +23,7 @@ Los sprints son secuenciales y cada uno tiene una rama, alcance cerrado, criteri
 | 17     | `sprint-17-purchases`              | `feature/sprint-17-purchases`              | Implementado          |
 | 18     | `sprint-18-account-notifications`  | `feature/sprint-18-account-notifications`  | Implementado          |
 | 19     | `sprint-19-ai-dashboard-assistant` | `feature/sprint-19-ai-dashboard-assistant` | Planificado posterior |
+| 20     | `sprint-20-technicians`            | `feature/sprint-20-technicians`            | Documentado           |
 
 El porcentaje solo cambia después de completar [Definition of Done](../04-calidad/definition-of-done.md) y registrar la aprobación.
 

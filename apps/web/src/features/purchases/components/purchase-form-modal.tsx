@@ -6,6 +6,8 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
+import { DatePicker } from '@/components/ui/date-picker'
+import { SmartSelect } from '@/components/ui/smart-select'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { useProducts } from '@/features/products/hooks/use-products'
 import { hasPermission } from '@/lib/permissions'
@@ -71,6 +73,8 @@ export function PurchaseFormModal({
     name: 'lines',
   })
   const rawLines = useWatch({ control, name: 'lines' })
+  const supplierId = useWatch({ control, name: 'supplierId' })
+  const purchaseDate = useWatch({ control, name: 'purchaseDate' })
   const lines = useMemo(() => rawLines ?? [], [rawLines])
 
   const total = useMemo(() => {
@@ -170,19 +174,23 @@ export function PurchaseFormModal({
             <label htmlFor="purchaseSupplierId" className="text-sm font-medium">
               Proveedor <span className="text-destructive">*</span>
             </label>
-            <select
+            <SmartSelect
               id="purchaseSupplierId"
-              {...register('supplierId')}
-              className="h-9 w-full rounded-lg border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+              value={supplierId}
+              placeholder="Selecciona un proveedor…"
+              options={[
+                { value: '', label: 'Selecciona un proveedor…' },
+                ...(suppliers.data?.map((supplier) => ({
+                  value: supplier.id,
+                  label: supplier.legalName,
+                  meta: supplier.documentNumber,
+                })) ?? []),
+              ]}
+              onChange={(value) =>
+                setValue('supplierId', value, { shouldValidate: true })
+              }
               aria-invalid={Boolean(formState.errors.supplierId)}
-            >
-              <option value="">Selecciona un proveedor…</option>
-              {suppliers.data?.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.legalName} ({s.documentNumber})
-                </option>
-              ))}
-            </select>
+            />
             {formState.errors.supplierId && (
               <p className="text-xs text-destructive" role="alert">
                 {formState.errors.supplierId.message}
@@ -194,10 +202,12 @@ export function PurchaseFormModal({
             <label htmlFor="purchaseDate" className="text-sm font-medium">
               Fecha de compra <span className="text-destructive">*</span>
             </label>
-            <Input
+            <DatePicker
               id="purchaseDate"
-              type="date"
-              {...register('purchaseDate')}
+              value={purchaseDate}
+              onChange={(value) =>
+                setValue('purchaseDate', value, { shouldValidate: true })
+              }
               aria-invalid={Boolean(formState.errors.purchaseDate)}
             />
             {formState.errors.purchaseDate && (
@@ -279,30 +289,26 @@ export function PurchaseFormModal({
                       >
                         Producto
                       </label>
-                      <select
+                      <SmartSelect
                         id={`line-product-${index}`}
                         value={currentProductId}
-                        onChange={(e) =>
-                          handleProductSelect(index, e.target.value)
-                        }
-                        className="h-9 w-full rounded-lg border bg-background px-3 text-xs outline-none focus:ring-2 focus:ring-ring"
-                        aria-label={`Producto para línea ${index + 1}`}
-                      >
-                        <option value="">Selecciona un producto…</option>
-                        {products.map((p) => (
-                          <option
-                            key={p.id}
-                            value={p.id}
-                            disabled={lines.some(
+                        placeholder="Selecciona un producto…"
+                        options={[
+                          { value: '', label: 'Selecciona un producto…' },
+                          ...products.map((product) => ({
+                            value: product.id,
+                            label: `${product.code} · ${product.name}`,
+                            meta: product.unit?.symbol ?? undefined,
+                            disabled: lines.some(
                               (line, lineIndex) =>
-                                lineIndex !== index && line.productId === p.id,
-                            )}
-                          >
-                            {p.code} - {p.name}{' '}
-                            {p.unit?.symbol ? `(${p.unit.symbol})` : ''}
-                          </option>
-                        ))}
-                      </select>
+                                lineIndex !== index &&
+                                line.productId === product.id,
+                            ),
+                          })),
+                        ]}
+                        onChange={(value) => handleProductSelect(index, value)}
+                        aria-label={`Producto para línea ${index + 1}`}
+                      />
                       {formState.errors.lines?.[index]?.productId && (
                         <p className="text-xs text-destructive" role="alert">
                           {formState.errors.lines[index]?.productId?.message}

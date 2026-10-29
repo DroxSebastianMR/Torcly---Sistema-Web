@@ -26,7 +26,7 @@ export const productQuerySchema = z.object({
   categoryId: z.uuid().optional(),
   status: z.enum(['all', 'active', 'inactive']).default('all'),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(5).max(100).default(20),
+  pageSize: z.coerce.number().int().min(5).max(100).default(10),
 })
 
 export const productInputSchema = z

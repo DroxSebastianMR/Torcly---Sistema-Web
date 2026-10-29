@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { maintenanceService } from '../services/maintenance.service'
 import type { MaintenanceScheduleInput } from '../types/maintenance.types'
 
@@ -33,11 +34,21 @@ export function useMaintenanceMutations() {
     schedule: useMutation({
       mutationFn: (input: MaintenanceScheduleInput) =>
         maintenanceService.schedule(input),
+      onMutate: () => ({
+        toastId: startActionToast('Programando mantenimiento…'),
+      }),
       onSuccess: refresh,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
     cancel: useMutation({
       mutationFn: (id: string) => maintenanceService.cancel(id),
+      onMutate: () => ({
+        toastId: startActionToast('Cancelando mantenimiento…'),
+      }),
       onSuccess: refresh,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
     }),
   }
 }

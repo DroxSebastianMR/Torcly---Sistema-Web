@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { ComponentType } from 'react'
-import { BarChart3 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { paths } from '@/app/router/constants/paths'
 import { useAuth } from '@/features/auth/hooks/auth-context'
@@ -18,7 +16,6 @@ interface BlockSegmentMeta {
   title: string
   moduleLabel: string
   modulePath: string
-  icon: ComponentType<{ 'aria-hidden'?: boolean; className?: string }>
 }
 
 const BLOCK_SEGMENTS: readonly BlockSegmentMeta[] = [
@@ -28,7 +25,6 @@ const BLOCK_SEGMENTS: readonly BlockSegmentMeta[] = [
     title: 'Ventas',
     moduleLabel: 'Ver ventas',
     modulePath: paths.sales,
-    icon: BarChart3,
   },
   {
     block: 'payments',
@@ -36,7 +32,6 @@ const BLOCK_SEGMENTS: readonly BlockSegmentMeta[] = [
     title: 'Cobros',
     moduleLabel: 'Ver caja',
     modulePath: paths.cash,
-    icon: BarChart3,
   },
   {
     block: 'inventory',
@@ -44,7 +39,6 @@ const BLOCK_SEGMENTS: readonly BlockSegmentMeta[] = [
     title: 'Inventario',
     moduleLabel: 'Ver inventario',
     modulePath: paths.inventory,
-    icon: BarChart3,
   },
   {
     block: 'services',
@@ -52,7 +46,6 @@ const BLOCK_SEGMENTS: readonly BlockSegmentMeta[] = [
     title: 'Servicios',
     moduleLabel: 'Ver servicios',
     modulePath: paths.services,
-    icon: BarChart3,
   },
   {
     block: 'workshop',
@@ -60,7 +53,6 @@ const BLOCK_SEGMENTS: readonly BlockSegmentMeta[] = [
     title: 'Taller',
     moduleLabel: 'Ver taller',
     modulePath: paths.workOrders,
-    icon: BarChart3,
   },
 ]
 
@@ -85,7 +77,7 @@ export default function Page() {
     <div className="space-y-6">
       <header>
         <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-          <BarChart3 size={15} /> Inteligencia de negocio
+          Inteligencia de negocio
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-brand-forest">
           Reportes
@@ -132,15 +124,11 @@ function BlockSegment({
   const { ref, enabled } = useBlockVisibility()
   const block = useReportBlock(meta.block, period, enabled)
   const data = block.data
-  const Icon = meta.icon
   return (
     <div ref={ref}>
       <BlockCard
         title={meta.title}
-        icon={<Icon aria-hidden className="size-5 text-primary" />}
         criteria={data?.descriptor.criteria}
-        source={data?.descriptor.source}
-        periodField={data?.descriptor.periodField}
         periodLabel={periodLabel}
         isPending={!enabled || block.isPending}
         isFetching={block.isFetching}

@@ -1,9 +1,11 @@
 import { useDeferredValue, useState } from 'react'
-import { Plus, ShieldCheck, UserRoundPlus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { ErrorState } from '@/components/ui/error-state'
+import { ModuleMetrics } from '@/components/ui/module-metrics'
+import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { UserFormModal } from '../components/user-form-modal'
@@ -71,7 +73,7 @@ export default function Page() {
       <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <ShieldCheck size={15} /> Accesos al sistema
+            Accesos al sistema
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
             Usuarios
@@ -87,35 +89,25 @@ export default function Page() {
         )}
       </header>
 
-      <section className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-b px-4 py-4 sm:px-5">
-          <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <UserRoundPlus size={17} />
-            </span>
-            <div>
-              <p className="text-xl font-semibold tabular-nums">{total}</p>
-              <p className="text-xs text-muted-foreground">
-                {total === 1 ? 'usuario encontrado' : 'usuarios encontrados'}
-              </p>
-            </div>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div>
-            <p className="text-xl font-semibold tabular-nums text-emerald-700">
-              {visibleUsers.filter((user) => user.active).length}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              activos en esta página
-            </p>
-          </div>
-          {users.isFetching && !users.isPending && (
-            <span className="ml-auto text-xs text-muted-foreground">
-              Actualizando…
-            </span>
-          )}
-        </div>
+      <ModuleMetrics
+        items={[
+          {
+            label: total === 1 ? 'Usuario encontrado' : 'Usuarios encontrados',
+            value: total,
+          },
+          {
+            label: 'Usuarios activos',
+            value: visibleUsers.filter((user) => user.active).length,
+            valueLabel: 'en esta página',
+            tone: 'success',
+          },
+        ]}
+      />
 
+      <section
+        aria-label="Filtros de usuarios"
+        className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
+      >
         <UsersToolbar
           filters={filters}
           onChange={setFilters}
@@ -124,7 +116,12 @@ export default function Page() {
             label: `${user.displayName} · @${user.username}`,
           }))}
         />
+      </section>
 
+      <section
+        aria-label="Resultados de usuarios"
+        className="overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]"
+      >
         {users.isError ? (
           <ErrorState
             title="No se pudo cargar los usuarios"
@@ -151,38 +148,14 @@ export default function Page() {
           />
         )}
 
-        {users.data && users.data.pagination.totalPages > 1 && (
-          <footer className="flex items-center justify-between border-t px-4 py-4 text-sm sm:px-5">
-            <span className="text-muted-foreground">
-              Página {filters.page} de {users.data.pagination.totalPages}
-            </span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                disabled={filters.page === 1}
-                onClick={() =>
-                  setFilters((current) => ({
-                    ...current,
-                    page: current.page - 1,
-                  }))
-                }
-              >
-                Anterior
-              </Button>
-              <Button
-                variant="outline"
-                disabled={filters.page >= users.data.pagination.totalPages}
-                onClick={() =>
-                  setFilters((current) => ({
-                    ...current,
-                    page: current.page + 1,
-                  }))
-                }
-              >
-                Siguiente
-              </Button>
-            </div>
-          </footer>
+        {users.data && (
+          <Pagination
+            page={filters.page}
+            totalPages={users.data.pagination.totalPages}
+            onPageChange={(page) =>
+              setFilters((current) => ({ ...current, page }))
+            }
+          />
         )}
       </section>
 

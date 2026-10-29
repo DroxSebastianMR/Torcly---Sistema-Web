@@ -26,7 +26,7 @@ export function PaymentsBlockContent({ data }: { data: PaymentsBlockData }) {
     )
   }
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-3">
         <IndicatorCard
           label="Cobrado neto"
