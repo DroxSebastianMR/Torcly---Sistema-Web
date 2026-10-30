@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
+  saleCancelSchema,
+  saleCreateSchema,
   saleIdSchema,
   saleInputSchema,
   saleQuerySchema,
@@ -117,5 +119,22 @@ describe('Validación de ventas', () => {
 
   it('acepta el mismo payload en la actualización', () => {
     expect(saleUpdateSchema.safeParse(validSale).success).toBe(true)
+  })
+
+  it('permite crear y confirmar en una sola solicitud', () => {
+    expect(
+      saleCreateSchema.parse({ ...validSale, confirm: true }).confirm,
+    ).toBe(true)
+  })
+
+  it('valida el motivo de anulación y el estado anulado', () => {
+    expect(
+      saleCancelSchema.parse({ reason: 'Cliente desistió de la compra.' })
+        .reason,
+    ).toBe('Cliente desistió de la compra.')
+    expect(saleCancelSchema.safeParse({ reason: 'no' }).success).toBe(false)
+    expect(saleQuerySchema.parse({ status: 'CANCELLED' }).status).toBe(
+      'CANCELLED',
+    )
   })
 })

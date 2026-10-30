@@ -5,15 +5,14 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import Page from './dashboard-page'
 
-const operations = vi.hoisted(() => ({ useOperationsSummary: vi.fn() }))
-
-vi.mock('../hooks/use-operations', () => ({
-  useOperationsSummary: operations.useOperationsSummary,
+const operations = vi.hoisted(() => ({
+  useOperationsSummary: vi.fn(),
+  useOperationsAttention: vi.fn(),
 }))
 
-vi.mock('@/features/assistant/components/assistant-chat', () => ({
-  AssistantChat: () => null,
-}))
+vi.mock('../hooks/use-operations', () => operations)
+
+const query = (data: unknown) => ({ data, isError: false, isPending: false })
 
 describe('Dashboard operativo', () => {
   afterEach(() => {
@@ -21,32 +20,59 @@ describe('Dashboard operativo', () => {
     vi.clearAllMocks()
   })
 
-  it('muestra el contador del resumen sin solicitar listas de atención al montar', () => {
-    operations.useOperationsSummary.mockReturnValue({
-      data: {
-        generatedAt: '2026-10-23T00:00:00.000Z',
-        period: { from: null, to: null },
-        sections: {
-          appointments: {
-            section: 'appointments',
-            total: 4,
-            byStatus: { PROGRAMADA: 3, CANCELADA: 1, ATENDIDA: 0 },
-            attentionCount: 3,
+  it('muestra una vista diaria concisa con agenda y alertas', () => {
+    operations.useOperationsSummary
+      .mockReturnValueOnce(
+        query({
+          sections: {
+            appointments: { total: 12 },
+            workOrders: { byStatus: { EN_EJECUCION: 2 } },
+            sales: { confirmedCount: 1 },
+            payments: { pendingCount: 1, pendingAmount: 220 },
+            inventory: { lowStockCount: 2 },
           },
-        },
-        descriptors: {
-          appointments: {
-            section: 'appointments',
-            label: 'Citas',
-            source: 'appointments',
-            periodField: 'date',
-            criteria: 'Programadas',
-            permissions: ['appointments:read'],
-          },
-        },
-      },
-      isError: false,
-    })
+        }),
+      )
+      .mockReturnValueOnce(query({ sections: { appointments: { total: 3 } } }))
+    operations.useOperationsAttention
+      .mockReturnValueOnce(
+        query({
+          data: [
+            {
+              code: 'CITA-000001',
+              date: '2026-10-30',
+              time: '09:00',
+              customerName: 'Ana López',
+              vehiclePlate: 'ABC123',
+            },
+          ],
+        }),
+      )
+      .mockReturnValueOnce(
+        query({
+          data: [
+            {
+              code: 'ACEITE-01',
+              name: 'Aceite',
+              stock: 2,
+              minimumStock: 5,
+              unitLabel: 'und',
+            },
+          ],
+        }),
+      )
+      .mockReturnValueOnce(
+        query({
+          data: [
+            {
+              code: 'VENTA-000001',
+              customerName: 'Ana López',
+              confirmedAt: '2026-10-30',
+              total: 120,
+            },
+          ],
+        }),
+      )
 
     render(
       <MemoryRouter>
@@ -54,8 +80,16 @@ describe('Dashboard operativo', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText('3 elemento(s) requieren atención.')).toBeTruthy()
-    expect(screen.getByRole('link', { name: /Ver módulo/i })).toBeTruthy()
-    expect(operations.useOperationsSummary).toHaveBeenCalledOnce()
+    expect(
+      screen.getByRole('heading', { name: 'Bienvenido de vuelta' }),
+    ).toBeTruthy()
+    expect(screen.getByText('Citas para hoy')).toBeTruthy()
+    expect(screen.getByText('Cobros pendientes')).toBeTruthy()
+    expect(screen.getByText('Próximas citas')).toBeTruthy()
+    expect(screen.getByText('Inventario por revisar')).toBeTruthy()
+    expect(screen.getByText('Actividad reciente')).toBeTruthy()
+    expect(screen.getByText('Estado del taller')).toBeTruthy()
+    expect(screen.queryByText('Consulta operativa')).toBeNull()
+    expect(operations.useOperationsSummary).toHaveBeenCalledTimes(2)
   })
 })

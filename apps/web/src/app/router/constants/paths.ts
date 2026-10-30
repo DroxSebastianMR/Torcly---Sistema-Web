@@ -7,7 +7,6 @@ export const paths = {
   products: '/productos',
   inventory: '/inventario',
   services: '/servicios',
-  purchases: '/compras',
   sales: '/ventas',
   appointments: '/citas',
   workOrders: '/ordenes-taller',
@@ -21,6 +20,4 @@ export const paths = {
   notifications: '/notificaciones',
   profile: '/perfil',
   reports: '/reportes',
-  maintenance: '/mantenimiento',
-  audit: '/auditoria',
 } as const

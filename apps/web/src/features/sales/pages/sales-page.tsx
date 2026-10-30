@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
-import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ErrorState } from '@/components/ui/error-state'
 import { ModuleMetrics } from '@/components/ui/module-metrics'
@@ -8,6 +7,7 @@ import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { SaleDetailModal } from '../components/sale-detail-modal'
+import { SaleCancelModal } from '../components/sale-cancel-modal'
 import { SaleFormModal } from '../components/sale-form-modal'
 import { SalesTable } from '../components/sales-table'
 import { SalesToolbar } from '../components/sales-toolbar'
@@ -18,7 +18,7 @@ const initialFilters: SaleFilters = {
   search: '',
   status: 'all',
   page: 1,
-  pageSize: 20,
+  pageSize: 10,
 }
 
 function useDebouncedValue<T>(value: T, delay = 280) {
@@ -39,10 +39,10 @@ export default function Page() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const [editingSale, setEditingSale] = useState<SaleDetail | null>(null)
+  const [cancellingSale, setCancellingSale] = useState<SaleDetail | null>(null)
   const debouncedSearch = useDebouncedValue(filters.search)
   const queryFilters = { ...filters, search: debouncedSearch }
   const sales = useSales(queryFilters)
-  const searchToastId = useRef<string | number | undefined>(undefined)
   const detail = useSale(selectedId ?? '')
   const total = sales.data?.pagination.total ?? 0
   const visibleSales = sales.data?.data ?? []
@@ -52,32 +52,6 @@ export default function Page() {
   const confirmedCount = visibleSales.filter(
     (sale) => sale.status === 'CONFIRMED',
   ).length
-
-  useEffect(() => {
-    const isFiltering = Boolean(
-      debouncedSearch.trim() || filters.status !== 'all',
-    )
-
-    if (sales.isFetching && isFiltering) {
-      searchToastId.current = toast.loading('Buscando ventas…', {
-        id: 'sales-search',
-      })
-      return
-    }
-
-    if (searchToastId.current !== undefined) {
-      toast.dismiss(searchToastId.current)
-      searchToastId.current = undefined
-    }
-  }, [debouncedSearch, filters.status, sales.isFetching])
-
-  useEffect(
-    () => () => {
-      if (searchToastId.current !== undefined)
-        toast.dismiss(searchToastId.current)
-    },
-    [],
-  )
 
   const openCreate = () => {
     setEditingSale(null)
@@ -197,6 +171,10 @@ export default function Page() {
         canEdit={canWrite}
         onClose={() => setSelectedId(null)}
         onEdit={editDetail}
+        onCancelSale={(sale) => {
+          setSelectedId(null)
+          setCancellingSale(sale)
+        }}
       />
       <SaleFormModal
         open={formOpen}
@@ -205,6 +183,11 @@ export default function Page() {
           setFormOpen(false)
           setEditingSale(null)
         }}
+      />
+      <SaleCancelModal
+        open={Boolean(cancellingSale)}
+        sale={cancellingSale}
+        onClose={() => setCancellingSale(null)}
       />
     </div>
   )

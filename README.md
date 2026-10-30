@@ -67,7 +67,11 @@ El botón de login conserva el acceso temporal de desarrollo con `VITE_ENABLE_DE
 
 ## Producción
 
-Compilar ambas aplicaciones. Servir `apps/web/dist` con fallback SPA y ejecutar `apps/api/dist/server.js`. Configurar un proxy inverso para `/api` o una URL absoluta en `VITE_API_URL` al compilar el frontend. El proxy de Vite solo existe en desarrollo. La API admite HOST, PORT y CORS_ORIGINS; no incluir secretos en variables VITE.
+Para Render se despliegan dos servicios: API y Static Site. El frontend se
+compila con una `VITE_API_URL` pública; la API recibe `DATABASE_URL` y
+`DIRECT_URL` como secretos propios de producción. El proxy de Vite solo existe
+en desarrollo. Consulta la [guía de despliegue en Render](docs/04-operaciones/render-production.md)
+antes de configurar o migrar la base real.
 
 ## Organización
 

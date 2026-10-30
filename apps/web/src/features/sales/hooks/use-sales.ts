@@ -1,7 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { paymentKeys } from '@/features/cash/hooks/use-payments'
+import { paymentsService } from '@/features/cash/services/payments.service'
 import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { salesService } from '../services/sales.service'
-import type { SaleFilters, SaleInput } from '../types/sales.types'
+import type {
+  SaleCancellationInput,
+  SaleFilters,
+  SaleInput,
+} from '../types/sales.types'
+
+const cashLandingFilters = {
+  search: '',
+  status: 'all',
+  method: 'all',
+  from: null,
+  to: null,
+  page: 1,
+  pageSize: 10,
+} as const
 
 export const saleKeys = {
   all: ['sales'] as const,
@@ -39,7 +55,15 @@ export function useSaleCatalog(enabled = true) {
 export function useSaleMutations() {
   const queryClient = useQueryClient()
   const refreshSales = async () => {
-    await queryClient.invalidateQueries({ queryKey: saleKeys.all })
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: saleKeys.all }),
+      queryClient.invalidateQueries({ queryKey: paymentKeys.all }),
+    ])
+
+    await queryClient.prefetchQuery({
+      queryKey: paymentKeys.list(cashLandingFilters),
+      queryFn: () => paymentsService.list(cashLandingFilters),
+    })
   }
 
   return {
@@ -58,9 +82,29 @@ export function useSaleMutations() {
       onSettled: (_data, _error, _variables, context) =>
         finishActionToast(context?.toastId),
     }),
+    createConfirmed: useMutation({
+      mutationFn: (input: SaleInput) => salesService.createConfirmed(input),
+      onMutate: () => ({ toastId: startActionToast('Confirmando venta…') }),
+      onSuccess: refreshSales,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
+    }),
     confirm: useMutation({
       mutationFn: (id: string) => salesService.confirm(id),
       onMutate: () => ({ toastId: startActionToast('Confirmando venta…') }),
+      onSuccess: refreshSales,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
+    }),
+    cancel: useMutation({
+      mutationFn: ({
+        id,
+        input,
+      }: {
+        id: string
+        input: SaleCancellationInput
+      }) => salesService.cancel(id, input),
+      onMutate: () => ({ toastId: startActionToast('Anulando venta…') }),
       onSuccess: refreshSales,
       onSettled: (_data, _error, _variables, context) =>
         finishActionToast(context?.toastId),

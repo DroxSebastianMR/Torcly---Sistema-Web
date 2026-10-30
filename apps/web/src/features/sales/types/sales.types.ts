@@ -1,4 +1,4 @@
-export type SaleStatus = 'DRAFT' | 'CONFIRMED'
+export type SaleStatus = 'DRAFT' | 'CONFIRMED' | 'CANCELLED'
 export type SaleStatusFilter = 'all' | SaleStatus
 export type SaleLineType = 'PRODUCT' | 'SERVICE'
 
@@ -32,6 +32,9 @@ export interface SaleSummary {
   performedBy: string
   confirmedBy: string | null
   confirmedAt: string | null
+  cancelledBy: string | null
+  cancelledAt: string | null
+  cancellationReason: string | null
   createdAt: string
   updatedAt: string
 }
@@ -47,6 +50,10 @@ export type SaleLineInput =
 export interface SaleInput {
   customerId: string | null
   lines: SaleLineInput[]
+}
+
+export interface SaleCancellationInput {
+  reason: string
 }
 
 export interface SaleFilters {

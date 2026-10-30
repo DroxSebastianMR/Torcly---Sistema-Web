@@ -1,8 +1,8 @@
-import { Package } from 'lucide-react'
+import { ArrowDownUp, Package, TriangleAlert } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
-import { BarChart } from '../bar-chart'
 import { IndicatorCard } from '../indicator-card'
 import { ReportTable } from '../report-table'
+import { TrendChart } from '../trend-chart'
 import type { InventoryBlockData } from '../../types/reports.types'
 import {
   formatCount,
@@ -41,33 +41,55 @@ export function InventoryBlockContent({ data }: { data: InventoryBlockData }) {
           label="Movimientos"
           value={formatCount(data.metrics.movementCount)}
           hint="Confirmados en el período"
+          icon={<ArrowDownUp className="size-4" />}
+          tone="cyan"
         />
         <IndicatorCard
           label="Cantidad neta"
           value={formatQuantity(data.metrics.netQuantity)}
           hint="Según la regla de stock confirmado"
+          icon={<Package className="size-4" />}
+          tone="purple"
         />
         <IndicatorCard
           label="Stock bajo"
           value={formatCount(data.metrics.lowStockCount)}
           hint="Instantánea actual de productos"
+          icon={<TriangleAlert className="size-4" />}
+          tone="red"
         />
       </div>
-      <BarChart
-        rows={data.trend.map((point) => ({
-          key: point.bucket,
-          label: point.label,
-          count: point.count,
-          amount: point.amount,
-        }))}
-        primary="amount"
-        label="Tendencia de inventario"
+      <TrendChart
+        data={data.trend}
+        type="bar"
+        title="Movimientos de inventario"
         ariaLabel="Tendencia de cantidad neta del período"
-        caption={`Tendencia de cantidad neta: ${data.period.from} a ${data.period.to}`}
-        countLabel="Movimientos"
-        amountLabel="Cantidad neta"
-        countFormatter={formatCount}
-        amountFormatter={formatQuantity}
+        series={[
+          {
+            key: 'entry',
+            label: 'Entradas',
+            color: '#147357',
+            formatter: formatQuantity,
+          },
+          {
+            key: 'exit',
+            label: 'Salidas',
+            color: '#c85d00',
+            formatter: formatQuantity,
+          },
+          {
+            key: 'adjustmentIn',
+            label: 'Ajuste ingreso',
+            color: '#2a79a5',
+            formatter: formatQuantity,
+          },
+          {
+            key: 'adjustmentOut',
+            label: 'Ajuste egreso',
+            color: '#b23a48',
+            formatter: formatQuantity,
+          },
+        ]}
       />
       <ReportTable
         caption="Movimientos por tipo"
@@ -88,8 +110,9 @@ export function InventoryBlockContent({ data }: { data: InventoryBlockData }) {
       />
       {lowStock.length > 0 && (
         <ReportTable
-          caption="Productos con stock bajo (instantánea)"
-          rows={lowStock}
+          caption="Productos que requieren atención"
+          rows={lowStock.slice(0, 5)}
+          ranked
           columns={[
             {
               key: 'name',

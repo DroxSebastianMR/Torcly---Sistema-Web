@@ -1,6 +1,1 @@
-export const quickAccessIds = [
-  'sales',
-  'products',
-  'purchases',
-  'cash',
-] as const
+export const quickAccessIds = ['sales', 'products', 'cash'] as const

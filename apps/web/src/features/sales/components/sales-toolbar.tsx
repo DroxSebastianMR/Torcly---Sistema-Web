@@ -42,6 +42,7 @@ export function SalesToolbar({
               { value: 'all', label: 'Todos los estados' },
               { value: 'DRAFT', label: 'Borradores' },
               { value: 'CONFIRMED', label: 'Confirmadas' },
+              { value: 'CANCELLED', label: 'Anuladas' },
             ]}
             onChange={(status) =>
               onChange({

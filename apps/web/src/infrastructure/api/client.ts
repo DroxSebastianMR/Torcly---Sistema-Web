@@ -15,4 +15,12 @@ export const api = {
   async delete<T>(url: string) {
     return (await http.delete<T>(url)).data
   },
+  async download(url: string, signal?: AbortSignal) {
+    return (
+      await http.get<Blob>(url, {
+        signal,
+        responseType: 'blob',
+      })
+    ).data
+  },
 }

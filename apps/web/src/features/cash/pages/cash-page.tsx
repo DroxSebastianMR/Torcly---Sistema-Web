@@ -1,4 +1,5 @@
 import { useDeferredValue, useState } from 'react'
+import { toast } from 'sonner'
 import { ErrorState } from '@/components/ui/error-state'
 import { ModuleMetrics } from '@/components/ui/module-metrics'
 import { Pagination } from '@/components/ui/pagination'
@@ -9,6 +10,14 @@ import { PaymentsTable } from '../components/payments-table'
 import { PaymentDetailModal } from '../components/payment-detail-modal'
 import { PaymentFormModal } from '../components/payment-form-modal'
 import { CompensationFormModal } from '../components/compensation-form-modal'
+import { CashSessionFormModal } from '../components/cash-session-form-modal'
+import { CashSessionDetailModal } from '../components/cash-session-detail-modal'
+import { CashSessionHistory } from '../components/cash-session-history'
+import { CashSessionOverview } from '../components/cash-session-overview'
+import {
+  useCashSessions,
+  useCurrentCashSession,
+} from '../hooks/use-cash-sessions'
 import { usePayment, usePayments } from '../hooks/use-payments'
 import type {
   PaymentEvent,
@@ -24,7 +33,7 @@ const initialFilters: PaymentFilters = {
   from: null,
   to: null,
   page: 1,
-  pageSize: 20,
+  pageSize: 10,
 }
 
 export default function Page() {
@@ -37,15 +46,31 @@ export default function Page() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [collectTarget, setCollectTarget] =
     useState<PaymentObligationSummary | null>(null)
-  const [compensationEvent, setCompensationEvent] =
-    useState<PaymentEvent | null>(null)
+  const [compensationTarget, setCompensationTarget] = useState<{
+    event: PaymentEvent
+    remainingAmount: number
+  } | null>(null)
+  const [cashSessionModal, setCashSessionModal] = useState<
+    'open' | 'close' | null
+  >(null)
+  const [historyPage, setHistoryPage] = useState(1)
+  const [selectedCashSessionId, setSelectedCashSessionId] = useState<
+    string | null
+  >(null)
   const deferredSearch = useDeferredValue(filters.search)
   const queryFilters = { ...filters, search: deferredSearch }
   const payments = usePayments(queryFilters)
   const detail = usePayment(selectedId ?? '')
+  const currentCashSession = useCurrentCashSession()
+  const cashSessionHistory = useCashSessions({
+    page: historyPage,
+    pageSize: 10,
+  })
 
   const visibleObligations = payments.data?.data ?? []
   const summary = payments.data?.summary
+  const hasOpenCashSession = Boolean(currentCashSession.data)
+  const canRegisterPayment = canCollect && hasOpenCashSession
 
   return (
     <div className="space-y-6">
@@ -91,6 +116,25 @@ export default function Page() {
         ]}
       />
 
+      {currentCashSession.isError ? (
+        <ErrorState
+          title="No se pudo consultar la caja actual"
+          description="Verifica la conexión e inténtalo nuevamente antes de registrar cobros."
+          action={{
+            label: 'Reintentar',
+            onClick: () => void currentCashSession.refetch(),
+          }}
+        />
+      ) : (
+        <CashSessionOverview
+          session={currentCashSession.data}
+          loading={currentCashSession.isPending}
+          canWrite={hasPermission(permissions, 'cash:write')}
+          onOpen={() => setCashSessionModal('open')}
+          onClose={() => setCashSessionModal('close')}
+        />
+      )}
+
       <section
         aria-label="Filtros de cobros"
         className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
@@ -129,10 +173,17 @@ export default function Page() {
         ) : (
           <PaymentsTable
             obligations={visibleObligations}
-            loading={payments.isPending}
+            loading={payments.isFetching}
             canCollect={canCollect}
             onOpen={(obligation) => setSelectedId(obligation.id)}
-            onCollect={(obligation) => setCollectTarget(obligation)}
+            onCollect={(obligation) => {
+              if (!hasOpenCashSession) {
+                toast.error('Abre una caja antes de registrar un cobro.')
+                setCashSessionModal('open')
+                return
+              }
+              setCollectTarget(obligation)
+            }}
           />
         )}
 
@@ -151,9 +202,11 @@ export default function Page() {
         open={Boolean(selectedId)}
         detail={detail.data ?? null}
         loading={detail.isPending}
-        canCompensate={canCollect}
+        canCompensate={canRegisterPayment}
         onClose={() => setSelectedId(null)}
-        onCompensate={(event) => setCompensationEvent(event)}
+        onCompensate={(event, remainingAmount) =>
+          setCompensationTarget({ event, remainingAmount })
+        }
       />
       <PaymentFormModal
         open={Boolean(collectTarget)}
@@ -161,9 +214,52 @@ export default function Page() {
         onClose={() => setCollectTarget(null)}
       />
       <CompensationFormModal
-        open={Boolean(compensationEvent)}
-        event={compensationEvent}
-        onClose={() => setCompensationEvent(null)}
+        open={Boolean(compensationTarget)}
+        event={compensationTarget?.event ?? null}
+        remainingAmount={compensationTarget?.remainingAmount}
+        onClose={() => setCompensationTarget(null)}
+      />
+      <section className="space-y-3">
+        <div>
+          <p className="text-sm font-semibold text-brand-forest">
+            Historial de cierres
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Consulta los arqueos realizados en períodos anteriores.
+          </p>
+        </div>
+        {cashSessionHistory.isError ? (
+          <ErrorState
+            title="No se pudo cargar el historial de cierres"
+            description="Verifica la conexión e inténtalo nuevamente."
+            action={{
+              label: 'Reintentar',
+              onClick: () => void cashSessionHistory.refetch(),
+            }}
+          />
+        ) : (
+          <CashSessionHistory
+            response={cashSessionHistory.data}
+            loading={cashSessionHistory.isPending}
+            page={historyPage}
+            onPageChange={setHistoryPage}
+            onOpen={(session) => setSelectedCashSessionId(session.id)}
+          />
+        )}
+      </section>
+      {cashSessionModal && (
+        <CashSessionFormModal
+          key={`${cashSessionModal}-${currentCashSession.data?.id ?? 'new'}`}
+          open
+          mode={cashSessionModal}
+          session={currentCashSession.data ?? null}
+          onClose={() => setCashSessionModal(null)}
+        />
+      )}
+      <CashSessionDetailModal
+        open={Boolean(selectedCashSessionId)}
+        id={selectedCashSessionId}
+        onClose={() => setSelectedCashSessionId(null)}
       />
     </div>
   )

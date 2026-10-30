@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { requireAuth, requirePermission } from '../auth/auth.middleware.js'
 import {
+  cancelSale,
   confirmSale,
   createSale,
   getSale,
@@ -18,3 +19,4 @@ salesRouter.get('/:id', requirePermission('sales:read'), getSale)
 salesRouter.post('/', requirePermission('sales:write'), createSale)
 salesRouter.put('/:id', requirePermission('sales:write'), updateSale)
 salesRouter.post('/:id/confirm', requirePermission('sales:write'), confirmSale)
+salesRouter.post('/:id/cancel', requirePermission('sales:write'), cancelSale)

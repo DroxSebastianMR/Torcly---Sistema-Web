@@ -1,5 +1,6 @@
 import { CalendarDays, Car, Eye, MoreHorizontal } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TableActionButton } from '@/components/ui/table-action-button'
 import type {
   Appointment,
   AppointmentStatus,
@@ -110,18 +111,16 @@ export function AppointmentsTable({
                   <StatusBadge status={appointment.status} />
                 </td>
                 <td className="px-4 py-4 text-right">
-                  <button
-                    type="button"
+                  <TableActionButton
                     onClick={(event) => {
                       event.stopPropagation()
                       onOpen(appointment)
                     }}
-                    aria-label={`Ver cita ${appointment.code}`}
+                    label={`Ver cita ${appointment.code}`}
                     title="Ver detalle"
-                    className="inline-flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
                   >
-                    <Eye size={16} />
-                  </button>
+                    <Eye aria-hidden size={16} />
+                  </TableActionButton>
                 </td>
               </tr>
             ))}
@@ -157,14 +156,14 @@ export function AppointmentsTable({
               </p>
             </div>
             <div className="mt-4 border-t pt-3">
-              <button
-                type="button"
+              <TableActionButton
                 onClick={() => onOpen(appointment)}
-                aria-label={`Ver cita ${appointment.code}`}
-                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-muted px-3 text-sm font-medium"
+                label={`Ver cita ${appointment.code}`}
+                title="Ver detalle"
+                className="h-10 w-full gap-2 px-3 text-sm font-medium"
               >
-                <Eye size={15} /> Ver detalle
-              </button>
+                <Eye aria-hidden size={15} /> Ver detalle
+              </TableActionButton>
             </div>
           </article>
         ))}

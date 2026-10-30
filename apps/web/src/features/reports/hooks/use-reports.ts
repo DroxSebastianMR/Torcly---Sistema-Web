@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { reportsService } from '../services/reports.service'
 import type { Period, ReportBlock } from '../types/reports.types'
 
@@ -27,4 +27,9 @@ export const useReportBlock = (
     enabled,
     staleTime: 60_000,
     refetchOnWindowFocus: false,
+  })
+
+export const useExportReports = () =>
+  useMutation({
+    mutationFn: reportsService.exportWorkbook,
   })

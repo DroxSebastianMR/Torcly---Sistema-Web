@@ -3,6 +3,7 @@ import { endpoints } from '@/infrastructure/api/endpoints'
 import type {
   DataResponse,
   SaleCatalog,
+  SaleCancellationInput,
   SaleDetail,
   SaleFilters,
   SaleInput,
@@ -36,10 +37,19 @@ export const salesService = {
   create(input: SaleInput) {
     return api.post<DataResponse<SaleDetail>>(endpoints.sales.root, input)
   },
+  createConfirmed(input: SaleInput) {
+    return api.post<DataResponse<SaleDetail>>(endpoints.sales.root, {
+      ...input,
+      confirm: true,
+    })
+  },
   update(id: string, input: SaleInput) {
     return api.put<DataResponse<SaleDetail>>(endpoints.sales.detail(id), input)
   },
   confirm(id: string) {
     return api.post<DataResponse<SaleDetail>>(endpoints.sales.confirm(id))
+  },
+  cancel(id: string, input: SaleCancellationInput) {
+    return api.post<DataResponse<SaleDetail>>(endpoints.sales.cancel(id), input)
   },
 }

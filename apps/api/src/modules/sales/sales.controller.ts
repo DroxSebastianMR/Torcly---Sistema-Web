@@ -1,8 +1,9 @@
 import type { Request, RequestHandler } from 'express'
 import { getRequestContext } from '../auth/auth.middleware.js'
 import {
+  saleCancelSchema,
+  saleCreateSchema,
   saleIdSchema,
-  saleInputSchema,
   saleQuerySchema,
   saleUpdateSchema,
 } from './sales.schemas.js'
@@ -26,15 +27,29 @@ export const getSaleCatalog: RequestHandler = async (_request, response) => {
 }
 
 export const createSale: RequestHandler = async (request, response) => {
+  const { confirm, ...input } = saleCreateSchema.parse(request.body)
   response
     .status(201)
     .json(
       await salesService.create(
-        saleInputSchema.parse(request.body),
+        input,
         actor(request),
         getRequestContext(request, response),
+        confirm,
       ),
     )
+}
+
+export const cancelSale: RequestHandler = async (request, response) => {
+  const { id } = saleIdSchema.parse(request.params)
+  response.json(
+    await salesService.cancel(
+      id,
+      saleCancelSchema.parse(request.body),
+      actor(request),
+      getRequestContext(request, response),
+    ),
+  )
 }
 
 export const updateSale: RequestHandler = async (request, response) => {

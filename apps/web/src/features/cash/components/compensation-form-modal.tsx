@@ -23,12 +23,14 @@ import {
 interface CompensationFormModalProps {
   open: boolean
   event: PaymentEvent | null
+  remainingAmount?: number
   onClose: () => void
 }
 
 export function CompensationFormModal({
   open,
   event,
+  remainingAmount,
   onClose,
 }: CompensationFormModalProps) {
   const mutations = usePaymentMutations()
@@ -43,11 +45,11 @@ export function CompensationFormModal({
   useEffect(() => {
     if (open)
       reset({
-        amount: formatPaymentAmount(event?.amount ?? 0),
+        amount: formatPaymentAmount(remainingAmount ?? event?.amount ?? 0),
         reason: '',
         notes: '',
       })
-  }, [open, event?.amount, reset])
+  }, [open, event?.amount, remainingAmount, reset])
 
   const closeModal = () => {
     if (busy) return
@@ -67,10 +69,11 @@ export function CompensationFormModal({
       toast.error('Revisa el importe y el motivo de la compensación.')
       return
     }
-    if (amount > event.amount) {
+    const maximumAmount = remainingAmount ?? event.amount
+    if (amount > maximumAmount) {
       toast.error(
         `La compensación no puede superar el importe del pago (${currencyFormatter.format(
-          event.amount,
+          maximumAmount,
         )}).`,
       )
       return
@@ -127,6 +130,15 @@ export function CompensationFormModal({
                     {currencyFormatter.format(event.amount)}
                   </span>
                 </p>
+                {remainingAmount !== undefined &&
+                  remainingAmount < event.amount && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Disponible por compensar:{' '}
+                      <span className="font-semibold tabular-nums text-foreground">
+                        {currencyFormatter.format(remainingAmount)}
+                      </span>
+                    </p>
+                  )}
               </div>
               <Undo2 aria-hidden className="shrink-0 text-muted-foreground" />
             </div>

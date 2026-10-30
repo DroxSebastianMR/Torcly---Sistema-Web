@@ -30,7 +30,9 @@ export function getSaleErrorMessage(error: unknown) {
 }
 
 export function saleStatusLabel(status: SaleStatus) {
-  return status === 'DRAFT' ? 'Borrador' : 'Confirmada'
+  if (status === 'DRAFT') return 'Borrador'
+  if (status === 'CANCELLED') return 'Anulada'
+  return 'Confirmada'
 }
 
 export function saleLineSubtotal(line: {

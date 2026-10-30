@@ -16,6 +16,8 @@ const variants = cva(
         danger: 'bg-red-600 text-white hover:bg-red-700',
         dangerOutline:
           'border-red-500 bg-[linear-gradient(to_right,rgb(220_38_38)_50%,var(--card)_50%)] bg-[position:100%_0] bg-[length:200%_100%] text-red-700 transition-[color,background-position,border-color,box-shadow,transform] duration-200 hover:border-red-600 hover:bg-[position:0_0] hover:text-white hover:shadow-[0_6px_16px_rgb(239_68_68_/_20%)]',
+        excelOutline:
+          'border-[#217346] bg-[linear-gradient(to_top,var(--card)_50%,#217346_50%)] bg-[position:0_100%] bg-[length:100%_200%] text-[#1c613b] transition-[color,background-position,border-color,box-shadow,transform] duration-200 hover:border-[#217346] hover:bg-[position:0_0] hover:text-white hover:shadow-[0_6px_16px_rgb(33_115_70_/_22%)]',
       },
       size: {
         sm: 'min-h-[34px] px-3 text-xs',

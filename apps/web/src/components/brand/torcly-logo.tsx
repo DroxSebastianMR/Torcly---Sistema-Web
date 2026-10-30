@@ -14,7 +14,7 @@ export function TorclyLogo({
       role="img"
       aria-label="Torcly"
       className={cn(
-        'inline-flex items-baseline text-4xl leading-none font-bold tracking-[-0.06em]',
+        'font-brand inline-flex items-baseline text-4xl leading-none font-bold tracking-[-0.06em]',
         variant === 'inverse' ? 'text-white' : 'text-brand-forest',
         className,
       )}

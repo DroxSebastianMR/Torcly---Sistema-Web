@@ -33,37 +33,53 @@ export function Pagination({
       <p className="font-medium text-foreground">
         Página {page} de {totalPages}
       </p>
-      <div className="flex items-center gap-2">
-        <PaginationButton
-          label="Página anterior"
-          disabled={page <= 1}
-          onClick={() => onPageChange(page - 1)}
-        >
-          <ChevronLeft size={17} aria-hidden />
-        </PaginationButton>
-        {visiblePages(page, totalPages).map((target, index, pages) => (
-          <div key={target} className="flex items-center gap-2">
-            {index > 0 && target - pages[index - 1]! > 1 && (
-              <span className="px-0.5 text-muted-foreground">…</span>
-            )}
-            <PaginationButton
-              label={`Ir a página ${target}`}
-              active={target === page}
-              onClick={() => onPageChange(target)}
-            >
-              {target}
-            </PaginationButton>
-          </div>
-        ))}
-        <PaginationButton
-          label="Página siguiente"
-          disabled={page >= totalPages}
-          onClick={() => onPageChange(page + 1)}
-        >
-          <ChevronRight size={17} aria-hidden />
-        </PaginationButton>
-      </div>
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+      />
     </footer>
+  )
+}
+
+/** Controles numéricos reutilizables para cualquier navegación por páginas o secciones. */
+export function PaginationControls({
+  page,
+  totalPages,
+  onPageChange,
+  className,
+}: PaginationProps) {
+  return (
+    <div className={`flex items-center gap-2 ${className ?? ''}`}>
+      <PaginationButton
+        label="Página anterior"
+        disabled={page <= 1}
+        onClick={() => onPageChange(page - 1)}
+      >
+        <ChevronLeft size={17} aria-hidden />
+      </PaginationButton>
+      {visiblePages(page, totalPages).map((target, index, pages) => (
+        <div key={target} className="flex items-center gap-2">
+          {index > 0 && target - pages[index - 1]! > 1 && (
+            <span className="px-0.5 text-muted-foreground">…</span>
+          )}
+          <PaginationButton
+            label={`Ir a página ${target}`}
+            active={target === page}
+            onClick={() => onPageChange(target)}
+          >
+            {target}
+          </PaginationButton>
+        </div>
+      ))}
+      <PaginationButton
+        label="Página siguiente"
+        disabled={page >= totalPages}
+        onClick={() => onPageChange(page + 1)}
+      >
+        <ChevronRight size={17} aria-hidden />
+      </PaginationButton>
+    </div>
   )
 }
 

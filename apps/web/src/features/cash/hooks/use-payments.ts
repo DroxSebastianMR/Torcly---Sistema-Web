@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { finishActionToast, startActionToast } from '@/lib/action-toast'
+import { cashSessionKeys } from './use-cash-sessions'
 import { paymentsService } from '../services/payments.service'
 import type {
   PaymentCompensateInput,
@@ -34,7 +35,11 @@ export function usePayment(id: string) {
 export function usePaymentMutations() {
   const queryClient = useQueryClient()
   const refreshPayments = async () => {
-    await queryClient.invalidateQueries({ queryKey: paymentKeys.all })
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: paymentKeys.all }),
+      queryClient.invalidateQueries({ queryKey: cashSessionKeys.all }),
+      queryClient.invalidateQueries({ queryKey: ['sales'] }),
+    ])
   }
 
   return {

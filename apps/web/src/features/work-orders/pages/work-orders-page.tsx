@@ -39,7 +39,7 @@ const initialFilters: WorkOrderFilters = {
   status: 'all',
   technicianId: '',
   page: 1,
-  pageSize: 20,
+  pageSize: 10,
 }
 
 export default function Page() {
@@ -373,15 +373,15 @@ export default function Page() {
         description={
           finalizeOrder
             ? execution.data?.productLines.some((line) => line.pending > 0)
-              ? 'Hay repuestos presupuestados aún sin consumo. Si finalizas, se considerarán no utilizados: no descontarán stock ni se incluirán en la venta. Cancela si necesitas registrarlos primero.'
-              : `La orden ${finalizeOrder.code} pasará a lista para entrega y ya no admitirá más consumos ni actividades.`
+              ? 'Hay repuestos pendientes; se excluirán del stock y del cobro.'
+              : 'La orden quedará lista para entregar y no admitirá más cambios.'
             : undefined
         }
         variant="info"
         icon={BadgeCheck}
         confirmLabel={
           execution.data?.productLines.some((line) => line.pending > 0)
-            ? 'Finalizar sin repuestos pendientes'
+            ? 'Finalizar orden'
             : 'Finalizar orden'
         }
         pending={mutations.finalize.isPending}

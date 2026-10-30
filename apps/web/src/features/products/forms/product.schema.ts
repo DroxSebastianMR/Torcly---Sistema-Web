@@ -14,14 +14,6 @@ export const productFormSchema = z.object({
       /^[A-Za-z0-9][A-Za-z0-9._-]*$/,
       'Usa letras, números, puntos o guiones.',
     ),
-  barcode: z
-    .string()
-    .trim()
-    .max(32)
-    .refine(
-      (value) => !value || /^[A-Za-z0-9-]{4,32}$/.test(value),
-      'El código de barras no es válido.',
-    ),
   name: z.string().trim().min(2, 'Ingresa el nombre.').max(120),
   description: z.string().trim().max(500),
   categoryId: z.string().min(1, 'Selecciona una categoría.'),

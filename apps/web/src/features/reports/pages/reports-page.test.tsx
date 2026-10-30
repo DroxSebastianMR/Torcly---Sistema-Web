@@ -13,6 +13,7 @@ vi.mock('@/features/auth/hooks/auth-context', () => auth)
 const reports = vi.hoisted(() => ({
   useReportSummary: vi.fn(),
   useReportBlock: vi.fn(),
+  useExportReports: vi.fn(),
 }))
 vi.mock('../hooks/use-reports', () => ({
   reportKeys: {
@@ -21,6 +22,7 @@ vi.mock('../hooks/use-reports', () => ({
   },
   useReportSummary: reports.useReportSummary,
   useReportBlock: reports.useReportBlock,
+  useExportReports: reports.useExportReports,
 }))
 
 const salesBlock: SalesBlockData = {
@@ -107,6 +109,11 @@ describe('Página de reportes', () => {
   afterEach(() => {
     cleanup()
     vi.clearAllMocks()
+  })
+
+  reports.useExportReports.mockReturnValue({
+    mutateAsync: vi.fn(),
+    isPending: false,
   })
 
   it('muestra reportes e indicadores para el bloque autorizado', () => {

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, KeyRound, UserRound } from 'lucide-react'
+import { KeyRound, UserRound } from 'lucide-react'
 import { ErrorState } from '@/components/ui/error-state'
 import { useProfile } from '../hooks/use-profile'
 import { ProfileInfoForm } from '../components/profile-info-form'
@@ -40,7 +40,7 @@ export default function ProfilePage() {
     icon: React.ComponentType<{ size?: number; className?: string }>
   }> = [
     { id: 'info', label: 'Datos personales', icon: UserRound },
-    { id: 'notifications', label: 'Preferencias de avisos', icon: Bell },
+    // { id: 'notifications', label: 'Preferencias de avisos', icon: Bell },
     { id: 'security', label: 'Seguridad y contraseña', icon: KeyRound },
   ]
 

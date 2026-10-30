@@ -6,6 +6,7 @@ import {
   Power,
 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TableActionButton } from '@/components/ui/table-action-button'
 import type { Product } from '../types/products.types'
 import { currencyFormatter, numberFormatter } from '../utils/product-formatters'
 
@@ -75,7 +76,6 @@ export function ProductsTable({
                       </button>
                       <p className="mt-1 font-mono text-xs text-muted-foreground">
                         {product.code}
-                        {product.barcode ? ` · ${product.barcode}` : ''}
                       </p>
                     </div>
                   </div>
@@ -106,28 +106,25 @@ export function ProductsTable({
                 {canWrite && (
                   <td className="px-4 py-4">
                     <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
-                      <button
-                        type="button"
+                      <TableActionButton
                         title="Editar producto"
-                        aria-label={`Editar ${product.name}`}
+                        label={`Editar ${product.name}`}
                         onClick={() => onEdit?.(product)}
-                        className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary"
                       >
                         <Pencil size={16} />
-                      </button>
-                      <button
-                        type="button"
+                      </TableActionButton>
+                      <TableActionButton
                         title={
                           product.active
                             ? 'Desactivar producto'
                             : 'Activar producto'
                         }
-                        aria-label={`${product.active ? 'Desactivar' : 'Activar'} ${product.name}`}
+                        label={`${product.active ? 'Desactivar' : 'Activar'} ${product.name}`}
                         onClick={() => onToggleStatus?.(product)}
-                        className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary"
+                        tone={product.active ? 'danger' : 'default'}
                       >
                         <Power size={16} />
-                      </button>
+                      </TableActionButton>
                     </div>
                   </td>
                 )}
@@ -170,21 +167,24 @@ export function ProductsTable({
             </div>
             {canWrite && (
               <div className="mt-4 flex gap-2 border-t pt-3">
-                <button
-                  type="button"
+                <TableActionButton
                   onClick={() => onEdit?.(product)}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-muted px-3 py-2 text-sm font-medium"
+                  label={`Editar ${product.name}`}
+                  title="Editar producto"
+                  className="h-10 flex-1 gap-2 px-3 text-sm font-medium"
                 >
-                  <Pencil size={15} /> Editar
-                </button>
-                <button
-                  type="button"
+                  <Pencil aria-hidden size={15} /> Editar
+                </TableActionButton>
+                <TableActionButton
                   onClick={() => onToggleStatus?.(product)}
-                  className="flex size-10 items-center justify-center rounded-lg border"
-                  aria-label={`${product.active ? 'Desactivar' : 'Activar'} ${product.name}`}
+                  label={`${product.active ? 'Desactivar' : 'Activar'} ${product.name}`}
+                  title={
+                    product.active ? 'Desactivar producto' : 'Activar producto'
+                  }
+                  tone={product.active ? 'danger' : 'default'}
                 >
                   <Power size={16} />
-                </button>
+                </TableActionButton>
               </div>
             )}
           </article>

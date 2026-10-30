@@ -87,6 +87,9 @@ function toSummary(
     performedBy: string
     confirmedBy: string | null
     confirmedAt: Date | null
+    cancelledBy: string | null
+    cancelledAt: Date | null
+    cancellationReason: string | null
     createdAt: Date
     updatedAt: Date
     _count?: { lines: number }
@@ -108,6 +111,11 @@ function toSummary(
       ? (actorNames.get(sale.confirmedBy) ?? sale.confirmedBy)
       : null,
     confirmedAt: sale.confirmedAt ? sale.confirmedAt.toISOString() : null,
+    cancelledBy: sale.cancelledBy
+      ? (actorNames.get(sale.cancelledBy) ?? sale.cancelledBy)
+      : null,
+    cancelledAt: sale.cancelledAt ? sale.cancelledAt.toISOString() : null,
+    cancellationReason: sale.cancellationReason ?? null,
     createdAt: sale.createdAt.toISOString(),
     updatedAt: sale.updatedAt.toISOString(),
   }
@@ -266,6 +274,7 @@ export const salesService = {
     input: SaleInput,
     actor: SaleActor | string,
     context: RequestContext,
+    confirm = false,
   ) {
     const customerId = input.customerId ?? null
     if (customerId) {
@@ -281,7 +290,13 @@ export const salesService = {
 
     try {
       const sale = await salesRepository.create(
-        { customerId, subtotal, total, lines },
+        {
+          customerId,
+          subtotal,
+          total,
+          lines,
+          ...(confirm ? { confirm: true } : {}),
+        },
         normalizedActor,
         context,
       )
@@ -328,6 +343,21 @@ export const salesService = {
   ) {
     const normalizedActor = normalizeActor(actor)
     const sale = await salesRepository.confirm(id, normalizedActor, context)
+    return { data: toDetail(sale) }
+  },
+
+  async cancel(
+    id: string,
+    input: { reason: string },
+    actor: SaleActor | string,
+    context: RequestContext,
+  ) {
+    const sale = await salesRepository.cancel(
+      id,
+      input.reason,
+      normalizeActor(actor),
+      context,
+    )
     return { data: toDetail(sale) }
   },
 }

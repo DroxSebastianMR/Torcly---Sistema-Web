@@ -3,6 +3,10 @@ import { databaseService } from '../../infrastructure/database/prisma.service.js
 import { AppError } from '../../shared/errors/app-error.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import {
+  cashSessionsRepository,
+  lockCashSession,
+} from '../cash-sessions/cash-session.repository.js'
+import {
   assertCompensationWithinPayment,
   assertPaymentDoesNotExceedBalance,
   assertValidPaymentAmount,
@@ -257,6 +261,7 @@ export const paymentsRepository = {
     context: RequestContext,
   ): Promise<ObligationDetailRow> {
     return databaseService.transaction(async (transaction) => {
+      await lockCashSession(transaction)
       await lockSale(transaction, saleId)
       const sale = await transaction.sale.findUnique({
         where: { id: saleId },
@@ -283,15 +288,6 @@ export const paymentsRepository = {
           'La venta no tiene un importe pendiente de cobro.',
         )
 
-      const payments = await transaction.payment.findMany({
-        where: { saleId },
-        select: { type: true, amount: true },
-      })
-      const paid = computePaidAmount(payments)
-      const balance = computeBalance(sale.total, paid)
-      assertValidPaymentAmount(input.amount)
-      assertPaymentDoesNotExceedBalance(input.amount, balance)
-
       const idempotencyKey = `payment:${saleId}:${input.requestId}`
       const replay = await transaction.payment.findUnique({
         where: { idempotencyKey },
@@ -303,12 +299,24 @@ export const paymentsRepository = {
           saleId,
         ) as Promise<ObligationDetailRow>
 
+      const cashSession =
+        await cashSessionsRepository.requireOpenSession(transaction)
+      const payments = await transaction.payment.findMany({
+        where: { saleId },
+        select: { type: true, amount: true },
+      })
+      const paid = computePaidAmount(payments)
+      const balance = computeBalance(sale.total, paid)
+      assertValidPaymentAmount(input.amount)
+      assertPaymentDoesNotExceedBalance(input.amount, balance)
+
       const code = await nextCode(transaction, 'PAGO')
       const payment = await transaction.payment.create({
         data: {
           code,
           saleId,
           customerId: sale.customerId,
+          cashSessionId: cashSession.id,
           type: 'PAYMENT',
           amount: input.amount,
           method: input.method,
@@ -365,6 +373,7 @@ export const paymentsRepository = {
           'Una compensación solo se aplica sobre un pago registrado.',
         )
 
+      await lockCashSession(transaction)
       await lockSale(transaction, paymentRow.saleId)
       const locked = await transaction.payment.findUnique({
         where: { id: paymentId },
@@ -373,6 +382,19 @@ export const paymentsRepository = {
       if (!locked || locked.type !== 'PAYMENT')
         throw new AppError(404, 'PAYMENT_NOT_FOUND', 'Pago no encontrado.')
 
+      const idempotencyKey = `payment-compensation:${paymentId}:${input.requestId}`
+      const replay = await transaction.payment.findUnique({
+        where: { idempotencyKey },
+        select: { id: true },
+      })
+      if (replay)
+        return loadObligation(
+          transaction,
+          locked.saleId,
+        ) as Promise<ObligationDetailRow>
+
+      const cashSession =
+        await cashSessionsRepository.requireOpenSession(transaction)
       const compensations = await transaction.payment.findMany({
         where: { originalPaymentId: paymentId },
         select: { amount: true },
@@ -388,22 +410,12 @@ export const paymentsRepository = {
         alreadyCompensated,
       )
 
-      const idempotencyKey = `payment-compensation:${paymentId}:${input.requestId}`
-      const replay = await transaction.payment.findUnique({
-        where: { idempotencyKey },
-        select: { id: true },
-      })
-      if (replay)
-        return loadObligation(
-          transaction,
-          locked.saleId,
-        ) as Promise<ObligationDetailRow>
-
       const code = await nextCode(transaction, 'COMP')
       const compensation = await transaction.payment.create({
         data: {
           code,
           saleId: locked.saleId,
+          cashSessionId: cashSession.id,
           type: 'COMPENSATION',
           originalPaymentId: locked.id,
           amount: input.amount,

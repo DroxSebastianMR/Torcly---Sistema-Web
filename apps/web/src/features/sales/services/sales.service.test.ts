@@ -60,7 +60,7 @@ describe('Servicio de ventas (web)', () => {
     expect(api.get).toHaveBeenCalledWith('/sales/catalogo', undefined)
   })
 
-  it('crea, actualiza y confirma ventas en los endpoints correctos', async () => {
+  it('crea, confirma y anula ventas en los endpoints correctos', async () => {
     const input = {
       customerId: 'c1',
       lines: [{ type: 'PRODUCT' as const, productId: 'p1', quantity: 2 }],
@@ -69,10 +69,18 @@ describe('Servicio de ventas (web)', () => {
     await salesService.create(input)
     expect(api.post).toHaveBeenCalledWith('/sales', input)
 
+    await salesService.createConfirmed(input)
+    expect(api.post).toHaveBeenCalledWith('/sales', { ...input, confirm: true })
+
     await salesService.update('s1', input)
     expect(api.put).toHaveBeenCalledWith('/sales/s1', input)
 
     await salesService.confirm('s1')
     expect(api.post).toHaveBeenCalledWith('/sales/s1/confirm')
+
+    await salesService.cancel('s1', { reason: 'Cliente desistió.' })
+    expect(api.post).toHaveBeenCalledWith('/sales/s1/cancel', {
+      reason: 'Cliente desistió.',
+    })
   })
 })

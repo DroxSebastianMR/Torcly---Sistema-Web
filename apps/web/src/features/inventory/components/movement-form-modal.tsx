@@ -191,7 +191,7 @@ export function MovementFormModal({
           )}
         </Field>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className={isAdjustment ? 'grid gap-4 sm:grid-cols-2' : undefined}>
           <Field
             label="Cantidad"
             error={fieldError('quantity')}
@@ -229,15 +229,7 @@ export function MovementFormModal({
                 }
               />
             </Field>
-          ) : (
-            <Field label="Referencia" error={undefined} hint="Opcional">
-              <Input
-                value=""
-                disabled
-                placeholder="Disponible en una próxima versión"
-              />
-            </Field>
-          )}
+          ) : null}
         </div>
 
         <Field label="Notas" hint="Opcional">

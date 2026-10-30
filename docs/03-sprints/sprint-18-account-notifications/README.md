@@ -30,7 +30,7 @@ No se elimina `Product.barcode`: se conserva como campo opcional de producto. Se
 
 ## Implementación realizada
 
-- API `profile`: consulta/edición exclusiva de la propia cuenta, preferencias de avisos, cambio de contraseña con validación de contraseña actual, revocación de sesiones y auditoría sanitizada.
+- API `profile`: consulta/edición exclusiva de la propia cuenta, , cambio de contraseña con validación de contraseña actual, revocación de sesiones y auditoría sanitizada.
 - API `notifications`: bandeja paginada por usuario, filtro por permiso de origen, contador de no leídas y acciones idempotentes para marcar una o todas como leídas.
 - Eventos no bloqueantes: stock bajo, compra recibida, cita programada/reprogramada, orden lista para entrega y pago compensado. Un fallo de aviso no revierte la operación origen ni expone el error interno en logs.
 - Web: perfil por pestañas, preferencias, cambio de contraseña, centro de notificaciones, contador en encabezado y estados loading/empty/error.

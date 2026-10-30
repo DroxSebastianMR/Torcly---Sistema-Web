@@ -12,6 +12,7 @@ import { salesRouter } from './modules/sales/sales.routes.js'
 import { appointmentsRouter } from './modules/appointments/appointment.routes.js'
 import { workOrdersRouter } from './modules/work-orders/work-order.routes.js'
 import { paymentsRouter } from './modules/payments/payment.routes.js'
+import { cashSessionsRouter } from './modules/cash-sessions/cash-session.routes.js'
 import { operationsRouter } from './modules/operations/operations.routes.js'
 import { reportsRouter } from './modules/reports/reports.routes.js'
 import { metricsRouter } from './modules/metrics/metrics.routes.js'
@@ -41,6 +42,7 @@ apiRouter.use('/appointments', appointmentsRouter)
 apiRouter.use('/work-orders', workOrdersRouter)
 apiRouter.use('/technicians', techniciansRouter)
 apiRouter.use('/payments', paymentsRouter)
+apiRouter.use('/cash-sessions', cashSessionsRouter)
 apiRouter.use('/operations', operationsRouter)
 apiRouter.use('/reports', reportsRouter)
 apiRouter.use('/metrics', metricsRouter)

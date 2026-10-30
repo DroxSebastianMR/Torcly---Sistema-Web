@@ -10,9 +10,9 @@ export const saleIdSchema = z.object({
 
 export const saleQuerySchema = z.object({
   search: z.string().trim().max(120).optional(),
-  status: z.enum(['all', 'DRAFT', 'CONFIRMED']).default('all'),
+  status: z.enum(['all', 'DRAFT', 'CONFIRMED', 'CANCELLED']).default('all'),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(5).max(100).default(20),
+  pageSize: z.coerce.number().int().min(5).max(100).default(10),
 })
 
 export const saleProductLineSchema = z
@@ -53,7 +53,21 @@ export const saleInputSchema = z
   })
   .strict()
 
+export const saleCreateSchema = saleInputSchema.extend({
+  confirm: z.boolean().optional().default(false),
+})
+
 export const saleUpdateSchema = saleInputSchema.strict()
+
+export const saleCancelSchema = z
+  .object({
+    reason: z
+      .string()
+      .trim()
+      .min(3, 'Indica un motivo de anulación de al menos 3 caracteres.')
+      .max(300, 'El motivo no puede superar 300 caracteres.'),
+  })
+  .strict()
 
 export type SaleInputDto = z.infer<typeof saleInputSchema>
 export type SaleQueryDto = z.infer<typeof saleQuerySchema>

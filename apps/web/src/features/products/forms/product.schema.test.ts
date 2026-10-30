@@ -3,7 +3,6 @@ import { productFormSchema } from './product.schema'
 
 const validForm = {
   code: 'REP-001',
-  barcode: '7751234567890',
   name: 'Filtro de aceite',
   description: '',
   categoryId: 'category-id',
@@ -52,24 +51,12 @@ describe('Formulario de productos', () => {
     }
   })
 
-  it('permite código de barras vacío para digitación opcional', () => {
-    expect(
-      productFormSchema.safeParse({ ...validForm, barcode: '' }).success,
-    ).toBe(true)
-  })
-
   it('rechaza códigos demasiado cortos o con caracteres inválidos', () => {
     expect(
       productFormSchema.safeParse({ ...validForm, code: 'A' }).success,
     ).toBe(false)
     expect(
       productFormSchema.safeParse({ ...validForm, code: 'REP_001*' }).success,
-    ).toBe(false)
-  })
-
-  it('rechaza un código de barras mal formado', () => {
-    expect(
-      productFormSchema.safeParse({ ...validForm, barcode: '12' }).success,
     ).toBe(false)
   })
 

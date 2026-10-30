@@ -1,5 +1,6 @@
 import { Eye, Package } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TableActionButton } from '@/components/ui/table-action-button'
 import type { PurchaseSummary } from '../types/purchases.types'
 import {
   currencyFormatter,
@@ -88,17 +89,16 @@ export function PurchasesTable({
                   <PurchaseStatusBadge status={purchase.status} />
                 </td>
                 <td className="px-4 py-3">
-                  <button
-                    type="button"
+                  <TableActionButton
                     onClick={(e) => {
                       e.stopPropagation()
                       onOpen(purchase)
                     }}
-                    className="flex size-8 items-center justify-center rounded-lg text-muted-foreground opacity-0 transition-opacity hover:bg-muted hover:text-foreground group-hover:opacity-100"
-                    aria-label={`Ver compra ${purchase.code}`}
+                    label={`Ver compra ${purchase.code}`}
+                    title="Ver detalle"
                   >
-                    <Eye size={15} />
-                  </button>
+                    <Eye aria-hidden size={15} />
+                  </TableActionButton>
                 </td>
               </tr>
             ))}

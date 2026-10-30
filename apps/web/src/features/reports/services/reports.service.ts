@@ -26,4 +26,6 @@ export const reportsService = {
       `${endpoints.reports.block(block)}?${query(period)}`,
       signal,
     ),
+  exportWorkbook: (period: Period) =>
+    api.download(`${endpoints.reports.export}?${query(period)}`),
 }

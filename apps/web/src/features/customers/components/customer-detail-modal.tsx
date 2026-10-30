@@ -46,16 +46,13 @@ export function CustomerDetailModal({
       }
       className="max-w-2xl"
       footer={
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cerrar
-          </Button>
-          {details && canWrite && (
+        details && canWrite ? (
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" onClick={() => onEdit(details)}>
               <Pencil size={16} /> Editar cliente
             </Button>
-          )}
-        </div>
+          </div>
+        ) : undefined
       }
     >
       {remoteCustomer.isPending && !details ? (

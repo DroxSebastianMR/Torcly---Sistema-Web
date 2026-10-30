@@ -1,5 +1,6 @@
 import { Eye, MoreHorizontal, Receipt, ShoppingCart } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TableActionButton } from '@/components/ui/table-action-button'
 import type { SaleSummary } from '../types/sales.types'
 import {
   currencyFormatter,
@@ -86,18 +87,16 @@ export function SalesTable({ sales, loading, onOpen }: SalesTableProps) {
                   <StatusBadge status={sale.status} />
                 </td>
                 <td className="px-4 py-4 text-right">
-                  <button
-                    type="button"
+                  <TableActionButton
                     onClick={(event) => {
                       event.stopPropagation()
                       onOpen(sale)
                     }}
-                    aria-label={`Ver venta ${sale.code}`}
+                    label={`Ver venta ${sale.code}`}
                     title="Ver detalle"
-                    className="inline-flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
                   >
-                    <Eye size={16} />
-                  </button>
+                    <Eye aria-hidden size={16} />
+                  </TableActionButton>
                 </td>
               </tr>
             ))}
@@ -140,14 +139,14 @@ export function SalesTable({ sales, loading, onOpen }: SalesTableProps) {
               </div>
             </div>
             <div className="mt-4 border-t pt-3">
-              <button
-                type="button"
+              <TableActionButton
                 onClick={() => onOpen(sale)}
-                aria-label={`Ver venta ${sale.code}`}
-                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-muted px-3 text-sm font-medium"
+                label={`Ver venta ${sale.code}`}
+                title="Ver detalle"
+                className="h-10 w-full gap-2 px-3 text-sm font-medium"
               >
-                <Eye size={15} /> Ver detalle
-              </button>
+                <Eye aria-hidden size={15} /> Ver detalle
+              </TableActionButton>
             </div>
           </article>
         ))}
@@ -157,14 +156,15 @@ export function SalesTable({ sales, loading, onOpen }: SalesTableProps) {
 }
 
 function StatusBadge({ status }: { status: SaleSummary['status'] }) {
-  const confirmed = status === 'CONFIRMED'
+  const tone =
+    status === 'CONFIRMED'
+      ? 'bg-emerald-50 text-emerald-700'
+      : status === 'CANCELLED'
+        ? 'bg-rose-50 text-rose-700'
+        : 'bg-amber-50 text-amber-700'
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${
-        confirmed
-          ? 'bg-emerald-50 text-emerald-700'
-          : 'bg-amber-50 text-amber-700'
-      }`}
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${tone}`}
     >
       {saleStatusLabel(status)}
     </span>

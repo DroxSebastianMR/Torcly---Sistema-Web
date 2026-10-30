@@ -6,13 +6,41 @@ import { PrismaClient } from '../src/generated/prisma/client.js'
 import { createPostgresPoolConfig } from '../src/infrastructure/database/postgres-pool.config.js'
 import { hashPassword } from '../src/modules/auth/password.js'
 
-const seedEnvSchema = z.object({
-  DIRECT_URL: z.url().startsWith('postgresql://'),
-  SEED_ADMIN_EMAIL: z.email(),
-  SEED_ADMIN_USERNAME: z.string().min(3).max(50),
-  SEED_ADMIN_NAME: z.string().min(2).max(120),
-  SEED_ADMIN_PASSWORD: z.string().min(12),
-})
+const seedEnvSchema = z
+  .object({
+    NODE_ENV: z
+      .enum(['development', 'test', 'production'])
+      .default('development'),
+    DIRECT_URL: z.url().startsWith('postgresql://'),
+    SEED_ADMIN_EMAIL: z.email(),
+    SEED_ADMIN_USERNAME: z.string().min(3).max(50),
+    SEED_ADMIN_NAME: z.string().min(2).max(120),
+    SEED_ADMIN_PASSWORD: z.string().min(12),
+    SEED_OWNER_EMAIL: z.email().optional(),
+    SEED_OWNER_USERNAME: z.string().min(3).max(50).optional(),
+    SEED_OWNER_NAME: z.string().min(2).max(120).optional(),
+    SEED_OWNER_PASSWORD: z.string().min(12).optional(),
+  })
+  .superRefine((value, context) => {
+    if (value.NODE_ENV !== 'production') return
+
+    const ownerFields = [
+      'SEED_OWNER_EMAIL',
+      'SEED_OWNER_USERNAME',
+      'SEED_OWNER_NAME',
+      'SEED_OWNER_PASSWORD',
+    ] as const
+
+    for (const field of ownerFields) {
+      if (!value[field]) {
+        context.addIssue({
+          code: 'custom',
+          path: [field],
+          message: `${field} es obligatorio para la semilla de producción.`,
+        })
+      }
+    }
+  })
 
 const defaultPermissionCodes = [
   'dashboard:read',
@@ -54,6 +82,15 @@ export interface SeedInput {
   password: string
   roleCode?: string
   permissionCodes?: readonly string[]
+  includeDemoTechnicians?: boolean
+  additionalAdministrators?: readonly SeedAccount[]
+}
+
+export interface SeedAccount {
+  email: string
+  username: string
+  name: string
+  password: string
 }
 
 const demoTechnicians = [
@@ -119,55 +156,76 @@ export async function seedDatabase(database: PrismaClient, input: SeedInput) {
     skipDuplicates: true,
   })
 
-  const passwordHash = await hashPassword(input.password)
-  const administrator = await database.user.upsert({
-    where: { email: input.email.toLowerCase() },
-    update: {
-      username: input.username.toLowerCase(),
-      displayName: input.name,
-      passwordHash,
-      active: true,
-      failedLoginAttempts: 0,
-      lockedUntil: null,
+  const accounts: readonly SeedAccount[] = [
+    {
+      email: input.email,
+      username: input.username,
+      name: input.name,
+      password: input.password,
     },
-    create: {
-      email: input.email.toLowerCase(),
-      username: input.username.toLowerCase(),
-      displayName: input.name,
-      passwordHash,
-    },
-  })
+    ...(input.additionalAdministrators ?? []),
+  ]
+  const seededAccounts = []
 
-  await database.userRole.upsert({
-    where: {
-      userId_roleId: {
-        userId: administrator.id,
-        roleId: administratorRole.id,
+  for (const account of accounts) {
+    const passwordHash = await hashPassword(account.password)
+    const user = await database.user.upsert({
+      where: { email: account.email.toLowerCase() },
+      update: {
+        username: account.username.toLowerCase(),
+        displayName: account.name,
+        passwordHash,
+        active: true,
+        failedLoginAttempts: 0,
+        lockedUntil: null,
       },
-    },
-    update: {},
-    create: { userId: administrator.id, roleId: administratorRole.id },
-  })
-
-  for (const technician of demoTechnicians) {
-    await database.technician.upsert({
-      where: { code: technician.code },
-      update: { ...technician, active: true, updatedBy: administrator.id },
       create: {
-        ...technician,
-        createdBy: administrator.id,
-        updatedBy: administrator.id,
+        email: account.email.toLowerCase(),
+        username: account.username.toLowerCase(),
+        displayName: account.name,
+        passwordHash,
       },
     })
+
+    await database.userRole.upsert({
+      where: {
+        userId_roleId: {
+          userId: user.id,
+          roleId: administratorRole.id,
+        },
+      },
+      update: {},
+      create: { userId: user.id, roleId: administratorRole.id },
+    })
+
+    seededAccounts.push(user)
   }
 
-  // La creación operativa usa la secuencia para generar TEC-000001, etc.
-  // El seed avanza la secuencia para no colisionar con sus cuatro registros.
-  await database.$executeRawUnsafe(
-    `SELECT setval('technicians_code_seq', GREATEST((SELECT COALESCE(MAX(CAST(SUBSTRING(code FROM 5) AS INTEGER)), 0) FROM technicians), 1), true)`,
-  )
+  const administrator = seededAccounts[0]
 
-  console.info(`Seed completado para ${administrator.email}.`)
+  if (input.includeDemoTechnicians ?? true) {
+    for (const technician of demoTechnicians) {
+      await database.technician.upsert({
+        where: { code: technician.code },
+        update: { ...technician, active: true, updatedBy: administrator.id },
+        create: {
+          ...technician,
+          createdBy: administrator.id,
+          updatedBy: administrator.id,
+        },
+      })
+    }
+
+    // La creación operativa usa la secuencia para generar TEC-000001, etc.
+    // El seed avanza la secuencia para no colisionar con sus cuatro registros.
+    await database.$executeRawUnsafe(
+      `SELECT setval('technicians_code_seq', GREATEST((SELECT COALESCE(MAX(CAST(SUBSTRING(code FROM 5) AS INTEGER)), 0) FROM technicians), 1), true)`,
+    )
+  }
+
+  console.info(
+    `Seed completado para ${seededAccounts.map((account) => account.email).join(', ')}.`,
+  )
   return administrator
 }
 
@@ -183,6 +241,17 @@ async function runSeed() {
       username: seedEnv.SEED_ADMIN_USERNAME,
       name: seedEnv.SEED_ADMIN_NAME,
       password: seedEnv.SEED_ADMIN_PASSWORD,
+      includeDemoTechnicians: seedEnv.NODE_ENV !== 'production',
+      additionalAdministrators: seedEnv.SEED_OWNER_EMAIL
+        ? [
+            {
+              email: seedEnv.SEED_OWNER_EMAIL,
+              username: seedEnv.SEED_OWNER_USERNAME!,
+              name: seedEnv.SEED_OWNER_NAME!,
+              password: seedEnv.SEED_OWNER_PASSWORD!,
+            },
+          ]
+        : [],
     })
   } finally {
     await database.$disconnect()

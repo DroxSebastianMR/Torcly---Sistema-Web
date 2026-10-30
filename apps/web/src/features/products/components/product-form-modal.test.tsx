@@ -149,24 +149,10 @@ describe('Formulario de productos', () => {
     expect(onClose).toHaveBeenCalledOnce()
   })
 
-  it('el Enter en el código no envía el formulario (compatible con lector USB)', async () => {
-    const user = userEvent.setup()
-    service.create.mockResolvedValue({ data: {} })
+  it('no muestra el campo de código de barras', () => {
     renderModal()
 
-    const codeInput = screen.getByLabelText(/^código del producto/i)
-    await user.type(codeInput, 'rep-999')
-    await user.keyboard('{Enter}')
-
-    expect((codeInput as HTMLInputElement).value).toBe('rep-999')
-    expect(service.create).not.toHaveBeenCalled()
-
-    const barcodeInput = screen.getByLabelText(/^código de barras/i)
-    await user.type(barcodeInput, '7759999999999')
-    await user.keyboard('{Enter}')
-
-    expect((barcodeInput as HTMLInputElement).value).toBe('7759999999999')
-    expect(service.create).not.toHaveBeenCalled()
+    expect(screen.queryByLabelText(/^código de barras/i)).toBeNull()
   })
 
   it('precarga la ficha, muestra existencias de solo lectura y actualiza', async () => {

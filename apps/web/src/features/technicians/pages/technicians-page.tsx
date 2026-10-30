@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
 import { ModuleMetrics } from '@/components/ui/module-metrics'
 import { Pagination } from '@/components/ui/pagination'
+import { TableActionButton } from '@/components/ui/table-action-button'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import {
@@ -175,19 +176,24 @@ export default function TechniciansPage() {
                     {canWrite && (
                       <td className="px-4 py-4">
                         <div className="flex justify-end gap-1">
-                          <button
-                            className="rounded-lg p-2 hover:bg-muted"
-                            aria-label={`Editar ${item.fullName}`}
+                          <TableActionButton
+                            label={`Editar ${item.fullName}`}
+                            title="Editar técnico"
                             onClick={() => {
                               setEditing(item)
                               setOpen(true)
                             }}
                           >
                             <Pencil size={16} />
-                          </button>
-                          <button
-                            className="rounded-lg p-2 hover:bg-muted"
-                            aria-label={`${item.active ? 'Desactivar' : 'Activar'} ${item.fullName}`}
+                          </TableActionButton>
+                          <TableActionButton
+                            label={`${item.active ? 'Desactivar' : 'Activar'} ${item.fullName}`}
+                            title={
+                              item.active
+                                ? 'Desactivar técnico'
+                                : 'Activar técnico'
+                            }
+                            tone={item.active ? 'danger' : 'default'}
                             onClick={async () => {
                               try {
                                 await mutations.status.mutateAsync({
@@ -205,7 +211,7 @@ export default function TechniciansPage() {
                             }}
                           >
                             <Power size={16} />
-                          </button>
+                          </TableActionButton>
                         </div>
                       </td>
                     )}

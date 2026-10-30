@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -33,7 +33,6 @@ const inputClass =
 
 const emptyValues: ProductFormValues = {
   code: '',
-  barcode: '',
   name: '',
   description: '',
   categoryId: '',
@@ -61,13 +60,12 @@ export function ProductFormModal({
   const unitId = useWatch({ control: form.control, name: 'unitId' })
   const { reset: resetForm } = form
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) return
     resetForm(
       product
         ? {
             code: product.code,
-            barcode: product.barcode ?? '',
             name: product.name,
             description: product.description ?? '',
             categoryId: product.categoryId,
@@ -84,7 +82,7 @@ export function ProductFormModal({
     const input: ProductInput = {
       ...values,
       code: values.code.trim().toUpperCase(),
-      barcode: values.barcode.trim() || null,
+      barcode: product?.barcode ?? null,
       name: values.name.trim(),
       description: values.description.trim() || null,
       brandId: values.brandId || null,
@@ -171,10 +169,7 @@ export function ProductFormModal({
         onSubmit={submit}
         onKeyDownCapture={(event) => {
           const target = event.target as HTMLInputElement
-          if (
-            event.key === 'Enter' &&
-            (target.name === 'code' || target.name === 'barcode')
-          ) {
+          if (event.key === 'Enter' && target.name === 'code') {
             event.preventDefault()
             event.stopPropagation()
           }
@@ -182,34 +177,15 @@ export function ProductFormModal({
         noValidate
         className="space-y-5"
       >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            label="Código del producto"
-            error={fieldError('code')}
-            required
-          >
-            <Input
-              {...form.register('code')}
-              autoComplete="off"
-              placeholder="Ej. REP-001"
-              className="uppercase"
-              onKeyDown={stopImplicitSubmit}
-            />
-          </Field>
-          <Field
-            label="Código de barras"
-            error={fieldError('barcode')}
-            hint="Opcional"
-          >
-            <Input
-              {...form.register('barcode')}
-              autoComplete="off"
-              inputMode="numeric"
-              placeholder="Escanea o digita el código"
-              onKeyDown={stopImplicitSubmit}
-            />
-          </Field>
-        </div>
+        <Field label="Código del producto" error={fieldError('code')} required>
+          <Input
+            {...form.register('code')}
+            autoComplete="off"
+            placeholder="Ej. REP-001"
+            className="uppercase"
+            onKeyDown={stopImplicitSubmit}
+          />
+        </Field>
 
         <Field label="Nombre del producto" error={fieldError('name')} required>
           <Input

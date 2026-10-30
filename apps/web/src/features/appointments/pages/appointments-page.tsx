@@ -280,10 +280,10 @@ export default function Page() {
         title="Atender cita y crear orden"
         description={
           attendTarget
-            ? `La cita ${attendTarget.code} pasará a estado atendida y se generará la orden de taller OT-###### con el cliente y vehículo de la cita. Esta acción no se puede deshacer.`
+            ? 'La cita se marcará como atendida y se creará su orden de taller.'
             : undefined
         }
-        confirmLabel="Atender y crear orden"
+        confirmLabel="Crear orden"
         onConfirm={attendAppointment}
         onCancel={() => setAttendTarget(null)}
       />

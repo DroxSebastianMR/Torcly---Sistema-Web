@@ -9,13 +9,17 @@ import {
 } from '../payments/payment.rules.js'
 import { MOVEMENT_TYPES } from './reports.types.js'
 import type {
+  InventoryTrendPoint,
+  PaymentsTrendPoint,
   ReportBlock,
   ReportBlockData,
   ReportGranularity,
   ReportPeriod,
   ReportSummary,
   ReportTrendPoint,
+  WorkshopTrendPoint,
 } from './reports.types.js'
+import { createReportsWorkbook } from './reports.exporter.js'
 import { reportsRepository } from './reports.repository.js'
 import type {
   MovementTrendRow,
@@ -69,17 +73,6 @@ function buildTrend<TRow>(
       amount: roundMoney(slot?.amount ?? 0),
     }
   })
-}
-
-function emptyTrend(
-  buckets: Array<{ key: string; label: string }>,
-): ReportTrendPoint[] {
-  return buckets.map((bucket) => ({
-    bucket: bucket.key,
-    label: bucket.label,
-    count: 0,
-    amount: 0,
-  }))
 }
 
 async function buildSalesBlock(
@@ -166,16 +159,7 @@ async function buildPaymentsBlock(
       ),
       byStatus,
     },
-    trend: buildTrend(
-      paymentRows,
-      (row: PaymentTrendRow) => ({
-        date: row.occurredAt,
-        count: 1,
-        amount: row.type === 'PAYMENT' ? row.amount : -row.amount,
-      }),
-      buckets,
-      granularity,
-    ),
+    trend: buildPaymentsTrend(paymentRows, buckets, granularity),
   }
 }
 
@@ -210,13 +194,44 @@ async function buildInventoryBlock(
       byType,
       lowStockCount: lowStock.length,
     },
-    trend: buckets.map((bucket) => {
+    trend: buckets.map((bucket): InventoryTrendPoint => {
       const movements = movementsByBucket.get(bucket.key) ?? []
+      const quantities = {
+        initial: 0,
+        entry: 0,
+        exit: 0,
+        adjustmentIn: 0,
+        adjustmentOut: 0,
+      }
+      for (const movement of movements) {
+        switch (movement.type) {
+          case 'INITIAL':
+            quantities.initial += movement.quantity
+            break
+          case 'ENTRY':
+            quantities.entry += movement.quantity
+            break
+          case 'EXIT':
+            quantities.exit += movement.quantity
+            break
+          case 'ADJUSTMENT_IN':
+            quantities.adjustmentIn += movement.quantity
+            break
+          case 'ADJUSTMENT_OUT':
+            quantities.adjustmentOut += movement.quantity
+            break
+        }
+      }
       return {
         bucket: bucket.key,
         label: bucket.label,
         count: movements.length,
         amount: roundMoney(computeStock(movements)),
+        initial: roundQuantity(quantities.initial),
+        entry: roundQuantity(quantities.entry),
+        exit: roundQuantity(quantities.exit),
+        adjustmentIn: roundQuantity(quantities.adjustmentIn),
+        adjustmentOut: roundQuantity(quantities.adjustmentOut),
       }
     }),
     lowStock: lowStock.map((product) => ({
@@ -346,15 +361,16 @@ async function buildWorkshopBlock(
       ),
       appointmentsByStatus,
     },
-    trend:
-      buckets.length > 0
-        ? buckets.map((bucket) => ({
-            bucket: bucket.key,
-            label: bucket.label,
-            count: ordersByBucket.get(bucket.key) ?? 0,
-            amount: deliveriesByBucket.get(bucket.key) ?? 0,
-          }))
-        : emptyTrend(buckets),
+    trend: buckets.map(
+      (bucket): WorkshopTrendPoint => ({
+        bucket: bucket.key,
+        label: bucket.label,
+        count: ordersByBucket.get(bucket.key) ?? 0,
+        amount: deliveriesByBucket.get(bucket.key) ?? 0,
+        ordersCreated: ordersByBucket.get(bucket.key) ?? 0,
+        delivered: deliveriesByBucket.get(bucket.key) ?? 0,
+      }),
+    ),
   }
 }
 
@@ -407,4 +423,59 @@ export const reportsService = {
     const granularity = resolveGranularity(period.from, period.to)
     return buildBlock(block, period, granularity)
   },
+
+  async exportWorkbook(
+    filters: { from: string | null; to: string | null },
+    permissions: readonly string[],
+  ): Promise<{ file: Buffer; period: ReportPeriod }> {
+    const period = resolvePeriod(filters.from, filters.to)
+    const granularity = resolveGranularity(period.from, period.to)
+    const blocks = await Promise.all(
+      authorizedBlocks(permissions).map((block) =>
+        buildBlock(block, period, granularity),
+      ),
+    )
+    const generatedAt = new Date().toISOString()
+    return {
+      file: await createReportsWorkbook({ period, generatedAt, blocks }),
+      period,
+    }
+  },
+}
+
+function buildPaymentsTrend(
+  rows: readonly PaymentTrendRow[],
+  buckets: Array<{ key: string; label: string }>,
+  granularity: ReportGranularity,
+): PaymentsTrendPoint[] {
+  const totals = new Map<
+    string,
+    { count: number; grossCollected: number; compensated: number }
+  >()
+  for (const row of rows) {
+    const key = bucketKey(row.occurredAt, granularity)
+    const slot = totals.get(key) ?? {
+      count: 0,
+      grossCollected: 0,
+      compensated: 0,
+    }
+    slot.count += 1
+    if (row.type === 'PAYMENT') slot.grossCollected += row.amount
+    else slot.compensated += row.amount
+    totals.set(key, slot)
+  }
+  return buckets.map((bucket) => {
+    const slot = totals.get(bucket.key)
+    const grossCollected = roundMoney(slot?.grossCollected ?? 0)
+    const compensated = roundMoney(slot?.compensated ?? 0)
+    return {
+      bucket: bucket.key,
+      label: bucket.label,
+      count: slot?.count ?? 0,
+      amount: roundMoney(grossCollected - compensated),
+      grossCollected,
+      compensated,
+      netCollected: roundMoney(grossCollected - compensated),
+    }
+  })
 }

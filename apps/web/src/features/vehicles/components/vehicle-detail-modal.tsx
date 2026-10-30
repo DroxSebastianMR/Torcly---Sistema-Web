@@ -32,16 +32,13 @@ export function VehicleDetailModal({
       }
       className="max-w-2xl"
       footer={
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cerrar
-          </Button>
-          {vehicle && canWrite && (
+        vehicle && canWrite ? (
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" onClick={() => onEdit(vehicle)}>
               <Pencil size={16} /> Editar vehículo
             </Button>
-          )}
-        </div>
+          </div>
+        ) : undefined
       }
     >
       {vehicle && (

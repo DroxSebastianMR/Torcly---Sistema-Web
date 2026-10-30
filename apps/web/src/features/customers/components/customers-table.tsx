@@ -6,6 +6,7 @@ import {
   UsersRound,
 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TableActionButton } from '@/components/ui/table-action-button'
 import type { Customer } from '../types/customers.types'
 import {
   customerDisplayName,
@@ -95,21 +96,21 @@ export function CustomersTable({
                 </td>
                 <td className="px-4 py-4">
                   <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
-                    <ActionButton
+                    <TableActionButton
                       label={`Ver ficha de ${customerDisplayName(customer)}`}
                       title="Ver ficha"
                       onClick={() => onOpenDetail(customer)}
                     >
                       <Eye size={16} />
-                    </ActionButton>
-                    <ActionButton
+                    </TableActionButton>
+                    <TableActionButton
                       label={`Editar ${customerDisplayName(customer)}`}
                       title="Editar datos"
                       onClick={() => onEdit(customer)}
                       disabled={!canWrite}
                     >
                       <Pencil size={16} />
-                    </ActionButton>
+                    </TableActionButton>
                   </div>
                 </td>
               </tr>
@@ -140,56 +141,28 @@ export function CustomersTable({
               />
             </div>
             <div className="mt-4 flex gap-2 border-t pt-3">
-              <button
-                type="button"
+              <TableActionButton
                 onClick={() => onOpenDetail(customer)}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-muted px-3 py-2 text-sm font-medium"
+                label={`Ver ficha de ${customerDisplayName(customer)}`}
+                title="Ver ficha"
+                className="h-10 flex-1 gap-2 px-3 text-sm font-medium"
               >
-                <Eye size={15} /> Ver ficha
-              </button>
+                <Eye aria-hidden size={15} /> Ver ficha
+              </TableActionButton>
               {canWrite && (
-                <button
-                  type="button"
+                <TableActionButton
                   onClick={() => onEdit(customer)}
-                  className="flex size-10 items-center justify-center rounded-lg border"
-                  aria-label={`Editar ${customerDisplayName(customer)}`}
+                  label={`Editar ${customerDisplayName(customer)}`}
                   title="Editar datos"
                 >
                   <Pencil size={16} />
-                </button>
+                </TableActionButton>
               )}
             </div>
           </article>
         ))}
       </div>
     </>
-  )
-}
-
-function ActionButton({
-  label,
-  title,
-  onClick,
-  disabled,
-  children,
-}: {
-  label: string
-  title: string
-  onClick: () => void
-  disabled?: boolean
-  children: React.ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      title={title}
-      aria-label={label}
-      onClick={onClick}
-      disabled={disabled}
-      className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary disabled:pointer-events-none disabled:opacity-40"
-    >
-      {children}
-    </button>
   )
 }
 

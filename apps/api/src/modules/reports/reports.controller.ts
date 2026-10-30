@@ -27,3 +27,21 @@ export const getReportBlock: RequestHandler = async (request, response) => {
     ),
   )
 }
+
+export const exportReports: RequestHandler = async (request, response) => {
+  const parsed = reportsSummaryQuerySchema.parse(request.query)
+  const { file, period } = await reportsService.exportWorkbook(
+    { from: parsed.from ?? null, to: parsed.to ?? null },
+    request.auth?.permissions ?? [],
+  )
+  const filename = `torcly-reportes-${period.from}-${period.to}.xlsx`
+  response
+    .status(200)
+    .setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+    .setHeader('Content-Disposition', `attachment; filename="${filename}"`)
+    .setHeader('Cache-Control', 'no-store')
+    .send(file)
+}

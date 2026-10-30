@@ -1,8 +1,8 @@
-import { Wrench } from 'lucide-react'
+import { BadgeDollarSign, PackageCheck, Wrench } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
-import { BarChart } from '../bar-chart'
 import { IndicatorCard } from '../indicator-card'
 import { ReportTable } from '../report-table'
+import { TrendChart } from '../trend-chart'
 import type { ServicesBlockData } from '../../types/reports.types'
 import {
   formatAmount,
@@ -28,36 +28,41 @@ export function ServicesBlockContent({ data }: { data: ServicesBlockData }) {
           label="Servicios"
           value={formatCount(data.metrics.serviceCount)}
           hint="Distintos en el período"
+          icon={<Wrench className="size-4" />}
+          tone="purple"
         />
         <IndicatorCard
           label="Unidades vendidas"
           value={formatQuantity(data.metrics.unitsSold)}
+          icon={<PackageCheck className="size-4" />}
+          tone="cyan"
         />
         <IndicatorCard
           label="Importe"
           value={formatAmount(data.metrics.amount)}
           hint={`Promedio por unidad: ${formatAmount(data.metrics.averagePerUnit)}`}
+          icon={<BadgeDollarSign className="size-4" />}
+          tone="amber"
         />
       </div>
-      <BarChart
-        rows={data.trend.map((point) => ({
-          key: point.bucket,
-          label: point.label,
-          count: point.count,
-          amount: point.amount,
-        }))}
-        primary="amount"
-        label="Tendencia de servicios"
+      <TrendChart
+        data={data.trend}
+        type="area"
+        title="Tendencia de servicios"
         ariaLabel="Tendencia de importe de servicios del período"
-        caption={`Tendencia de servicios: ${data.period.from} a ${data.period.to}`}
-        countLabel="Unidades"
-        amountLabel="Importe"
-        countFormatter={formatQuantity}
-        amountFormatter={formatAmount}
+        series={[
+          {
+            key: 'amount',
+            label: 'Importe facturado',
+            color: '#147357',
+            formatter: formatAmount,
+          },
+        ]}
       />
       <ReportTable
-        caption="Servicios más vendidos (top 10)"
-        rows={data.top}
+        caption="Servicios más solicitados"
+        rows={data.top.slice(0, 5)}
+        ranked
         columns={[
           {
             key: 'name',

@@ -11,6 +11,7 @@ const repository = vi.hoisted(() => ({
   create: vi.fn(),
   update: vi.fn(),
   confirm: vi.fn(),
+  cancel: vi.fn(),
   getCatalog: vi.fn(),
 }))
 
@@ -125,6 +126,9 @@ describe('Servicio de ventas', () => {
           performedBy: 'actor-1',
           confirmedBy: 'actor-1',
           confirmedAt: '2026-01-03T00:00:00.000Z',
+          cancelledBy: null,
+          cancelledAt: null,
+          cancellationReason: null,
           createdAt: '2026-01-02T00:00:00.000Z',
           updatedAt: '2026-01-02T00:00:00.000Z',
         },
@@ -399,6 +403,52 @@ describe('Servicio de ventas', () => {
       context,
     )
     expect(result.data.status).toBe('CONFIRMED')
+  })
+
+  it('crea y confirma en una única operación del repositorio', async () => {
+    repository.findProductRef.mockResolvedValue({
+      id: productId,
+      code: 'FILTRO-01',
+      name: 'Filtro de aceite',
+      active: true,
+      salePrice: 35.5,
+      unit: { name: 'Unidad', symbol: 'ud' },
+    })
+    repository.create.mockResolvedValue(
+      record({
+        status: 'CONFIRMED',
+        confirmedBy: 'actor-1',
+        confirmedAt: new Date(),
+      }),
+    )
+
+    await salesService.create(input, 'actor-1', context, true)
+
+    expect(repository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ confirm: true }),
+      { id: 'actor-1', name: 'actor-1' },
+      context,
+    )
+    expect(repository.confirm).not.toHaveBeenCalled()
+  })
+
+  it('anula una venta delegando la reversión auditada al repositorio', async () => {
+    repository.cancel.mockResolvedValue(record({ status: 'CANCELLED' }))
+
+    const result = await salesService.cancel(
+      'sale-1',
+      { reason: 'Cliente desistió de la compra.' },
+      'actor-1',
+      context,
+    )
+
+    expect(repository.cancel).toHaveBeenCalledWith(
+      'sale-1',
+      'Cliente desistió de la compra.',
+      { id: 'actor-1', name: 'actor-1' },
+      context,
+    )
+    expect(result.data.status).toBe('CANCELLED')
   })
 
   it('mapea claves de idempotencia duplicadas en la creación', async () => {

@@ -1,4 +1,4 @@
-import { Pencil, Receipt, UserRound } from 'lucide-react'
+import { Ban, Pencil, Receipt, UserRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
 import type { SaleDetail, SaleLine } from '../types/sales.types'
@@ -16,6 +16,7 @@ interface SaleDetailModalProps {
   canEdit: boolean
   onClose: () => void
   onEdit: (sale: SaleDetail) => void
+  onCancelSale: (sale: SaleDetail) => void
 }
 
 export function SaleDetailModal({
@@ -25,6 +26,7 @@ export function SaleDetailModal({
   canEdit,
   onClose,
   onEdit,
+  onCancelSale,
 }: SaleDetailModalProps) {
   return (
     <Modal
@@ -36,16 +38,22 @@ export function SaleDetailModal({
       }
       className="max-w-3xl"
       footer={
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          {sale && sale.status === 'DRAFT' && canEdit && (
-            <Button type="button" onClick={() => onEdit(sale)}>
-              <Pencil size={16} /> Editar venta
+        sale && sale.status !== 'CANCELLED' && canEdit ? (
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            {sale.status === 'DRAFT' && (
+              <Button type="button" onClick={() => onEdit(sale)}>
+                <Pencil size={16} /> Editar venta
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onCancelSale(sale)}
+            >
+              <Ban size={16} /> Anular venta
             </Button>
-          )}
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cerrar
-          </Button>
-        </div>
+          </div>
+        ) : undefined
       }
     >
       {loading || !sale ? (
@@ -81,7 +89,28 @@ export function SaleDetailModal({
                   : 'Pendiente de confirmación'
               }
             />
+            {sale.status === 'CANCELLED' && (
+              <InfoItem
+                label="Anulada por"
+                value={
+                  sale.cancelledBy
+                    ? `${sale.cancelledBy} · ${dateTimeFormatter.format(
+                        new Date(sale.cancelledAt ?? sale.updatedAt),
+                      )}`
+                    : 'Anulada'
+                }
+              />
+            )}
           </div>
+
+          {sale.status === 'CANCELLED' && sale.cancellationReason && (
+            <div className="rounded-xl border border-rose-100 bg-rose-50/60 px-4 py-3 text-sm text-rose-900">
+              <p className="text-xs font-semibold uppercase tracking-wider text-rose-700">
+                Motivo de anulación
+              </p>
+              <p className="mt-1 font-medium">{sale.cancellationReason}</p>
+            </div>
+          )}
 
           <div className="overflow-hidden rounded-xl border">
             <div className="hidden divide-y md:block">

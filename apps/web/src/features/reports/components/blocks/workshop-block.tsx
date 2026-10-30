@@ -1,10 +1,11 @@
-import { Building2 } from 'lucide-react'
+import { Building2, CalendarDays, Clock3, PackageCheck } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { appointmentStatusLabel } from '@/features/appointments/utils/appointment-formatters'
 import { workOrderStatusLabel } from '@/features/work-orders/utils/work-order-formatters'
-import { BarChart } from '../bar-chart'
 import { IndicatorCard } from '../indicator-card'
 import { ReportTable } from '../report-table'
+import { CompositionChart } from '../composition-chart'
+import { TrendChart } from '../trend-chart'
 import type { WorkshopBlockData } from '../../types/reports.types'
 import { formatCount, formatHours } from '../../utils/report-formatters'
 
@@ -47,36 +48,59 @@ export function WorkshopBlockContent({ data }: { data: WorkshopBlockData }) {
         <IndicatorCard
           label="Órdenes de taller"
           value={formatCount(data.metrics.workOrderCount)}
+          icon={<Building2 className="size-4" />}
+          tone="purple"
         />
         <IndicatorCard
           label="Entregadas"
           value={formatCount(data.metrics.deliveredCount)}
+          icon={<PackageCheck className="size-4" />}
+          tone="cyan"
         />
         <IndicatorCard
           label="Tiempo promedio"
           value={formatHours(data.metrics.averageDeliveryHours)}
           hint="Entre creación y entrega"
+          icon={<Clock3 className="size-4" />}
+          tone="amber"
         />
         <IndicatorCard
           label="Citas"
           value={formatCount(data.metrics.appointmentCount)}
+          icon={<CalendarDays className="size-4" />}
+          tone="red"
         />
       </div>
-      <BarChart
-        rows={data.trend.map((point) => ({
-          key: point.bucket,
-          label: point.label,
-          count: point.count,
-          amount: point.amount,
-        }))}
-        primary="count"
-        label="Tendencia de taller"
+      <TrendChart
+        data={data.trend}
+        type="bar"
+        title="Órdenes y entregas"
         ariaLabel="Tendencia de órdenes y entregas del período"
-        caption={`Tendencia de taller: ${data.period.from} a ${data.period.to}`}
-        countLabel="Órdenes"
-        amountLabel="Entregas"
-        countFormatter={formatCount}
-        amountFormatter={formatCount}
+        series={[
+          {
+            key: 'ordersCreated',
+            label: 'Órdenes creadas',
+            color: '#147357',
+            formatter: formatCount,
+          },
+          {
+            key: 'delivered',
+            label: 'Entregadas',
+            color: '#2a79a5',
+            formatter: formatCount,
+          },
+        ]}
+      />
+      <CompositionChart
+        title="Órdenes por etapa"
+        ariaLabel="Distribución de órdenes de taller por etapa"
+        formatter={formatCount}
+        rows={workOrders.map((row, index) => ({
+          key: row.status,
+          label: workOrderStatusLabel[row.status],
+          value: row.count,
+          color: ['#147357', '#2a79a5', '#c85d00', '#7758b5'][index % 4]!,
+        }))}
       />
       <ReportTable
         caption="Órdenes por etapa"

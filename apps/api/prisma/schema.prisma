@@ -33,6 +33,7 @@ enum CustomerType {
 enum SaleStatus {
   DRAFT
   CONFIRMED
+  CANCELLED
 }
 
 enum SaleLineType {
@@ -84,6 +85,11 @@ enum PaymentType {
   COMPENSATION
 }
 
+enum CashSessionStatus {
+  OPEN
+  CLOSED
+}
+
 enum AuditEventType {
   LOGIN_SUCCESS
   LOGIN_FAILURE
@@ -118,6 +124,7 @@ enum AuditEventType {
   INVENTORY_ADJUSTMENT_REGISTERED
   SALE_CREATED
   SALE_CONFIRMED
+  SALE_CANCELLED
   APPOINTMENT_CREATED
   APPOINTMENT_RESCHEDULED
   APPOINTMENT_CANCELLED
@@ -138,6 +145,8 @@ enum AuditEventType {
   WORK_ORDER_DELIVERED
   PAYMENT_REGISTERED
   PAYMENT_COMPENSATED
+  CASH_SESSION_OPENED
+  CASH_SESSION_CLOSED
   REPLENISHMENT_RUN_EXECUTED
   PASSWORD_RESET_REQUESTED
   PASSWORD_RESET_COMPLETED
@@ -479,6 +488,9 @@ model Sale {
   performedBy String     @map("performed_by") @db.VarChar(80)
   confirmedBy String?    @map("confirmed_by") @db.VarChar(80)
   confirmedAt DateTime?  @map("confirmed_at") @db.Timestamptz(3)
+  cancelledBy String?    @map("cancelled_by") @db.VarChar(80)
+  cancelledAt DateTime?  @map("cancelled_at") @db.Timestamptz(3)
+  cancellationReason String? @map("cancellation_reason") @db.VarChar(300)
   lines       SaleLine[]
   payments    Payment[]
   createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -663,6 +675,8 @@ model Payment {
   code              String        @unique @db.VarChar(20)
   saleId            String        @map("sale_id") @db.Uuid
   sale              Sale          @relation(fields: [saleId], references: [id], onDelete: Restrict)
+  cashSessionId     String?       @map("cash_session_id") @db.Uuid
+  cashSession       CashSession?  @relation(fields: [cashSessionId], references: [id], onDelete: SetNull)
   customerId        String?       @map("customer_id") @db.Uuid
   customer          Customer?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
   type              PaymentType   @default(PAYMENT)
@@ -679,11 +693,37 @@ model Payment {
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
 
   @@index([saleId, occurredAt])
+  @@index([cashSessionId, method, occurredAt])
   @@index([saleId, method])
   @@index([customerId])
   @@index([method, occurredAt])
   @@index([occurredAt])
   @@map("payments")
+}
+
+model CashSession {
+  id                    String            @id @default(uuid()) @db.Uuid
+  code                  String            @unique @db.VarChar(20)
+  status                CashSessionStatus @default(OPEN)
+  openingAmount         Decimal           @map("opening_amount") @db.Decimal(12, 2)
+  openingNotes          String?           @map("opening_notes") @db.VarChar(300)
+  openedBy              String            @map("opened_by") @db.VarChar(80)
+  openedAt              DateTime          @default(now()) @map("opened_at") @db.Timestamptz(3)
+  openingIdempotencyKey String            @unique @map("opening_idempotency_key") @db.VarChar(100)
+  expectedCashAmount    Decimal?          @map("expected_cash_amount") @db.Decimal(12, 2)
+  countedCashAmount     Decimal?          @map("counted_cash_amount") @db.Decimal(12, 2)
+  differenceAmount      Decimal?          @map("difference_amount") @db.Decimal(12, 2)
+  closingNotes          String?           @map("closing_notes") @db.VarChar(300)
+  closedBy              String?           @map("closed_by") @db.VarChar(80)
+  closedAt              DateTime?         @map("closed_at") @db.Timestamptz(3)
+  closingIdempotencyKey String?           @unique @map("closing_idempotency_key") @db.VarChar(100)
+  payments              Payment[]
+  createdAt             DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([status, openedAt])
+  @@index([closedAt])
+  @@map("cash_sessions")
 }
 
 model ReplenishmentRun {

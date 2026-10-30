@@ -1,6 +1,6 @@
-import { History, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Eye, History, X } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TableActionButton } from '@/components/ui/table-action-button'
 import type { ReplenishmentRunSummary } from '../types/replenishment.types'
 import {
   formatCount,
@@ -78,15 +78,13 @@ export function RunTable({ runs, loading, onOpenDetail }: RunTableProps) {
                   {run.actorName}
                 </td>
                 <td className="px-4 py-4 text-right">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-9 px-3"
-                    aria-label={`Ver detalle de corrida ${run.code}`}
+                  <TableActionButton
+                    label={`Ver detalle de corrida ${run.code}`}
+                    title="Ver detalle"
                     onClick={() => onOpenDetail(run.code)}
                   >
-                    Ver
-                  </Button>
+                    <Eye aria-hidden size={16} />
+                  </TableActionButton>
                 </td>
               </tr>
             ))}
@@ -130,15 +128,14 @@ export function RunTable({ runs, loading, onOpenDetail }: RunTableProps) {
               <RunInfo label="Ejecutado por" value={run.actorName} />
             </div>
             <div className="mt-4 border-t pt-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="h-10 w-full"
-                aria-label={`Ver detalle de corrida ${run.code}`}
+              <TableActionButton
+                label={`Ver detalle de corrida ${run.code}`}
+                title="Ver detalle"
                 onClick={() => onOpenDetail(run.code)}
+                className="h-10 w-full gap-2 px-3 text-sm font-medium"
               >
-                Ver detalle
-              </Button>
+                <Eye aria-hidden size={16} /> Ver detalle
+              </TableActionButton>
             </div>
           </article>
         ))}

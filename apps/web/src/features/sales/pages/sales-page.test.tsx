@@ -12,11 +12,13 @@ vi.mock('@/features/auth/hooks/auth-context', () => auth)
 const sales = vi.hoisted(() => ({
   useSales: vi.fn(),
   useSale: vi.fn(),
+  useSaleMutations: vi.fn(),
 }))
 vi.mock('../hooks/use-sales', () => ({
   saleKeys: { all: ['sales'] },
   useSales: sales.useSales,
   useSale: sales.useSale,
+  useSaleMutations: sales.useSaleMutations,
 }))
 
 vi.mock('../components/sale-detail-modal', () => ({
@@ -24,6 +26,9 @@ vi.mock('../components/sale-detail-modal', () => ({
 }))
 vi.mock('../components/sale-form-modal', () => ({
   SaleFormModal: () => null,
+}))
+vi.mock('../components/sale-cancel-modal', () => ({
+  SaleCancelModal: () => null,
 }))
 
 const saleMock = {
@@ -37,6 +42,9 @@ const saleMock = {
   performedBy: 'Admin',
   confirmedBy: null,
   confirmedAt: null,
+  cancelledBy: null,
+  cancelledAt: null,
+  cancellationReason: null,
   createdAt: '2026-01-02T00:00:00.000Z',
   updatedAt: '2026-01-02T00:00:00.000Z',
 }

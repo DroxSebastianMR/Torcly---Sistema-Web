@@ -24,7 +24,7 @@ export const workOrderQuerySchema = z.object({
   status: workOrderStatusSchema.or(z.literal('all')).default('all'),
   technicianId: z.uuid('Técnico inválido.').optional(),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(5).max(100).default(20),
+  pageSize: z.coerce.number().int().min(5).max(100).default(10),
 })
 
 export const createWorkOrderSchema = z

@@ -72,6 +72,7 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
 
   const busy =
     mutations.create.isPending ||
+    mutations.createConfirmed?.isPending ||
     mutations.update.isPending ||
     mutations.confirm.isPending
   const isEditing = sale !== null
@@ -265,8 +266,11 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
             : 'Venta actualizada correctamente.',
         )
       } else {
-        const created = await mutations.create.mutateAsync(input)
-        if (confirm) await mutations.confirm.mutateAsync(created.data.id)
+        if (confirm) {
+          await mutations.createConfirmed.mutateAsync(input)
+        } else {
+          await mutations.create.mutateAsync(input)
+        }
         toast.success(
           confirm
             ? 'Venta confirmada correctamente.'

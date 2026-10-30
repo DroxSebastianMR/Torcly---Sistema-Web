@@ -36,10 +36,7 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
               >
                 {header.account.name}
               </strong>
-              <span className="inline-flex shrink-0 items-center gap-1 text-[10px] text-muted-foreground">
-                <i aria-hidden className="size-2 rounded-full bg-emerald-500" />
-                En línea
-              </span>
+              <span className="inline-flex shrink-0 items-center gap-1 text-[10px] text-muted-foreground"></span>
             </div>
           </div>
           <Button

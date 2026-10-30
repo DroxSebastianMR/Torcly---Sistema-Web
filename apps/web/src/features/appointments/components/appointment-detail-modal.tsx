@@ -52,30 +52,29 @@ export function AppointmentDetailModal({
       }
       className="max-w-2xl"
       footer={
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          {isProgrammed && canWrite && appointment && (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onCancel(appointment)}
-              >
-                <X size={16} /> Cancelar cita
+        isProgrammed && appointment && (canWrite || canAttend) ? (
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            {isProgrammed && canWrite && appointment && (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onCancel(appointment)}
+                >
+                  <X size={16} /> Cancelar cita
+                </Button>
+                <Button type="button" onClick={() => onReschedule(appointment)}>
+                  <Pencil size={16} /> Reprogramar
+                </Button>
+              </>
+            )}
+            {isProgrammed && canAttend && appointment && (
+              <Button type="button" onClick={() => onAttend(appointment)}>
+                <ClipboardPlus size={16} /> Atender y crear orden
               </Button>
-              <Button type="button" onClick={() => onReschedule(appointment)}>
-                <Pencil size={16} /> Reprogramar
-              </Button>
-            </>
-          )}
-          {isProgrammed && canAttend && appointment && (
-            <Button type="button" onClick={() => onAttend(appointment)}>
-              <ClipboardPlus size={16} /> Atender y crear orden
-            </Button>
-          )}
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cerrar
-          </Button>
-        </div>
+            )}
+          </div>
+        ) : undefined
       }
     >
       {loading || !appointment ? (

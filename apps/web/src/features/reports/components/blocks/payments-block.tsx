@@ -1,9 +1,10 @@
-import { Wallet } from 'lucide-react'
+import { CircleDollarSign, TriangleAlert, Wallet } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { paymentCollectionStatusLabel } from '@/features/cash/utils/payment-formatters'
-import { BarChart } from '../bar-chart'
 import { IndicatorCard } from '../indicator-card'
 import { ReportTable } from '../report-table'
+import { CompositionChart } from '../composition-chart'
+import { TrendChart } from '../trend-chart'
 import type { PaymentsBlockData } from '../../types/reports.types'
 import { formatAmount, formatCount } from '../../utils/report-formatters'
 
@@ -32,33 +33,65 @@ export function PaymentsBlockContent({ data }: { data: PaymentsBlockData }) {
           label="Cobrado neto"
           value={formatAmount(data.metrics.netCollected)}
           hint="Pagos menos compensaciones del período"
+          icon={<Wallet className="size-4" />}
+          tone="cyan"
         />
         <IndicatorCard
           label="Saldo pendiente"
           value={formatAmount(data.metrics.pendingAmount)}
           hint="Instantánea actual de ventas con saldo"
+          icon={<CircleDollarSign className="size-4" />}
+          tone="purple"
         />
         <IndicatorCard
           label="Obligaciones"
           value={formatCount(data.metrics.pendingCount)}
           hint="Con saldo pendiente hoy"
+          icon={<TriangleAlert className="size-4" />}
+          tone="red"
         />
       </div>
-      <BarChart
-        rows={data.trend.map((point) => ({
-          key: point.bucket,
-          label: point.label,
-          count: point.count,
-          amount: point.amount,
-        }))}
-        primary="amount"
-        label="Tendencia de cobro"
+      <TrendChart
+        data={data.trend}
+        type="bar"
+        title="Cobros y compensaciones"
         ariaLabel="Tendencia de cobro neto del período"
-        caption={`Tendencia de cobro neto: ${data.period.from} a ${data.period.to}`}
-        countLabel="Movimientos"
-        amountLabel="Cobrado"
-        countFormatter={formatCount}
-        amountFormatter={formatAmount}
+        series={[
+          {
+            key: 'grossCollected',
+            label: 'Pagos',
+            color: '#147357',
+            formatter: formatAmount,
+          },
+          {
+            key: 'compensated',
+            label: 'Compensaciones',
+            color: '#c85d00',
+            formatter: formatAmount,
+          },
+          {
+            key: 'netCollected',
+            label: 'Neto',
+            color: '#083b2d',
+            formatter: formatAmount,
+          },
+        ]}
+      />
+      <CompositionChart
+        title="Estado de las obligaciones"
+        ariaLabel="Distribución de obligaciones de cobro por estado"
+        formatter={formatCount}
+        rows={byStatus.map((row) => ({
+          key: row.status,
+          label: paymentCollectionStatusLabel(row.status),
+          value: row.count,
+          color:
+            row.status === 'PAID'
+              ? '#147357'
+              : row.status === 'PARTIALLY_PAID'
+                ? '#c85d00'
+                : '#b23a48',
+        }))}
       />
       <ReportTable
         caption="Estado de las obligaciones (instantánea)"

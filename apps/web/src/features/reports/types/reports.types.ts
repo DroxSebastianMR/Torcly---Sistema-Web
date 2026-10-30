@@ -32,6 +32,25 @@ export interface TrendPoint {
   amount: number
 }
 
+export interface PaymentsTrendPoint extends TrendPoint {
+  grossCollected: number
+  compensated: number
+  netCollected: number
+}
+
+export interface InventoryTrendPoint extends TrendPoint {
+  initial: number
+  entry: number
+  exit: number
+  adjustmentIn: number
+  adjustmentOut: number
+}
+
+export interface WorkshopTrendPoint extends TrendPoint {
+  ordersCreated: number
+  delivered: number
+}
+
 export interface SalesBlockData {
   block: 'sales'
   descriptor: ReportDescriptor
@@ -69,7 +88,7 @@ export interface PaymentsBlockData {
       { count: number; amount: number }
     >
   }
-  trend: TrendPoint[]
+  trend: PaymentsTrendPoint[]
 }
 
 export interface InventoryBlockData {
@@ -83,7 +102,7 @@ export interface InventoryBlockData {
     byType: Record<string, number>
     lowStockCount: number
   }
-  trend: TrendPoint[]
+  trend: InventoryTrendPoint[]
   lowStock: Array<{
     code: string
     name: string
@@ -126,7 +145,7 @@ export interface WorkshopBlockData {
     appointmentCount: number
     appointmentsByStatus: Record<string, number>
   }
-  trend: TrendPoint[]
+  trend: WorkshopTrendPoint[]
 }
 
 export type BlockData =

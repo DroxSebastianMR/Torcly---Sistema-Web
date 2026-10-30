@@ -1,6 +1,6 @@
-import { HandCoins, MoreHorizontal, Receipt } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Eye, HandCoins, MoreHorizontal, Receipt } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TableActionButton } from '@/components/ui/table-action-button'
 import type { PaymentObligationSummary } from '../types/payment.types'
 import {
   currencyFormatter,
@@ -102,21 +102,22 @@ export function PaymentsTable({
                   onClick={(event) => event.stopPropagation()}
                 >
                   {canCollect && obligation.balance > 0 ? (
-                    <Button
-                      type="button"
-                      variant="outline"
+                    <TableActionButton
                       onClick={() => onCollect(obligation)}
+                      label={`Cobrar ${obligation.code}`}
+                      title="Registrar cobro"
+                      tone="warning"
                     >
-                      <HandCoins size={15} /> Cobrar
-                    </Button>
+                      <HandCoins aria-hidden size={17} />
+                    </TableActionButton>
                   ) : (
-                    <Button
-                      type="button"
-                      variant="ghost"
+                    <TableActionButton
                       onClick={() => onOpen(obligation)}
+                      label={`Ver ${obligation.code}`}
+                      title="Ver detalle"
                     >
-                      Ver
-                    </Button>
+                      <Eye aria-hidden size={17} />
+                    </TableActionButton>
                   )}
                 </td>
               </tr>
@@ -141,7 +142,33 @@ export function PaymentsTable({
                     : 'Venta sin cliente'}
                 </p>
               </div>
-              <CollectionBadge status={obligation.collectionStatus} />
+              <div className="flex shrink-0 items-center gap-2">
+                <CollectionBadge status={obligation.collectionStatus} />
+                {canCollect && obligation.balance > 0 ? (
+                  <TableActionButton
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onCollect(obligation)
+                    }}
+                    label={`Cobrar ${obligation.code}`}
+                    title="Registrar cobro"
+                    tone="warning"
+                  >
+                    <HandCoins aria-hidden size={17} />
+                  </TableActionButton>
+                ) : (
+                  <TableActionButton
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onOpen(obligation)
+                    }}
+                    label={`Ver ${obligation.code}`}
+                    title="Ver detalle"
+                  >
+                    <Eye aria-hidden size={17} />
+                  </TableActionButton>
+                )}
+              </div>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
               <div>
@@ -163,19 +190,6 @@ export function PaymentsTable({
                 </p>
               </div>
             </div>
-            {canCollect && obligation.balance > 0 && (
-              <Button
-                type="button"
-                variant="outline"
-                className="mt-4 w-full"
-                onClick={(event) => {
-                  event.stopPropagation()
-                  onCollect(obligation)
-                }}
-              >
-                <HandCoins size={15} /> Cobrar
-              </Button>
-            )}
           </article>
         ))}
       </div>

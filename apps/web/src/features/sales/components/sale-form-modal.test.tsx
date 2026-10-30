@@ -58,6 +58,9 @@ const existingSale: SaleDetail = {
   performedBy: 'Admin',
   confirmedBy: null,
   confirmedAt: null,
+  cancelledBy: null,
+  cancelledAt: null,
+  cancellationReason: null,
   createdAt: '2026-01-02T00:00:00.000Z',
   updatedAt: '2026-01-02T00:00:00.000Z',
   lines: [
@@ -100,6 +103,7 @@ describe('Formulario de ventas', () => {
     })
     sales.useSaleMutations.mockReturnValue({
       create: { isPending: false, mutateAsync: vi.fn() },
+      createConfirmed: { isPending: false, mutateAsync: vi.fn() },
       update: { isPending: false, mutateAsync: vi.fn() },
       confirm: { isPending: false, mutateAsync: vi.fn() },
     })
@@ -264,12 +268,13 @@ describe('Formulario de ventas', () => {
     ).toBeTruthy()
   })
 
-  it('confirma la venta al crearla guardando primero el borrador', async () => {
+  it('crea una venta confirmada en una sola operación', async () => {
     const user = userEvent.setup()
     const mutations = {
-      create: {
+      create: { isPending: false, mutateAsync: vi.fn() },
+      createConfirmed: {
         isPending: false,
-        mutateAsync: vi.fn().mockResolvedValue({ data: { id: 's9' } }),
+        mutateAsync: vi.fn().mockResolvedValue({}),
       },
       update: { isPending: false, mutateAsync: vi.fn() },
       confirm: { isPending: false, mutateAsync: vi.fn().mockResolvedValue({}) },
@@ -280,8 +285,11 @@ describe('Formulario de ventas', () => {
     await addProduct(user)
     await user.click(screen.getByRole('button', { name: 'Confirmar venta' }))
 
-    await waitFor(() => expect(mutations.create.mutateAsync).toHaveBeenCalled())
-    expect(mutations.confirm.mutateAsync).toHaveBeenCalledWith('s9')
+    await waitFor(() =>
+      expect(mutations.createConfirmed.mutateAsync).toHaveBeenCalled(),
+    )
+    expect(mutations.create.mutateAsync).not.toHaveBeenCalled()
+    expect(mutations.confirm.mutateAsync).not.toHaveBeenCalled()
     expect(toast.success).toHaveBeenCalledWith(
       'Venta confirmada correctamente.',
     )

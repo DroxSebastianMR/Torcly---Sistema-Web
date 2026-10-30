@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BadgeHelp, ChevronDown, ListTree, X } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TableActionButton } from '@/components/ui/table-action-button'
 import type { ReplenishmentRecommendation } from '../types/replenishment.types'
 import { formatQuantity } from '../utils/replenishment-formatters'
 import { PriorityBadge } from './priority-badge'
@@ -166,12 +167,12 @@ function RecommendationCard({
         />
       </div>
       <div className="mt-4 border-t pt-3">
-        <button
-          type="button"
+        <TableActionButton
           aria-expanded={isExpanded}
-          aria-label={`Ver explicación de ${recommendation.name}`}
+          label={`Ver explicación de ${recommendation.name}`}
+          title={isExpanded ? 'Ocultar explicación' : 'Ver explicación'}
           onClick={onToggle}
-          className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+          className="h-10 w-full gap-2 px-3 text-sm font-medium"
         >
           {isExpanded ? (
             <ChevronDown aria-hidden className="size-4" />
@@ -179,7 +180,7 @@ function RecommendationCard({
             <BadgeHelp aria-hidden className="size-4" />
           )}
           {isExpanded ? 'Ocultar explicación' : 'Por qué'}
-        </button>
+        </TableActionButton>
         {isExpanded && (
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             {recommendation.explanation}
@@ -263,20 +264,18 @@ function RecommendationRow({
           <PriorityBadge priority={recommendation.priority} />
         </td>
         <td className="px-4 py-4 text-right">
-          <button
-            type="button"
+          <TableActionButton
             aria-expanded={isExpanded}
-            aria-label={`Ver explicación de ${recommendation.name}`}
+            label={`Ver explicación de ${recommendation.name}`}
+            title={isExpanded ? 'Ocultar explicación' : 'Ver explicación'}
             onClick={onToggle}
-            className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-background px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
           >
             {isExpanded ? (
               <ChevronDown aria-hidden className="size-4" />
             ) : (
               <BadgeHelp aria-hidden className="size-4" />
             )}
-            {isExpanded ? 'Ocultar' : 'Por qué'}
-          </button>
+          </TableActionButton>
         </td>
       </tr>
       {isExpanded && (

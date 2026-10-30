@@ -20,6 +20,10 @@
     'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
   --font-display:
     'Raleway Variable', 'Raleway', ui-sans-serif, system-ui, sans-serif;
+  /* La fuente comercial se carga cuando se agregue su archivo licenciado en public/fonts. */
+  --font-brand:
+    'GTI Grotesque Display', 'Raleway Variable', 'Raleway', ui-sans-serif,
+    system-ui, sans-serif;
   font-family: var(--font-body);
   font-synthesis: none;
   --background: #f7f8fa;
@@ -34,6 +38,10 @@
   --card-radius: 16px;
   --hover-duration: 150ms;
   --table-row-height: 56px;
+}
+
+@utility font-brand {
+  font-family: var(--font-brand);
 }
 @keyframes torcly-loader-breathe {
   0%,

@@ -15,7 +15,7 @@ interface PaymentDetailModalProps {
   loading: boolean
   canCompensate: boolean
   onClose: () => void
-  onCompensate: (event: PaymentEvent) => void
+  onCompensate: (event: PaymentEvent, remainingAmount: number) => void
 }
 
 export function PaymentDetailModal({
@@ -39,79 +39,116 @@ export function PaymentDetailModal({
           : undefined
       }
       className="max-w-2xl"
-      footer={
-        <Button type="button" variant="outline" onClick={onClose}>
-          Cerrar
-        </Button>
-      }
     >
       {loading || !detail ? (
         <DetailSkeleton />
       ) : (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <SummaryCell label="Total" value={detail.total} emphasis />
-            <SummaryCell label="Cobrado" value={detail.paid} />
-            <SummaryCell label="Saldo" value={detail.balance} paid />
-            <div className="space-y-1 rounded-xl bg-muted/60 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Estado
-              </p>
-              <p
-                className={`text-sm font-bold ${
-                  detail.collectionStatus === 'PAID'
-                    ? 'text-emerald-700'
-                    : detail.collectionStatus === 'PARTIALLY_PAID'
-                      ? 'text-sky-700'
-                      : 'text-amber-700'
-                }`}
-              >
-                {paymentCollectionStatusLabel(detail.collectionStatus)}
-              </p>
-            </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <InfoItem
-              icon={<UserRound aria-hidden size={15} />}
-              label="Cliente"
-              value={
-                detail.customer
-                  ? `${detail.customer.name} · ${detail.customer.documentNumber}`
-                  : 'Venta sin cliente'
-              }
-            />
-            <InfoItem
-              icon={<Receipt aria-hidden size={15} />}
-              label="Confirmada"
-              value={dateTimeFormatter.format(new Date(detail.confirmedAt))}
-            />
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-brand-forest">
-              Historial de pagos
-            </h3>
-            {detail.events.length === 0 ? (
-              <p className="rounded-xl bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
-                Aún no hay pagos registrados para esta venta.
-              </p>
-            ) : (
-              <ol className="space-y-3">
-                {detail.events.map((event) => (
-                  <EventRow
-                    key={event.id}
-                    event={event}
-                    canCompensate={canCompensate}
-                    onCompensate={() => onCompensate(event)}
-                  />
-                ))}
-              </ol>
-            )}
-          </div>
-        </div>
+        <PaymentDetailContent
+          detail={detail}
+          canCompensate={canCompensate}
+          onCompensate={onCompensate}
+        />
       )}
     </Modal>
+  )
+}
+
+function PaymentDetailContent({
+  detail,
+  canCompensate,
+  onCompensate,
+}: {
+  detail: PaymentDetail
+  canCompensate: boolean
+  onCompensate: (event: PaymentEvent, remainingAmount: number) => void
+}) {
+  const compensatedByPaymentCode = detail.events.reduce<Map<string, number>>(
+    (totals, event) => {
+      if (event.type === 'COMPENSATION' && event.originalCode) {
+        totals.set(
+          event.originalCode,
+          (totals.get(event.originalCode) ?? 0) + event.amount,
+        )
+      }
+      return totals
+    },
+    new Map(),
+  )
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <SummaryCell label="Total" value={detail.total} emphasis />
+        <SummaryCell label="Cobrado" value={detail.paid} />
+        <SummaryCell label="Saldo" value={detail.balance} paid />
+        <div className="space-y-1 rounded-xl bg-muted/60 px-4 py-3">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Estado
+          </p>
+          <p
+            className={`text-sm font-bold ${
+              detail.collectionStatus === 'PAID'
+                ? 'text-emerald-700'
+                : detail.collectionStatus === 'PARTIALLY_PAID'
+                  ? 'text-sky-700'
+                  : 'text-amber-700'
+            }`}
+          >
+            {paymentCollectionStatusLabel(detail.collectionStatus)}
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <InfoItem
+          icon={<UserRound aria-hidden size={15} />}
+          label="Cliente"
+          value={
+            detail.customer
+              ? `${detail.customer.name} · ${detail.customer.documentNumber}`
+              : 'Venta sin cliente'
+          }
+        />
+        <InfoItem
+          icon={<Receipt aria-hidden size={15} />}
+          label="Confirmada"
+          value={dateTimeFormatter.format(new Date(detail.confirmedAt))}
+        />
+      </div>
+
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-brand-forest">
+          Historial de pagos
+        </h3>
+        {detail.events.length === 0 ? (
+          <p className="rounded-xl bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
+            Aún no hay pagos registrados para esta venta.
+          </p>
+        ) : (
+          <ol className="space-y-3">
+            {detail.events.map((event) => {
+              const remainingAmount =
+                event.type === 'PAYMENT'
+                  ? Math.max(
+                      0,
+                      event.amount -
+                        (compensatedByPaymentCode.get(event.code) ?? 0),
+                    )
+                  : 0
+              return (
+                <EventRow
+                  key={event.id}
+                  event={event}
+                  canCompensate={canCompensate}
+                  remainingAmount={remainingAmount}
+                  onCompensate={() => onCompensate(event, remainingAmount)}
+                />
+              )
+            })}
+          </ol>
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -145,10 +182,12 @@ function SummaryCell({
 function EventRow({
   event,
   canCompensate,
+  remainingAmount,
   onCompensate,
 }: {
   event: PaymentEvent
   canCompensate: boolean
+  remainingAmount: number
   onCompensate: () => void
 }) {
   const compensation = event.type === 'COMPENSATION'
@@ -207,7 +246,7 @@ function EventRow({
             {currencyFormatter.format(event.amount)}
           </p>
           <p className="text-xs text-muted-foreground">{event.performedBy}</p>
-          {!compensation && canCompensate && (
+          {!compensation && canCompensate && remainingAmount > 0.000_001 && (
             <Button type="button" variant="outline" onClick={onCompensate}>
               <Undo2 size={14} /> Compensar
             </Button>

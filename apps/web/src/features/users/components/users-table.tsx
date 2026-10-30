@@ -7,6 +7,7 @@ import {
   Users,
 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TableActionButton } from '@/components/ui/table-action-button'
 import type { User } from '../types/users.types'
 import { dateFormatter } from '../utils/user-formatters'
 
@@ -99,23 +100,23 @@ export function UsersTable({
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
-                      <ActionButton
+                      <TableActionButton
                         label={`Editar ${user.displayName}`}
                         title="Editar datos"
                         onClick={() => onEdit(user)}
                         disabled={!canWrite}
                       >
                         <Pencil size={16} />
-                      </ActionButton>
-                      <ActionButton
+                      </TableActionButton>
+                      <TableActionButton
                         label={`Cambiar rol de ${user.displayName}`}
                         title="Cambiar rol"
                         onClick={() => onChangeRole(user)}
                         disabled={!canWrite || isCurrentUser}
                       >
                         <UserRoundCog size={16} />
-                      </ActionButton>
-                      <ActionButton
+                      </TableActionButton>
+                      <TableActionButton
                         label={`${user.active ? 'Desactivar' : 'Activar'} ${user.displayName}`}
                         title={
                           user.active ? 'Desactivar usuario' : 'Activar usuario'
@@ -124,7 +125,7 @@ export function UsersTable({
                         disabled={!canWrite || isCurrentUser}
                       >
                         <Power size={16} />
-                      </ActionButton>
+                      </TableActionButton>
                     </div>
                   </td>
                 </tr>
@@ -161,33 +162,31 @@ export function UsersTable({
               </div>
               {canWrite && (
                 <div className="mt-4 flex gap-2 border-t pt-3">
-                  <button
-                    type="button"
+                  <TableActionButton
                     onClick={() => onEdit(user)}
-                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-muted px-3 py-2 text-sm font-medium"
+                    label={`Editar ${user.displayName}`}
+                    title="Editar datos"
+                    className="h-10 flex-1 gap-2 px-3 text-sm font-medium"
                   >
-                    <Pencil size={15} /> Editar
-                  </button>
-                  <button
-                    type="button"
+                    <Pencil aria-hidden size={15} /> Editar
+                  </TableActionButton>
+                  <TableActionButton
                     onClick={() => onChangeRole(user)}
                     disabled={isCurrentUser}
-                    className="flex size-10 items-center justify-center rounded-lg border disabled:opacity-40"
-                    aria-label={`Cambiar rol de ${user.displayName}`}
+                    label={`Cambiar rol de ${user.displayName}`}
                     title="Cambiar rol"
                   >
                     <UserRoundCog size={16} />
-                  </button>
-                  <button
-                    type="button"
+                  </TableActionButton>
+                  <TableActionButton
                     onClick={() => onToggleStatus(user)}
                     disabled={isCurrentUser}
-                    className="flex size-10 items-center justify-center rounded-lg border disabled:opacity-40"
-                    aria-label={`${user.active ? 'Desactivar' : 'Activar'} ${user.displayName}`}
+                    label={`${user.active ? 'Desactivar' : 'Activar'} ${user.displayName}`}
                     title={user.active ? 'Desactivar' : 'Activar'}
+                    tone={user.active ? 'danger' : 'default'}
                   >
                     <Power size={16} />
-                  </button>
+                  </TableActionButton>
                 </div>
               )}
             </article>
@@ -195,33 +194,6 @@ export function UsersTable({
         })}
       </div>
     </>
-  )
-}
-
-function ActionButton({
-  label,
-  title,
-  onClick,
-  disabled,
-  children,
-}: {
-  label: string
-  title: string
-  onClick: () => void
-  disabled?: boolean
-  children: React.ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      title={title}
-      aria-label={label}
-      onClick={onClick}
-      disabled={disabled}
-      className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary disabled:pointer-events-none disabled:opacity-40"
-    >
-      {children}
-    </button>
   )
 }
 

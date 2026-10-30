@@ -179,7 +179,9 @@ describe('Página de productos', () => {
     expect(screen.getAllByText('REP-001').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Filtro de aceite').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Stock bajo').length).toBeGreaterThan(0)
-    expect(screen.getByLabelText('Editar Filtro de aceite')).toBeTruthy()
+    expect(
+      screen.getAllByLabelText('Editar Filtro de aceite'),
+    ).not.toHaveLength(0)
 
     await userEvent.click(
       screen.getByRole('button', { name: 'Abrir ficha de Filtro de aceite' }),

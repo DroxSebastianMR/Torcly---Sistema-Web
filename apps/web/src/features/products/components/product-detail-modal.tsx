@@ -35,26 +35,21 @@ export function ProductDetailModal({
       }
       className="max-w-3xl"
       footer={
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cerrar
-          </Button>
-          {product && canWrite && (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onToggleStatus(product)}
-              >
-                <Power size={16} />
-                {product.active ? 'Desactivar' : 'Activar'}
-              </Button>
-              <Button type="button" onClick={() => onEdit(product)}>
-                <Pencil size={16} /> Editar producto
-              </Button>
-            </>
-          )}
-        </div>
+        product && canWrite ? (
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onToggleStatus(product)}
+            >
+              <Power size={16} />
+              {product.active ? 'Desactivar' : 'Activar'}
+            </Button>
+            <Button type="button" onClick={() => onEdit(product)}>
+              <Pencil size={16} /> Editar producto
+            </Button>
+          </div>
+        ) : undefined
       }
     >
       {product && (
@@ -82,10 +77,6 @@ export function ProductDetailModal({
 
           <dl className="grid overflow-hidden rounded-2xl border border-[#dce9e2] sm:grid-cols-2">
             <Datum label="Código" value={product.code} mono bordered />
-            <Datum
-              label="Código de barras"
-              value={product.barcode ?? 'Sin registro'}
-            />
             <Datum label="Categoría" value={product.category.name} bordered />
             <Datum label="Marca" value={product.brand?.name ?? 'Sin marca'} />
             <Datum

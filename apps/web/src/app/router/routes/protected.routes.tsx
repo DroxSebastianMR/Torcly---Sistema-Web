@@ -24,21 +24,6 @@ export const protectedRoutes: RouteObject[] = [
             ],
           },
           {
-            element: <PermissionRoute permission="assistant:read" />,
-            children: [
-              {
-                path: paths.assistantHistory,
-                lazy: async () => ({
-                  Component: (
-                    await import(
-                      '@/features/assistant/pages/assistant-history-page'
-                    )
-                  ).default,
-                }),
-              },
-            ],
-          },
-          {
             element: <PermissionRoute permission="products:read" />,
             children: [
               {
@@ -72,19 +57,6 @@ export const protectedRoutes: RouteObject[] = [
                 lazy: async () => ({
                   Component: (
                     await import('@/features/services/pages/services-page')
-                  ).default,
-                }),
-              },
-            ],
-          },
-          {
-            element: <PermissionRoute permission="purchases:read" />,
-            children: [
-              {
-                path: paths.purchases,
-                lazy: async () => ({
-                  Component: (
-                    await import('@/features/purchases/pages/purchases-page')
                   ).default,
                 }),
               },
@@ -234,33 +206,6 @@ export const protectedRoutes: RouteObject[] = [
                   Component: (
                     await import('@/features/reports/pages/reports-page')
                   ).default,
-                }),
-              },
-            ],
-          },
-          {
-            element: <PermissionRoute permission="maintenance:read" />,
-            children: [
-              {
-                path: paths.maintenance,
-                lazy: async () => ({
-                  Component: (
-                    await import(
-                      '@/features/maintenance/pages/maintenance-page'
-                    )
-                  ).default,
-                }),
-              },
-            ],
-          },
-          {
-            element: <PermissionRoute permission="audit:read" />,
-            children: [
-              {
-                path: paths.audit,
-                lazy: async () => ({
-                  Component: (await import('@/features/audit/pages/audit-page'))
-                    .default,
                 }),
               },
             ],

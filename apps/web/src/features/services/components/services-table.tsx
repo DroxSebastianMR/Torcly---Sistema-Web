@@ -6,6 +6,7 @@ import {
   Wrench,
 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
+import { TableActionButton } from '@/components/ui/table-action-button'
 import type { Service } from '../types/services.types'
 import { currencyFormatter } from '../utils/service-formatters'
 
@@ -85,28 +86,25 @@ export function ServicesTable({
                 {canWrite && (
                   <td className="px-4 py-4">
                     <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
-                      <button
-                        type="button"
+                      <TableActionButton
                         title="Editar servicio"
-                        aria-label={`Editar ${service.name}`}
+                        label={`Editar ${service.name}`}
                         onClick={() => onEdit?.(service)}
-                        className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary"
                       >
                         <Pencil size={16} />
-                      </button>
-                      <button
-                        type="button"
+                      </TableActionButton>
+                      <TableActionButton
                         title={
                           service.active
                             ? 'Desactivar servicio'
                             : 'Activar servicio'
                         }
-                        aria-label={`${service.active ? 'Desactivar' : 'Activar'} ${service.name}`}
+                        label={`${service.active ? 'Desactivar' : 'Activar'} ${service.name}`}
                         onClick={() => onToggleStatus?.(service)}
-                        className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary"
+                        tone={service.active ? 'danger' : 'default'}
                       >
                         <Power size={16} />
-                      </button>
+                      </TableActionButton>
                     </div>
                   </td>
                 )}
@@ -146,21 +144,24 @@ export function ServicesTable({
             </div>
             {canWrite && (
               <div className="mt-4 flex gap-2 border-t pt-3">
-                <button
-                  type="button"
+                <TableActionButton
                   onClick={() => onEdit?.(service)}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-muted px-3 py-2 text-sm font-medium"
+                  label={`Editar ${service.name}`}
+                  title="Editar servicio"
+                  className="h-10 flex-1 gap-2 px-3 text-sm font-medium"
                 >
-                  <Pencil size={15} /> Editar
-                </button>
-                <button
-                  type="button"
+                  <Pencil aria-hidden size={15} /> Editar
+                </TableActionButton>
+                <TableActionButton
                   onClick={() => onToggleStatus?.(service)}
-                  className="flex size-10 items-center justify-center rounded-lg border"
-                  aria-label={`${service.active ? 'Desactivar' : 'Activar'} ${service.name}`}
+                  label={`${service.active ? 'Desactivar' : 'Activar'} ${service.name}`}
+                  title={
+                    service.active ? 'Desactivar servicio' : 'Activar servicio'
+                  }
+                  tone={service.active ? 'danger' : 'default'}
                 >
                   <Power size={16} />
-                </button>
+                </TableActionButton>
               </div>
             )}
           </article>

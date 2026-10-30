@@ -59,6 +59,7 @@ export const endpoints = {
     catalog: '/sales/catalogo',
     detail: (id: string) => `/sales/${id}`,
     confirm: (id: string) => `/sales/${id}/confirm`,
+    cancel: (id: string) => `/sales/${id}/cancel`,
   },
   appointments: {
     root: '/appointments',
@@ -108,6 +109,13 @@ export const endpoints = {
     pay: (id: string) => `/payments/${id}/pay`,
     compensate: (paymentId: string) => `/payments/${paymentId}/compensate`,
   },
+  cashSessions: {
+    root: '/cash-sessions',
+    current: '/cash-sessions/current',
+    detail: (id: string) => `/cash-sessions/${id}`,
+    open: '/cash-sessions/open',
+    close: (id: string) => `/cash-sessions/${id}/close`,
+  },
   users: {
     root: '/users',
     roles: '/users/roles',
@@ -133,6 +141,7 @@ export const endpoints = {
   reports: {
     summary: '/reports/summary',
     block: (block: string) => `/reports/blocks/${block}`,
+    export: '/reports/export',
   },
   maintenance: {
     status: '/maintenance',

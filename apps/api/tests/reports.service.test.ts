@@ -80,6 +80,23 @@ describe('Servicio de reportes', () => {
     }
   })
 
+  it('exporta solo los bloques autorizados en un libro XLSX', async () => {
+    repository.listSalesInPeriod.mockResolvedValue([])
+    repository.listSaleLinesInPeriod.mockResolvedValue([])
+
+    const result = await reportsService.exportWorkbook(
+      { from: '2026-10-01', to: '2026-10-02' },
+      salesOnly,
+    )
+
+    expect(result.period).toEqual({ from: '2026-10-01', to: '2026-10-02' })
+    expect(result.file.subarray(0, 2).toString()).toBe('PK')
+    expect(repository.listSalesInPeriod).toHaveBeenCalledOnce()
+    expect(repository.listSaleLinesInPeriod).toHaveBeenCalledOnce()
+    expect(repository.listPaymentsInPeriod).not.toHaveBeenCalled()
+    expect(repository.listMovementsInPeriod).not.toHaveBeenCalled()
+  })
+
   it('rechaza un bloque sin sus permisos sin consultar datos', async () => {
     const error = await reportsService
       .getBlock('payments', { from: null, to: null }, salesOnly)
@@ -215,8 +232,24 @@ describe('Servicio de reportes', () => {
       },
     })
     expect(result.trend).toEqual([
-      { bucket: '2026-10-01', label: '1 oct', count: 1, amount: 50 },
-      { bucket: '2026-10-02', label: '2 oct', count: 2, amount: 50 },
+      {
+        bucket: '2026-10-01',
+        label: '1 oct',
+        count: 1,
+        amount: 50,
+        grossCollected: 50,
+        compensated: 0,
+        netCollected: 50,
+      },
+      {
+        bucket: '2026-10-02',
+        label: '2 oct',
+        count: 2,
+        amount: 50,
+        grossCollected: 60,
+        compensated: 10,
+        netCollected: 50,
+      },
     ])
   })
 
@@ -268,8 +301,28 @@ describe('Servicio de reportes', () => {
       lowStockCount: 1,
     })
     expect(result.trend).toEqual([
-      { bucket: '2026-10-01', label: '1 oct', count: 2, amount: 15 },
-      { bucket: '2026-10-02', label: '2 oct', count: 1, amount: -3 },
+      {
+        bucket: '2026-10-01',
+        label: '1 oct',
+        count: 2,
+        amount: 15,
+        initial: 10,
+        entry: 5,
+        exit: 0,
+        adjustmentIn: 0,
+        adjustmentOut: 0,
+      },
+      {
+        bucket: '2026-10-02',
+        label: '2 oct',
+        count: 1,
+        amount: -3,
+        initial: 0,
+        entry: 0,
+        exit: 3,
+        adjustmentIn: 0,
+        adjustmentOut: 0,
+      },
     ])
     expect(result.lowStock).toEqual([
       {
@@ -386,9 +439,30 @@ describe('Servicio de reportes', () => {
       ATENDIDA: 7,
     })
     expect(result.trend).toEqual([
-      { bucket: '2026-10-01', label: '1 oct', count: 2, amount: 0 },
-      { bucket: '2026-10-02', label: '2 oct', count: 1, amount: 1 },
-      { bucket: '2026-10-03', label: '3 oct', count: 0, amount: 1 },
+      {
+        bucket: '2026-10-01',
+        label: '1 oct',
+        count: 2,
+        amount: 0,
+        ordersCreated: 2,
+        delivered: 0,
+      },
+      {
+        bucket: '2026-10-02',
+        label: '2 oct',
+        count: 1,
+        amount: 1,
+        ordersCreated: 1,
+        delivered: 1,
+      },
+      {
+        bucket: '2026-10-03',
+        label: '3 oct',
+        count: 0,
+        amount: 1,
+        ordersCreated: 0,
+        delivered: 1,
+      },
     ])
   })
 

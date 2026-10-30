@@ -2,7 +2,6 @@ import {
   LayoutDashboard,
   ChartNoAxesCombined,
   ShoppingCart,
-  Truck,
   UsersRound,
   Car,
   Wallet,
@@ -13,9 +12,6 @@ import {
   Wrench,
   CalendarDays,
   ClipboardList,
-  ScrollText,
-  CalendarClock,
-  MessageSquareText,
 } from 'lucide-react'
 import { paths } from '@/app/router/constants/paths'
 import type { NavigationGroup } from '../types/navigation.types'
@@ -41,14 +37,6 @@ export const appNavigation: readonly NavigationGroup[] = [
         visible: true,
         permission: 'reports:read',
       },
-      {
-        id: 'assistant-history',
-        label: 'Historial IA',
-        icon: MessageSquareText,
-        path: paths.assistantHistory,
-        visible: true,
-        permission: 'assistant:read',
-      },
     ],
   },
   {
@@ -70,14 +58,6 @@ export const appNavigation: readonly NavigationGroup[] = [
         path: paths.appointments,
         visible: true,
         permission: 'appointments:read',
-      },
-      {
-        id: 'purchases',
-        label: 'Compras',
-        icon: Truck,
-        path: paths.purchases,
-        visible: true,
-        permission: 'purchases:read',
       },
       {
         id: 'customers',
@@ -176,22 +156,6 @@ export const appNavigation: readonly NavigationGroup[] = [
         path: paths.profile,
         visible: true,
         permission: 'profile:read',
-      },
-      {
-        id: 'maintenance',
-        label: 'Mantenimiento',
-        icon: CalendarClock,
-        path: paths.maintenance,
-        visible: true,
-        permission: 'maintenance:read',
-      },
-      {
-        id: 'audit',
-        label: 'Auditoría',
-        icon: ScrollText,
-        path: paths.audit,
-        visible: true,
-        permission: 'audit:read',
       },
     ],
   },

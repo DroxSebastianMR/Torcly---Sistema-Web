@@ -118,7 +118,7 @@ describe('Schemas de órdenes de taller', () => {
     expect(workOrderQuerySchema.parse({})).toMatchObject({
       status: 'all',
       page: 1,
-      pageSize: 20,
+      pageSize: 10,
     })
     expect(
       workOrderQuerySchema.parse({ status: 'EN_DIAGNOSTICO' }).status,

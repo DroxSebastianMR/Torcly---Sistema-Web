@@ -1,8 +1,8 @@
-import { ReceiptText } from 'lucide-react'
+import { ReceiptText, ShoppingBag, Ticket } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
-import { BarChart } from '../bar-chart'
 import { IndicatorCard } from '../indicator-card'
 import { ReportTable } from '../report-table'
+import { TrendChart } from '../trend-chart'
 import type { SalesBlockData } from '../../types/reports.types'
 import {
   formatAmount,
@@ -29,36 +29,44 @@ export function SalesBlockContent({ data }: { data: SalesBlockData }) {
   return (
     <div className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-3">
-        <IndicatorCard label="Ventas" value={formatCount(data.metrics.count)} />
+        <IndicatorCard
+          label="Ventas"
+          value={formatCount(data.metrics.count)}
+          icon={<ShoppingBag className="size-4" />}
+          tone="blue"
+        />
         <IndicatorCard
           label="Importe"
           value={formatAmount(data.metrics.amount)}
+          icon={<ReceiptText className="size-4" />}
+          tone="green"
         />
         <IndicatorCard
           label="Ticket promedio"
           value={formatAmount(data.metrics.averageTicket)}
           hint="Importe entre ventas confirmadas"
+          icon={<Ticket className="size-4" />}
+          tone="purple"
         />
       </div>
-      <BarChart
-        rows={data.trend.map((point) => ({
-          key: point.bucket,
-          label: point.label,
-          count: point.count,
-          amount: point.amount,
-        }))}
-        primary="count"
-        label="Tendencia de ventas"
+      <TrendChart
+        data={data.trend}
+        type="area"
+        title="Tendencia de ventas"
         ariaLabel="Tendencia de ventas confirmadas"
-        caption={`Tendencia de ventas confirmadas: ${data.period.from} a ${data.period.to}`}
-        countLabel="Ventas"
-        amountLabel="Importe"
-        countFormatter={formatCount}
-        amountFormatter={formatAmount}
+        series={[
+          {
+            key: 'amount',
+            label: 'Importe confirmado',
+            color: '#147357',
+            formatter: formatAmount,
+          },
+        ]}
       />
       <ReportTable
-        caption="Composición por producto o servicio (top 10)"
-        rows={data.composition}
+        caption="Principales productos y servicios"
+        rows={data.composition.slice(0, 5)}
+        ranked
         columns={[
           {
             key: 'name',

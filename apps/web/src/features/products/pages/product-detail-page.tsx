@@ -128,7 +128,6 @@ export default function Page() {
           </div>
           <p className="mt-1 font-mono text-sm text-muted-foreground">
             {details.code}
-            {details.barcode ? ` · ${details.barcode}` : ''}
           </p>
         </div>
       </header>
@@ -141,10 +140,6 @@ export default function Page() {
         </header>
         <dl className="grid gap-x-6 gap-y-4 px-5 py-5 sm:grid-cols-2">
           <Datum label="Código" value={details.code} mono />
-          <Datum
-            label="Código de barras"
-            value={details.barcode ?? 'Sin registro'}
-          />
           <Datum label="Categoría" value={details.category.name} />
           <Datum label="Marca" value={details.brand?.name ?? 'Sin marca'} />
           <Datum

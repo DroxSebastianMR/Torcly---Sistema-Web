@@ -20,6 +20,9 @@ const saleSummarySelect = {
   performedBy: true,
   confirmedBy: true,
   confirmedAt: true,
+  cancelledBy: true,
+  cancelledAt: true,
+  cancellationReason: true,
   createdAt: true,
   updatedAt: true,
   customer: {
@@ -97,6 +100,130 @@ function auditData(
 
 async function lockSale(transaction: Prisma.TransactionClient, saleId: string) {
   await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:sale:${saleId}`}))`
+}
+
+async function confirmSaleWithinTransaction(
+  transaction: Prisma.TransactionClient,
+  id: string,
+  actor: { id: string; name: string },
+  context: RequestContext,
+): Promise<SaleDetailRecord> {
+  await lockSale(transaction, id)
+
+  const sale = await transaction.sale.findUnique({
+    where: { id },
+    include: saleDetailInclude,
+  })
+  if (!sale) throw new AppError(404, 'SALE_NOT_FOUND', 'Venta no encontrada.')
+  if (sale.status === 'CONFIRMED') return sale as SaleDetailRecord
+  if (sale.status === 'CANCELLED') {
+    throw new AppError(
+      409,
+      'SALE_CANCELLED',
+      'No se puede confirmar una venta anulada.',
+    )
+  }
+
+  assertHasLines(sale.lines)
+  const aggregates = aggregateProductQuantities(sale.lines)
+  for (const [productId, quantity] of aggregates) {
+    const product = await transaction.product.findUnique({
+      where: { id: productId },
+      select: { id: true, code: true, name: true, active: true },
+    })
+    if (!product) {
+      throw new AppError(
+        409,
+        'PRODUCT_NOT_FOUND',
+        'Uno de los productos de la venta ya no existe.',
+      )
+    }
+    if (!product.active) {
+      throw new AppError(
+        409,
+        'PRODUCT_INACTIVE',
+        'Un producto de la venta está inactivo.',
+      )
+    }
+
+    await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:inventory:${productId}`}))`
+    const confirmed = await transaction.inventoryMovement.groupBy({
+      by: ['type'],
+      where: { productId, status: 'CONFIRMED' },
+      _sum: { quantity: true },
+    })
+    const stockMovements = confirmed.map((movement) => ({
+      type: movement.type,
+      quantity: movement._sum.quantity ?? 0,
+    }))
+    const currentStock = computeStock(stockMovements)
+    const hasInitialMovement = confirmed.some(
+      (movement) => movement.type === 'INITIAL',
+    )
+    assertCanRegisterMovement({
+      type: 'EXIT',
+      quantity,
+      currentStock,
+      hasInitialMovement,
+    })
+
+    const movement = await transaction.inventoryMovement.create({
+      data: {
+        productId,
+        type: 'EXIT',
+        status: 'CONFIRMED',
+        quantity,
+        idempotencyKey: `sale-exit:${id}:${productId}`,
+        notes: `Venta ${sale.code}`,
+        performedBy: actor.name,
+        occurredAt: new Date(),
+        referenceType: 'sale',
+        referenceId: id,
+      },
+      select: { id: true },
+    })
+    const stockAfter = computeStock([
+      ...stockMovements,
+      { type: 'EXIT', quantity },
+    ])
+    await transaction.auditLog.create({
+      data: auditData(
+        'INVENTORY_EXIT_REGISTERED',
+        actor.id,
+        product.code,
+        context,
+        {
+          productId,
+          movementId: movement.id,
+          type: 'EXIT',
+          quantity,
+          stockAfter,
+          saleId: id,
+          saleCode: sale.code,
+        },
+      ),
+    })
+  }
+
+  const updated = await transaction.sale.update({
+    where: { id },
+    data: {
+      status: 'CONFIRMED',
+      confirmedBy: actor.name,
+      confirmedAt: new Date(),
+    },
+    include: saleDetailInclude,
+  })
+  await transaction.auditLog.create({
+    data: auditData('SALE_CONFIRMED', actor.id, updated.code, context, {
+      saleId: updated.id,
+      code: updated.code,
+      lineCount: updated.lines.length,
+      subtotal: Number(updated.subtotal),
+      total: Number(updated.total),
+    }),
+  })
+  return updated
 }
 
 export type SaleDetailRecord = Prisma.SaleGetPayload<{
@@ -179,6 +306,7 @@ export const salesRepository = {
       subtotal: number
       total: number
       lines: Prisma.SaleLineCreateManySaleInput[]
+      confirm?: boolean
     },
     actor: { id: string; name: string },
     context: RequestContext,
@@ -212,7 +340,9 @@ export const salesRepository = {
         }),
       })
 
-      return sale
+      return input.confirm
+        ? confirmSaleWithinTransaction(transaction, sale.id, actor, context)
+        : sale
     })
   },
 
@@ -302,6 +432,13 @@ export const salesRepository = {
       if (!sale)
         throw new AppError(404, 'SALE_NOT_FOUND', 'Venta no encontrada.')
       if (sale.status === 'CONFIRMED') return sale as SaleDetailRecord
+      if (sale.status === 'CANCELLED') {
+        throw new AppError(
+          409,
+          'SALE_CANCELLED',
+          'No se puede confirmar una venta anulada.',
+        )
+      }
 
       assertHasLines(sale.lines)
 
@@ -406,6 +543,113 @@ export const salesRepository = {
         }),
       })
 
+      return updated
+    })
+  },
+
+  async cancel(
+    id: string,
+    reason: string,
+    actor: { id: string; name: string },
+    context: RequestContext,
+  ): Promise<SaleDetailRecord> {
+    return databaseService.transaction(async (transaction) => {
+      await lockSale(transaction, id)
+      const sale = await transaction.sale.findUnique({
+        where: { id },
+        include: saleDetailInclude,
+      })
+      if (!sale)
+        throw new AppError(404, 'SALE_NOT_FOUND', 'Venta no encontrada.')
+      if (sale.status === 'CANCELLED') return sale as SaleDetailRecord
+
+      const payments = await transaction.payment.findMany({
+        where: { saleId: id },
+        select: { type: true, amount: true },
+      })
+      const netPaid = payments.reduce(
+        (sum, payment) =>
+          sum +
+          (payment.type === 'PAYMENT'
+            ? Number(payment.amount)
+            : -Number(payment.amount)),
+        0,
+      )
+      if (netPaid > 0.000_001) {
+        throw new AppError(
+          409,
+          'SALE_PAYMENT_REQUIRES_COMPENSATION',
+          'Compensa los cobros de esta venta antes de anularla.',
+        )
+      }
+
+      if (sale.status === 'CONFIRMED') {
+        const aggregates = aggregateProductQuantities(sale.lines)
+        for (const [productId, quantity] of aggregates) {
+          await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:inventory:${productId}`}))`
+          const product = await transaction.product.findUnique({
+            where: { id: productId },
+            select: { code: true },
+          })
+          if (!product) continue
+
+          const movement = await transaction.inventoryMovement.create({
+            data: {
+              productId,
+              type: 'ADJUSTMENT_IN',
+              status: 'CONFIRMED',
+              quantity,
+              idempotencyKey: `sale-cancel-return:${id}:${productId}`,
+              notes: `Anulación de venta ${sale.code}: ${reason}`,
+              performedBy: actor.name,
+              occurredAt: new Date(),
+              referenceType: 'sale-cancellation',
+              referenceId: id,
+            },
+            select: { id: true },
+          })
+          await transaction.auditLog.create({
+            data: auditData(
+              'INVENTORY_ADJUSTMENT_REGISTERED',
+              actor.id,
+              product.code,
+              context,
+              {
+                productId,
+                movementId: movement.id,
+                type: 'ADJUSTMENT_IN',
+                quantity,
+                saleId: id,
+                saleCode: sale.code,
+                reason,
+              },
+            ),
+          })
+        }
+      }
+
+      const updated = await transaction.sale.update({
+        where: { id },
+        data: {
+          status: 'CANCELLED',
+          cancelledBy: actor.name,
+          cancelledAt: new Date(),
+          cancellationReason: reason,
+        },
+        include: saleDetailInclude,
+      })
+      await transaction.auditLog.create({
+        data: auditData('SALE_CANCELLED', actor.id, updated.code, context, {
+          saleId: updated.id,
+          code: updated.code,
+          priorStatus: sale.status,
+          reason,
+          restoredProductLines:
+            sale.status === 'CONFIRMED'
+              ? aggregateProductQuantities(sale.lines).size
+              : 0,
+        }),
+      })
       return updated
     })
   },
