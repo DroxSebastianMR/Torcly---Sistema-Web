@@ -27,6 +27,10 @@ const schema = z.object({
   DATABASE_CONNECT_TIMEOUT_MS: z.coerce.number().int().min(1000).default(10000),
   DATABASE_IDLE_TIMEOUT_MS: z.coerce.number().int().min(1000).default(30000),
   SESSION_COOKIE_NAME: z.string().min(1).default('torcly_session'),
+  SESSION_COOKIE_SAME_SITE: z
+    .enum(['lax', 'none', 'strict'])
+    .optional()
+    .default(process.env.NODE_ENV === 'production' ? 'none' : 'lax'),
   SESSION_IDLE_MINUTES: z.coerce.number().int().min(5).max(1440).default(30),
   SESSION_ABSOLUTE_HOURS: z.coerce.number().int().min(1).max(24).default(8),
   SESSION_ACTIVITY_REFRESH_MINUTES: z.coerce

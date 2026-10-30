@@ -25,8 +25,9 @@ export function readSessionCookie(request: Request) {
 export function setSessionCookie(response: Response, token: string) {
   response.cookie(env.SESSION_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure:
+      env.NODE_ENV === 'production' || env.SESSION_COOKIE_SAME_SITE === 'none',
+    sameSite: env.SESSION_COOKIE_SAME_SITE,
     path: '/',
     maxAge,
   })
@@ -35,8 +36,9 @@ export function setSessionCookie(response: Response, token: string) {
 export function clearSessionCookie(response: Response) {
   response.clearCookie(env.SESSION_COOKIE_NAME, {
     httpOnly: true,
-    secure: env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure:
+      env.NODE_ENV === 'production' || env.SESSION_COOKIE_SAME_SITE === 'none',
+    sameSite: env.SESSION_COOKIE_SAME_SITE,
     path: '/',
   })
 }
