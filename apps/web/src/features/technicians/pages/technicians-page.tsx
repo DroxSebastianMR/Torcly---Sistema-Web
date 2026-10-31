@@ -287,15 +287,16 @@ function TechnicianModal({
       onClose={onClose}
       title={technician ? 'Editar técnico' : 'Registrar técnico'}
       description="Los técnicos no necesitan usuario ni contraseña para ser asignados."
+      busy={busy}
       footer={
-        <>
-          <Button variant="outline" onClick={onClose}>
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Button variant="outline" disabled={busy} onClick={onClose}>
             Cancelar
           </Button>
           <Button form="technician-form" type="submit" disabled={busy}>
             {busy ? 'Guardando…' : 'Guardar técnico'}
           </Button>
-        </>
+        </div>
       }
     >
       <form

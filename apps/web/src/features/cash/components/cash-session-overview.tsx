@@ -1,4 +1,10 @@
-import { Banknote, CreditCard, Landmark, WalletCards } from 'lucide-react'
+import {
+  Banknote,
+  CreditCard,
+  Landmark,
+  LockKeyhole,
+  WalletCards,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { CashSession } from '../types/cash-session.types'
 import {
@@ -93,6 +99,7 @@ export function CashSessionOverview({
         </div>
         {canWrite && (
           <Button variant="outline" onClick={onClose}>
+            <LockKeyhole aria-hidden className="size-4" />
             Cerrar caja
           </Button>
         )}

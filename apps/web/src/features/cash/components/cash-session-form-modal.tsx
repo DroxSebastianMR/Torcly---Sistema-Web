@@ -1,5 +1,11 @@
 import { useCallback, useState } from 'react'
-import { Landmark } from 'lucide-react'
+import {
+  Banknote,
+  CreditCard,
+  Landmark,
+  LockKeyhole,
+  WalletCards,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -34,6 +40,27 @@ export function CashSessionFormModal({
   const mutations = useCashSessionMutations()
   const closing = mode === 'close'
   const expected = session?.totals.expectedCashAmount ?? 0
+  const netTotals = session?.totals.net
+  const netCollected = netTotals
+    ? netTotals.cash +
+      netTotals.card +
+      netTotals.transfer +
+      netTotals.digitalWallet
+    : 0
+  const closingSummary = [
+    { label: 'Efectivo esperado', value: expected, icon: Banknote },
+    { label: 'Tarjeta', value: netTotals?.card ?? 0, icon: CreditCard },
+    {
+      label: 'Transferencia',
+      value: netTotals?.transfer ?? 0,
+      icon: Landmark,
+    },
+    {
+      label: 'Billetera digital',
+      value: netTotals?.digitalWallet ?? 0,
+      icon: WalletCards,
+    },
+  ]
   const [amount, setAmount] = useState(() =>
     closing ? expected.toFixed(2) : '0.00',
   )
@@ -95,10 +122,14 @@ export function CashSessionFormModal({
       }
       visual={
         <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary ring-8 ring-primary/5">
-          <Landmark aria-hidden className="size-6" />
+          {closing ? (
+            <LockKeyhole aria-hidden className="size-6" />
+          ) : (
+            <Landmark aria-hidden className="size-6" />
+          )}
         </span>
       }
-      className="max-w-lg"
+      className={closing ? 'max-w-2xl' : 'max-w-lg'}
       busy={busy}
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -111,6 +142,11 @@ export function CashSessionFormModal({
             Cancelar
           </Button>
           <Button type="button" loading={busy} onClick={() => void submit()}>
+            {closing ? (
+              <LockKeyhole aria-hidden className="size-4" />
+            ) : (
+              <Landmark aria-hidden className="size-4" />
+            )}
             {closing ? 'Registrar cierre' : 'Abrir caja'}
           </Button>
         </div>
@@ -118,14 +154,49 @@ export function CashSessionFormModal({
     >
       <div className="space-y-4">
         {closing && session && (
-          <div className="rounded-xl bg-muted/60 p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Efectivo esperado
+          <section
+            aria-labelledby="cash-closing-summary-title"
+            className="rounded-xl border bg-muted/35 p-4"
+          >
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p
+                  id="cash-closing-summary-title"
+                  className="text-sm font-semibold text-brand-forest"
+                >
+                  Resumen esperado del período
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Importes netos después de compensaciones por método de pago.
+                </p>
+              </div>
+              <div className="mt-2 sm:mt-0 sm:text-right">
+                <p className="text-xs text-muted-foreground">
+                  Total neto cobrado
+                </p>
+                <p className="font-semibold tabular-nums text-brand-forest">
+                  {currencyFormatter.format(netCollected)}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {closingSummary.map(({ label, value, icon: Icon }) => (
+                <div key={label} className="rounded-lg bg-card p-3 shadow-sm">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Icon aria-hidden className="size-4 shrink-0 text-primary" />
+                    <span>{label}</span>
+                  </div>
+                  <p className="mt-2 font-semibold tabular-nums text-brand-forest">
+                    {currencyFormatter.format(value)}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-xs leading-5 text-muted-foreground">
+              Solo el efectivo requiere conteo físico. Su valor esperado incluye
+              el monto inicial de apertura.
             </p>
-            <p className="mt-1 text-xl font-semibold tabular-nums text-brand-forest">
-              {currencyFormatter.format(expected)}
-            </p>
-          </div>
+          </section>
         )}
         <div className="space-y-2">
           <label htmlFor="cash-session-amount" className="text-sm font-medium">
