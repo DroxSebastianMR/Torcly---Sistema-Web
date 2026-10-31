@@ -5,6 +5,7 @@ import { AppError } from '../src/shared/errors/app-error.js'
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
   findById: vi.fn(),
+  isCodeAvailable: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
   updateStatus: vi.fn(),
@@ -167,6 +168,17 @@ describe('Servicio de productos', () => {
       context,
     )
     expect(result.data.id).toBe('p1')
+  })
+
+  it('comprueba si el código está disponible excluyendo el producto editado', async () => {
+    repository.isCodeAvailable.mockResolvedValue(false)
+
+    await expect(
+      productsService.checkCodeAvailability('REP-001', 'p1'),
+    ).resolves.toEqual({
+      data: { code: 'REP-001', available: false },
+    })
+    expect(repository.isCodeAvailable).toHaveBeenCalledWith('REP-001', 'p1')
   })
 
   it('mapea un código duplicado a un error accionable', async () => {

@@ -15,7 +15,7 @@ const methodRows = [
   { key: 'cash', label: 'Efectivo' },
   { key: 'card', label: 'Tarjeta' },
   { key: 'transfer', label: 'Transferencia' },
-  { key: 'digitalWallet', label: 'Billetera digital' },
+  { key: 'digitalWallet', label: 'Billetera digital (Yape/Plin)' },
 ] as const
 
 export function CashSessionDetailModal({

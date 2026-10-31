@@ -76,6 +76,12 @@ export interface PaymentRegisterInput {
   notes?: string
 }
 
+export interface SplitPaymentRegisterInput {
+  requestId: string
+  payments: Array<{ amount: number; method: PaymentMethod }>
+  notes?: string
+}
+
 export interface PaymentCompensateInput {
   requestId: string
   amount: number

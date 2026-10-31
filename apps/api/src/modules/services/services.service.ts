@@ -63,6 +63,15 @@ export const servicesService = {
     return { data: toResponse(service) }
   },
 
+  async checkCodeAvailability(code: string, excludeId?: string) {
+    return {
+      data: {
+        code,
+        available: await servicesRepository.isCodeAvailable(code, excludeId),
+      },
+    }
+  },
+
   async getOptions() {
     return { data: await servicesRepository.listActive() }
   },

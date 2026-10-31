@@ -18,6 +18,7 @@ import type {
   PaymentFilters,
   PaymentObligationSummary,
   PaymentRegisterInput,
+  SplitPaymentRegisterInput,
   PaymentsResponse,
 } from './payment.types.js'
 import { notificationsService } from '../notifications/notifications.service.js'
@@ -191,6 +192,21 @@ export const paymentsService = {
     context: RequestContext,
   ): Promise<{ data: PaymentDetail }> {
     const row = await paymentsRepository.registerPayment(
+      saleId,
+      input,
+      actor,
+      context,
+    )
+    return { data: toDetail(row) }
+  },
+
+  async registerSplitPayment(
+    saleId: string,
+    input: SplitPaymentRegisterInput,
+    actor: { id: string; name: string },
+    context: RequestContext,
+  ): Promise<{ data: PaymentDetail }> {
+    const row = await paymentsRepository.registerSplitPayment(
       saleId,
       input,
       actor,

@@ -42,6 +42,17 @@ Crear dos servicios desde el mismo repositorio:
 - Build command: `pnpm install --frozen-lockfile && pnpm --filter @torcly/web build`
 - Publish directory: `apps/web/dist`
 - Variable de compilación: `VITE_API_URL=https://<dominio-de-la-api>/api/v1`
+- Regla obligatoria para React Router:
+  - Source: `/*`
+  - Destination: `/index.html`
+  - Action: `Rewrite`
+
+Sin esa reescritura, la navegación interna funciona, pero recargar o abrir
+directamente `/dashboard`, `/productos`, `/caja` u otra ruta devuelve el
+`Not Found` del CDN antes de que React Router pueda iniciar. El archivo
+`render.yaml` versiona esta regla cuando los servicios se administran como
+Blueprint. Si el Static Site fue creado manualmente, la misma regla debe
+registrarse una vez en **Redirects/Rewrites** del panel de Render.
 
 No usar `VITE_` para secretos: todo valor con ese prefijo termina incluido en
 el JavaScript público del navegador.
@@ -64,6 +75,8 @@ el JavaScript público del navegador.
 4. Verificar `https://<api>/api/v1/health`.
 5. Crear el Static Site, configurar `VITE_API_URL` y copiar su URL exacta en
    `CORS_ORIGINS` de la API. Hacer redeploy de API si ese valor cambió.
+   No agregar una barra final a ninguna URL. Ejemplo:
+   `CORS_ORIGINS=https://torcly-web.onrender.com`.
 6. Probar inicio y cierre de sesión, una consulta, una venta, un pago y el
    cierre de caja en una cuenta controlada.
 7. Confirmar que las cookies se emiten con HTTPS y que la consola del navegador

@@ -4,6 +4,7 @@ import { Prisma } from '../src/generated/prisma/client.js'
 const repository = vi.hoisted(() => ({
   list: vi.fn(),
   findById: vi.fn(),
+  isCodeAvailable: vi.fn(),
   listActive: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
@@ -101,6 +102,20 @@ describe('Servicio de servicios', () => {
     expect(options.data).toEqual([
       { id: 's1', code: 'CAMBIO-ACEITE', name: 'Cambio de aceite' },
     ])
+  })
+
+  it('comprueba disponibilidad del código antes de guardar', async () => {
+    repository.isCodeAvailable.mockResolvedValue(true)
+
+    await expect(
+      servicesService.checkCodeAvailability('SERV-TOR'),
+    ).resolves.toEqual({
+      data: { code: 'SERV-TOR', available: true },
+    })
+    expect(repository.isCodeAvailable).toHaveBeenCalledWith(
+      'SERV-TOR',
+      undefined,
+    )
   })
 
   it('crea, actualiza y cambia el estado auditando con actor y contexto', async () => {

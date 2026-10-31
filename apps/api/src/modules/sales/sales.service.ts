@@ -152,6 +152,14 @@ async function resolveActorNames(
 
 function mapPersistenceError(error: unknown): never {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === 'P2028') {
+      throw new AppError(
+        503,
+        'SALE_TRANSACTION_TIMEOUT',
+        'La base de datos tardó más de lo esperado. Intenta confirmar la venta nuevamente.',
+      )
+    }
+
     if (error.code === 'P2003') {
       throw new AppError(
         400,
@@ -342,8 +350,12 @@ export const salesService = {
     context: RequestContext,
   ) {
     const normalizedActor = normalizeActor(actor)
-    const sale = await salesRepository.confirm(id, normalizedActor, context)
-    return { data: toDetail(sale) }
+    try {
+      const sale = await salesRepository.confirm(id, normalizedActor, context)
+      return { data: toDetail(sale) }
+    } catch (error) {
+      return mapPersistenceError(error)
+    }
   },
 
   async cancel(

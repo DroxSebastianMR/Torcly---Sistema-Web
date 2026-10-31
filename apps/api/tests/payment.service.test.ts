@@ -4,6 +4,7 @@ const repository = vi.hoisted(() => ({
   listObligations: vi.fn(),
   findById: vi.fn(),
   registerPayment: vi.fn(),
+  registerSplitPayment: vi.fn(),
   compensatePayment: vi.fn(),
 }))
 
@@ -268,6 +269,47 @@ describe('Servicio de cobros', () => {
     )
     expect(result.data.paid).toBe(50)
     expect(result.data.balance).toBe(80)
+  })
+
+  it('registra un pago mixto y devuelve ambos movimientos', async () => {
+    const input = {
+      requestId: 'uuid',
+      payments: [
+        { amount: 30, method: 'CASH' as const },
+        { amount: 70, method: 'DIGITAL_WALLET' as const },
+      ],
+    }
+    repository.registerSplitPayment.mockResolvedValue(
+      detail({
+        total: 130,
+        events: [
+          event({ amount: 30, method: 'CASH' }),
+          event({
+            id: 'payment-2',
+            code: 'PAGO-000002',
+            amount: 70,
+            method: 'DIGITAL_WALLET',
+          }),
+        ],
+      }),
+    )
+
+    const result = await paymentsService.registerSplitPayment(
+      'sale-1',
+      input,
+      { id: 'user-1', name: 'Cajero' },
+      context,
+    )
+
+    expect(repository.registerSplitPayment).toHaveBeenCalledWith(
+      'sale-1',
+      input,
+      { id: 'user-1', name: 'Cajero' },
+      context,
+    )
+    expect(result.data.paid).toBe(100)
+    expect(result.data.balance).toBe(30)
+    expect(result.data.events).toHaveLength(2)
   })
 
   it('compensa un pago con el motivo y devuelve el detalle', async () => {

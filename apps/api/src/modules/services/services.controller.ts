@@ -1,6 +1,7 @@
 import type { RequestHandler } from 'express'
 import { getRequestContext } from '../auth/auth.middleware.js'
 import {
+  serviceCodeAvailabilitySchema,
   serviceIdSchema,
   serviceInputSchema,
   serviceQuerySchema,
@@ -18,6 +19,14 @@ export const listServices: RequestHandler = async (request, response) => {
 export const getService: RequestHandler = async (request, response) => {
   const { id } = serviceIdSchema.parse(request.params)
   response.json(await servicesService.getById(id))
+}
+
+export const checkServiceCodeAvailability: RequestHandler = async (
+  request,
+  response,
+) => {
+  const { code, excludeId } = serviceCodeAvailabilitySchema.parse(request.query)
+  response.json(await servicesService.checkCodeAvailability(code, excludeId))
 }
 
 export const getServiceOptions: RequestHandler = async (_request, response) => {

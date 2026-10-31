@@ -474,4 +474,44 @@ describe('Servicio de ventas', () => {
       code: 'SALE_REFERENCE_INVALID',
     })
   })
+
+  it('informa un timeout transaccional de forma accionable', async () => {
+    repository.findProductRef.mockResolvedValue({
+      id: productId,
+      code: 'FILTRO-01',
+      name: 'Filtro de aceite',
+      active: true,
+      salePrice: 35.5,
+      unit: { name: 'Unidad', symbol: 'ud' },
+    })
+    repository.create.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('Transacción expirada', {
+        code: 'P2028',
+        clientVersion: '7.10.0',
+      }),
+    )
+
+    await expect(
+      salesService.create(input, 'actor-1', context, true),
+    ).rejects.toMatchObject({
+      status: 503,
+      code: 'SALE_TRANSACTION_TIMEOUT',
+    })
+  })
+
+  it('informa el timeout al confirmar una venta guardada', async () => {
+    repository.confirm.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('Transacción expirada', {
+        code: 'P2028',
+        clientVersion: '7.10.0',
+      }),
+    )
+
+    await expect(
+      salesService.confirm('sale-1', 'actor-1', context),
+    ).rejects.toMatchObject({
+      status: 503,
+      code: 'SALE_TRANSACTION_TIMEOUT',
+    })
+  })
 })

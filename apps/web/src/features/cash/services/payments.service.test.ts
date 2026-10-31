@@ -72,6 +72,21 @@ describe('Servicio de cobros (web)', () => {
       method: 'CASH',
     })
 
+    await paymentsService.paySplit('s1', {
+      requestId: 'req-split',
+      payments: [
+        { amount: 30, method: 'CASH' },
+        { amount: 70, method: 'DIGITAL_WALLET' },
+      ],
+    })
+    expect(api.post).toHaveBeenCalledWith('/payments/s1/pay-split', {
+      requestId: 'req-split',
+      payments: [
+        { amount: 30, method: 'CASH' },
+        { amount: 70, method: 'DIGITAL_WALLET' },
+      ],
+    })
+
     await paymentsService.compensate('p1', {
       requestId: 'req-2',
       amount: 20,

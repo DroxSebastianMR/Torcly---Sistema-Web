@@ -29,6 +29,17 @@ export const productQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(5).max(100).default(10),
 })
 
+export const productCodeAvailabilitySchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .min(2, 'Ingresa un código válido.')
+    .max(40)
+    .regex(/^[A-Za-z0-9][A-Za-z0-9._-]*$/, 'El código no es válido.')
+    .transform((value) => value.toUpperCase()),
+  excludeId: z.uuid('Producto inválido.').optional(),
+})
+
 export const productInputSchema = z
   .object({
     code: z

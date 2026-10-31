@@ -67,7 +67,10 @@ export function PaymentsToolbar({
               { value: 'CASH', label: 'Efectivo' },
               { value: 'CARD', label: 'Tarjeta' },
               { value: 'TRANSFER', label: 'Transferencia' },
-              { value: 'DIGITAL_WALLET', label: 'Billetera digital' },
+              {
+                value: 'DIGITAL_WALLET',
+                label: 'Billetera digital (Yape/Plin)',
+              },
             ]}
             onChange={(method) =>
               update({ method: method as PaymentFilters['method'] })

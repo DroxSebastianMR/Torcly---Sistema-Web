@@ -6,6 +6,7 @@ import type {
   PaymentCompensateInput,
   PaymentFilters,
   PaymentRegisterInput,
+  SplitPaymentRegisterInput,
 } from '../types/payment.types'
 
 export const paymentKeys = {
@@ -52,6 +53,21 @@ export function usePaymentMutations() {
         input: PaymentRegisterInput
       }) => paymentsService.pay(saleId, input),
       onMutate: () => ({ toastId: startActionToast('Registrando pago…') }),
+      onSuccess: refreshPayments,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
+    }),
+    paySplit: useMutation({
+      mutationFn: ({
+        saleId,
+        input,
+      }: {
+        saleId: string
+        input: SplitPaymentRegisterInput
+      }) => paymentsService.paySplit(saleId, input),
+      onMutate: () => ({
+        toastId: startActionToast('Registrando pago mixto…'),
+      }),
       onSuccess: refreshPayments,
       onSettled: (_data, _error, _variables, context) =>
         finishActionToast(context?.toastId),

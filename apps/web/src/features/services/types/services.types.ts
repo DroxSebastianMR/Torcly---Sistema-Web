@@ -38,3 +38,8 @@ export interface ServicesResponse {
 export interface DataResponse<T> {
   data: T
 }
+
+export interface ServiceCodeAvailability {
+  code: string
+  available: boolean
+}

@@ -61,3 +61,8 @@ export interface ProductsResponse {
     totalPages: number
   }
 }
+
+export interface ProductCodeAvailability {
+  code: string
+  available: boolean
+}

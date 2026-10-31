@@ -10,6 +10,7 @@ export const endpoints = {
     root: '/products',
     options: '/products/options',
     catalog: '/products/catalog',
+    codeAvailability: '/products/code-availability',
     categories: '/products/categories',
     brands: '/products/brands',
     units: '/products/units',
@@ -41,6 +42,7 @@ export const endpoints = {
   services: {
     root: '/services',
     options: '/services/options',
+    codeAvailability: '/services/code-availability',
     detail: (id: string) => `/services/${id}`,
     status: (id: string) => `/services/${id}/status`,
   },
@@ -107,6 +109,7 @@ export const endpoints = {
     root: '/payments',
     detail: (id: string) => `/payments/${id}`,
     pay: (id: string) => `/payments/${id}/pay`,
+    paySplit: (id: string) => `/payments/${id}/pay-split`,
     compensate: (paymentId: string) => `/payments/${paymentId}/compensate`,
   },
   cashSessions: {

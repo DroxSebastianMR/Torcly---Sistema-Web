@@ -4,6 +4,7 @@ import {
   createCategory,
   createProduct,
   createUnit,
+  checkProductCodeAvailability,
   getCatalog,
   getProduct,
   getProductOptions,
@@ -29,6 +30,11 @@ productsRouter.get(
   getProductOptions,
 )
 productsRouter.get('/catalog', requirePermission('products:write'), getCatalog)
+productsRouter.get(
+  '/code-availability',
+  requirePermission('products:write'),
+  checkProductCodeAvailability,
+)
 productsRouter.post(
   '/categories',
   requirePermission('products:write'),

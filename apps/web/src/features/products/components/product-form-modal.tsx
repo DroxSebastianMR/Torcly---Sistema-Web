@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -7,10 +7,20 @@ import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
 import { SmartSelect } from '@/components/ui/smart-select'
 import {
+  appendCatalogCodeSequence,
+  normalizeCatalogCode,
+  suggestProductCode,
+} from '@/lib/catalog-code'
+import { useDebouncedValue } from '@/lib/use-debounced-value'
+import {
   productFormSchema,
   type ProductFormValues,
 } from '../forms/product.schema'
-import { useProductMutations } from '../hooks/use-products'
+import {
+  useProductCodeAvailability,
+  useProductMutations,
+} from '../hooks/use-products'
+import { productsService } from '../services/products.service'
 import type {
   Product,
   ProductInput,
@@ -58,10 +68,33 @@ export function ProductFormModal({
   const categoryId = useWatch({ control: form.control, name: 'categoryId' })
   const brandId = useWatch({ control: form.control, name: 'brandId' })
   const unitId = useWatch({ control: form.control, name: 'unitId' })
-  const { reset: resetForm } = form
+  const name = useWatch({ control: form.control, name: 'name' })
+  const code = useWatch({ control: form.control, name: 'code' })
+  const nameField = form.register('name')
+  const [codeSequence, setCodeSequence] = useState(1)
+  const rejectedCode = useRef('')
+  const initializedForm = useRef('')
+  const { reset: resetForm, setValue } = form
+  const brandName = options?.brands.find((brand) => brand.id === brandId)?.name
+  const baseCode = suggestProductCode(name ?? '', brandName)
+  const normalizedCode = normalizeCatalogCode(code ?? '')
+  const debouncedCode = useDebouncedValue(normalizedCode)
+  const codeAvailability = useProductCodeAvailability(
+    debouncedCode,
+    product?.id,
+    open,
+  )
 
   useLayoutEffect(() => {
-    if (!open) return
+    if (!open) {
+      initializedForm.current = ''
+      return
+    }
+    const formKey = product ? `edit:${product.id}` : 'create'
+    if (initializedForm.current === formKey) return
+    initializedForm.current = formKey
+    setCodeSequence(1)
+    rejectedCode.current = ''
     resetForm(
       product
         ? {
@@ -78,10 +111,57 @@ export function ProductFormModal({
     )
   }, [open, product, resetForm])
 
+  useEffect(() => {
+    if (!open || product) return
+    setValue('code', appendCatalogCodeSequence(baseCode, codeSequence), {
+      shouldValidate: false,
+    })
+  }, [baseCode, codeSequence, open, product, setValue])
+
+  useEffect(() => {
+    if (
+      product ||
+      codeAvailability.isFetching ||
+      codeAvailability.data?.available !== false ||
+      !normalizedCode ||
+      normalizedCode !== debouncedCode ||
+      rejectedCode.current === normalizedCode
+    ) {
+      return
+    }
+    rejectedCode.current = normalizedCode
+    setCodeSequence((current) => current + 1)
+  }, [
+    codeAvailability.data?.available,
+    codeAvailability.isFetching,
+    debouncedCode,
+    normalizedCode,
+    product,
+  ])
+
   const submit = form.handleSubmit(async (values) => {
+    const normalizedCode = normalizeCatalogCode(values.code)
+    let availability
+    try {
+      availability = await productsService.checkCodeAvailability(
+        normalizedCode,
+        product?.id,
+      )
+    } catch (error) {
+      toast.error(getProductErrorMessage(error))
+      return
+    }
+    if (!availability.data.available) {
+      form.setError('code', {
+        type: 'validate',
+        message: 'Este código ya pertenece a otro producto.',
+      })
+      return
+    }
+
     const input: ProductInput = {
       ...values,
-      code: values.code.trim().toUpperCase(),
+      code: normalizedCode,
       barcode: product?.barcode ?? null,
       name: values.name.trim(),
       description: values.description.trim() || null,
@@ -109,14 +189,6 @@ export function ProductFormModal({
     return message ? String(message) : undefined
   }
 
-  const stopImplicitSubmit: React.KeyboardEventHandler<HTMLInputElement> = (
-    event,
-  ) => {
-    if (event.key !== 'Enter') return
-    event.preventDefault()
-    event.stopPropagation()
-  }
-
   return (
     <Modal
       open={open}
@@ -134,6 +206,8 @@ export function ProductFormModal({
             form="product-form"
             disabled={
               isSubmitting ||
+              codeAvailability.isFetching ||
+              codeAvailability.data?.available === false ||
               !options?.categories.length ||
               !options.units.length
             }
@@ -177,36 +251,6 @@ export function ProductFormModal({
         noValidate
         className="space-y-5"
       >
-        <Field label="Código del producto" error={fieldError('code')} required>
-          <Input
-            {...form.register('code')}
-            autoComplete="off"
-            placeholder="Ej. REP-001"
-            className="uppercase"
-            onKeyDown={stopImplicitSubmit}
-          />
-        </Field>
-
-        <Field label="Nombre del producto" error={fieldError('name')} required>
-          <Input
-            {...form.register('name')}
-            placeholder="Nombre comercial del repuesto"
-          />
-        </Field>
-
-        <Field
-          label="Descripción"
-          error={fieldError('description')}
-          hint="Opcional"
-        >
-          <textarea
-            {...form.register('description')}
-            rows={3}
-            placeholder="Características o aplicación del producto"
-            className={`${inputClass} h-auto resize-y py-3`}
-          />
-        </Field>
-
         <div className="grid gap-4 sm:grid-cols-3">
           <Field label="Categoría" error={fieldError('categoryId')} required>
             <SmartSelect
@@ -238,12 +282,16 @@ export function ProductFormModal({
                   label: option.name,
                 })) ?? []
               }
-              onChange={(brandId) =>
+              onChange={(brandId) => {
                 form.setValue('brandId', brandId, {
                   shouldDirty: true,
                   shouldValidate: true,
                 })
-              }
+                if (!product) {
+                  setCodeSequence(1)
+                  rejectedCode.current = ''
+                }
+              }}
             />
           </Field>
           <Field label="Unidad" error={fieldError('unitId')} required>
@@ -266,6 +314,33 @@ export function ProductFormModal({
             />
           </Field>
         </div>
+
+        <Field label="Nombre del producto" error={fieldError('name')} required>
+          <Input
+            {...nameField}
+            placeholder="Nombre comercial del repuesto"
+            onChange={(event) => {
+              nameField.onChange(event)
+              if (!product) {
+                setCodeSequence(1)
+                rejectedCode.current = ''
+              }
+            }}
+          />
+        </Field>
+
+        <Field
+          label="Descripción"
+          error={fieldError('description')}
+          hint="Opcional"
+        >
+          <textarea
+            {...form.register('description')}
+            rows={3}
+            placeholder="Características o aplicación del producto"
+            className={`${inputClass} h-auto resize-y py-3`}
+          />
+        </Field>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
@@ -300,8 +375,55 @@ export function ProductFormModal({
             />
           </Field>
         </div>
+
+        <Field label="Código del producto" error={fieldError('code')} required>
+          <Input
+            {...form.register('code')}
+            readOnly
+            aria-readonly="true"
+            autoComplete="off"
+            placeholder="Se genera automáticamente"
+            className="cursor-default bg-muted/60 font-mono uppercase text-brand-forest"
+          />
+          <CodeAvailabilityHint
+            code={normalizedCode}
+            checking={codeAvailability.isFetching}
+            available={codeAvailability.data?.available}
+          />
+        </Field>
       </form>
     </Modal>
+  )
+}
+
+function CodeAvailabilityHint({
+  code,
+  checking,
+  available,
+}: {
+  code: string
+  checking: boolean
+  available?: boolean
+}) {
+  const message = !code
+    ? 'Se generará automáticamente al completar los datos del producto.'
+    : checking
+      ? 'Validando el código automático…'
+      : available === false
+        ? 'Generando una variante corta disponible…'
+        : available
+          ? 'Código automático disponible.'
+          : 'Código generado automáticamente y protegido contra edición.'
+
+  return (
+    <span
+      aria-live="polite"
+      className={`block text-xs font-normal ${
+        available === false ? 'text-red-600' : 'text-muted-foreground'
+      }`}
+    >
+      {message}
+    </span>
   )
 }
 

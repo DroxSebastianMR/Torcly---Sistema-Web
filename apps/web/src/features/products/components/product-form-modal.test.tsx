@@ -9,7 +9,7 @@ import {
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ProductFormModal } from './product-form-modal'
 import type { Product, ProductOptions } from '../types/products.types'
 
@@ -18,6 +18,9 @@ const service = vi.hoisted(() => ({
   update: vi.fn(),
   list: vi.fn(),
   get: vi.fn(),
+  checkCodeAvailability: vi.fn(() =>
+    Promise.resolve({ data: { code: 'REP-001', available: true } }),
+  ),
 }))
 
 vi.mock('../services/products.service', () => ({ productsService: service }))
@@ -81,6 +84,12 @@ async function selectCategoryAndUnit(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('Formulario de productos', () => {
+  beforeEach(() => {
+    service.checkCodeAvailability.mockResolvedValue({
+      data: { code: 'REP-001', available: true },
+    })
+  })
+
   afterEach(() => {
     cleanup()
     vi.resetAllMocks()
@@ -102,13 +111,18 @@ describe('Formulario de productos', () => {
     const user = userEvent.setup()
     renderModal()
 
-    await user.type(screen.getByLabelText(/^código del producto/i), 'REP-001')
     await user.type(screen.getByLabelText(/^nombre del producto/i), 'Filtro')
     fireEvent.change(screen.getByLabelText(/^precio de venta/i), {
       target: { value: '-5' },
     })
     await selectCategoryAndUnit(user)
-    await user.click(screen.getByRole('button', { name: 'Guardar producto' }))
+    const submitButton = screen.getByRole('button', {
+      name: 'Guardar producto',
+    })
+    await waitFor(() =>
+      expect((submitButton as HTMLButtonElement).disabled).toBe(false),
+    )
+    await user.click(submitButton)
 
     expect(
       await screen.findByText('El precio no puede ser negativo.'),
@@ -116,23 +130,34 @@ describe('Formulario de productos', () => {
     expect(service.create).not.toHaveBeenCalled()
   })
 
-  it('normaliza el código y envía el payload correcto al registrar', async () => {
+  it('genera el código y envía el payload correcto al registrar', async () => {
     const user = userEvent.setup()
     service.create.mockResolvedValue({ data: {} })
     const { onClose } = renderModal()
 
-    await user.type(screen.getByLabelText(/^código del producto/i), 'rep-001')
     await user.type(
       screen.getByLabelText(/^nombre del producto/i),
       'Filtro de aceite',
     )
     await user.type(screen.getByLabelText(/^precio de venta/i), '35.5')
     await selectCategoryAndUnit(user)
-    await user.click(screen.getByRole('button', { name: 'Guardar producto' }))
+    await waitFor(() =>
+      expect(
+        (screen.getByLabelText(/^código del producto/i) as HTMLInputElement)
+          .value,
+      ).toBe('FIL-ACE'),
+    )
+    const submitButton = screen.getByRole('button', {
+      name: 'Guardar producto',
+    })
+    await waitFor(() =>
+      expect((submitButton as HTMLButtonElement).disabled).toBe(false),
+    )
+    await user.click(submitButton)
 
     await waitFor(() =>
       expect(service.create).toHaveBeenCalledWith({
-        code: 'REP-001',
+        code: 'FIL-ACE',
         barcode: null,
         name: 'Filtro de aceite',
         description: null,
@@ -147,6 +172,49 @@ describe('Formulario de productos', () => {
       'Producto registrado correctamente.',
     )
     expect(onClose).toHaveBeenCalledOnce()
+  })
+
+  it('genera un código compacto de solo lectura', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await user.type(
+      screen.getByLabelText(/^nombre del producto/i),
+      'Filtro de aceite CA 2022',
+    )
+
+    await waitFor(() =>
+      expect(
+        (screen.getByLabelText(/^código del producto/i) as HTMLInputElement)
+          .value,
+      ).toBe('FIL-CA2022'),
+    )
+    expect(screen.getByLabelText(/^código del producto/i)).toHaveProperty(
+      'readOnly',
+      true,
+    )
+  })
+
+  it('presenta los campos según la jerarquía de registro definida', () => {
+    renderModal()
+
+    const fields = [
+      screen.getByRole('button', { name: 'Categoría' }),
+      screen.getByRole('button', { name: 'Marca' }),
+      screen.getByRole('button', { name: 'Unidad' }),
+      screen.getByLabelText(/^nombre del producto/i),
+      screen.getByLabelText(/^descripción/i),
+      screen.getByLabelText(/^precio de venta/i),
+      screen.getByLabelText(/^stock mínimo/i),
+      screen.getByLabelText(/^código del producto/i),
+    ]
+
+    fields.slice(0, -1).forEach((field, index) => {
+      expect(
+        field.compareDocumentPosition(fields[index + 1]) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
+    })
   })
 
   it('no muestra el campo de código de barras', () => {
@@ -164,6 +232,10 @@ describe('Formulario de productos', () => {
       (screen.getByLabelText(/^código del producto/i) as HTMLInputElement)
         .value,
     ).toBe('REP-001')
+    expect(screen.getByLabelText(/^código del producto/i)).toHaveProperty(
+      'readOnly',
+      true,
+    )
     expect(screen.getByText('Existencia disponible')).toBeTruthy()
     expect(screen.getByText('12 und')).toBeTruthy()
     expect(screen.getByText('Solo lectura')).toBeTruthy()

@@ -83,6 +83,17 @@ export const servicesRepository = {
     return databaseService.client.service.findUnique({ where: { id } })
   },
 
+  async isCodeAvailable(code: string, excludeId?: string) {
+    const service = await databaseService.client.service.findFirst({
+      where: {
+        code: { equals: code, mode: 'insensitive' },
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+      },
+      select: { id: true },
+    })
+    return service === null
+  },
+
   listActive() {
     return databaseService.client.service.findMany({
       where: { active: true },

@@ -12,6 +12,8 @@ export const productKeys = {
   detail: (id: string) => [...productKeys.all, 'detail', id] as const,
   options: () => [...productKeys.all, 'options'] as const,
   catalog: () => [...productKeys.all, 'catalog'] as const,
+  codeAvailability: (code: string, excludeId?: string) =>
+    [...productKeys.all, 'code-availability', code, excludeId] as const,
 }
 
 export function useProducts(filters: ProductFilters) {
@@ -47,6 +49,21 @@ export function useProductCatalog(enabled: boolean) {
     enabled,
     select: (response) => response.data,
     staleTime: CATALOG_STALE_TIME,
+  })
+}
+
+export function useProductCodeAvailability(
+  code: string,
+  excludeId?: string,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: productKeys.codeAvailability(code, excludeId),
+    queryFn: ({ signal }) =>
+      productsService.checkCodeAvailability(code, excludeId, signal),
+    enabled: enabled && code.length >= 2,
+    select: (response) => response.data,
+    staleTime: 15_000,
   })
 }
 

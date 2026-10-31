@@ -3,6 +3,7 @@ import { requireAuth, requirePermission } from '../auth/auth.middleware.js'
 import {
   compensatePayment,
   createPayment,
+  createSplitPayment,
   getPayment,
   listPayments,
 } from './payment.controller.js'
@@ -27,6 +28,12 @@ paymentsRouter.post(
   requirePermission('cash:write'),
   requirePermission('sales:write'),
   createPayment,
+)
+paymentsRouter.post(
+  '/:id/pay-split',
+  requirePermission('cash:write'),
+  requirePermission('sales:write'),
+  createSplitPayment,
 )
 paymentsRouter.post(
   '/:paymentId/compensate',

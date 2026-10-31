@@ -3,6 +3,7 @@ import {
   paymentCompensateSchema,
   paymentQuerySchema,
   paymentRegisterSchema,
+  splitPaymentRegisterSchema,
 } from '../src/modules/payments/payment.schemas.js'
 
 const requestId = 'a0000000-0000-4000-8000-000000000001'
@@ -26,6 +27,36 @@ describe('Schemas de cobros', () => {
         method: 'CASH',
       }),
     ).toThrow(/dos decimales/)
+  })
+
+  it('acepta un pago mixto con dos métodos diferentes', () => {
+    expect(
+      splitPaymentRegisterSchema.parse({
+        requestId,
+        payments: [
+          { amount: 30, method: 'CASH' },
+          { amount: 70, method: 'DIGITAL_WALLET' },
+        ],
+      }).payments,
+    ).toHaveLength(2)
+  })
+
+  it('rechaza un pago mixto con el mismo método o cantidad incorrecta', () => {
+    expect(
+      splitPaymentRegisterSchema.safeParse({
+        requestId,
+        payments: [
+          { amount: 30, method: 'CASH' },
+          { amount: 70, method: 'CASH' },
+        ],
+      }).success,
+    ).toBe(false)
+    expect(
+      splitPaymentRegisterSchema.safeParse({
+        requestId,
+        payments: [{ amount: 100, method: 'CASH' }],
+      }).success,
+    ).toBe(false)
   })
 
   it('rechaza importes no positivos y métodos desconocidos', () => {

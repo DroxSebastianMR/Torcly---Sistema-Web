@@ -55,6 +55,36 @@ export const paymentRegisterSchema = z
   })
   .strict()
 
+export const splitPaymentRegisterSchema = z
+  .object({
+    requestId: z.uuid('El identificador de la operación es inválido.'),
+    payments: z
+      .array(
+        z
+          .object({
+            amount: paymentAmountSchema,
+            method: z.enum(['CASH', 'CARD', 'TRANSFER', 'DIGITAL_WALLET']),
+          })
+          .strict(),
+      )
+      .length(2, 'El pago mixto requiere exactamente dos métodos.'),
+    notes: z
+      .string()
+      .trim()
+      .max(300, 'La observación no puede exceder los 300 caracteres.')
+      .optional(),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.payments[0]?.method === value.payments[1]?.method) {
+      context.addIssue({
+        code: 'custom',
+        path: ['payments', 1, 'method'],
+        message: 'Selecciona dos métodos de pago diferentes.',
+      })
+    }
+  })
+
 export const paymentCompensateSchema = z
   .object({
     requestId: z.uuid('El identificador de la operación es inválido.'),
@@ -74,4 +104,5 @@ export const paymentCompensateSchema = z
 
 export type PaymentQueryDto = z.infer<typeof paymentQuerySchema>
 export type PaymentRegisterDto = z.infer<typeof paymentRegisterSchema>
+export type SplitPaymentRegisterDto = z.infer<typeof splitPaymentRegisterSchema>
 export type PaymentCompensateDto = z.infer<typeof paymentCompensateSchema>

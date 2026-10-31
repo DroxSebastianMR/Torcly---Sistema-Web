@@ -28,6 +28,10 @@ const obligation: PaymentObligationSummary = {
 function mutationsMock() {
   return {
     pay: { isPending: false, mutateAsync: vi.fn().mockResolvedValue({}) },
+    paySplit: {
+      isPending: false,
+      mutateAsync: vi.fn().mockResolvedValue({}),
+    },
     compensate: { isPending: false, mutateAsync: vi.fn() },
   }
 }
@@ -95,6 +99,46 @@ describe('Formulario de cobro (QA-07)', () => {
     await user.tab()
 
     expect(input.value).toBe('100.00')
+  })
+
+  it('registra dos métodos como una sola operación de pago mixto', async () => {
+    const user = userEvent.setup()
+    const mutations = mutationsMock()
+    payments.usePaymentMutations.mockReturnValue(mutations)
+    renderModal()
+
+    await user.click(screen.getByRole('button', { name: 'Pago mixto' }))
+    const firstAmount = screen.getByLabelText(
+      'Importe a cobrar',
+    ) as HTMLInputElement
+    const secondAmount = screen.getByLabelText(
+      'Segundo importe a cobrar',
+    ) as HTMLInputElement
+    await user.clear(firstAmount)
+    await user.type(firstAmount, '30')
+    await user.clear(secondAmount)
+    await user.type(secondAmount, '120.50')
+    await user.click(
+      screen.getByRole('button', { name: 'Registrar pago mixto' }),
+    )
+
+    await waitFor(() =>
+      expect(mutations.paySplit.mutateAsync).toHaveBeenCalledWith({
+        saleId: 'sale-1',
+        input: {
+          requestId: 'req-payment-1',
+          payments: [
+            { amount: 30, method: 'CASH' },
+            { amount: 120.5, method: 'DIGITAL_WALLET' },
+          ],
+          notes: undefined,
+        },
+      }),
+    )
+    expect(mutations.pay.mutateAsync).not.toHaveBeenCalled()
+    expect(toast.success).toHaveBeenCalledWith(
+      'Pago mixto registrado correctamente.',
+    )
   })
 
   it('rechaza un importe mayor al saldo sin registrar el pago', async () => {

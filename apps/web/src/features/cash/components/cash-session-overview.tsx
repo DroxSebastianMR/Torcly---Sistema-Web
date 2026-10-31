@@ -64,7 +64,7 @@ export function CashSessionOverview({
       icon: Landmark,
     },
     {
-      label: 'Billetera digital',
+      label: 'Billetera digital (Yape/Plin)',
       value: session.totals.net.digitalWallet,
       icon: WalletCards,
     },

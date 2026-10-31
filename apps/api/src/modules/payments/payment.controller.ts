@@ -6,6 +6,7 @@ import {
   paymentIdSchema,
   paymentQuerySchema,
   paymentRegisterSchema,
+  splitPaymentRegisterSchema,
 } from './payment.schemas.js'
 import { paymentsService } from './payment.service.js'
 
@@ -37,6 +38,20 @@ export const createPayment: RequestHandler = async (request, response) => {
       await paymentsService.registerPayment(
         id,
         paymentRegisterSchema.parse(request.body),
+        actor(request),
+        getRequestContext(request, response),
+      ),
+    )
+}
+
+export const createSplitPayment: RequestHandler = async (request, response) => {
+  const { id } = paymentIdSchema.parse(request.params)
+  response
+    .status(201)
+    .json(
+      await paymentsService.registerSplitPayment(
+        id,
+        splitPaymentRegisterSchema.parse(request.body),
         actor(request),
         getRequestContext(request, response),
       ),

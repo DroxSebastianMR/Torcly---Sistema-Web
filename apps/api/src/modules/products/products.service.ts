@@ -95,6 +95,15 @@ export const productsService = {
     return { data: toResponse(product) }
   },
 
+  async checkCodeAvailability(code: string, excludeId?: string) {
+    return {
+      data: {
+        code,
+        available: await productsRepository.isCodeAvailable(code, excludeId),
+      },
+    }
+  },
+
   async create(input: ProductInput, actorId: string, context: RequestContext) {
     try {
       return {

@@ -9,6 +9,8 @@ export const serviceKeys = {
     [...serviceKeys.all, 'list', filters] as const,
   detail: (id: string) => [...serviceKeys.all, 'detail', id] as const,
   options: () => [...serviceKeys.all, 'options'] as const,
+  codeAvailability: (code: string, excludeId?: string) =>
+    [...serviceKeys.all, 'code-availability', code, excludeId] as const,
 }
 
 export function useServices(filters: ServiceFilters) {
@@ -34,6 +36,21 @@ export function useServiceOptions() {
     queryKey: serviceKeys.options(),
     queryFn: ({ signal }) => servicesService.options(signal),
     select: (response) => response.data,
+  })
+}
+
+export function useServiceCodeAvailability(
+  code: string,
+  excludeId?: string,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: serviceKeys.codeAvailability(code, excludeId),
+    queryFn: ({ signal }) =>
+      servicesService.checkCodeAvailability(code, excludeId, signal),
+    enabled: enabled && code.length >= 2,
+    select: (response) => response.data,
+    staleTime: 15_000,
   })
 }
 

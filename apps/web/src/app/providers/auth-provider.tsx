@@ -30,7 +30,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
         throw error
       }
     },
-    retry: false,
+    retry: (failureCount, error) => {
+      if (!isAxiosError(error) || failureCount >= 2) return false
+      return !error.response || error.response.status >= 500
+    },
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 4000),
   })
   return (
     <AuthContext.Provider

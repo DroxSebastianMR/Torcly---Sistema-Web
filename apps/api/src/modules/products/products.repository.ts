@@ -180,6 +180,17 @@ export const productsRepository = {
     })
   },
 
+  async isCodeAvailable(code: string, excludeId?: string) {
+    const product = await databaseService.client.product.findFirst({
+      where: {
+        code: { equals: code, mode: 'insensitive' },
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+      },
+      select: { id: true },
+    })
+    return product === null
+  },
+
   create(input: ProductInput, actorId: string, context: RequestContext) {
     return databaseService.transaction(async (transaction) => {
       const product = await databaseService.measure(

@@ -1,6 +1,7 @@
 import type { Prisma } from '../../generated/prisma/client.js'
 import { prisma } from './prisma.client.js'
 import { requestMetricsContext } from '../../shared/observability/request-context.js'
+import { env } from '../../config/env.js'
 
 class PrismaService {
   readonly client = prisma
@@ -55,7 +56,10 @@ class PrismaService {
   ): Promise<T> {
     const startedAt = performance.now()
     try {
-      return await this.client.$transaction(operation)
+      return await this.client.$transaction(operation, {
+        maxWait: env.DATABASE_TRANSACTION_MAX_WAIT_MS,
+        timeout: env.DATABASE_TRANSACTION_TIMEOUT_MS,
+      })
     } finally {
       if (process.env.NODE_ENV !== 'test') {
         const context = requestMetricsContext.getStore()

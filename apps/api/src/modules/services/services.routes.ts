@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { requireAuth, requirePermission } from '../auth/auth.middleware.js'
 import {
+  checkServiceCodeAvailability,
   createService,
   getService,
   getServiceOptions,
@@ -17,6 +18,11 @@ servicesRouter.get(
   '/options',
   requirePermission('services:read'),
   getServiceOptions,
+)
+servicesRouter.get(
+  '/code-availability',
+  requirePermission('services:write'),
+  checkServiceCodeAvailability,
 )
 servicesRouter.get('/:id', requirePermission('services:read'), getService)
 servicesRouter.post('/', requirePermission('services:write'), createService)

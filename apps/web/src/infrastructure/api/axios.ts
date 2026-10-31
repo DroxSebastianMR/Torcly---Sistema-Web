@@ -6,7 +6,10 @@ import { notifySessionExpired } from './session-events'
 export const http = axios.create({
   baseURL: env.apiUrl,
   withCredentials: true,
-  timeout: 15000,
+  // Un Web Service de Render puede necesitar varios segundos para reactivarse.
+  // El límite anterior cortaba la comprobación de sesión antes de que la API
+  // terminara de iniciar y mostraba un falso error de conexión.
+  timeout: 60000,
   headers: { 'Content-Type': 'application/json' },
 })
 

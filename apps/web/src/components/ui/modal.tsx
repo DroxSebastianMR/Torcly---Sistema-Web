@@ -70,6 +70,16 @@ export function Modal({
   const titleId = useId()
   const descriptionId = useId()
   const panelRef = useRef<HTMLDivElement>(null)
+  const onCloseRef = useRef(onClose)
+  const busyRef = useRef(busy)
+
+  // Mantiene el listener estable mientras el diálogo está abierto. Varios
+  // formularios recrean sus callbacks al escribir; reiniciar el efecto de foco
+  // en cada pulsación devolvía el foco al panel y expulsaba al usuario del input.
+  useEffect(() => {
+    onCloseRef.current = onClose
+    busyRef.current = busy
+  }, [busy, onClose])
 
   useEffect(() => {
     if (!open) return
@@ -78,7 +88,7 @@ export function Modal({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (!busy) onClose()
+        if (!busyRef.current) onCloseRef.current()
         return
       }
       if (event.key !== 'Tab') return
@@ -101,17 +111,20 @@ export function Modal({
     }
 
     document.addEventListener('keydown', handleKeyDown)
-    requestAnimationFrame(() => {
+    const focusFrame = requestAnimationFrame(() => {
+      const panel = panelRef.current
+      if (panel?.contains(document.activeElement)) return
       const target = initialFocusRef?.current ?? panelRef.current
       target?.focus()
     })
 
     return () => {
+      cancelAnimationFrame(focusFrame)
       document.removeEventListener('keydown', handleKeyDown)
       unlockBodyScroll()
       previousFocus?.focus()
     }
-  }, [onClose, open, busy, initialFocusRef])
+  }, [open, initialFocusRef])
 
   if (!open) return null
 

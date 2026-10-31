@@ -6,6 +6,7 @@ import type {
   PaymentDetail,
   PaymentFilters,
   PaymentRegisterInput,
+  SplitPaymentRegisterInput,
   PaymentsResponse,
 } from '../types/payment.types'
 
@@ -39,6 +40,12 @@ export const paymentsService = {
   pay(saleId: string, input: PaymentRegisterInput) {
     return api.post<DataResponse<PaymentDetail>>(
       endpoints.payments.pay(saleId),
+      input,
+    )
+  },
+  paySplit(saleId: string, input: SplitPaymentRegisterInput) {
+    return api.post<DataResponse<PaymentDetail>>(
+      endpoints.payments.paySplit(saleId),
       input,
     )
   },

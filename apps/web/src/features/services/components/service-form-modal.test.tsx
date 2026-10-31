@@ -8,7 +8,7 @@ import {
   waitFor,
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ServiceFormModal } from './service-form-modal'
 import type { Service } from '../types/services.types'
 
@@ -18,9 +18,21 @@ const mutations = vi.hoisted(() => ({
   status: { isPending: false, mutateAsync: vi.fn() },
 }))
 
+const serviceApi = vi.hoisted(() => ({
+  checkCodeAvailability: vi.fn(() =>
+    Promise.resolve({ data: { code: 'SERV-TOR', available: true } }),
+  ),
+}))
+
 vi.mock('../hooks/use-services', () => ({
   useServiceMutations: () => mutations,
+  useServiceCodeAvailability: () => ({
+    data: { code: 'SERV-TOR', available: true },
+    isFetching: false,
+  }),
 }))
+
+vi.mock('../services/services.service', () => ({ servicesService: serviceApi }))
 
 const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }))
 vi.mock('sonner', () => ({ toast }))
@@ -46,6 +58,12 @@ function renderModal({
 }
 
 describe('Formulario de servicios', () => {
+  beforeEach(() => {
+    serviceApi.checkCodeAvailability.mockResolvedValue({
+      data: { code: 'SERV-TOR', available: true },
+    })
+  })
+
   afterEach(() => {
     cleanup()
     vi.resetAllMocks()
@@ -68,10 +86,6 @@ describe('Formulario de servicios', () => {
     renderModal()
 
     await user.type(
-      screen.getByLabelText(/^código del servicio/i),
-      'CAMBIO-BOMBA',
-    )
-    await user.type(
       screen.getByLabelText(/^nombre del servicio/i),
       'Cambio de bomba',
     )
@@ -86,25 +100,27 @@ describe('Formulario de servicios', () => {
     expect(mutations.create.mutateAsync).not.toHaveBeenCalled()
   })
 
-  it('normaliza el código y envía el payload correcto al registrar', async () => {
+  it('genera el código y envía el payload correcto al registrar', async () => {
     const user = userEvent.setup()
     mutations.create.mutateAsync.mockResolvedValue({ data: {} })
     const { onClose } = renderModal()
 
     await user.type(
-      screen.getByLabelText(/^código del servicio/i),
-      'cambio-bomba',
-    )
-    await user.type(
       screen.getByLabelText(/^nombre del servicio/i),
       'Cambio de bomba de agua',
     )
     await user.type(screen.getByLabelText(/^precio/i), '250.5')
+    await waitFor(() =>
+      expect(
+        (screen.getByLabelText(/^código del servicio/i) as HTMLInputElement)
+          .value,
+      ).toBe('SERV-CAM-BOM'),
+    )
     await user.click(screen.getByRole('button', { name: 'Guardar servicio' }))
 
     await waitFor(() =>
       expect(mutations.create.mutateAsync).toHaveBeenCalledWith({
-        code: 'CAMBIO-BOMBA',
+        code: 'SERV-CAM-BOM',
         name: 'Cambio de bomba de agua',
         description: null,
         price: 250.5,
@@ -116,17 +132,61 @@ describe('Formulario de servicios', () => {
     expect(onClose).toHaveBeenCalledOnce()
   })
 
-  it('el Enter en el código no envía el formulario', async () => {
+  it('sugiere un código corto y visible desde el nombre', async () => {
     const user = userEvent.setup()
-    mutations.create.mutateAsync.mockResolvedValue({ data: {} })
     renderModal()
 
-    const codeInput = screen.getByLabelText(/^código del servicio/i)
-    await user.type(codeInput, 'cambio-bomba')
-    await user.keyboard('{Enter}')
+    await user.type(
+      screen.getByLabelText(/^nombre del servicio/i),
+      'Servicio de torque',
+    )
 
-    expect((codeInput as HTMLInputElement).value).toBe('cambio-bomba')
+    await waitFor(() =>
+      expect(
+        (screen.getByLabelText(/^código del servicio/i) as HTMLInputElement)
+          .value,
+      ).toBe('SERV-TOR'),
+    )
+    expect(screen.getByLabelText(/^código del servicio/i)).toHaveProperty(
+      'readOnly',
+      true,
+    )
+  })
+
+  it('no permite modificar manualmente el código generado', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await user.type(
+      screen.getByLabelText(/^nombre del servicio/i),
+      'Servicio de torque',
+    )
+    const codeInput = screen.getByLabelText(/^código del servicio/i)
+    await waitFor(() =>
+      expect((codeInput as HTMLInputElement).value).toBe('SERV-TOR'),
+    )
+    await user.type(codeInput, 'OTRO-CODIGO')
+
+    expect((codeInput as HTMLInputElement).value).toBe('SERV-TOR')
     expect(mutations.create.mutateAsync).not.toHaveBeenCalled()
+  })
+
+  it('presenta nombre, descripción, precio y código en ese orden', () => {
+    renderModal()
+
+    const fields = [
+      screen.getByLabelText(/^nombre del servicio/i),
+      screen.getByLabelText(/^descripción/i),
+      screen.getByLabelText(/^precio/i),
+      screen.getByLabelText(/^código del servicio/i),
+    ]
+
+    fields.slice(0, -1).forEach((field, index) => {
+      expect(
+        field.compareDocumentPosition(fields[index + 1]) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
+    })
   })
 
   it('precarga la ficha, muestra la tarifa vigente y actualiza', async () => {
@@ -138,6 +198,10 @@ describe('Formulario de servicios', () => {
       (screen.getByLabelText(/^código del servicio/i) as HTMLInputElement)
         .value,
     ).toBe('CAMBIO-BOMBA')
+    expect(screen.getByLabelText(/^código del servicio/i)).toHaveProperty(
+      'readOnly',
+      true,
+    )
     expect(screen.getByText('Tarifa vigente')).toBeTruthy()
 
     const nameInput = screen.getByLabelText(/^nombre del servicio/i)

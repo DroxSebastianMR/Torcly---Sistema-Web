@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, render } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Modal } from './modal'
 
@@ -33,5 +33,28 @@ describe('Modal', () => {
 
     view.rerender(<Dialogs first={false} second={false} />)
     expect(document.body.style.overflow).toBe('')
+  })
+
+  it('conserva el foco al cambiar callbacks mientras se escribe', () => {
+    const firstClose = vi.fn()
+    const secondClose = vi.fn()
+    const view = render(
+      <Modal open title="Diálogo editable" onClose={firstClose}>
+        <input aria-label="Motivo" />
+      </Modal>,
+    )
+    const input = screen.getByLabelText('Motivo')
+    input.focus()
+
+    view.rerender(
+      <Modal open title="Diálogo editable" onClose={secondClose}>
+        <input aria-label="Motivo" />
+      </Modal>,
+    )
+
+    expect(document.activeElement).toBe(input)
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(firstClose).not.toHaveBeenCalled()
+    expect(secondClose).toHaveBeenCalledOnce()
   })
 })

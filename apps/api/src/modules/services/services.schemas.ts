@@ -20,6 +20,17 @@ export const serviceQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(5).max(100).default(10),
 })
 
+export const serviceCodeAvailabilitySchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .min(2, 'Ingresa un código válido.')
+    .max(40)
+    .regex(/^[A-Za-z0-9][A-Za-z0-9._-]*$/, 'El código no es válido.')
+    .transform((value) => value.toUpperCase()),
+  excludeId: z.uuid('Servicio inválido.').optional(),
+})
+
 export const serviceInputSchema = z
   .object({
     code: z

@@ -3,6 +3,7 @@ import { endpoints } from '@/infrastructure/api/endpoints'
 import type {
   DataResponse,
   Service,
+  ServiceCodeAvailability,
   ServiceFilters,
   ServiceInput,
   ServiceOption,
@@ -35,6 +36,18 @@ export const servicesService = {
   },
   get(id: string, signal?: AbortSignal) {
     return api.get<DataResponse<Service>>(endpoints.services.detail(id), signal)
+  },
+  checkCodeAvailability(
+    code: string,
+    excludeId?: string,
+    signal?: AbortSignal,
+  ) {
+    const query = new URLSearchParams({ code })
+    if (excludeId) query.set('excludeId', excludeId)
+    return api.get<DataResponse<ServiceCodeAvailability>>(
+      `${endpoints.services.codeAvailability}?${query}`,
+      signal,
+    )
   },
   create(input: ServiceInput) {
     return api.post<DataResponse<Service>>(endpoints.services.root, input)

@@ -1,15 +1,25 @@
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
 import {
+  appendCatalogCodeSequence,
+  normalizeCatalogCode,
+  suggestServiceCode,
+} from '@/lib/catalog-code'
+import { useDebouncedValue } from '@/lib/use-debounced-value'
+import {
   serviceFormSchema,
   type ServiceFormValues,
 } from '../forms/service.schema'
-import { useServiceMutations } from '../hooks/use-services'
+import {
+  useServiceCodeAvailability,
+  useServiceMutations,
+} from '../hooks/use-services'
+import { servicesService } from '../services/services.service'
 import type { Service, ServiceInput } from '../types/services.types'
 import {
   currencyFormatter,
@@ -44,10 +54,32 @@ export function ServiceFormModal({
     resolver: zodResolver(serviceFormSchema),
     defaultValues: emptyValues,
   })
-  const { reset: resetForm } = form
+  const name = useWatch({ control: form.control, name: 'name' })
+  const code = useWatch({ control: form.control, name: 'code' })
+  const nameField = form.register('name')
+  const [codeSequence, setCodeSequence] = useState(1)
+  const rejectedCode = useRef('')
+  const initializedForm = useRef('')
+  const { reset: resetForm, setValue } = form
+  const baseCode = suggestServiceCode(name ?? '')
+  const normalizedCode = normalizeCatalogCode(code ?? '')
+  const debouncedCode = useDebouncedValue(normalizedCode)
+  const codeAvailability = useServiceCodeAvailability(
+    debouncedCode,
+    service?.id,
+    open,
+  )
 
-  useEffect(() => {
-    if (!open) return
+  useLayoutEffect(() => {
+    if (!open) {
+      initializedForm.current = ''
+      return
+    }
+    const formKey = service ? `edit:${service.id}` : 'create'
+    if (initializedForm.current === formKey) return
+    initializedForm.current = formKey
+    setCodeSequence(1)
+    rejectedCode.current = ''
     resetForm(
       service
         ? {
@@ -60,10 +92,57 @@ export function ServiceFormModal({
     )
   }, [open, service, resetForm])
 
+  useEffect(() => {
+    if (!open || service) return
+    setValue('code', appendCatalogCodeSequence(baseCode, codeSequence), {
+      shouldValidate: false,
+    })
+  }, [baseCode, codeSequence, open, service, setValue])
+
+  useEffect(() => {
+    if (
+      service ||
+      codeAvailability.isFetching ||
+      codeAvailability.data?.available !== false ||
+      !normalizedCode ||
+      normalizedCode !== debouncedCode ||
+      rejectedCode.current === normalizedCode
+    ) {
+      return
+    }
+    rejectedCode.current = normalizedCode
+    setCodeSequence((current) => current + 1)
+  }, [
+    codeAvailability.data?.available,
+    codeAvailability.isFetching,
+    debouncedCode,
+    normalizedCode,
+    service,
+  ])
+
   const submit = form.handleSubmit(async (values) => {
+    const normalizedCode = normalizeCatalogCode(values.code)
+    let availability
+    try {
+      availability = await servicesService.checkCodeAvailability(
+        normalizedCode,
+        service?.id,
+      )
+    } catch (error) {
+      toast.error(getServiceErrorMessage(error))
+      return
+    }
+    if (!availability.data.available) {
+      form.setError('code', {
+        type: 'validate',
+        message: 'Este código ya pertenece a otro servicio.',
+      })
+      return
+    }
+
     const input: ServiceInput = {
       ...values,
-      code: values.code.trim().toUpperCase(),
+      code: normalizedCode,
       name: values.name.trim(),
       description: values.description.trim() || null,
       price: Number(values.price),
@@ -88,14 +167,6 @@ export function ServiceFormModal({
     return message ? String(message) : undefined
   }
 
-  const stopImplicitSubmit: React.KeyboardEventHandler<HTMLInputElement> = (
-    event,
-  ) => {
-    if (event.key !== 'Enter') return
-    event.preventDefault()
-    event.stopPropagation()
-  }
-
   return (
     <Modal
       open={open}
@@ -108,7 +179,15 @@ export function ServiceFormModal({
           <Button type="button" variant="outline" onClick={onClose}>
             Cancelar
           </Button>
-          <Button type="submit" form="service-form" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            form="service-form"
+            disabled={
+              isSubmitting ||
+              codeAvailability.isFetching ||
+              codeAvailability.data?.available === false
+            }
+          >
             {isSubmitting ? 'Guardando…' : 'Guardar servicio'}
           </Button>
         </div>
@@ -143,40 +222,17 @@ export function ServiceFormModal({
         noValidate
         className="space-y-5"
       >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            label="Código del servicio"
-            error={fieldError('code')}
-            required
-          >
-            <Input
-              {...form.register('code')}
-              autoComplete="off"
-              placeholder="Ej. CAMBIO-BOMBA"
-              className="uppercase"
-              onKeyDown={stopImplicitSubmit}
-            />
-          </Field>
-          <Field label="Precio" error={fieldError('price')} required>
-            <div className="relative">
-              <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground">
-                S/
-              </span>
-              <Input
-                {...form.register('price', { valueAsNumber: true })}
-                type="number"
-                min="0"
-                step="0.01"
-                className="pl-9"
-              />
-            </div>
-          </Field>
-        </div>
-
         <Field label="Nombre del servicio" error={fieldError('name')} required>
           <Input
-            {...form.register('name')}
+            {...nameField}
             placeholder="Nombre comercial del servicio"
+            onChange={(event) => {
+              nameField.onChange(event)
+              if (!service) {
+                setCodeSequence(1)
+                rejectedCode.current = ''
+              }
+            }}
           />
         </Field>
 
@@ -192,8 +248,70 @@ export function ServiceFormModal({
             className={`${inputClass} h-auto resize-y py-3`}
           />
         </Field>
+
+        <Field label="Precio" error={fieldError('price')} required>
+          <div className="relative">
+            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground">
+              S/
+            </span>
+            <Input
+              {...form.register('price', { valueAsNumber: true })}
+              type="number"
+              min="0"
+              step="0.01"
+              className="pl-9"
+            />
+          </div>
+        </Field>
+
+        <Field label="Código del servicio" error={fieldError('code')} required>
+          <Input
+            {...form.register('code')}
+            readOnly
+            aria-readonly="true"
+            autoComplete="off"
+            placeholder="Se genera automáticamente"
+            className="cursor-default bg-muted/60 font-mono uppercase text-brand-forest"
+          />
+          <CodeAvailabilityHint
+            code={normalizedCode}
+            checking={codeAvailability.isFetching}
+            available={codeAvailability.data?.available}
+          />
+        </Field>
       </form>
     </Modal>
+  )
+}
+
+function CodeAvailabilityHint({
+  code,
+  checking,
+  available,
+}: {
+  code: string
+  checking: boolean
+  available?: boolean
+}) {
+  const message = !code
+    ? 'Se generará automáticamente al completar el nombre del servicio.'
+    : checking
+      ? 'Validando el código automático…'
+      : available === false
+        ? 'Generando una variante corta disponible…'
+        : available
+          ? 'Código automático disponible.'
+          : 'Código generado automáticamente y protegido contra edición.'
+
+  return (
+    <span
+      aria-live="polite"
+      className={`block text-xs font-normal ${
+        available === false ? 'text-red-600' : 'text-muted-foreground'
+      }`}
+    >
+      {message}
+    </span>
   )
 }
 

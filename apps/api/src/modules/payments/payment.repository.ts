@@ -19,6 +19,7 @@ import type {
   PaymentFilters,
   PaymentMethod,
   PaymentRegisterInput,
+  SplitPaymentRegisterInput,
   PaymentType,
 } from './payment.types.js'
 
@@ -338,6 +339,116 @@ export const paymentsRepository = {
           method: input.method,
           balanceBefore: balance,
           balanceAfter: roundMoney(balance - input.amount),
+        }),
+      })
+
+      return loadObligation(transaction, saleId) as Promise<ObligationDetailRow>
+    })
+  },
+
+  async registerSplitPayment(
+    saleId: string,
+    input: SplitPaymentRegisterInput,
+    actor: { id: string; name: string },
+    context: RequestContext,
+  ): Promise<ObligationDetailRow> {
+    return databaseService.transaction(async (transaction) => {
+      await lockCashSession(transaction)
+      await lockSale(transaction, saleId)
+      const sale = await transaction.sale.findUnique({
+        where: { id: saleId },
+        select: {
+          id: true,
+          code: true,
+          status: true,
+          total: true,
+          customerId: true,
+        },
+      })
+      if (!sale)
+        throw new AppError(404, 'SALE_NOT_FOUND', 'Venta no encontrada.')
+      if (sale.status !== 'CONFIRMED')
+        throw new AppError(
+          409,
+          'PAYMENT_SALE_NOT_CONFIRMED',
+          'Solo se pueden registrar pagos para ventas confirmadas.',
+        )
+      if (Number(sale.total) <= 0)
+        throw new AppError(
+          409,
+          'PAYMENT_SALE_TOTAL_INVALID',
+          'La venta no tiene un importe pendiente de cobro.',
+        )
+
+      const idempotencyPrefix = `payment-split:${saleId}:${input.requestId}`
+      const replay = await transaction.payment.findUnique({
+        where: { idempotencyKey: `${idempotencyPrefix}:0` },
+        select: { id: true },
+      })
+      if (replay)
+        return loadObligation(
+          transaction,
+          saleId,
+        ) as Promise<ObligationDetailRow>
+
+      const cashSession =
+        await cashSessionsRepository.requireOpenSession(transaction)
+      const payments = await transaction.payment.findMany({
+        where: { saleId },
+        select: { type: true, amount: true },
+      })
+      const paid = computePaidAmount(payments)
+      const balance = computeBalance(sale.total, paid)
+      const totalAmount = roundMoney(
+        input.payments.reduce((sum, payment) => sum + payment.amount, 0),
+      )
+      for (const payment of input.payments) {
+        assertValidPaymentAmount(payment.amount)
+      }
+      assertPaymentDoesNotExceedBalance(totalAmount, balance)
+
+      const occurredAt = new Date()
+      const createdPayments: Array<{
+        id: string
+        code: string
+        amount: number
+        method: PaymentMethod
+      }> = []
+      for (const [index, item] of input.payments.entries()) {
+        const code = await nextCode(transaction, 'PAGO')
+        const payment = await transaction.payment.create({
+          data: {
+            code,
+            saleId,
+            customerId: sale.customerId,
+            cashSessionId: cashSession.id,
+            type: 'PAYMENT',
+            amount: item.amount,
+            method: item.method,
+            idempotencyKey: `${idempotencyPrefix}:${index}`,
+            notes: input.notes?.trim() || null,
+            performedBy: actor.name,
+            occurredAt,
+          },
+          select: { id: true },
+        })
+        createdPayments.push({
+          id: payment.id,
+          code,
+          amount: item.amount,
+          method: item.method,
+        })
+      }
+
+      await transaction.auditLog.create({
+        data: auditData('PAYMENT_REGISTERED', actor.id, sale.code, context, {
+          saleId,
+          code: sale.code,
+          mode: 'SPLIT',
+          payments: createdPayments,
+          totalAmount,
+          balanceBefore: balance,
+          balanceAfter: roundMoney(balance - totalAmount),
         }),
       })
 

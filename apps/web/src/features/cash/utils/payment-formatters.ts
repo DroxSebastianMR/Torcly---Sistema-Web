@@ -22,7 +22,7 @@ export const paymentMethodLabel: Record<PaymentMethod, string> = {
   CASH: 'Efectivo',
   CARD: 'Tarjeta',
   TRANSFER: 'Transferencia',
-  DIGITAL_WALLET: 'Billetera digital',
+  DIGITAL_WALLET: 'Billetera digital (Yape/Plin)',
 }
 
 export function paymentCollectionStatusLabel(status: PaymentCollectionStatus) {

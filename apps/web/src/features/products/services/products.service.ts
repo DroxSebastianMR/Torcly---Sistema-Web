@@ -7,6 +7,7 @@ import type {
   ProductInput,
   ProductCatalog,
   ProductOptions,
+  ProductCodeAvailability,
   ProductsResponse,
 } from '../types/products.types'
 
@@ -47,6 +48,18 @@ export const productsService = {
   },
   get(id: string, signal?: AbortSignal) {
     return api.get<DataResponse<Product>>(endpoints.products.detail(id), signal)
+  },
+  checkCodeAvailability(
+    code: string,
+    excludeId?: string,
+    signal?: AbortSignal,
+  ) {
+    const query = new URLSearchParams({ code })
+    if (excludeId) query.set('excludeId', excludeId)
+    return api.get<DataResponse<ProductCodeAvailability>>(
+      `${endpoints.products.codeAvailability}?${query}`,
+      signal,
+    )
   },
   create(input: ProductInput) {
     return api.post<DataResponse<Product>>(endpoints.products.root, input)

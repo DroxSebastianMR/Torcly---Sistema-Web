@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, useForm, useFormState } from 'react-hook-form'
+import { Controller, useForm, useFormState, useWatch } from 'react-hook-form'
 import { HandCoins } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -33,7 +33,7 @@ const methodOptions: SmartSelectOption[] = [
   { value: 'CASH', label: 'Efectivo' },
   { value: 'CARD', label: 'Tarjeta' },
   { value: 'TRANSFER', label: 'Transferencia' },
-  { value: 'DIGITAL_WALLET', label: 'Billetera digital' },
+  { value: 'DIGITAL_WALLET', label: 'Billetera digital (Yape/Plin)' },
 ]
 
 export function PaymentFormModal({
@@ -48,19 +48,45 @@ export function PaymentFormModal({
   })
   const { reset, getValues, setValue } = form
   const formState = useFormState({ control: form.control })
-  const busy = mutations.pay.isPending
+  const firstAmount = useWatch({ control: form.control, name: 'amount' })
+  const firstMethod = useWatch({ control: form.control, name: 'method' })
+  const [splitPayment, setSplitPayment] = useState(false)
+  const [secondAmount, setSecondAmount] = useState('')
+  const [secondMethod, setSecondMethod] =
+    useState<PaymentRegisterFormValues['method']>('DIGITAL_WALLET')
+  const busy = mutations.pay.isPending || mutations.paySplit.isPending
 
   useEffect(() => {
-    if (open)
+    if (open) {
       reset({
         amount: formatPaymentAmount(obligation?.balance ?? 0),
         method: 'CASH',
         notes: '',
       })
+    }
   }, [open, obligation?.balance, reset])
+
+  const resetPaymentMode = () => {
+    setSplitPayment(false)
+    setSecondAmount('')
+    setSecondMethod('DIGITAL_WALLET')
+  }
+
+  const enableSplitPayment = () => {
+    const balance = obligation?.balance ?? 0
+    const firstAmount = Math.floor(balance * 50) / 100
+    setValue('amount', formatPaymentAmount(firstAmount), {
+      shouldValidate: true,
+    })
+    setValue('method', 'CASH', { shouldValidate: true })
+    setSecondAmount(formatPaymentAmount(balance - firstAmount))
+    setSecondMethod('DIGITAL_WALLET')
+    setSplitPayment(true)
+  }
 
   const closeModal = () => {
     if (busy) return
+    resetPaymentMode()
     onClose()
   }
 
@@ -77,25 +103,53 @@ export function PaymentFormModal({
       toast.error('Revisa el importe y el método de pago.')
       return
     }
-    if (amount > obligation.balance) {
+    const parsedSecondAmount = splitPayment
+      ? parsePaymentAmount(secondAmount)
+      : null
+    if (splitPayment && parsedSecondAmount === null) {
+      toast.error('Ingresa un segundo importe válido y mayor a cero.')
+      return
+    }
+    if (splitPayment && values.method === secondMethod) {
+      toast.error('Selecciona dos métodos de pago diferentes.')
+      return
+    }
+    const totalAmount = amount + (parsedSecondAmount ?? 0)
+    if (totalAmount > obligation.balance) {
       toast.error(
-        `El importe supera el saldo pendiente (${currencyFormatter.format(
-          obligation.balance,
-        )}).`,
+        `${splitPayment ? 'El importe total' : 'El importe'} supera el saldo pendiente (${currencyFormatter.format(obligation.balance)}).`,
       )
       return
     }
     try {
-      await mutations.pay.mutateAsync({
-        saleId: obligation.id,
-        input: {
-          requestId: crypto.randomUUID(),
-          amount,
-          method: values.method,
-          notes: values.notes?.trim() || undefined,
-        },
-      })
-      toast.success('Pago registrado correctamente.')
+      const requestId = crypto.randomUUID()
+      const notes = values.notes?.trim() || undefined
+      if (splitPayment && parsedSecondAmount !== null) {
+        await mutations.paySplit.mutateAsync({
+          saleId: obligation.id,
+          input: {
+            requestId,
+            payments: [
+              { amount, method: values.method },
+              { amount: parsedSecondAmount, method: secondMethod },
+            ],
+            notes,
+          },
+        })
+        toast.success('Pago mixto registrado correctamente.')
+      } else {
+        await mutations.pay.mutateAsync({
+          saleId: obligation.id,
+          input: {
+            requestId,
+            amount,
+            method: values.method,
+            notes,
+          },
+        })
+        toast.success('Pago registrado correctamente.')
+      }
+      resetPaymentMode()
       onClose()
     } catch (error) {
       toast.error(getPaymentErrorMessage(error))
@@ -122,7 +176,11 @@ export function PaymentFormModal({
             Cancelar
           </Button>
           <Button type="button" disabled={busy} onClick={() => void submit()}>
-            {busy ? 'Registrando…' : 'Registrar pago'}
+            {busy
+              ? 'Registrando…'
+              : splitPayment
+                ? 'Registrar pago mixto'
+                : 'Registrar pago'}
           </Button>
         </div>
       }
@@ -151,12 +209,32 @@ export function PaymentFormModal({
           </div>
         )}
 
+        <div className="grid grid-cols-2 gap-2 rounded-xl bg-muted/55 p-1.5">
+          <Button
+            type="button"
+            variant={splitPayment ? 'ghost' : 'default'}
+            onClick={() => {
+              setSplitPayment(false)
+              setValue('amount', formatPaymentAmount(obligation?.balance ?? 0))
+            }}
+          >
+            Un método
+          </Button>
+          <Button
+            type="button"
+            variant={splitPayment ? 'default' : 'ghost'}
+            onClick={enableSplitPayment}
+          >
+            Pago mixto
+          </Button>
+        </div>
+
         <div className="space-y-2">
           <label
             htmlFor="payment-amount"
             className="text-sm font-medium text-foreground"
           >
-            Importe
+            {splitPayment ? 'Primer importe' : 'Importe'}
           </label>
           <Controller
             control={form.control}
@@ -194,10 +272,10 @@ export function PaymentFormModal({
             htmlFor="payment-method"
             className="text-sm font-medium text-foreground"
           >
-            Método de pago
+            {splitPayment ? 'Primer método' : 'Método de pago'}
           </label>
           <SmartSelect
-            value={form.getValues('method')}
+            value={firstMethod}
             aria-label="Método de pago"
             options={methodOptions}
             disabled={busy}
@@ -217,6 +295,54 @@ export function PaymentFormModal({
             </p>
           )}
         </div>
+
+        {splitPayment && (
+          <div className="grid gap-4 rounded-xl border border-primary/20 bg-emerald-50/35 p-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <label
+                htmlFor="payment-second-amount"
+                className="text-sm font-medium text-foreground"
+              >
+                Segundo importe
+              </label>
+              <Input
+                id="payment-second-amount"
+                aria-label="Segundo importe a cobrar"
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                placeholder="0.00"
+                value={secondAmount}
+                onChange={(event) => setSecondAmount(event.target.value)}
+                onBlur={() => {
+                  const parsed = parsePaymentAmount(secondAmount)
+                  if (parsed !== null) {
+                    setSecondAmount(formatPaymentAmount(parsed))
+                  }
+                }}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                Segundo método
+              </label>
+              <SmartSelect
+                value={secondMethod}
+                aria-label="Segundo método de pago"
+                options={methodOptions}
+                disabled={busy}
+                onChange={(method) =>
+                  setSecondMethod(method as PaymentRegisterFormValues['method'])
+                }
+              />
+            </div>
+            <SplitPaymentSummary
+              balance={obligation?.balance ?? 0}
+              firstAmount={firstAmount}
+              secondAmount={secondAmount}
+            />
+          </div>
+        )}
 
         <div className="space-y-2">
           <label
@@ -253,11 +379,46 @@ export function PaymentFormModal({
         {obligation && obligation.balance > 0 && (
           <p className="flex items-start gap-2 rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
             <HandCoins aria-hidden size={14} className="mt-0.5 shrink-0" />
-            El pago no puede superar el saldo pendiente y se registra con un
-            identificador único para no duplicarse al reintentar.
+            {splitPayment
+              ? 'Ambas partes se registrarán juntas y se reflejarán por separado en los totales de caja.'
+              : 'El pago no puede superar el saldo pendiente y se registra con un identificador único para no duplicarse al reintentar.'}
           </p>
         )}
       </form>
     </Modal>
+  )
+}
+
+function SplitPaymentSummary({
+  balance,
+  firstAmount,
+  secondAmount,
+}: {
+  balance: number
+  firstAmount: string
+  secondAmount: string
+}) {
+  const first = parsePaymentAmount(firstAmount) ?? 0
+  const second = parsePaymentAmount(secondAmount) ?? 0
+  const total = Math.round((first + second) * 100) / 100
+  const difference = Math.round((balance - total) * 100) / 100
+
+  return (
+    <div className="sm:col-span-2 grid grid-cols-2 gap-3 border-t border-primary/15 pt-3 text-sm">
+      <div>
+        <p className="text-xs text-muted-foreground">Total distribuido</p>
+        <p className="mt-1 font-semibold tabular-nums">
+          {currencyFormatter.format(total)}
+        </p>
+      </div>
+      <div className="text-right">
+        <p className="text-xs text-muted-foreground">Saldo posterior</p>
+        <p
+          className={`mt-1 font-semibold tabular-nums ${difference < 0 ? 'text-red-600' : 'text-emerald-700'}`}
+        >
+          {currencyFormatter.format(difference)}
+        </p>
+      </div>
+    </div>
   )
 }

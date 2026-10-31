@@ -4,6 +4,7 @@ import {
   catalogIdSchema,
   catalogItemSchema,
   catalogUpdateSchema,
+  productCodeAvailabilitySchema,
   productIdSchema,
   productInputSchema,
   productQuerySchema,
@@ -23,6 +24,14 @@ export const listProducts: RequestHandler = async (request, response) => {
 export const getProduct: RequestHandler = async (request, response) => {
   const { id } = productIdSchema.parse(request.params)
   response.json(await productsService.getById(id))
+}
+
+export const checkProductCodeAvailability: RequestHandler = async (
+  request,
+  response,
+) => {
+  const { code, excludeId } = productCodeAvailabilitySchema.parse(request.query)
+  response.json(await productsService.checkCodeAvailability(code, excludeId))
 }
 
 export const createProduct: RequestHandler = async (request, response) => {
