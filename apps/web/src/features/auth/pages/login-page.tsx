@@ -5,7 +5,6 @@ export function LoginPage() {
     <section aria-labelledby="login-title">
       <header className="mb-8">
         <p className="mb-5 flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
-          <span aria-hidden="true" className="h-px w-6 bg-primary" />
           Acceso a la plataforma
         </p>
         <h1

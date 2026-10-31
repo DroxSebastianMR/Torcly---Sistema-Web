@@ -9,6 +9,7 @@ Este directorio separa las fuentes aprobadas, las decisiones vigentes, la arquit
 - `02-arquitectura/`: arquitectura, frontend y estándar de módulos.
 - `03-sprints/`: alcance, aceptación, pruebas y aprobación de cada sprint.
 - `04-calidad/`: Definition of Done, medición, trazabilidad y estrategia Git.
+- `04-operaciones/`: guías de despliegue y notas de versión operativa.
 
 ## Fuente de verdad
 
@@ -25,3 +26,7 @@ Un estado declarado en un informe no reemplaza la evidencia del repositorio. Una
 ## Ruta inmediata
 
 La meta preparada es completar 29 de las 92 historias del backlog: 31,52%. Véase [hoja de ruta](01-producto/roadmap-30-35.md) y [medición](04-calidad/progress-measurement.md).
+
+## Versión operativa
+
+La versión operativa vigente está documentada en las [notas de versión 1.0.1](04-operaciones/release-1.0.1.md).

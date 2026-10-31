@@ -101,24 +101,24 @@ function OperationalCard({
   return (
     <article
       className={cn(
-        'relative min-h-40 overflow-hidden rounded-2xl border p-5 shadow-sm',
+        'relative min-h-36 overflow-hidden rounded-2xl border p-4 shadow-sm',
         colors.card,
       )}
     >
       <Icon
         aria-hidden
         className={cn(
-          'pointer-events-none absolute -right-2 bottom-2 size-24 opacity-10',
+          'pointer-events-none absolute -right-10 -bottom-7 size-32 opacity-[0.12]',
           colors.icon,
         )}
       />
       <p className="text-xs font-bold uppercase tracking-[0.1em] text-ink-muted">
         {label}
       </p>
-      <p className={cn('mt-3 text-2xl font-bold tracking-tight text-ink')}>
+      <p className={cn('mt-2 text-2xl font-bold tracking-tight text-ink')}>
         {value}
       </p>
-      <p className="mt-3 text-sm text-ink-muted">{detail}</p>
+      <p className="mt-2 text-sm text-ink-muted">{detail}</p>
     </article>
   )
 }
@@ -475,7 +475,7 @@ function DashboardSkeleton() {
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
           <div
-            className="h-40 animate-pulse rounded-2xl bg-surface-muted"
+            className="h-36 animate-pulse rounded-2xl bg-surface-muted"
             key={index}
           />
         ))}

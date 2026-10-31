@@ -66,7 +66,7 @@ export function IndicatorCard({
         <span
           aria-hidden
           className={cn(
-            'pointer-events-none absolute -bottom-2 right-3 opacity-20 [&>svg]:!size-20',
+            'pointer-events-none absolute -bottom-7 -right-10 opacity-[0.12] [&>svg]:!size-32',
             styles.icon,
           )}
         >

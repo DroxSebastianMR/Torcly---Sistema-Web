@@ -1,18 +1,20 @@
 import {
   ArrowRight,
+  CircleHelp,
   Eye,
   EyeOff,
   LoaderCircle,
   LockKeyhole,
   UserRound,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { paths } from '@/app/router/constants/paths'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Modal } from '@/components/ui/modal'
 import { AuthInput } from '@/features/auth/components/auth-input'
 import { useLoginForm } from '@/features/auth/hooks/use-login-form'
 
 export function LoginForm() {
+  const [accessHelpOpen, setAccessHelpOpen] = useState(false)
   const {
     register,
     onSubmit,
@@ -84,12 +86,13 @@ export function LoginForm() {
           />
           Recordar usuario
         </label>
-        <Link
+        <button
+          type="button"
+          onClick={() => setAccessHelpOpen(true)}
           className="rounded-sm text-xs font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-          to={paths.forgotPassword}
         >
           ¿Olvidaste tu contraseña?
-        </Link>
+        </button>
       </div>
       <Button
         disabled={isSubmitting}
@@ -107,6 +110,23 @@ export function LoginForm() {
           <ArrowRight aria-hidden="true" className="ml-2 size-4" />
         )}
       </Button>
+      <Modal
+        open={accessHelpOpen}
+        onClose={() => setAccessHelpOpen(false)}
+        title="Recuperación de acceso"
+        description="La recuperación por correo no está habilitada en esta versión."
+        className="max-w-md"
+        visual={
+          <span className="grid size-12 place-items-center rounded-full bg-primary/10 text-primary">
+            <CircleHelp aria-hidden className="size-6" />
+          </span>
+        }
+      >
+        <p className="text-sm leading-6 text-muted-foreground">
+          Contacta al propietario del taller o al equipo responsable de Torcly
+          para que gestionen el restablecimiento de tu contraseña.
+        </p>
+      </Modal>
     </form>
   )
 }

@@ -53,10 +53,6 @@ export function AuthBrandPanel() {
             </div>
           </div>
         </div>
-
-        <footer className="text-[11px] text-white/45">
-          Torcly / Gestión comercial
-        </footer>
       </div>
     </aside>
   )

@@ -103,4 +103,19 @@ describe('Formulario de acceso', () => {
     )
     expect(screen.getByRole('button', { name: /iniciar sesión/i })).toBeTruthy()
   })
+
+  it('orienta al usuario sin simular una recuperación por correo', async () => {
+    renderForm(vi.fn())
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /olvidaste tu contraseña/i }),
+    )
+
+    expect(
+      await screen.findByRole('heading', { name: 'Recuperación de acceso' }),
+    ).toBeTruthy()
+    expect(
+      screen.getByText(/recuperación por correo no está habilitada/i),
+    ).toBeTruthy()
+  })
 })

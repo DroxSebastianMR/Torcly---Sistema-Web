@@ -15,7 +15,7 @@ export function AuthLayout() {
           aria-hidden="true"
           className="pointer-events-none absolute -bottom-52 -left-44 size-[510px] rounded-full bg-[radial-gradient(circle_at_center,rgb(174_239_219_/_48%),transparent_68%)]"
         />
-        <div className="relative z-10 w-full min-w-0 max-w-[540px] rounded-[28px] border border-white/80 bg-card/95 p-6 shadow-[0_28px_70px_rgb(15_67_55_/_13%)] backdrop-blur sm:p-9 lg:p-10 2xl:p-12">
+        <div className="relative z-10 w-full min-w-0 max-w-[460px] rounded-[28px] border border-white/80 bg-card/95 p-6 shadow-[0_28px_70px_rgb(15_67_55_/_13%)] backdrop-blur sm:p-9 lg:p-10">
           <div className="mb-8 lg:hidden">
             <TorclyLogo />
           </div>
