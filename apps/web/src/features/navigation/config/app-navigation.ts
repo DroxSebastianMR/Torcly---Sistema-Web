@@ -10,6 +10,7 @@ import {
   UserCog,
   CircleUserRound,
   Wrench,
+  HardHat,
   CalendarDays,
   ClipboardList,
 } from 'lucide-react'
@@ -100,7 +101,7 @@ export const appNavigation: readonly NavigationGroup[] = [
       {
         id: 'technicians',
         label: 'Técnicos',
-        icon: Wrench,
+        icon: HardHat,
         path: paths.technicians,
         visible: true,
         permission: 'workshop:read',

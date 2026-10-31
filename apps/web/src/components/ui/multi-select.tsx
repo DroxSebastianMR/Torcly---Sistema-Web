@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, ChevronDown, Search } from 'lucide-react'
 import { Button } from './button'
+import { ClearInputButton } from './clear-input-button'
 import type { SmartSelectOption } from './smart-select'
 import { cn } from '@/lib/utils'
 
@@ -100,8 +101,9 @@ export function MultiSelect({
                 if (event.key === 'Escape') setOpen(false)
               }}
               placeholder={searchPlaceholder}
-              className="h-10 w-full rounded-lg border border-input bg-background py-2 pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-10 w-full rounded-lg border border-input bg-background py-2 pr-10 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
+            {query && <ClearInputButton onClear={() => setQuery('')} />}
           </div>
           <ul
             role="listbox"

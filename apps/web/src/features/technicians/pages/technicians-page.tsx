@@ -330,6 +330,7 @@ function TechnicianModal({
           <Input
             value={values.document ?? ''}
             onChange={set('document')}
+            placeholder="Ej. 70458963"
             className="mt-2"
           />
         </label>
@@ -338,6 +339,7 @@ function TechnicianModal({
           <Input
             value={values.phone ?? ''}
             onChange={set('phone')}
+            placeholder="Ej. 986 321 457"
             className="mt-2"
           />
         </label>
@@ -347,6 +349,7 @@ function TechnicianModal({
             type="email"
             value={values.email ?? ''}
             onChange={set('email')}
+            placeholder="Ej. tecnico@taller.com"
             className="mt-2"
           />
         </label>
@@ -364,6 +367,7 @@ function TechnicianModal({
           <textarea
             value={values.notes ?? ''}
             onChange={set('notes')}
+            placeholder="Ej. Disponible de lunes a sábado."
             className="mt-2 min-h-24 w-full rounded-xl border bg-background px-3 py-2 text-sm"
           />
         </label>

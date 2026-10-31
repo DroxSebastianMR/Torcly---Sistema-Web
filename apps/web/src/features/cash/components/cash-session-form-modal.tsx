@@ -129,7 +129,7 @@ export function CashSessionFormModal({
           )}
         </span>
       }
-      className={closing ? 'max-w-2xl' : 'max-w-lg'}
+      className={closing ? 'max-w-3xl' : 'max-w-lg'}
       busy={busy}
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -179,14 +179,20 @@ export function CashSessionFormModal({
                 </p>
               </div>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
               {closingSummary.map(({ label, value, icon: Icon }) => (
-                <div key={label} className="rounded-lg bg-card p-3 shadow-sm">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Icon aria-hidden className="size-4 shrink-0 text-primary" />
-                    <span>{label}</span>
+                <div
+                  key={label}
+                  className="min-w-0 rounded-lg bg-card p-2.5 shadow-sm"
+                >
+                  <div className="flex min-h-5 items-center gap-1.5 text-[11px] leading-4 text-muted-foreground">
+                    <Icon
+                      aria-hidden
+                      className="size-3.5 shrink-0 text-primary"
+                    />
+                    <span className="truncate whitespace-nowrap">{label}</span>
                   </div>
-                  <p className="mt-2 font-semibold tabular-nums text-brand-forest">
+                  <p className="mt-1.5 text-sm font-semibold tabular-nums text-brand-forest sm:text-base">
                     {currencyFormatter.format(value)}
                   </p>
                 </div>

@@ -81,6 +81,30 @@ describe('SmartSelect', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
 
+  it('permite limpiar una búsqueda con el botón del campo', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <SmartSelect
+        options={smallOptions}
+        value=""
+        onChange={onChange}
+        forceSearch
+        allowCustomValue
+        aria-label="Buscar usuarios"
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Buscar usuarios' }))
+    const search = screen.getByPlaceholderText('Buscar opción…')
+    await user.type(search, 'arian')
+    await user.click(screen.getByRole('button', { name: 'Limpiar búsqueda' }))
+
+    expect((search as HTMLInputElement).value).toBe('')
+    expect(onChange).toHaveBeenLastCalledWith('')
+    expect(document.activeElement).toBe(search)
+  })
+
   it('permite definir el criterio de coincidencia de cada módulo', async () => {
     const user = userEvent.setup()
     render(

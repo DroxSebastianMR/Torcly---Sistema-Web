@@ -9,6 +9,7 @@ import {
   type CSSProperties,
 } from 'react'
 import { Check, ChevronDown, Search } from 'lucide-react'
+import { ClearInputButton } from './clear-input-button'
 import { cn } from '@/lib/utils'
 
 export interface SmartSelectOption {
@@ -243,8 +244,16 @@ export function SmartSelect({
                     }
                   }}
                   placeholder={searchPlaceholder}
-                  className="h-10 w-full rounded-lg border border-input bg-background py-2 pr-3 pl-9 text-sm outline-none focus-visible:border-primary/70"
+                  className="h-10 w-full rounded-lg border border-input bg-background py-2 pr-10 pl-9 text-sm outline-none focus-visible:border-primary/70"
                 />
+                {query && (
+                  <ClearInputButton
+                    onClear={() => {
+                      setQuery('')
+                      if (allowCustomValue) onChange('')
+                    }}
+                  />
+                )}
               </div>
             )}
             <ul
