@@ -30,11 +30,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
         throw error
       }
     },
-    retry: (failureCount, error) => {
-      if (!isAxiosError(error) || failureCount >= 2) return false
-      return !error.response || error.response.status >= 500
-    },
-    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 4000),
+    // El primer sondeo ya espera hasta 60 s para cubrir el arranque en frío de
+    // Render. Reintentar automáticamente varias veces dejaba la pantalla en
+    // "Verificando tu sesión" durante minutos cuando la API no respondía.
+    // El guard muestra entonces una acción explícita para volver a intentar.
+    retry: false,
   })
   return (
     <AuthContext.Provider

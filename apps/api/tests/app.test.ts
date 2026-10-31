@@ -37,6 +37,11 @@ describe('Base HTTP', () => {
     expect(products.status).toBe(401)
     expect(products.body.error.code).toBe('AUTH_REQUIRED')
   })
+  it('impide cachear las respuestas de autenticación', async () => {
+    const response = await request(app).get('/api/v1/auth/me')
+    expect(response.headers['cache-control']).toContain('no-store')
+    expect(response.headers.pragma).toBe('no-cache')
+  })
   it('permite el origen de desarrollo', async () => {
     const response = await request(app)
       .get('/api/v1/health')
