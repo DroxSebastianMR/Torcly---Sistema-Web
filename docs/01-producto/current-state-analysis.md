@@ -22,12 +22,12 @@ La base técnica sí aporta valor y no debe desecharse: monorepo pnpm, React 19,
 
 ## Inconsistencias encontradas
 
-1. El primer checkout auditado no contenía Prisma ni productos; `origin/main` incorporó ese trabajo durante la revisión. El informe previo queda parcialmente respaldado por el nuevo commit, pero la aceptación aún carece de permisos de servidor y evidencia completa.
-2. La documentación frontend mencionaba NestJS, mientras el backend real es Express 5.
-3. El Business Case conserva una carátula V2.5 aunque el nombre del archivo y el historial apuntan a V2.6.
-4. El presupuesto resumido de S/ 10 000 y el costeo de mercado no representan la misma línea base; el informe reconoce que el costo no era evaluable.
-5. La navegación actual incluye compras, caja, códigos de barras y notificaciones como módulos principales, pero el SRS V1.0 organiza el alcance en diez componentes distintos. Deben conservarse solo cuando apoyen una historia aprobada.
-6. Los requisitos exigen correo o nombre de usuario para autenticarse; el formulario actual exige correo. El contrato se normalizará a `identifier`.
+1.  El primer checkout auditado no contenía Prisma ni productos; `origin/main` incorporó ese trabajo durante la revisión. El informe previo queda parcialmente respaldado por el nuevo commit, pero la aceptación aún carece de permisos de servidor y evidencia completa.
+2.  La documentación frontend mencionaba NestJS, mientras el backend real es Express 5.
+3.  El Business Case conserva una carátula V2.5 aunque el nombre del archivo y el historial apuntan a V2.6.
+4.  El presupuesto resumido de S/ 10 000 y el costeo de mercado no representan la misma línea base; el informe reconoce que el costo no era evaluable.
+5.  La navegación actual incluye compras, caja, códigos de barras y notificaciones como módulos principales, pero el SRS V1.0 organiza el alcance en diez componentes distintos. Deben conservarse solo cuando apoyen una historia aprobada.
+6.  Los requisitos exigen correo o nombre de usuario para autenticarse; el formulario actual exige correo. El contrato se normalizará a `identifier`.
 
 ## Riesgos inmediatos
 

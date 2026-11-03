@@ -4,14 +4,14 @@
 
 El porcentaje se calcula por historias aprobadas del Product Backlog: `historias aprobadas / 92 × 100`. No se asigna avance parcial a una historia. Las tareas técnicas habilitadoras forman parte de la historia que soportan.
 
-| Sprint | Alcance                                      |             Historias nuevas | Acumulado | Porcentaje |
-| ------ | -------------------------------------------- | ---------------------------: | --------: | ---------: |
-| 01     | Fundaciones de datos, autenticación y sesión |                HU-01 a HU-02 |         2 |      2,17% |
-| 02     | Usuarios, roles y estado de cuenta           |                HU-03 a HU-06 |         6 |      6,52% |
-| 03     | Gestión de clientes                          |                HU-07 a HU-10 |        10 |     10,87% |
-| 04     | Gestión de vehículos                         |                HU-11 a HU-14 |        14 |     15,22% |
-| 05     | Catálogo de productos                        |                HU-15 a HU-18 |        18 |     19,57% |
-| 06     | Inventario y catálogo de servicios           | HU-19 a HU-24, HU-58 a HU-62 |        29 |     31,52% |
+| Sprint | Alcance                                      | Historias nuevas             | Acumulado | Porcentaje |
+| ------ | -------------------------------------------- | ---------------------------- | --------- | ---------- |
+| 01     | Fundaciones de datos, autenticación y sesión | HU-01 a HU-02                | 2         | 2,17%      |
+| 02     | Usuarios, roles y estado de cuenta           | HU-03 a HU-06                | 6         | 6,52%      |
+| 03     | Gestión de clientes                          | HU-07 a HU-10                | 10        | 10,87%     |
+| 04     | Gestión de vehículos                         | HU-11 a HU-14                | 14        | 15,22%     |
+| 05     | Catálogo de productos                        | HU-15 a HU-18                | 18        | 19,57%     |
+| 06     | Inventario y catálogo de servicios           | HU-19 a HU-24, HU-58 a HU-62 | 29        | 31,52%     |
 
 ## Orden y dependencias
 

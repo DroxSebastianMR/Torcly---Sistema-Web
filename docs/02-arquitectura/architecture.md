@@ -8,7 +8,7 @@ Un repositorio Git, dos aplicaciones y un lockfile de pnpm. Cada aplicación dec
 
 ## API
 
-```text
+```
 apps/api/src/
   app.ts                    Composición HTTP, sin escuchar un puerto
   server.ts                 Inicio y apagado del proceso

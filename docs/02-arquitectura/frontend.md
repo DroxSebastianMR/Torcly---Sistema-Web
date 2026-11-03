@@ -6,7 +6,7 @@ Frontend modular con React, Vite y TypeScript. La base técnica está operativa;
 
 Requiere Node.js 22.12+ y pnpm 11.19+.
 
-```sh
+```
 pnpm install
 pnpm dev:web
 pnpm test

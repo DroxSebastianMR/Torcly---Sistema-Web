@@ -13,22 +13,22 @@ Al cierre del Sprint 09 hay **46 de 92 historias aprobadas (50,00%)**. Esta hoja
 ## Plan de sprints
 
 | Sprint | Objetivo                                                                                        | Historias nuevas                          | Acumulado | Avance al cierre |
-| ------ | ----------------------------------------------------------------------------------------------- | ----------------------------------------- | --------: | ---------------: |
-| 01–06  | Fundaciones, accesos, clientes, vehículos, catálogo, inventario y servicios                     | HU-01 a HU-24, HU-58 a HU-62              |        29 |           31,52% |
-| 07     | Ventas: borrador, líneas de producto/servicio, confirmación y consulta                          | HU-25 a HU-30                             |        35 |           38,04% |
-| 08     | Citas: agenda, disponibilidad, búsqueda, reprogramación y cancelación                           | HU-31 a HU-35                             |        40 |           43,48% |
-| 09     | Taller I: operación desde cita, diagnóstico, presupuesto, aprobación y técnico                  | HU-36, HU-42 a HU-46                      |        46 |           50,00% |
-| 10     | Taller II: ejecución, consumo, estados, cierre, entrega e historial                             | HU-47 a HU-57                             |        57 |           61,96% |
-| 11     | Cobros: pagos, saldo, pendientes, consulta e historial                                          | HU-37 a HU-41                             |        62 |           67,39% |
-| 12     | Consulta operativa: resumen, filtros y acceso a detalles                                        | HU-63 a HU-65                             |        65 |           70,65% |
-| 13     | BI: indicadores trazables para inventario, ventas, pagos, servicios y taller                    | HU-66 a HU-73                             |        73 |           79,35% |
-| 14     | IA asistiva: elegibilidad, recomendaciones, versiones y permisos                                | HU-74 a HU-80                             |        80 |           86,96% |
-| 15     | Calidad y rendimiento: validación, experiencia, compatibilidad y tiempos                        | HU-81, HU-82, HU-86, HU-89, HU-90         |        85 |           92,39% |
-| 16     | Seguridad y preparación operativa: disponibilidad, sesiones, auditoría, respaldo y consistencia | HU-83 a HU-85, HU-87, HU-88, HU-91, HU-92 |        92 |          100,00% |
+| ------ | ----------------------------------------------------------------------------------------------- | ----------------------------------------- | --------- | ---------------- |
+| 01–06  | Fundaciones, accesos, clientes, vehículos, catálogo, inventario y servicios                     | HU-01 a HU-24, HU-58 a HU-62              | 29        | 31,52%           |
+| 07     | Ventas: borrador, líneas de producto/servicio, confirmación y consulta                          | HU-25 a HU-30                             | 35        | 38,04%           |
+| 08     | Citas: agenda, disponibilidad, búsqueda, reprogramación y cancelación                           | HU-31 a HU-35                             | 40        | 43,48%           |
+| 09     | Taller I: operación desde cita, diagnóstico, presupuesto, aprobación y técnico                  | HU-36, HU-42 a HU-46                      | 46        | 50,00%           |
+| 10     | Taller II: ejecución, consumo, estados, cierre, entrega e historial                             | HU-47 a HU-57                             | 57        | 61,96%           |
+| 11     | Cobros: pagos, saldo, pendientes, consulta e historial                                          | HU-37 a HU-41                             | 62        | 67,39%           |
+| 12     | Consulta operativa: resumen, filtros y acceso a detalles                                        | HU-63 a HU-65                             | 65        | 70,65%           |
+| 13     | BI: indicadores trazables para inventario, ventas, pagos, servicios y taller                    | HU-66 a HU-73                             | 73        | 79,35%           |
+| 14     | IA asistiva: elegibilidad, recomendaciones, versiones y permisos                                | HU-74 a HU-80                             | 80        | 86,96%           |
+| 15     | Calidad y rendimiento: validación, experiencia, compatibilidad y tiempos                        | HU-81, HU-82, HU-86, HU-89, HU-90         | 85        | 92,39%           |
+| 16     | Seguridad y preparación operativa: disponibilidad, sesiones, auditoría, respaldo y consistencia | HU-83 a HU-85, HU-87, HU-88, HU-91, HU-92 | 92        | 100,00%          |
 
 ## Secuencia técnica
 
-```text
+```
 clientes + vehículos + productos + inventario + servicios
                          ↓
                        ventas
@@ -57,11 +57,11 @@ clientes + vehículos + productos + inventario + servicios
 
 Cada sprint se abre solo cuando el anterior tenga su acta de aprobación actualizada. Antes de iniciar uno nuevo se debe verificar:
 
-1. Migraciones aplicadas en el entorno de prueba y semilla conocida, si corresponde.
-2. Flujos manuales del sprint anterior aprobados, incluidos errores y permisos.
-3. Pruebas automatizadas, typecheck, lint, build y formato en verde.
-4. Sin cambios ajenos mezclados; archivos locales como `.playwright-mcp/` permanecen fuera del control de versiones.
-5. Alcance congelado: un hallazgo del usuario se corrige en el sprint abierto antes de contar el avance.
+1.  Migraciones aplicadas en el entorno de prueba y semilla conocida, si corresponde.
+2.  Flujos manuales del sprint anterior aprobados, incluidos errores y permisos.
+3.  Pruebas automatizadas, typecheck, lint, build y formato en verde.
+4.  Sin cambios ajenos mezclados; archivos locales como `.playwright-mcp/` permanecen fuera del control de versiones.
+5.  Alcance congelado: un hallazgo del usuario se corrige en el sprint abierto antes de contar el avance.
 
 ## Criterios de prioridad
 

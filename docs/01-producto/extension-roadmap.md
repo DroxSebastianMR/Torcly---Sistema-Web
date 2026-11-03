@@ -14,14 +14,14 @@ El backlog base de Torcly concluye con 92 historias. Los sprints de este documen
 
 ## Decisiones transversales
 
-1. Cada sprint se implementa y verifica en una rama separada; su acta sigue siendo obligatoria antes de declararlo aprobado.
-2. Las compras afectan inventario una sola vez al confirmar la recepción, mediante transacción, idempotencia, auditoría y permiso de servidor.
-3. El retiro de **Códigos de barras** significa quitar la ruta, navegación, permisos, endpoint declarado y pantalla del módulo. El campo opcional `Product.barcode` no se elimina: es información comercial ya existente y no equivale al módulo.
-4. Perfil y notificaciones no reemplazan la administración de usuarios ni exponen información de otros usuarios.
-5. El asistente IA es solo lectura. No crea ventas, citas, pagos, compras, movimientos de inventario ni usuarios; tampoco recibe secretos, tokens, contraseñas, documentos completos ni PII innecesaria.
-6. Las claves de proveedor permanecen exclusivamente en `apps/api/.env`; jamás se publican como `VITE_*`, se registran en logs o se agregan al repositorio.
-7. Los técnicos no son usuarios de Torcly: no tienen cuenta, contraseña, sesión ni permisos. Una orden puede quedar sin técnico y solo puede asignarse a un técnico activo del catálogo operativo.
-8. La caja se abre y cierra manualmente según el período operativo real; una sola sesión puede permanecer abierta. Sus cierres son inmutables y el efectivo se calcula separadamente de tarjeta, transferencia y billetera digital.
+1.  Cada sprint se implementa y verifica en una rama separada; su acta sigue siendo obligatoria antes de declararlo aprobado.
+2.  Las compras afectan inventario una sola vez al confirmar la recepción, mediante transacción, idempotencia, auditoría y permiso de servidor.
+3.  El retiro de **Códigos de barras** significa quitar la ruta, navegación, permisos, endpoint declarado y pantalla del módulo. El campo opcional `Product.barcode` no se elimina: es información comercial ya existente y no equivale al módulo.
+4.  Perfil y notificaciones no reemplazan la administración de usuarios ni exponen información de otros usuarios.
+5.  El asistente IA es solo lectura. No crea ventas, citas, pagos, compras, movimientos de inventario ni usuarios; tampoco recibe secretos, tokens, contraseñas, documentos completos ni PII innecesaria.
+6.  Las claves de proveedor permanecen exclusivamente en `apps/api/.env`; jamás se publican como `VITE_*`, se registran en logs o se agregan al repositorio.
+7.  Los técnicos no son usuarios de Torcly: no tienen cuenta, contraseña, sesión ni permisos. Una orden puede quedar sin técnico y solo puede asignarse a un técnico activo del catálogo operativo.
+8.  La caja se abre y cierra manualmente según el período operativo real; una sola sesión puede permanecer abierta. Sus cierres son inmutables y el efectivo se calcula separadamente de tarjeta, transferencia y billetera digital.
 
 ## Proveedor IA recomendado para el MVP
 
