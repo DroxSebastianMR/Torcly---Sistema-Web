@@ -1,12 +1,6 @@
 // @vitest-environment jsdom
 
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { WorkOrderConsumptionModal } from './work-order-consumption-modal'
@@ -63,7 +57,7 @@ function execution(
   }
 }
 
-describe('Modal de consumo de repuestos (QA-06)', () => {
+describe('Modal de consumo de repuestos', () => {
   beforeEach(() => {
     workOrders.useWorkOrdersMutations.mockReturnValue({
       consume: { isPending: false, mutateAsync: vi.fn() },
@@ -76,8 +70,7 @@ describe('Modal de consumo de repuestos (QA-06)', () => {
     vi.resetAllMocks()
   })
 
-  it('explica que solo aparecen productos del presupuesto aprobado pendientes', async () => {
-    const user = userEvent.setup()
+  it('explica cuando no existen productos pendientes', () => {
     render(
       <WorkOrderConsumptionModal
         open
@@ -87,30 +80,73 @@ describe('Modal de consumo de repuestos (QA-06)', () => {
       />,
     )
 
-    await user.click(
-      screen.getByRole('button', { name: 'Repuesto a consumir' }),
-    )
-
     expect(screen.getByText(emptyMessage)).toBeTruthy()
   })
 
-  it('muestra los productos con cantidad pendiente por consumir', async () => {
+  it('permite marcar todos los repuestos pendientes', async () => {
     const user = userEvent.setup()
     render(
       <WorkOrderConsumptionModal
         open
         order={order}
-        execution={execution([line({ pending: 2 })])}
+        execution={execution([
+          line({ pending: 2 }),
+          line({ lineId: 'line-2', name: 'Bujía', pending: 1 }),
+        ])}
         onClose={vi.fn()}
       />,
     )
 
-    await user.click(
-      screen.getByRole('button', { name: 'Repuesto a consumir' }),
+    await user.click(screen.getByRole('button', { name: 'Marcar todos' }))
+
+    expect(
+      (
+        screen.getByRole('checkbox', {
+          name: /Aceite 20W50/,
+        }) as HTMLInputElement
+      ).checked,
+    ).toBe(true)
+    expect(
+      (screen.getByRole('checkbox', { name: /Bujía/ }) as HTMLInputElement)
+        .checked,
+    ).toBe(true)
+  })
+
+  it('envía en una sola operación los repuestos seleccionados', async () => {
+    const user = userEvent.setup()
+    const mutateAsync = vi.fn().mockResolvedValue({})
+    workOrders.useWorkOrdersMutations.mockReturnValue({
+      consume: { isPending: false, mutateAsync },
+      returnProducts: { isPending: false, mutateAsync: vi.fn() },
+    })
+    render(
+      <WorkOrderConsumptionModal
+        open
+        order={order}
+        execution={execution([
+          line({ pending: 2 }),
+          line({ lineId: 'line-2', name: 'Bujía', pending: 1 }),
+        ])}
+        onClose={vi.fn()}
+      />,
     )
 
-    expect(screen.getByText('Aceite 20W50 · ACE-01')).toBeTruthy()
-    expect(screen.queryByText(emptyMessage)).toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Marcar todos' }))
+    await user.clear(screen.getByLabelText('Cantidad para Aceite 20W50'))
+    await user.type(screen.getByLabelText('Cantidad para Aceite 20W50'), '1.5')
+    await user.click(screen.getByRole('button', { name: 'Registrar consumos' }))
+
+    await waitFor(() => expect(mutateAsync).toHaveBeenCalledTimes(1))
+    expect(mutateAsync).toHaveBeenCalledWith({
+      id: 'wo-1',
+      input: {
+        requestId: expect.any(String),
+        items: [
+          { lineId: 'line-1', quantity: 1.5 },
+          { lineId: 'line-2', quantity: 1 },
+        ],
+      },
+    })
   })
 
   it('rechaza cantidades con más de tres decimales sin registrar consumo', async () => {
@@ -129,19 +165,15 @@ describe('Modal de consumo de repuestos (QA-06)', () => {
       />,
     )
 
-    await user.click(
-      screen.getByRole('button', { name: 'Repuesto a consumir' }),
+    await user.click(screen.getByRole('checkbox', { name: /Aceite 20W50/ }))
+    await user.clear(screen.getByLabelText('Cantidad para Aceite 20W50'))
+    await user.type(
+      screen.getByLabelText('Cantidad para Aceite 20W50'),
+      '1.2345',
     )
-    await user.click(screen.getByRole('option', { name: /Aceite 20W50/ }))
-    const quantity = screen.getByLabelText('Cantidad a consumir')
-    fireEvent.change(quantity, { target: { value: '1.2345' } })
-    await user.click(screen.getByRole('button', { name: 'Registrar consumo' }))
+    await user.click(screen.getByRole('button', { name: 'Registrar consumos' }))
 
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith(
-        'Selecciona un repuesto y una cantidad válida.',
-      ),
-    )
+    await waitFor(() => expect(toast.error).toHaveBeenCalled())
     expect(mutations.consume.mutateAsync).not.toHaveBeenCalled()
   })
 })

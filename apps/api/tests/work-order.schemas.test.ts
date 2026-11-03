@@ -74,6 +74,20 @@ describe('Schemas de órdenes de taller', () => {
         ],
       }),
     ).toThrow()
+    expect(() =>
+      workOrderBudgetSchema.parse({
+        lines: [
+          {
+            type: 'SERVICE',
+            serviceId: 'a0000000-0000-4000-8000-000000000001',
+          },
+          {
+            type: 'SERVICE',
+            serviceId: 'a0000000-0000-4000-8000-000000000001',
+          },
+        ],
+      }),
+    ).toThrow('Un servicio solo puede agregarse una vez al presupuesto.')
   })
 
   it('valida la decisión con aprobación o rechazo y observación opcional', () => {
@@ -194,6 +208,15 @@ describe('Schemas de órdenes de taller', () => {
         items: [{ lineId, quantity: 1 }],
       }),
     ).toThrow()
+    expect(() =>
+      workOrderConsumptionSchema.parse({
+        requestId,
+        items: [
+          { lineId, quantity: 1 },
+          { lineId, quantity: 1 },
+        ],
+      }),
+    ).toThrow('Cada repuesto solo puede registrarse una vez por consumo.')
   })
 
   it('valida la devolución con observación opcional', () => {

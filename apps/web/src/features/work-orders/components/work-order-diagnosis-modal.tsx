@@ -20,12 +20,14 @@ interface WorkOrderDiagnosisModalProps {
   open: boolean
   order: WorkOrderDetail | null
   onClose: () => void
+  onBack?: () => void
 }
 
 export function WorkOrderDiagnosisModal({
   open,
   order,
   onClose,
+  onBack,
 }: WorkOrderDiagnosisModalProps) {
   const mutations = useWorkOrdersMutations()
   const form = useForm<WorkOrderDiagnosisFormValues>({
@@ -59,10 +61,16 @@ export function WorkOrderDiagnosisModal({
         diagnosis: form.getValues('diagnosis').trim(),
       })
       toast.success('Diagnóstico registrado correctamente.')
-      closeModal()
+      backToDetail()
     } catch (error) {
       toast.error(getWorkOrderErrorMessage(error))
     }
+  }
+
+  const backToDetail = () => {
+    if (busy) return
+    reset({ diagnosis: '' })
+    ;(onBack ?? onClose)()
   }
 
   return (
@@ -78,8 +86,8 @@ export function WorkOrderDiagnosisModal({
       className="max-w-xl"
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={closeModal}>
-            Cancelar
+          <Button type="button" variant="outline" onClick={backToDetail}>
+            Atrás
           </Button>
           <Button type="button" disabled={busy} onClick={() => void save()}>
             {busy ? 'Guardando…' : 'Guardar diagnóstico'}

@@ -210,7 +210,7 @@ describe('Reglas de órdenes de taller', () => {
     )
   })
 
-  it('redondea cantidades y calcula el neto consumido', () => {
+  it('redondea cantidades y calcula el consumo neto facturable', () => {
     expect(roundQuantity(1.0004)).toBe(1)
     expect(roundQuantity(1.0006)).toBe(1.001)
     expect(

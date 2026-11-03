@@ -363,6 +363,85 @@ describe('Servicio de órdenes de taller', () => {
     expect(result.data.lines).toHaveLength(2)
   })
 
+  it('consolida líneas repetidas del mismo producto antes de guardar el presupuesto', async () => {
+    repository.findProductRef.mockResolvedValue(productRef)
+    repository.saveBudget.mockResolvedValue(
+      record({
+        status: 'PENDIENTE_APROBACION',
+        subtotal: 361.5,
+        total: 361.5,
+        _count: { lines: 1 },
+        lines: [
+          {
+            id: 'line-1',
+            type: 'PRODUCT',
+            productId,
+            serviceId: null,
+            name: 'Aceite 5W-30',
+            code: 'P-001',
+            unitLabel: 'btl',
+            unitPrice: 120.5,
+            quantity: 3,
+            subtotal: 361.5,
+          },
+        ],
+      }),
+    )
+
+    await workOrdersService.saveBudget(
+      'work-order-1',
+      {
+        lines: [
+          { type: 'PRODUCT', productId, quantity: 1 },
+          { type: 'PRODUCT', productId, quantity: 2 },
+        ],
+      },
+      actor,
+      context,
+    )
+
+    expect(repository.findProductRef).toHaveBeenCalledTimes(1)
+    expect(repository.saveBudget).toHaveBeenCalledWith(
+      'work-order-1',
+      expect.objectContaining({
+        lines: [
+          expect.objectContaining({
+            type: 'PRODUCT',
+            productId,
+            quantity: 3,
+            subtotal: 361.5,
+          }),
+        ],
+        subtotal: 361.5,
+        total: 361.5,
+      }),
+      actor,
+      context,
+    )
+  })
+
+  it('rechaza servicios repetidos antes de guardar el presupuesto', async () => {
+    await expect(
+      workOrdersService.saveBudget(
+        'work-order-1',
+        {
+          lines: [
+            { type: 'SERVICE', serviceId },
+            { type: 'SERVICE', serviceId },
+          ],
+        },
+        actor,
+        context,
+      ),
+    ).rejects.toThrowError(
+      expect.objectContaining({
+        status: 400,
+        code: 'WORK_ORDER_DUPLICATE_SERVICE',
+      }),
+    )
+    expect(repository.saveBudget).not.toHaveBeenCalled()
+  })
+
   it('rechaza un presupuesto con un producto inactivo', async () => {
     repository.findProductRef.mockResolvedValue({
       ...productRef,

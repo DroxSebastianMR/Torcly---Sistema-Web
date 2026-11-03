@@ -17,12 +17,14 @@ interface WorkOrderDeliveryModalProps {
   open: boolean
   order: WorkOrderDetail | null
   onClose: () => void
+  onBack?: () => void
 }
 
 export function WorkOrderDeliveryModal({
   open,
   order,
   onClose,
+  onBack,
 }: WorkOrderDeliveryModalProps) {
   const mutations = useWorkOrdersMutations()
   const form = useForm<WorkOrderDeliveryFormValues>({
@@ -43,6 +45,12 @@ export function WorkOrderDeliveryModal({
     onClose()
   }
 
+  const backToDetail = () => {
+    if (busy) return
+    reset({ notes: '' })
+    ;(onBack ?? onClose)()
+  }
+
   const submit = async () => {
     const valid = await trigger()
     if (!valid) {
@@ -57,7 +65,7 @@ export function WorkOrderDeliveryModal({
         input: { ...(notes ? { notes } : {}) },
       })
       toast.success('Entrega registrada correctamente.')
-      closeModal()
+      backToDetail()
     } catch (error) {
       toast.error(getWorkOrderErrorMessage(error))
     }
@@ -81,8 +89,8 @@ export function WorkOrderDeliveryModal({
       className="max-w-xl"
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={closeModal}>
-            Cancelar
+          <Button type="button" variant="outline" onClick={backToDetail}>
+            Atrás
           </Button>
           <Button type="button" disabled={busy} onClick={() => void submit()}>
             {busy ? 'Registrando…' : 'Registrar entrega'}

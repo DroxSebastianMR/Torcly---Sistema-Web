@@ -157,6 +157,14 @@ export default function Page() {
     setDeliveryTarget(order)
   }
 
+  const returnToDetail = (
+    order: WorkOrderDetail | null,
+    closeChild: () => void,
+  ) => {
+    closeChild()
+    if (order) setSelectedId(order.id)
+  }
+
   const confirmStart = async () => {
     if (!startOrder) return
     try {
@@ -312,26 +320,39 @@ export default function Page() {
         open={Boolean(diagnosisTarget)}
         order={diagnosisTarget}
         onClose={() => setDiagnosisTarget(null)}
+        onBack={() =>
+          returnToDetail(diagnosisTarget, () => setDiagnosisTarget(null))
+        }
       />
       <WorkOrderBudgetModal
         open={Boolean(budgetTarget)}
         order={budgetTarget}
         onClose={() => setBudgetTarget(null)}
+        onBack={() => returnToDetail(budgetTarget, () => setBudgetTarget(null))}
       />
       <WorkOrderDecisionModal
         open={Boolean(decisionTarget)}
         order={decisionTarget}
         onClose={() => setDecisionTarget(null)}
+        onBack={() =>
+          returnToDetail(decisionTarget, () => setDecisionTarget(null))
+        }
       />
       <WorkOrderTechnicianModal
         open={Boolean(technicianTarget)}
         order={technicianTarget}
         onClose={() => setTechnicianTarget(null)}
+        onBack={() =>
+          returnToDetail(technicianTarget, () => setTechnicianTarget(null))
+        }
       />
       <WorkOrderActivityModal
         open={Boolean(activityTarget)}
         order={activityTarget}
         onClose={() => setActivityTarget(null)}
+        onBack={() =>
+          returnToDetail(activityTarget, () => setActivityTarget(null))
+        }
       />
       <WorkOrderConsumptionModal
         open={Boolean(consumptionTarget)}
@@ -339,6 +360,9 @@ export default function Page() {
         execution={consumptionExecution.data ?? null}
         executionLoading={consumptionExecution.isPending}
         onClose={() => setConsumptionTarget(null)}
+        onBack={() =>
+          returnToDetail(consumptionTarget, () => setConsumptionTarget(null))
+        }
       />
       <WorkOrderReturnModal
         open={Boolean(returnTarget)}
@@ -346,11 +370,15 @@ export default function Page() {
         execution={returnExecution.data ?? null}
         executionLoading={returnExecution.isPending}
         onClose={() => setReturnTarget(null)}
+        onBack={() => returnToDetail(returnTarget, () => setReturnTarget(null))}
       />
       <WorkOrderDeliveryModal
         open={Boolean(deliveryTarget)}
         order={deliveryTarget}
         onClose={() => setDeliveryTarget(null)}
+        onBack={() =>
+          returnToDetail(deliveryTarget, () => setDeliveryTarget(null))
+        }
       />
       <ConfirmationDialog
         open={Boolean(startOrder)}

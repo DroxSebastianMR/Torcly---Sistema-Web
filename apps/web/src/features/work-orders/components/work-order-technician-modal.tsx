@@ -16,12 +16,14 @@ interface WorkOrderTechnicianModalProps {
   open: boolean
   order: WorkOrderDetail | null
   onClose: () => void
+  onBack?: () => void
 }
 
 export function WorkOrderTechnicianModal({
   open,
   order,
   onClose,
+  onBack,
 }: WorkOrderTechnicianModalProps) {
   if (!order) {
     return (
@@ -39,6 +41,7 @@ export function WorkOrderTechnicianModal({
       open={open}
       order={order}
       onClose={onClose}
+      onBack={onBack}
     />
   )
 }
@@ -47,10 +50,12 @@ function TechnicianForm({
   open,
   order,
   onClose,
+  onBack,
 }: {
   open: boolean
   order: WorkOrderDetail
   onClose: () => void
+  onBack?: () => void
 }) {
   const [technicianId, setTechnicianId] = useState(order.technicianId ?? '')
   const mutations = useWorkOrdersMutations()
@@ -79,6 +84,11 @@ function TechnicianForm({
     onClose()
   }
 
+  const backToDetail = () => {
+    if (busy) return
+    ;(onBack ?? onClose)()
+  }
+
   const save = async () => {
     try {
       await mutations.assignTechnician.mutateAsync({
@@ -90,7 +100,7 @@ function TechnicianForm({
           ? 'Técnico asignado a la orden.'
           : 'Se liberó el técnico de la orden.',
       )
-      closeModal()
+      backToDetail()
     } catch (error) {
       toast.error(getWorkOrderErrorMessage(error))
     }
@@ -105,8 +115,8 @@ function TechnicianForm({
       className="max-w-xl"
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={closeModal}>
-            Cancelar
+          <Button type="button" variant="outline" onClick={backToDetail}>
+            Atrás
           </Button>
           <Button type="button" disabled={busy} onClick={() => void save()}>
             {busy ? 'Guardando…' : 'Asignar técnico'}

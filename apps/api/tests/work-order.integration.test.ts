@@ -934,12 +934,24 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
 
     const generatedSale = await databaseService.client.sale.findFirst({
       where: { workOrderId: state.order1Id },
-      select: { id: true, status: true, total: true },
+      select: {
+        id: true,
+        status: true,
+        total: true,
+        lines: { select: { type: true, quantity: true } },
+      },
     })
     expect(generatedSale).toEqual(
       expect.objectContaining({ status: 'CONFIRMED' }),
     )
     expect(Number(generatedSale?.total)).toBeGreaterThan(0)
+    expect(Number(generatedSale?.total)).toBe(200.5)
+    expect(generatedSale?.lines).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'PRODUCT', quantity: 1 }),
+        expect.objectContaining({ type: 'SERVICE', quantity: 1 }),
+      ]),
+    )
 
     const double = await adminAgent
       .post(`/api/v1/work-orders/${state.order1Id}/delivery`)

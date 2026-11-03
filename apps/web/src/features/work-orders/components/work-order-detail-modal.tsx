@@ -29,6 +29,7 @@ import {
   workOrderStatusLabel,
 } from '../utils/work-order-formatters'
 import { WorkOrderExecutionPanel } from './work-order-execution-panel'
+import { WorkOrderFinalSummary } from './work-order-final-summary'
 
 interface WorkOrderDetailModalProps {
   open: boolean
@@ -337,6 +338,13 @@ export function WorkOrderDetailModal({
               loading={executionLoading}
             />
           )}
+          {order &&
+            execution &&
+            !executionLoading &&
+            (order.status === 'LISTA_PARA_ENTREGA' ||
+              order.status === 'ENTREGADA') && (
+              <WorkOrderFinalSummary order={order} execution={execution} />
+            )}
         </div>
       )}
     </Modal>
