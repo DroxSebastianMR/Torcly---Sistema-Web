@@ -20,12 +20,14 @@ interface WorkOrderActivityModalProps {
   open: boolean
   order: WorkOrderDetail | null
   onClose: () => void
+  onBack?: () => void
 }
 
 export function WorkOrderActivityModal({
   open,
   order,
   onClose,
+  onBack,
 }: WorkOrderActivityModalProps) {
   const mutations = useWorkOrdersMutations()
   const form = useForm<WorkOrderActivityFormValues>({
@@ -46,6 +48,12 @@ export function WorkOrderActivityModal({
     onClose()
   }
 
+  const backToDetail = () => {
+    if (busy) return
+    reset({ description: '', occurredAt: '' })
+    ;(onBack ?? onClose)()
+  }
+
   const save = async () => {
     const valid = await trigger()
     if (!valid) {
@@ -63,7 +71,7 @@ export function WorkOrderActivityModal({
         },
       })
       toast.success('Actividad registrada correctamente.')
-      closeModal()
+      backToDetail()
     } catch (error) {
       toast.error(getWorkOrderErrorMessage(error))
     }
@@ -82,8 +90,8 @@ export function WorkOrderActivityModal({
       className="max-w-xl"
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={closeModal}>
-            Cancelar
+          <Button type="button" variant="outline" onClick={backToDetail}>
+            Atrás
           </Button>
           <Button type="button" disabled={busy} onClick={() => void save()}>
             {busy ? 'Guardando…' : 'Registrar actividad'}

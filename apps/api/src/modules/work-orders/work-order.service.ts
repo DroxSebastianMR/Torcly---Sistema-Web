@@ -448,6 +448,66 @@ function mapPersistenceError(error: unknown): never {
   throw error
 }
 
+/**
+ * El presupuesto representa cada producto una sola vez. El cliente puede
+ * enviar una misma pieza en varias líneas (por ejemplo, al agregarla dos
+ * veces desde el formulario), pero el servidor consolida la cantidad antes
+ * de congelar el precio y persistir el presupuesto.
+ */
+function consolidateBudgetProductLines(
+  lines: WorkOrderLineInput[],
+): WorkOrderLineInput[] {
+  const consolidated = [...lines]
+  const productIndexes = new Map<string, number>()
+
+  for (let index = 0; index < consolidated.length; index += 1) {
+    const line = consolidated[index]
+    if (line.type !== 'PRODUCT' || !line.productId) continue
+
+    const existingIndex = productIndexes.get(line.productId)
+    if (existingIndex === undefined) {
+      productIndexes.set(line.productId, index)
+      continue
+    }
+
+    const existingLine = consolidated[existingIndex]
+    if (existingLine.type !== 'PRODUCT') continue
+
+    const quantity = roundQuantity(
+      (existingLine.quantity ?? 1) + (line.quantity ?? 1),
+    )
+    if (quantity > 999_999_999) {
+      throw new AppError(
+        400,
+        'WORK_ORDER_INVALID_QUANTITY',
+        'La cantidad consolidada de un producto es demasiado grande.',
+      )
+    }
+
+    consolidated[existingIndex] = { ...existingLine, quantity }
+    consolidated.splice(index, 1)
+    index -= 1
+  }
+
+  return consolidated
+}
+
+function assertNoDuplicateServices(lines: WorkOrderLineInput[]) {
+  const serviceIds = new Set<string>()
+
+  for (const line of lines) {
+    if (line.type !== 'SERVICE' || !line.serviceId) continue
+    if (serviceIds.has(line.serviceId)) {
+      throw new AppError(
+        400,
+        'WORK_ORDER_DUPLICATE_SERVICE',
+        'Un servicio solo puede agregarse una vez al presupuesto.',
+      )
+    }
+    serviceIds.add(line.serviceId)
+  }
+}
+
 async function resolveLines(
   lines: WorkOrderLineInput[],
 ): Promise<Prisma.WorkOrderLineCreateManyWorkOrderInput[]> {
@@ -605,7 +665,8 @@ export const workOrdersService = {
     context: RequestContext,
   ) {
     assertHasLines(input.lines)
-    const lines = await resolveLines(input.lines)
+    assertNoDuplicateServices(input.lines)
+    const lines = await resolveLines(consolidateBudgetProductLines(input.lines))
     const { subtotal, total } = computeWorkOrderTotals(lines)
     const order = await workOrdersRepository.saveBudget(
       id,

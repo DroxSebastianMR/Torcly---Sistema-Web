@@ -39,6 +39,7 @@ interface WorkOrderBudgetModalProps {
   open: boolean
   order: WorkOrderDetail | null
   onClose: () => void
+  onBack?: () => void
 }
 
 const emptyValues: WorkOrderBudgetFormValues = {
@@ -50,6 +51,7 @@ export function WorkOrderBudgetModal({
   open,
   order,
   onClose,
+  onBack,
 }: WorkOrderBudgetModalProps) {
   const mutations = useWorkOrdersMutations()
   const catalog = useWorkOrderCatalog(open)
@@ -136,6 +138,14 @@ export function WorkOrderBudgetModal({
     onClose()
   }
 
+  const backToDetail = () => {
+    if (busy) return
+    reset(emptyValues)
+    setSelectedProductId('')
+    setSelectedServiceId('')
+    ;(onBack ?? onClose)()
+  }
+
   const addProduct = () => {
     if (!selectedProductId) {
       toast.error('Selecciona un producto.')
@@ -183,6 +193,15 @@ export function WorkOrderBudgetModal({
     )
     if (!service) {
       toast.error('Selecciona un servicio.')
+      return
+    }
+    if (
+      getValues('lines').some(
+        (line) =>
+          line.type === 'SERVICE' && line.referenceId === selectedServiceId,
+      )
+    ) {
+      toast.error('Este servicio ya está incluido en el presupuesto.')
       return
     }
     append(
@@ -237,10 +256,10 @@ export function WorkOrderBudgetModal({
         toast.success('Presupuesto guardado correctamente.')
       }
       void updated
+      backToDetail()
     } catch (error) {
       toast.error(getWorkOrderErrorMessage(error))
     }
-    closeModal()
   }
 
   const updateQuantity = (index: number, value: number) => {
@@ -258,8 +277,8 @@ export function WorkOrderBudgetModal({
       className="max-w-3xl"
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={closeModal}>
-            Cancelar
+          <Button type="button" variant="outline" onClick={backToDetail}>
+            Atrás
           </Button>
           <Button
             type="button"

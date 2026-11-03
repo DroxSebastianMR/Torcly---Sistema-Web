@@ -26,12 +26,14 @@ interface WorkOrderDecisionModalProps {
   open: boolean
   order: WorkOrderDetail | null
   onClose: () => void
+  onBack?: () => void
 }
 
 export function WorkOrderDecisionModal({
   open,
   order,
   onClose,
+  onBack,
 }: WorkOrderDecisionModalProps) {
   const mutations = useWorkOrdersMutations()
   const form = useForm<WorkOrderDecisionFormValues>({
@@ -51,6 +53,12 @@ export function WorkOrderDecisionModal({
     if (busy) return
     reset({ decision: 'APPROVED', notes: '' })
     onClose()
+  }
+
+  const backToDetail = () => {
+    if (busy) return
+    reset({ decision: 'APPROVED', notes: '' })
+    ;(onBack ?? onClose)()
   }
 
   const decisionOptions = useMemo<SmartSelectOption[]>(
@@ -82,7 +90,7 @@ export function WorkOrderDecisionModal({
           ? 'Presupuesto aprobado por el cliente.'
           : 'Presupuesto rechazado por el cliente.',
       )
-      closeModal()
+      backToDetail()
     } catch (error) {
       toast.error(getWorkOrderErrorMessage(error))
     }
@@ -98,11 +106,11 @@ export function WorkOrderDecisionModal({
       description={
         order ? `Presupuesto enviado de la orden ${order.code}.` : undefined
       }
-      className="max-w-xl"
+      className="max-w-xl min-h-[540px]"
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={closeModal}>
-            Cancelar
+          <Button type="button" variant="outline" onClick={backToDetail}>
+            Atrás
           </Button>
           <Button type="button" disabled={busy} onClick={() => void save()}>
             {busy ? 'Guardando…' : 'Registrar decisión'}
@@ -121,7 +129,7 @@ export function WorkOrderDecisionModal({
             </p>
           </div>
         )}
-        <div className="space-y-2">
+        <div className="relative z-50 space-y-2">
           <label htmlFor="decision" className="text-sm font-medium">
             Decisión del cliente
           </label>

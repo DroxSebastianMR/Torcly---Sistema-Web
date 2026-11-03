@@ -30,6 +30,7 @@ interface WorkOrderReturnModalProps {
   execution: WorkOrderExecution | null
   executionLoading?: boolean
   onClose: () => void
+  onBack?: () => void
 }
 
 export function WorkOrderReturnModal({
@@ -38,6 +39,7 @@ export function WorkOrderReturnModal({
   execution,
   executionLoading = false,
   onClose,
+  onBack,
 }: WorkOrderReturnModalProps) {
   const mutations = useWorkOrdersMutations()
   const [selectedLineId, setSelectedLineId] = useState('')
@@ -83,6 +85,13 @@ export function WorkOrderReturnModal({
     onClose()
   }
 
+  const backToDetail = () => {
+    if (busy) return
+    reset({ lineId: '', quantity: 1, notes: '' })
+    setSelectedLineId('')
+    ;(onBack ?? onClose)()
+  }
+
   const submit = async () => {
     const valid = await trigger()
     if (!valid) {
@@ -115,7 +124,7 @@ export function WorkOrderReturnModal({
         },
       })
       toast.success('Devolución registrada correctamente.')
-      closeModal()
+      backToDetail()
     } catch (error) {
       toast.error(getWorkOrderErrorMessage(error))
     }
@@ -139,8 +148,8 @@ export function WorkOrderReturnModal({
       className="max-w-lg"
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={closeModal}>
-            Cancelar
+          <Button type="button" variant="outline" onClick={backToDetail}>
+            Atrás
           </Button>
           <Button
             type="button"

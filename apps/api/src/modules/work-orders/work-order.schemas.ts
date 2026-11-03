@@ -76,6 +76,22 @@ export const workOrderBudgetSchema = z
       .max(100, 'Se permite un máximo de 100 líneas por presupuesto.'),
   })
   .strict()
+  .superRefine((value, context) => {
+    const serviceIds = new Set<string>()
+
+    value.lines.forEach((line, index) => {
+      if (line.type !== 'SERVICE') return
+      if (serviceIds.has(line.serviceId)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['lines', index, 'serviceId'],
+          message: 'Un servicio solo puede agregarse una vez al presupuesto.',
+        })
+        return
+      }
+      serviceIds.add(line.serviceId)
+    })
+  })
 
 export const workOrderDecisionSchema = z
   .object({
@@ -144,6 +160,16 @@ export const workOrderConsumptionSchema = z
       .max(100, 'Se permite un máximo de 100 ítems.'),
   })
   .strict()
+  .superRefine((value, context) => {
+    const lineIds = value.items.map((item) => item.lineId)
+    if (new Set(lineIds).size !== lineIds.length) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['items'],
+        message: 'Cada repuesto solo puede registrarse una vez por consumo.',
+      })
+    }
+  })
 
 const workOrderReturnItemSchema = z
   .object({
