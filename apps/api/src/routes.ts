@@ -22,11 +22,13 @@ import { profileRouter } from './modules/profile/profile.routes.js'
 import { notificationsRouter } from './modules/notifications/notifications.routes.js'
 import { assistantRouter } from './modules/assistant/assistant.routes.js'
 import { techniciansRouter } from './modules/technicians/technicians.routes.js'
+import { platformRouter } from './modules/platform/platform.routes.js'
 
 export const apiRouter = Router()
 
 apiRouter.use('/health', healthRouter)
 apiRouter.use('/auth', authRouter)
+apiRouter.use('/platform', platformRouter)
 apiRouter.use('/profile', profileRouter)
 apiRouter.use('/notifications', notificationsRouter)
 apiRouter.use('/assistant', assistantRouter)

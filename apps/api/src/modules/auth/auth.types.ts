@@ -4,6 +4,12 @@ export interface AuthUser {
   email: string
   username: string
   permissions: string[]
+  isPlatformAdmin?: boolean
+  organization?: {
+    id: string
+    code: string
+    name: string
+  }
 }
 
 export interface RequestContext {

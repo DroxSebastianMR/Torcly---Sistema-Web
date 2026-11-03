@@ -43,6 +43,7 @@ function userRecord(passwordHash: string) {
     displayName: 'Administrador',
     passwordHash,
     active: true,
+    isPlatformAdmin: false,
     failedLoginAttempts: 0,
     lockedUntil: null,
     createdAt: new Date(),
@@ -69,6 +70,7 @@ function userRecord(passwordHash: string) {
         },
       },
     ],
+    organizationMemberships: [],
   }
 }
 
@@ -101,6 +103,67 @@ describe('Servicio de autenticación', () => {
       username: 'admin',
       permissions: ['products:read'],
     })
+  })
+
+  it('resuelve los permisos y la organización desde la membresía activa', async () => {
+    const baseUser = userRecord(await hashPassword('Clave-segura-2026'))
+    const user = {
+      ...baseUser,
+      organizationMemberships: [
+        {
+          organizationId: '8d4e3c62-2a85-4d4d-8fce-a15dcce68712',
+          userId: baseUser.id,
+          roleId: baseUser.roles[0].roleId,
+          active: true,
+          joinedAt: new Date(),
+          organization: {
+            id: '8d4e3c62-2a85-4d4d-8fce-a15dcce68712',
+            code: 'taller-centro',
+            name: 'Taller Centro',
+            active: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          role: baseUser.roles[0].role,
+        },
+      ],
+    }
+    repository.findUserByIdentifier.mockResolvedValue(user)
+    repository.createSession.mockResolvedValue(user)
+
+    const result = await authService.login(
+      { identifier: user.email, password: 'Clave-segura-2026' },
+      context,
+    )
+
+    expect(result.user).toMatchObject({
+      organization: {
+        id: '8d4e3c62-2a85-4d4d-8fce-a15dcce68712',
+        code: 'taller-centro',
+      },
+      permissions: ['products:read'],
+      isPlatformAdmin: false,
+    })
+  })
+
+  it('no concede permisos operativos al administrador global sin membresía', async () => {
+    const user = {
+      ...userRecord(await hashPassword('Clave-segura-2026')),
+      isPlatformAdmin: true,
+    }
+    repository.findUserByIdentifier.mockResolvedValue(user)
+    repository.createSession.mockResolvedValue(user)
+
+    const result = await authService.login(
+      { identifier: user.email, password: 'Clave-segura-2026' },
+      context,
+    )
+
+    expect(result.user).toMatchObject({
+      isPlatformAdmin: true,
+      permissions: [],
+    })
+    expect(result.user.organization).toBeUndefined()
   })
 
   it('usa un error genérico para usuarios inexistentes', async () => {

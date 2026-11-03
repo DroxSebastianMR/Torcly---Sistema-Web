@@ -20,6 +20,17 @@ const seedEnvSchema = z
     SEED_OWNER_USERNAME: z.string().min(3).max(50).optional(),
     SEED_OWNER_NAME: z.string().min(2).max(120).optional(),
     SEED_OWNER_PASSWORD: z.string().min(12).optional(),
+    SEED_ORGANIZATION_CODE: z
+      .string()
+      .min(3)
+      .max(40)
+      .regex(/^[a-z0-9-]+$/)
+      .default('torcly-principal'),
+    SEED_ORGANIZATION_NAME: z.string().min(2).max(120).default('Torcly'),
+    SEED_PLATFORM_ADMIN_EMAIL: z.email().optional(),
+    SEED_PLATFORM_ADMIN_USERNAME: z.string().min(3).max(50).optional(),
+    SEED_PLATFORM_ADMIN_NAME: z.string().min(2).max(120).optional(),
+    SEED_PLATFORM_ADMIN_PASSWORD: z.string().min(12).optional(),
   })
   .superRefine((value, context) => {
     if (value.NODE_ENV !== 'production') return
@@ -38,6 +49,27 @@ const seedEnvSchema = z
           path: [field],
           message: `${field} es obligatorio para la semilla de producción.`,
         })
+      }
+    }
+
+    const platformFields = [
+      'SEED_PLATFORM_ADMIN_EMAIL',
+      'SEED_PLATFORM_ADMIN_USERNAME',
+      'SEED_PLATFORM_ADMIN_NAME',
+      'SEED_PLATFORM_ADMIN_PASSWORD',
+    ] as const
+    const hasPlatformField = platformFields.some((field) =>
+      Boolean(value[field]),
+    )
+    if (hasPlatformField) {
+      for (const field of platformFields) {
+        if (!value[field]) {
+          context.addIssue({
+            code: 'custom',
+            path: [field],
+            message: `${field} es obligatorio si se crea el administrador de plataforma.`,
+          })
+        }
       }
     }
   })
@@ -84,6 +116,11 @@ export interface SeedInput {
   permissionCodes?: readonly string[]
   includeDemoTechnicians?: boolean
   additionalAdministrators?: readonly SeedAccount[]
+  organization?: {
+    code: string
+    name: string
+  }
+  platformAdministrator?: SeedAccount
 }
 
 export interface SeedAccount {
@@ -156,6 +193,19 @@ export async function seedDatabase(database: PrismaClient, input: SeedInput) {
     skipDuplicates: true,
   })
 
+  const organizationInput = input.organization ?? {
+    code: 'torcly-principal',
+    name: 'Torcly',
+  }
+  const organization = await database.organization.upsert({
+    where: { code: organizationInput.code.toLowerCase() },
+    update: { name: organizationInput.name, active: true },
+    create: {
+      code: organizationInput.code.toLowerCase(),
+      name: organizationInput.name,
+    },
+  })
+
   const accounts: readonly SeedAccount[] = [
     {
       email: input.email,
@@ -198,10 +248,50 @@ export async function seedDatabase(database: PrismaClient, input: SeedInput) {
       create: { userId: user.id, roleId: administratorRole.id },
     })
 
+    await database.organizationMembership.upsert({
+      where: {
+        organizationId_userId: {
+          organizationId: organization.id,
+          userId: user.id,
+        },
+      },
+      update: { roleId: administratorRole.id, active: true },
+      create: {
+        organizationId: organization.id,
+        userId: user.id,
+        roleId: administratorRole.id,
+      },
+    })
+
     seededAccounts.push(user)
   }
 
   const administrator = seededAccounts[0]
+
+  if (input.platformAdministrator) {
+    const passwordHash = await hashPassword(
+      input.platformAdministrator.password,
+    )
+    await database.user.upsert({
+      where: { email: input.platformAdministrator.email.toLowerCase() },
+      update: {
+        username: input.platformAdministrator.username.toLowerCase(),
+        displayName: input.platformAdministrator.name,
+        passwordHash,
+        active: true,
+        isPlatformAdmin: true,
+        failedLoginAttempts: 0,
+        lockedUntil: null,
+      },
+      create: {
+        email: input.platformAdministrator.email.toLowerCase(),
+        username: input.platformAdministrator.username.toLowerCase(),
+        displayName: input.platformAdministrator.name,
+        passwordHash,
+        isPlatformAdmin: true,
+      },
+    })
+  }
 
   if (input.includeDemoTechnicians ?? true) {
     for (const technician of demoTechnicians) {
@@ -252,6 +342,18 @@ async function runSeed() {
             },
           ]
         : [],
+      organization: {
+        code: seedEnv.SEED_ORGANIZATION_CODE,
+        name: seedEnv.SEED_ORGANIZATION_NAME,
+      },
+      platformAdministrator: seedEnv.SEED_PLATFORM_ADMIN_EMAIL
+        ? {
+            email: seedEnv.SEED_PLATFORM_ADMIN_EMAIL,
+            username: seedEnv.SEED_PLATFORM_ADMIN_USERNAME!,
+            name: seedEnv.SEED_PLATFORM_ADMIN_NAME!,
+            password: seedEnv.SEED_PLATFORM_ADMIN_PASSWORD!,
+          }
+        : undefined,
     })
   } finally {
     await database.$disconnect()

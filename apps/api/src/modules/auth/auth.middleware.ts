@@ -6,6 +6,7 @@ import {
   setSessionCookie,
 } from './auth.cookies.js'
 import { authService } from './auth.service.js'
+import { requirePlatformAdministrator } from './organization-context.js'
 import type { RequestContext } from './auth.types.js'
 
 export function getRequestContext(
@@ -53,5 +54,19 @@ export function requirePermission(permission: string): RequestHandler {
     } catch (error) {
       next(error)
     }
+  }
+}
+
+/** Solo para el espacio interno /plataforma de Torcly. */
+export const requirePlatformAdmin: RequestHandler = (
+  request,
+  _response,
+  next,
+) => {
+  try {
+    requirePlatformAdministrator(request.auth)
+    next()
+  } catch (error) {
+    next(error)
   }
 }

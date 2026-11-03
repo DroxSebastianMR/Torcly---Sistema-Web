@@ -187,6 +187,7 @@ model User {
   displayName              String                  @map("display_name") @db.VarChar(120)
   passwordHash             String                  @map("password_hash") @db.VarChar(255)
   active                   Boolean                 @default(true)
+  isPlatformAdmin          Boolean                 @default(false) @map("is_platform_admin")
   failedLoginAttempts      Int                     @default(0) @map("failed_login_attempts")
   lockedUntil              DateTime?               @map("locked_until") @db.Timestamptz(3)
   roles                    UserRole[]
@@ -198,11 +199,43 @@ model User {
   notificationPreferences  Json?                   @map("notification_preferences")
   notifications            Notification[]
   assistantConversations   AssistantConversation[]
+  organizationMemberships  OrganizationMembership[]
   createdAt                DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt                DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@index([active])
+  @@index([isPlatformAdmin])
   @@map("users")
+}
+
+model Organization {
+  id          String                   @id @default(uuid()) @db.Uuid
+  code        String                   @unique @db.VarChar(40)
+  name        String                   @db.VarChar(160)
+  active      Boolean                  @default(true)
+  memberships OrganizationMembership[]
+  sessions    AuthSession[]            @relation("ActiveOrganizationSession")
+  createdAt   DateTime                 @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([active, name])
+  @@map("organizations")
+}
+
+model OrganizationMembership {
+  organizationId String       @map("organization_id") @db.Uuid
+  userId         String       @map("user_id") @db.Uuid
+  roleId         String       @map("role_id") @db.Uuid
+  active         Boolean      @default(true)
+  joinedAt       DateTime     @default(now()) @map("joined_at") @db.Timestamptz(3)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           Role         @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  @@id([organizationId, userId])
+  @@index([userId, active])
+  @@index([roleId])
+  @@map("organization_memberships")
 }
 
 model AssistantConversation {
@@ -236,6 +269,7 @@ model Role {
   name        String           @db.VarChar(80)
   active      Boolean          @default(true)
   users       UserRole[]
+  organizationMemberships OrganizationMembership[]
   permissions RolePermission[]
   createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt   DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
@@ -279,6 +313,7 @@ model RolePermission {
 model AuthSession {
   tokenHash      String    @id @map("token_hash") @db.Char(64)
   userId         String    @map("user_id") @db.Uuid
+  activeOrganizationId String? @map("active_organization_id") @db.Uuid
   expiresAt      DateTime  @map("expires_at") @db.Timestamptz(3)
   lastActivityAt DateTime  @default(now()) @map("last_activity_at") @db.Timestamptz(3)
   revokedAt      DateTime? @map("revoked_at") @db.Timestamptz(3)
@@ -286,8 +321,10 @@ model AuthSession {
   userAgent      String?   @map("user_agent") @db.VarChar(300)
   createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activeOrganization Organization? @relation("ActiveOrganizationSession", fields: [activeOrganizationId], references: [id], onDelete: SetNull)
 
   @@index([userId, revokedAt])
+  @@index([activeOrganizationId])
   @@index([expiresAt])
   @@map("auth_sessions")
 }

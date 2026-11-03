@@ -108,9 +108,25 @@ function getSessionReplacement(tokenHash: string) {
   return replacement
 }
 
-function toAuthUser(user: AuthUserRecord): AuthUser {
+function toAuthUser(
+  user: AuthUserRecord,
+  activeOrganizationId?: string | null,
+): AuthUser {
+  // Durante la transición, las sesiones históricas y los dobles de prueba aún
+  // pueden no traer membresías. La ausencia no concede permisos de tenant.
+  const memberships = user.organizationMemberships ?? []
+  const membership = activeOrganizationId
+    ? memberships.find(
+        (candidate) => candidate.organizationId === activeOrganizationId,
+      )
+    : memberships[0]
+  const roleAssignments = membership
+    ? [membership]
+    : user.isPlatformAdmin
+      ? []
+      : user.roles
   const permissions = new Set(
-    user.roles.flatMap(({ role }) =>
+    roleAssignments.flatMap(({ role }) =>
       role.permissions.map(({ permission }) => permission.code),
     ),
   )
@@ -121,6 +137,14 @@ function toAuthUser(user: AuthUserRecord): AuthUser {
     email: user.email,
     username: user.username,
     permissions: [...permissions].sort(),
+    isPlatformAdmin: user.isPlatformAdmin ?? false,
+    organization: membership
+      ? {
+          id: membership.organization.id,
+          code: membership.organization.code,
+          name: membership.organization.name,
+        }
+      : undefined,
   }
 }
 
@@ -131,7 +155,7 @@ function rememberAuthentication(
   const entry: CachedAuthentication = {
     tokenHash,
     userId: session.userId,
-    user: toAuthUser(session.user),
+    user: toAuthUser(session.user, session.activeOrganizationId),
     expiresAt: session.expiresAt,
     lastActivityAt: session.lastActivityAt,
     createdAt: session.createdAt,
@@ -253,10 +277,11 @@ export const authService = {
     )
 
     const tokenHash = hashSessionToken(token)
+    const authenticatedUserWithOrganization = toAuthUser(authenticatedUser)
     authenticationCache.set(tokenHash, {
       tokenHash,
       userId: authenticatedUser.id,
-      user: toAuthUser(authenticatedUser),
+      user: authenticatedUserWithOrganization,
       expiresAt: sessionExpiration(now),
       lastActivityAt: now,
       createdAt: now,
@@ -264,7 +289,7 @@ export const authService = {
       cachedAt: Date.now(),
     })
 
-    return { token, user: toAuthUser(authenticatedUser) }
+    return { token, user: authenticatedUserWithOrganization }
   },
 
   async authenticate(token: string, context: RequestContext) {

@@ -15,6 +15,20 @@ const authUserInclude = {
       },
     },
   },
+  organizationMemberships: {
+    where: { active: true, organization: { active: true } },
+    orderBy: { joinedAt: 'asc' },
+    include: {
+      organization: true,
+      role: {
+        include: {
+          permissions: {
+            include: { permission: { select: { code: true } } },
+          },
+        },
+      },
+    },
+  },
 } satisfies Prisma.UserInclude
 
 const auditData = (
@@ -110,6 +124,7 @@ export const authRepository = {
         data: {
           tokenHash,
           userId,
+          activeOrganizationId: user.organizationMemberships[0]?.organizationId,
           expiresAt,
           ipAddress: context.ipAddress,
           userAgent: context.userAgent,
@@ -126,7 +141,10 @@ export const authRepository = {
     return databaseService.measure('auth.session.lookup', () =>
       databaseService.client.authSession.findUnique({
         where: { tokenHash },
-        include: { user: { include: authUserInclude } },
+        include: {
+          activeOrganization: true,
+          user: { include: authUserInclude },
+        },
       }),
     )
   },
