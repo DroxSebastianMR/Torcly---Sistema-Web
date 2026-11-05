@@ -26,7 +26,8 @@ Los sprints son secuenciales y cada uno tiene una rama, alcance cerrado, criteri
 | 20     | `sprint-20-technicians`            | `feature/sprint-20-technicians`            | Documentado                   |
 | 21     | `sprint-21-cash-sessions`          | `feature/sprint-21-cash-sessions`          | Listo para prueba del usuario |
 | 22     | `sprint-22-reporting-redesign`     | `feature/sprint-22-reporting-redesign`     | Listo para prueba del usuario |
-| 23     | `sprint-23-multitenencia`          | `codex/multitenancy-organizations`         | En implementación             |
+| 23     | `sprint-23-multitenencia`          | `feature/multitenancy-organizations`       | Aprobado (v1.1.1 en main)     |
+| 24     | `sprint-24-roles-identidad-taller` | `feature/workshop-manager-role`            | Aprobado (v1.1.2 en develop)  |
 
 El porcentaje solo cambia después de completar [Definition of Done](../04-calidad/definition-of-done.md) y registrar la aprobación.
 

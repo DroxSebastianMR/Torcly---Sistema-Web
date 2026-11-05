@@ -5,6 +5,10 @@ export interface AuthUser {
   username: string
   permissions: string[]
   isPlatformAdmin?: boolean
+  role?: {
+    code: string
+    name: string
+  }
   organization?: {
     id: string
     code: string

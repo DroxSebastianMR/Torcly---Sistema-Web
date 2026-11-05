@@ -23,6 +23,11 @@ export function useAppHeader() {
     isSigningOut,
     onLogout,
     profile: links.find((item) => item.id === 'profile'),
+    userName: user?.name ?? account.name,
+    userEmail: user?.email ?? account.email,
+    userRole:
+      user?.role?.name ??
+      (user?.isPlatformAdmin ? 'Administrador de plataforma' : ''),
     organization: user?.organization,
     isPlatformAdmin: user?.isPlatformAdmin,
   }

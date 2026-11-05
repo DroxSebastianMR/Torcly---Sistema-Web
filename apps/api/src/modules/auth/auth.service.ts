@@ -135,6 +135,13 @@ function toAuthUser(
     ),
   )
 
+  const primaryRole = roleAssignments[0]?.role
+  const resolvedRole = primaryRole
+    ? { code: primaryRole.code, name: primaryRole.name }
+    : user.isPlatformAdmin
+      ? { code: 'platform_admin', name: 'Administrador de plataforma' }
+      : undefined
+
   return {
     id: user.id,
     name: user.displayName,
@@ -142,6 +149,7 @@ function toAuthUser(
     username: user.username,
     permissions: [...permissions].sort(),
     isPlatformAdmin: user.isPlatformAdmin ?? false,
+    role: resolvedRole,
     organization: membership
       ? {
           id: membership.organization.id,

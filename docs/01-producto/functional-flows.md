@@ -13,9 +13,15 @@ Este documento completa los recorridos que el SRS describe por requisito, pero n
 
 La respuesta de credenciales inválidas no revela si la cuenta existe.
 
-## 2\. Administración de usuarios
+## 2. Administración de usuarios y roles del taller
 
-`crear con rol → consultar/buscar → actualizar datos o rol → desactivar/reactivar`
+El sistema distingue dos perfiles operativos dentro de cada taller para garantizar control de accesos:
+
+- **Dueño del taller (`administrator`):** Máxima autoridad operativa del taller. Es el único rol facultado con permisos `users:read` y `users:write` para administrar, crear, editar y desactivar miembros.
+- **Administrador del taller (`workshop_manager`):** Encargado de la operación diaria del taller (clientes, vehículos, servicios, citas, órdenes de trabajo, inventario, ventas, compras y caja). No posee facultades para gestionar usuarios ni permisos; el módulo se encuentra oculto y bloqueado en la API.
+
+Flujo de gestión:
+`crear con rol (Dueño o Administrador) → consultar/buscar → actualizar datos o rol → desactivar/reactivar`
 
 Desactivar revoca sesiones activas y evita nuevos accesos, pero conserva todas las referencias históricas. No existe borrado físico en V1.0.
 
