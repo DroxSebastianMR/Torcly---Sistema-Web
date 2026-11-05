@@ -14,9 +14,22 @@ import {
   type UpdateProfileInput,
 } from './profile.types.js'
 
-function toProfileResponse(record: UserProfileRecord): ProfileResponse {
+function toProfileResponse(
+  record: UserProfileRecord,
+  organizationId?: string,
+): ProfileResponse {
+  const membership = organizationId
+    ? record.organizationMemberships.find(
+        (item) => item.organizationId === organizationId,
+      )
+    : undefined
+
+  const effectiveRoles = membership
+    ? [membership.role]
+    : record.roles.map(({ role }) => role)
+
   const permissions = new Set(
-    record.roles.flatMap(({ role }) =>
+    effectiveRoles.flatMap((role) =>
       role.permissions.map(({ permission }) => permission.code),
     ),
   )
@@ -35,7 +48,7 @@ function toProfileResponse(record: UserProfileRecord): ProfileResponse {
     username: record.username,
     email: record.email,
     displayName: record.displayName,
-    roles: record.roles.map(({ role }) => ({
+    roles: effectiveRoles.map((role) => ({
       id: role.id,
       code: role.code,
       name: role.name,
@@ -67,7 +80,7 @@ export const profileService = {
     if (!user) {
       throw new AppError(404, 'USER_NOT_FOUND', 'Usuario no encontrado.')
     }
-    return toProfileResponse(user)
+    return toProfileResponse(user, authUser.organization?.id)
   },
 
   async updateProfile(
@@ -100,7 +113,7 @@ export const profileService = {
       context,
     )
 
-    return toProfileResponse(updated)
+    return toProfileResponse(updated, authUser.organization?.id)
   },
 
   async changePassword(

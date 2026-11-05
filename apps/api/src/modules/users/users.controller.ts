@@ -1,5 +1,6 @@
 import type { RequestHandler } from 'express'
 import { getRequestContext } from '../auth/auth.middleware.js'
+import { requireOrganizationContext } from '../auth/organization-context.js'
 import {
   createUserSchema,
   updateUserSchema,
@@ -11,18 +12,29 @@ import {
 import { usersService } from './users.service.js'
 
 export const listUsers: RequestHandler = async (request, response) => {
-  response.json(await usersService.list(userQuerySchema.parse(request.query)))
+  response.json(
+    await usersService.list(
+      userQuerySchema.parse(request.query),
+      requireOrganizationContext(request.auth!).id,
+    ),
+  )
 }
 
 export const getUser: RequestHandler = async (request, response) => {
   const { id } = userIdSchema.parse(request.params)
-  response.json(await usersService.getById(id))
+  response.json(
+    await usersService.getById(
+      id,
+      requireOrganizationContext(request.auth!).id,
+    ),
+  )
 }
 
 export const createUser: RequestHandler = async (request, response) => {
   const result = await usersService.create(
     createUserSchema.parse(request.body),
     getRequestContext(request, response),
+    requireOrganizationContext(request.auth!).id,
   )
   response.status(201).json(result)
 }
@@ -34,6 +46,7 @@ export const updateUser: RequestHandler = async (request, response) => {
       id,
       updateUserSchema.parse(request.body),
       getRequestContext(request, response),
+      requireOrganizationContext(request.auth!).id,
     ),
   )
 }
@@ -47,6 +60,7 @@ export const updateUserRole: RequestHandler = async (request, response) => {
       roleId,
       request.auth!.id,
       getRequestContext(request, response),
+      requireOrganizationContext(request.auth!).id,
     ),
   )
 }
@@ -60,6 +74,7 @@ export const updateUserStatus: RequestHandler = async (request, response) => {
       active,
       request.auth!.id,
       getRequestContext(request, response),
+      requireOrganizationContext(request.auth!).id,
     ),
   )
 }

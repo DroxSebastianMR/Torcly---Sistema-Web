@@ -61,9 +61,13 @@ export type AppointmentStateRow = Prisma.AppointmentGetPayload<{
   select: { id: true; code: true; status: true }
 }>
 
-function buildWhere(filters: AppointmentFilters): Prisma.AppointmentWhereInput {
+function buildWhere(
+  filters: AppointmentFilters,
+  organizationId: string,
+): Prisma.AppointmentWhereInput {
   const search = filters.search?.trim()
   return {
+    organizationId,
     ...(filters.status === 'all' ? {} : { status: filters.status }),
     ...(filters.date ? { date: toDateOnly(filters.date) } : {}),
     ...(filters.customerId ? { customerId: filters.customerId } : {}),
@@ -106,6 +110,7 @@ function auditData(
   return {
     event,
     userId: actorId,
+    organizationId: context.organizationId,
     identifier,
     requestId: context.requestId,
     ipAddress: context.ipAddress,
@@ -115,25 +120,29 @@ function auditData(
 
 async function lockSlot(
   transaction: Prisma.TransactionClient,
+  organizationId: string,
   dateISO: string,
   time: string,
 ) {
-  await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:appointment:slot:${dateISO}:${time}`}))`
+  await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:appointment:slot:${organizationId}:${dateISO}:${time}`}))`
 }
 
 async function lockAppointment(
   transaction: Prisma.TransactionClient,
+  organizationId: string,
   appointmentId: string,
 ) {
-  await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:appointment:${appointmentId}`}))`
+  await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:appointment:${organizationId}:${appointmentId}`}))`
 }
 
 function activeSlotWhere(
+  organizationId: string,
   dateISO: string,
   time: string,
   excludeId?: string,
 ): Prisma.AppointmentWhereInput {
   return {
+    organizationId,
     date: toDateOnly(dateISO),
     time: toTimeOnly(time),
     status: 'PROGRAMADA',
@@ -142,37 +151,46 @@ function activeSlotWhere(
 }
 
 function activeVehicleSlotWhere(
+  organizationId: string,
   dateISO: string,
   time: string,
   vehicleId: string,
   excludeId?: string,
 ): Prisma.AppointmentWhereInput {
   return {
-    ...activeSlotWhere(dateISO, time, excludeId),
+    ...activeSlotWhere(organizationId, dateISO, time, excludeId),
     vehicleId,
   }
 }
 
 async function countActiveInSlot(
   transaction: Prisma.TransactionClient,
+  organizationId: string,
   dateISO: string,
   time: string,
   excludeId?: string,
 ): Promise<number> {
   return transaction.appointment.count({
-    where: activeSlotWhere(dateISO, time, excludeId),
+    where: activeSlotWhere(organizationId, dateISO, time, excludeId),
   })
 }
 
 async function assertVehicleAvailableInSlot(
   transaction: Prisma.TransactionClient,
+  organizationId: string,
   dateISO: string,
   time: string,
   vehicleId: string,
   excludeId?: string,
 ) {
   const appointment = await transaction.appointment.findFirst({
-    where: activeVehicleSlotWhere(dateISO, time, vehicleId, excludeId),
+    where: activeVehicleSlotWhere(
+      organizationId,
+      dateISO,
+      time,
+      vehicleId,
+      excludeId,
+    ),
     select: { code: true },
   })
   if (appointment) {
@@ -185,8 +203,8 @@ async function assertVehicleAvailableInSlot(
 }
 
 export const appointmentsRepository = {
-  async list(filters: AppointmentFilters) {
-    const where = buildWhere(filters)
+  async list(filters: AppointmentFilters, organizationId: string) {
+    const where = buildWhere(filters, organizationId)
     const [items, total] = await Promise.all([
       databaseService.measure('appointments.list.records', () =>
         databaseService.client.appointment.findMany({
@@ -204,16 +222,19 @@ export const appointmentsRepository = {
     return { items, total }
   },
 
-  findById(id: string): Promise<AppointmentRecord | null> {
-    return databaseService.client.appointment.findUnique({
-      where: { id },
+  findById(
+    id: string,
+    organizationId: string,
+  ): Promise<AppointmentRecord | null> {
+    return databaseService.client.appointment.findFirst({
+      where: { id, organizationId },
       select: appointmentSummarySelect,
     })
   },
 
-  findCustomerRef(id: string) {
-    return databaseService.client.customer.findUnique({
-      where: { id },
+  findCustomerRef(id: string, organizationId: string) {
+    return databaseService.client.customer.findFirst({
+      where: { id, organizationId },
       select: {
         id: true,
         documentNumber: true,
@@ -224,9 +245,13 @@ export const appointmentsRepository = {
     })
   },
 
-  findVehicleOfCustomer(vehicleId: string, customerId: string) {
+  findVehicleOfCustomer(
+    vehicleId: string,
+    customerId: string,
+    organizationId: string,
+  ) {
     return databaseService.client.vehicle.findFirst({
-      where: { id: vehicleId, customerId },
+      where: { id: vehicleId, customerId, organizationId },
       select: {
         id: true,
         plate: true,
@@ -244,14 +269,16 @@ export const appointmentsRepository = {
     })
   },
 
-  async getStats() {
+  async getStats(organizationId: string) {
     const [byStatus, hoy] = await Promise.all([
       databaseService.client.appointment.groupBy({
+        where: { organizationId },
         by: ['status'],
         _count: { _all: true },
       }),
       databaseService.client.appointment.count({
         where: {
+          organizationId,
           date: toDateOnly(todayLocalDate()),
           status: 'PROGRAMADA',
         },
@@ -278,17 +305,20 @@ export const appointmentsRepository = {
     },
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<AppointmentRecord> {
     return databaseService.transaction(async (transaction) => {
-      await lockSlot(transaction, input.dateISO, input.time)
+      await lockSlot(transaction, organizationId, input.dateISO, input.time)
       const active = await countActiveInSlot(
         transaction,
+        organizationId,
         input.dateISO,
         input.time,
       )
       assertActiveSlotCount(active)
       await assertVehicleAvailableInSlot(
         transaction,
+        organizationId,
         input.dateISO,
         input.time,
         input.vehicleId,
@@ -301,6 +331,7 @@ export const appointmentsRepository = {
 
       const appointment = await transaction.appointment.create({
         data: {
+          organizationId,
           code,
           customerId: input.customerId,
           vehicleId: input.vehicleId,
@@ -340,12 +371,13 @@ export const appointmentsRepository = {
     input: { dateISO: string; time: string },
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<AppointmentRecord> {
     return databaseService.transaction(async (transaction) => {
-      await lockAppointment(transaction, id)
+      await lockAppointment(transaction, organizationId, id)
 
-      const existing = await transaction.appointment.findUnique({
-        where: { id },
+      const existing = await transaction.appointment.findFirst({
+        where: { id, organizationId },
         select: {
           id: true,
           code: true,
@@ -359,9 +391,10 @@ export const appointmentsRepository = {
         throw new AppError(404, 'APPOINTMENT_NOT_FOUND', 'Cita no encontrada.')
       assertIsProgramada(existing)
 
-      await lockSlot(transaction, input.dateISO, input.time)
+      await lockSlot(transaction, organizationId, input.dateISO, input.time)
       const active = await countActiveInSlot(
         transaction,
+        organizationId,
         input.dateISO,
         input.time,
         id,
@@ -369,6 +402,7 @@ export const appointmentsRepository = {
       assertActiveSlotCount(active)
       await assertVehicleAvailableInSlot(
         transaction,
+        organizationId,
         input.dateISO,
         input.time,
         existing.vehicleId,
@@ -411,12 +445,13 @@ export const appointmentsRepository = {
     id: string,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<AppointmentRecord> {
     return databaseService.transaction(async (transaction) => {
-      await lockAppointment(transaction, id)
+      await lockAppointment(transaction, organizationId, id)
 
-      const existing = await transaction.appointment.findUnique({
-        where: { id },
+      const existing = await transaction.appointment.findFirst({
+        where: { id, organizationId },
         select: { id: true, code: true, status: true },
       })
       if (!existing)

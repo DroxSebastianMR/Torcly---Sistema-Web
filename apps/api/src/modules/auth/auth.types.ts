@@ -16,6 +16,8 @@ export interface RequestContext {
   requestId?: string
   ipAddress?: string
   userAgent?: string
+  /** Tenant resuelto por la sesión autenticada; nunca procede del cliente. */
+  organizationId?: string
 }
 
 export interface LoginInput {

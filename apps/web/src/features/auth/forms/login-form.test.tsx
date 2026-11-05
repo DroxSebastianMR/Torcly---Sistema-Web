@@ -32,6 +32,7 @@ function renderForm(
           <Route path="/login" element={<LoginForm />} />
           <Route path="/dashboard" element={<p>Panel principal</p>} />
           <Route path="/products" element={<p>Catálogo de productos</p>} />
+          <Route path="/plataforma" element={<p>Consola de plataforma</p>} />
         </Routes>
       </MemoryRouter>
     </AuthContext.Provider>,
@@ -60,7 +61,14 @@ describe('Formulario de acceso', () => {
   })
 
   it('envía identifier y vuelve a la ruta protegida solicitada', async () => {
-    const login = vi.fn().mockResolvedValue(undefined)
+    const login = vi.fn().mockResolvedValue({
+      id: 'user-1',
+      name: 'Administrador',
+      email: 'administrador@torcly.test',
+      username: 'administrador',
+      permissions: ['products:read'],
+      isPlatformAdmin: false,
+    })
     renderForm(login, { pathname: '/login', state: { from: '/products' } })
 
     await userEvent.type(
@@ -102,6 +110,29 @@ describe('Formulario de acceso', () => {
       }),
     )
     expect(screen.getByRole('button', { name: /iniciar sesión/i })).toBeTruthy()
+  })
+
+  it('dirige una cuenta global a la consola de plataforma', async () => {
+    const login = vi.fn().mockResolvedValue({
+      id: 'platform-1',
+      name: 'Administrador Torcly',
+      email: 'plataforma@torcly.test',
+      username: 'plataforma',
+      permissions: [],
+      isPlatformAdmin: true,
+    })
+    renderForm(login)
+
+    await userEvent.type(
+      screen.getByLabelText(/usuario o correo electrónico/i),
+      'plataforma',
+    )
+    await userEvent.type(screen.getByLabelText('Contraseña'), 'Clave-segura')
+    await userEvent.click(
+      screen.getByRole('button', { name: /iniciar sesión/i }),
+    )
+
+    expect(await screen.findByText('Consola de plataforma')).toBeTruthy()
   })
 
   it('orienta al usuario sin simular una recuperación por correo', async () => {

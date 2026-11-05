@@ -42,25 +42,29 @@ const existenceSelect = {
 
 function buildExistenceWhere(
   filters: ExistenceFilters,
+  organizationId: string,
 ): Prisma.ProductWhereInput {
   const search = filters.search?.trim()
   return search
     ? {
+        organizationId,
         OR: [
           { code: { contains: search, mode: 'insensitive' } },
           { name: { contains: search, mode: 'insensitive' } },
         ],
       }
-    : {}
+    : { organizationId }
 }
 
 function buildMovementWhere(
   filters: InventoryMovementFilters,
+  organizationId: string,
 ): Prisma.InventoryMovementWhereInput {
   const from = filters.from ? new Date(`${filters.from}T00:00:00.000Z`) : null
   const to = filters.to ? new Date(`${filters.to}T23:59:59.999Z`) : null
 
   return {
+    organizationId,
     ...(filters.productId ? { productId: filters.productId } : {}),
     ...(filters.type ? { type: filters.type } : {}),
     ...(from || to
@@ -84,6 +88,7 @@ function auditData(
   return {
     event,
     userId: actorId,
+    organizationId: context.organizationId,
     identifier,
     requestId: context.requestId,
     ipAddress: context.ipAddress,
@@ -112,8 +117,8 @@ const auditEventByType: Record<MovementType, AuditEventType> = {
 }
 
 export const inventoryRepository = {
-  async listExistence(filters: ExistenceFilters) {
-    const where = buildExistenceWhere(filters)
+  async listExistence(filters: ExistenceFilters, organizationId: string) {
+    const where = buildExistenceWhere(filters, organizationId)
     const [products, total] = await Promise.all([
       databaseService.measure('inventory.existence.records', () =>
         databaseService.client.product.findMany({
@@ -136,7 +141,7 @@ export const inventoryRepository = {
       () =>
         databaseService.client.inventoryMovement.groupBy({
           by: ['productId', 'type'],
-          where: { productId: { in: productIds } },
+          where: { organizationId, productId: { in: productIds } },
           _sum: { quantity: true },
           _max: { occurredAt: true },
         }),
@@ -178,8 +183,8 @@ export const inventoryRepository = {
     return { items, total }
   },
 
-  listMovements(filters: InventoryMovementFilters) {
-    const where = buildMovementWhere(filters)
+  listMovements(filters: InventoryMovementFilters, organizationId: string) {
+    const where = buildMovementWhere(filters, organizationId)
     return Promise.all([
       databaseService.measure('inventory.history.records', () =>
         databaseService.client.inventoryMovement.findMany({
@@ -205,11 +210,15 @@ export const inventoryRepository = {
     )
   },
 
-  findByKey(idempotencyKey: string) {
-    return databaseService.client.inventoryMovement.findUnique({
-      where: { idempotencyKey },
-      select: movementResponseSelect,
-    })
+  findByKey(idempotencyKey: string, organizationId: string) {
+    return databaseService.client.inventoryMovement
+      .findUnique({
+        where: { idempotencyKey },
+        select: { ...movementResponseSelect, organizationId: true },
+      })
+      .then((movement) =>
+        movement?.organizationId === organizationId ? movement : null,
+      )
   },
 
   async registerMovement(
@@ -217,11 +226,12 @@ export const inventoryRepository = {
     type: MovementType,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<InventoryMovementRegistration> {
     const [product, existing] = await Promise.all([
       databaseService.measure('inventory.movement.preflight.product', () =>
-        databaseService.client.product.findUnique({
-          where: { id: input.productId },
+        databaseService.client.product.findFirst({
+          where: { id: input.productId, organizationId },
           select: {
             id: true,
             code: true,
@@ -237,7 +247,7 @@ export const inventoryRepository = {
             () =>
               databaseService.client.inventoryMovement.findUnique({
                 where: { idempotencyKey: input.idempotencyKey },
-                select: { ...movementResponseSelect },
+                select: { ...movementResponseSelect, organizationId: true },
               }),
           )
         : Promise.resolve(null),
@@ -252,7 +262,7 @@ export const inventoryRepository = {
         'El producto está inactivo y no admite movimientos.',
       )
 
-    if (existing) {
+    if (existing && existing.organizationId === organizationId) {
       if (existing.productId !== input.productId || existing.type !== type)
         throw new AppError(
           409,
@@ -280,7 +290,11 @@ export const inventoryRepository = {
         () =>
           transaction.inventoryMovement.groupBy({
             by: ['type'],
-            where: { productId: input.productId, status: 'CONFIRMED' },
+            where: {
+              organizationId,
+              productId: input.productId,
+              status: 'CONFIRMED',
+            },
             _sum: { quantity: true },
           }),
       )
@@ -304,6 +318,7 @@ export const inventoryRepository = {
         () =>
           transaction.inventoryMovement.create({
             data: {
+              organizationId,
               productId: input.productId,
               type,
               status: 'CONFIRMED',

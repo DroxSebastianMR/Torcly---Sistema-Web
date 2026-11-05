@@ -1,6 +1,6 @@
-import type {
-  AuditEventType,
-  CustomerType,
+import {
+  type AuditEventType,
+  type CustomerType,
   Prisma,
 } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
@@ -17,6 +17,7 @@ function auditData(
   return {
     event,
     userId: actorId,
+    organizationId: context.organizationId,
     identifier: documentNumber,
     requestId: context.requestId,
     ipAddress: context.ipAddress,
@@ -24,11 +25,15 @@ function auditData(
   }
 }
 
-function buildWhere(filters: CustomerListFilters): Prisma.CustomerWhereInput {
+function buildWhere(
+  filters: CustomerListFilters,
+  organizationId: string,
+): Prisma.CustomerWhereInput {
   const search = filters.search?.trim()
   const isDocumentSearch = Boolean(search && /^\d+$/.test(search))
 
   return {
+    organizationId,
     ...(filters.type === 'all' ? {} : { type: filters.type as CustomerType }),
     ...(isDocumentSearch
       ? { documentNumber: search }
@@ -47,8 +52,8 @@ function buildWhere(filters: CustomerListFilters): Prisma.CustomerWhereInput {
 }
 
 export const customersRepository = {
-  async list(filters: CustomerListFilters) {
-    const where = buildWhere(filters)
+  async list(filters: CustomerListFilters, organizationId: string) {
+    const where = buildWhere(filters, organizationId)
     const [items, total] = await Promise.all([
       databaseService.measure('customers.list.records', () =>
         databaseService.client.customer.findMany({
@@ -66,8 +71,10 @@ export const customersRepository = {
     return { items, total }
   },
 
-  findById(id: string) {
-    return databaseService.client.customer.findUnique({ where: { id } })
+  findById(id: string, organizationId: string) {
+    return databaseService.client.customer.findFirst({
+      where: { id, organizationId },
+    })
   },
 
   create(
@@ -99,17 +106,27 @@ export const customersRepository = {
     id: string,
     input: Prisma.CustomerUncheckedUpdateInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const customer = await databaseService.measure(
+      const result = await databaseService.measure(
         'customers.update.record',
         () =>
-          transaction.customer.update({
-            where: { id },
+          transaction.customer.updateMany({
+            where: { id, organizationId },
             data: input,
           }),
       )
+      if (result.count === 0) {
+        throw new Prisma.PrismaClientKnownRequestError('Customer not found', {
+          code: 'P2025',
+          clientVersion: Prisma.prismaVersion.client,
+        })
+      }
+      const customer = await transaction.customer.findFirstOrThrow({
+        where: { id, organizationId },
+      })
       await databaseService.measure('customers.update.audit', () =>
         transaction.auditLog.create({
           data: auditData(

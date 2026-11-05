@@ -24,11 +24,33 @@ permisos, códigos, reportes ni actividad se crucen.
 
 ## Estado
 
-En implementación. La migración de fundación se creó pero **no está aplicada**.
-La consola interna ya cuenta con una ruta de acceso protegida
-(`GET /api/v1/platform/access`); aún no expone datos de organizaciones ni
-reemplaza el panel operativo. No se deben ejecutar migraciones ni seed en
-producción sin respaldo, preflight y autorización explícita.
+**Listo para prueba manual controlada.** La migración de fundación fue aplicada
+en desarrollo por el usuario. La cuenta de plataforma entra a una consola exclusiva (`/plataforma`)
+y no recibe permisos ni navegación operativa de un taller. Las entidades
+operativas ya incorporan su `organization_id`; las consultas y mutaciones lo
+resuelven desde la membresía activa de la sesión, nunca desde un valor enviado
+por el navegador.
+
+La consola ya permite listar, buscar, registrar, activar y desactivar
+organizaciones; además permite registrar miembros del taller, cambiar su rol y
+activar o desactivar su membresía. Al desactivar un taller o miembro se revocan
+sus sesiones de base de datos y las entradas de sesión en memoria. Sus rutas
+están protegidas por autenticación y por la marca de administrador de
+plataforma; un administrador regular de taller no puede utilizarlas.
+
+Pendiente de aceptación: aplicar las migraciones restantes únicamente en el
+entorno autorizado, ejecutar las pruebas cruzadas A/B con PostgreSQL y revisar
+el backfill de instalaciones existentes. No se deben ejecutar migraciones ni
+seed en producción sin respaldo, preflight y autorización explícita.
+
+## Verificación técnica actual
+
+- API: `prisma validate`, typecheck y lint correctos; **438 pruebas aprobadas**
+  y **111 integraciones omitidas** al no activar `DATABASE_TESTS`.
+- Web: typecheck, lint, build y **428 pruebas en 88 archivos** correctos.
+- `pnpm format:check` y `git diff --check` correctos.
+- Los fixtures heredados ya declaran una organización explícita; los contratos
+  de producción no hacen opcional `organizationId`.
 
 ## Documentos de control
 

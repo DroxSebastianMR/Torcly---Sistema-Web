@@ -10,6 +10,7 @@ import { appointmentsRepository } from '../src/modules/appointments/appointment.
 
 const customerId = 'a0000000-0000-4000-8000-000000000001'
 const vehicleId = 'a0000000-0000-4000-8000-000000000002'
+const organizationId = 'a0000000-0000-4000-8000-000000000003'
 const actor = { id: 'user-1', name: 'Admin' }
 const context = { requestId: 'req-slot-1', ipAddress: '127.0.0.1' }
 const input = {
@@ -54,7 +55,7 @@ describe('Repositorio de citas: capacidad por franja (QA-05)', () => {
     const transaction = makeTransaction(8)
 
     await expect(
-      appointmentsRepository.create(input, actor, context),
+      appointmentsRepository.create(input, actor, context, organizationId),
     ).rejects.toMatchObject({
       status: 409,
       code: 'APPOINTMENT_SLOT_FULL',
@@ -67,6 +68,7 @@ describe('Repositorio de citas: capacidad por franja (QA-05)', () => {
     )
     expect(transaction.appointment.count).toHaveBeenCalledWith({
       where: {
+        organizationId,
         date: new Date('2099-12-31T00:00:00.000Z'),
         time: new Date('2000-01-01T12:30:00.000Z'),
         status: 'PROGRAMADA',
@@ -79,11 +81,17 @@ describe('Repositorio de citas: capacidad por franja (QA-05)', () => {
   it('crea la cita cuando la franja tiene 7 activas y normaliza fecha y hora', async () => {
     const transaction = makeTransaction(7)
 
-    const result = await appointmentsRepository.create(input, actor, context)
+    const result = await appointmentsRepository.create(
+      input,
+      actor,
+      context,
+      organizationId,
+    )
 
     expect(result).toEqual(createdRecord)
     expect(transaction.appointment.findFirst).toHaveBeenCalledWith({
       where: {
+        organizationId,
         date: new Date('2099-12-31T00:00:00.000Z'),
         time: new Date('2000-01-01T12:30:00.000Z'),
         status: 'PROGRAMADA',
@@ -93,6 +101,7 @@ describe('Repositorio de citas: capacidad por franja (QA-05)', () => {
     })
     expect(transaction.appointment.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
+        organizationId,
         customerId,
         vehicleId,
         date: new Date('2099-12-31T00:00:00.000Z'),

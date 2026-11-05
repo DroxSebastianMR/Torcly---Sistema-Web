@@ -2,8 +2,13 @@ import type { Prisma } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import type { AuditQueryFilters } from './audit.types.js'
 
-function buildWhere(filters: AuditQueryFilters): Prisma.AuditLogWhereInput {
-  const where: Prisma.AuditLogWhereInput = {}
+function buildWhere(
+  filters: AuditQueryFilters,
+  organizationId: string,
+): Prisma.AuditLogWhereInput {
+  const where: Prisma.AuditLogWhereInput = {
+    organizationId,
+  }
   if (filters.event) where.event = filters.event
   if (filters.actorId) where.userId = filters.actorId
   if (filters.identifier) {
@@ -18,8 +23,8 @@ function buildWhere(filters: AuditQueryFilters): Prisma.AuditLogWhereInput {
 }
 
 export const auditRepository = {
-  async search(filters: AuditQueryFilters) {
-    const where = buildWhere(filters)
+  async search(filters: AuditQueryFilters, organizationId: string) {
+    const where = buildWhere(filters, organizationId)
     const [items, total] = await Promise.all([
       databaseService.client.auditLog.findMany({
         where,

@@ -1,5 +1,6 @@
 import { AppError } from '../../shared/errors/app-error.js'
 import type { AuthUser, RequestContext } from '../auth/auth.types.js'
+import { requireOrganizationContext } from '../auth/organization-context.js'
 import {
   notificationsRepository,
   type NotificationRecord,
@@ -35,7 +36,9 @@ function paginate(total: number, page: number, pageSize: number) {
 
 export const notificationsService = {
   async listNotifications(authUser: AuthUser, filters: NotificationFilters) {
+    const organizationId = requireOrganizationContext(authUser).id
     const result = await notificationsRepository.listNotifications(
+      organizationId,
       authUser.id,
       filters,
       authUser.permissions,
@@ -47,7 +50,9 @@ export const notificationsService = {
   },
 
   async getUnreadCount(authUser: AuthUser) {
+    const organizationId = requireOrganizationContext(authUser).id
     const count = await notificationsRepository.getUnreadCount(
+      organizationId,
       authUser.id,
       authUser.permissions,
     )
@@ -55,8 +60,10 @@ export const notificationsService = {
   },
 
   async markAsRead(id: string, authUser: AuthUser, context: RequestContext) {
+    const organizationId = requireOrganizationContext(authUser).id
     const updated = await notificationsRepository.markAsRead(
       id,
+      organizationId,
       authUser.id,
       authUser.permissions,
       context,
@@ -72,7 +79,9 @@ export const notificationsService = {
   },
 
   async markAllAsRead(authUser: AuthUser, context: RequestContext) {
+    const organizationId = requireOrganizationContext(authUser).id
     return notificationsRepository.markAllAsRead(
+      organizationId,
       authUser.id,
       authUser.permissions,
       context,
@@ -83,6 +92,7 @@ export const notificationsService = {
     try {
       const eligibleUsers =
         await notificationsRepository.findUsersEligibleForNotification(
+          event.organizationId,
           event.permission,
           event.preferenceKey,
         )
@@ -91,6 +101,7 @@ export const notificationsService = {
 
       await notificationsRepository.createNotificationsBatch(
         eligibleUsers.map((user) => ({
+          organizationId: event.organizationId,
           userId: user.id,
           title: event.title,
           message: event.message,

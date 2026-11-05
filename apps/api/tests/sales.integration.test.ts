@@ -11,6 +11,7 @@ const describeWithDatabase = describe.runIf(runDatabaseTests)
 describeWithDatabase('Ventas integradas con PostgreSQL', () => {
   const app = createApp()
   const suffix = randomUUID().slice(0, 8)
+  const organizationCode = `org-ventas-${suffix}`
   const password = `Clave-ven-${suffix}!`
   const productCode = `VP-${suffix.slice(0, 6).toUpperCase()}`
   const serviceCode = `VS-${suffix.slice(0, 6).toUpperCase()}`
@@ -47,6 +48,7 @@ describeWithDatabase('Ventas integradas con PostgreSQL', () => {
     customerId: '',
   }
   const cleanupRoleIds: string[] = []
+  let organizationId = ''
   let sharedPasswordHash = ''
 
   async function loginAs(identifier: string) {
@@ -58,6 +60,10 @@ describeWithDatabase('Ventas integradas con PostgreSQL', () => {
   beforeAll(async () => {
     await databaseService.connect()
     sharedPasswordHash = await hashPassword(password)
+    const organization = await databaseService.client.organization.create({
+      data: { code: organizationCode, name: `Organización ventas ${suffix}` },
+    })
+    organizationId = organization.id
 
     const [readPermission, writePermission] = await Promise.all([
       databaseService.client.permission.upsert({
@@ -133,20 +139,30 @@ describeWithDatabase('Ventas integradas con PostgreSQL', () => {
       }),
     ])
 
+    await databaseService.client.organizationMembership.createMany({
+      data: [
+        { organizationId, userId: admin.id, roleId: adminRole.id },
+        { organizationId, userId: reader.id, roleId: readerRole.id },
+        { organizationId, userId: noAccess.id, roleId: noAccessRole.id },
+      ],
+    })
+
     const category = await databaseService.client.productCategory.create({
-      data: { name: `Categoría ventas ${suffix}` },
+      data: { organizationId, name: `Categoría ventas ${suffix}` },
     })
     const brand = await databaseService.client.productBrand.create({
-      data: { name: `Marca ventas ${suffix}` },
+      data: { organizationId, name: `Marca ventas ${suffix}` },
     })
     const unit = await databaseService.client.productUnit.create({
       data: {
+        organizationId,
         name: `Unidad ventas ${suffix}`,
         symbol: `v${suffix.slice(0, 3)}`,
       },
     })
     const product = await databaseService.client.product.create({
       data: {
+        organizationId,
         code: productCode,
         name: 'Balancín delantero',
         description: 'Producto para venta',
@@ -159,6 +175,7 @@ describeWithDatabase('Ventas integradas con PostgreSQL', () => {
     })
     const service = await databaseService.client.service.create({
       data: {
+        organizationId,
         code: serviceCode,
         name: 'Alineación de dirección',
         description: 'Servicio de venta',
@@ -167,6 +184,7 @@ describeWithDatabase('Ventas integradas con PostgreSQL', () => {
     })
     const customer = await databaseService.client.customer.create({
       data: {
+        organizationId,
         type: 'NATURAL',
         documentNumber: `74${suffix.slice(0, 8)}`,
         firstName: `Cliente ${suffix}`,
@@ -177,6 +195,7 @@ describeWithDatabase('Ventas integradas con PostgreSQL', () => {
     })
     await databaseService.client.inventoryMovement.create({
       data: {
+        organizationId,
         productId: product.id,
         type: 'INITIAL',
         status: 'CONFIRMED',
@@ -240,6 +259,9 @@ describeWithDatabase('Ventas integradas con PostgreSQL', () => {
     await databaseService.client.authSession.deleteMany({
       where: { userId: { in: userIds } },
     })
+    await databaseService.client.organizationMembership.deleteMany({
+      where: { organizationId },
+    })
     await databaseService.client.userRole.deleteMany({
       where: { userId: { in: userIds } },
     })
@@ -251,6 +273,9 @@ describeWithDatabase('Ventas integradas con PostgreSQL', () => {
     })
     await databaseService.client.role.deleteMany({
       where: { id: { in: cleanupRoleIds } },
+    })
+    await databaseService.client.organization.deleteMany({
+      where: { id: organizationId },
     })
     await databaseService.disconnect()
   }, 60_000)

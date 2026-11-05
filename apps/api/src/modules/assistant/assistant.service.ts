@@ -66,8 +66,13 @@ function provider(): AiProvider | null {
 async function buildContext(
   filters: { from: string | null; to: string | null },
   permissions: readonly string[],
+  organizationId: string,
 ): Promise<AssistantContext> {
-  const summary = await operationsService.getSummary(filters, permissions)
+  const summary = await operationsService.getSummary(
+    filters,
+    permissions,
+    organizationId,
+  )
   const sections = authorizedSections(permissions)
   const attentionEntries = await Promise.all(
     sections.map(async (section) => {
@@ -75,6 +80,7 @@ async function buildContext(
         section,
         { ...filters, page: 1, pageSize: 10 },
         permissions,
+        organizationId,
       )
       return [section, response.data] as const
     }),
@@ -112,7 +118,11 @@ export const assistantService = {
       to: string | null
       conversationId?: string
     },
-    actor: { id: string; permissions: readonly string[] },
+    actor: {
+      id: string
+      permissions: readonly string[]
+      organizationId: string
+    },
   ): Promise<AssistantAnswer> {
     assertReadOnly(input.message)
     consumeRateLimit(actor.id)
@@ -127,10 +137,12 @@ export const assistantService = {
     const context = await buildContext(
       { from: input.from, to: input.to },
       actor.permissions,
+      actor.organizationId,
     )
     const history = input.conversationId
       ? await assistantRepository.getRecentMessages(
           actor.id,
+          actor.organizationId,
           input.conversationId,
         )
       : []
@@ -147,6 +159,7 @@ export const assistantService = {
       history,
     })
     const conversationId = await assistantRepository.saveExchange({
+      organizationId: actor.organizationId,
       userId: actor.id,
       conversationId: input.conversationId,
       question: input.message,
@@ -172,8 +185,11 @@ export const assistantService = {
   resetRateLimits() {
     rateWindows.clear()
   },
-  async listConversations(userId: string) {
-    const conversations = await assistantRepository.listConversations(userId)
+  async listConversations(userId: string, organizationId: string) {
+    const conversations = await assistantRepository.listConversations(
+      userId,
+      organizationId,
+    )
     return conversations.map((conversation) => ({
       id: conversation.id,
       title: conversation.title,
@@ -181,8 +197,12 @@ export const assistantService = {
       preview: conversation.messages[0]?.content ?? null,
     }))
   },
-  async getConversation(userId: string, id: string) {
-    const conversation = await assistantRepository.getConversation(userId, id)
+  async getConversation(userId: string, organizationId: string, id: string) {
+    const conversation = await assistantRepository.getConversation(
+      userId,
+      organizationId,
+      id,
+    )
     if (!conversation) {
       throw new AppError(
         404,

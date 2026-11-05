@@ -6,6 +6,19 @@ export const endpoints = {
     forgotPassword: '/auth/forgot-password',
     resetPassword: '/auth/reset-password',
   },
+  platform: {
+    access: '/platform/access',
+    roles: '/platform/roles',
+    organizations: '/platform/organizations',
+    organization: (organizationId: string) =>
+      `/platform/organizations/${organizationId}`,
+    organizationMembers: (organizationId: string) =>
+      `/platform/organizations/${organizationId}/members`,
+    organizationStatus: (organizationId: string) =>
+      `/platform/organizations/${organizationId}/status`,
+    organizationMember: (organizationId: string, userId: string) =>
+      `/platform/organizations/${organizationId}/members/${userId}`,
+  },
   products: {
     root: '/products',
     options: '/products/options',

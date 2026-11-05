@@ -75,8 +75,8 @@ function mapPersistenceError(error: unknown): never {
 }
 
 export const productsService = {
-  async list(filters: ProductFilters) {
-    const result = await productsRepository.list(filters)
+  async list(filters: ProductFilters, organizationId: string) {
+    const result = await productsRepository.list(filters, organizationId)
     return {
       data: result.items.map(toResponse),
       pagination: {
@@ -88,27 +88,45 @@ export const productsService = {
     }
   },
 
-  async getById(id: string) {
-    const product = await productsRepository.findById(id)
+  async getById(id: string, organizationId: string) {
+    const product = await productsRepository.findById(id, organizationId)
     if (!product)
       throw new AppError(404, 'PRODUCT_NOT_FOUND', 'Producto no encontrado.')
     return { data: toResponse(product) }
   },
 
-  async checkCodeAvailability(code: string, excludeId?: string) {
+  async checkCodeAvailability(
+    code: string,
+    organizationId: string,
+    excludeId?: string,
+  ) {
     return {
       data: {
         code,
-        available: await productsRepository.isCodeAvailable(code, excludeId),
+        available: await productsRepository.isCodeAvailable(
+          code,
+          organizationId,
+          excludeId,
+        ),
       },
     }
   },
 
-  async create(input: ProductInput, actorId: string, context: RequestContext) {
+  async create(
+    input: ProductInput,
+    actorId: string,
+    organizationId: string,
+    context: RequestContext,
+  ) {
     try {
       return {
         data: toResponse(
-          await productsRepository.create(input, actorId, context),
+          await productsRepository.create(
+            input,
+            actorId,
+            organizationId,
+            context,
+          ),
         ),
       }
     } catch (error) {
@@ -120,12 +138,19 @@ export const productsService = {
     id: string,
     input: ProductInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     try {
       return {
         data: toResponse(
-          await productsRepository.update(id, input, actorId, context),
+          await productsRepository.update(
+            id,
+            input,
+            actorId,
+            organizationId,
+            context,
+          ),
         ),
       }
     } catch (error) {
@@ -137,12 +162,19 @@ export const productsService = {
     id: string,
     active: boolean,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     try {
       return {
         data: toResponse(
-          await productsRepository.updateStatus(id, active, actorId, context),
+          await productsRepository.updateStatus(
+            id,
+            active,
+            actorId,
+            organizationId,
+            context,
+          ),
         ),
       }
     } catch (error) {
@@ -150,81 +182,125 @@ export const productsService = {
     }
   },
 
-  async getOptions() {
-    return { data: await productsRepository.getOptions() }
+  async getOptions(organizationId: string) {
+    return { data: await productsRepository.getOptions(organizationId) }
   },
 
-  async getCatalog() {
-    return { data: await productsRepository.getCatalog() }
+  async getCatalog(organizationId: string) {
+    return { data: await productsRepository.getCatalog(organizationId) }
   },
 
-  async createCategory(name: string) {
+  async createCategory(name: string, organizationId: string) {
     try {
-      return { data: await productsRepository.createCategory(name) }
+      return {
+        data: await productsRepository.createCategory(name, organizationId),
+      }
     } catch (error) {
       return mapPersistenceError(error)
     }
   },
 
-  async createBrand(name: string) {
+  async createBrand(name: string, organizationId: string) {
     try {
-      return { data: await productsRepository.createBrand(name) }
+      return {
+        data: await productsRepository.createBrand(name, organizationId),
+      }
     } catch (error) {
       return mapPersistenceError(error)
     }
   },
 
-  async createUnit(name: string, symbol: string) {
+  async createUnit(name: string, symbol: string, organizationId: string) {
     try {
-      return { data: await productsRepository.createUnit(name, symbol) }
+      return {
+        data: await productsRepository.createUnit(name, symbol, organizationId),
+      }
     } catch (error) {
       return mapPersistenceError(error)
     }
   },
 
-  async updateCategory(id: string, name: string) {
+  async updateCategory(id: string, name: string, organizationId: string) {
     try {
-      return { data: await productsRepository.updateCategory(id, name) }
+      return {
+        data: await productsRepository.updateCategory(id, name, organizationId),
+      }
     } catch (error) {
       return mapPersistenceError(error)
     }
   },
 
-  async updateBrand(id: string, name: string) {
+  async updateBrand(id: string, name: string, organizationId: string) {
     try {
-      return { data: await productsRepository.updateBrand(id, name) }
+      return {
+        data: await productsRepository.updateBrand(id, name, organizationId),
+      }
     } catch (error) {
       return mapPersistenceError(error)
     }
   },
 
-  async updateUnit(id: string, name: string, symbol: string) {
+  async updateUnit(
+    id: string,
+    name: string,
+    symbol: string,
+    organizationId: string,
+  ) {
     try {
-      return { data: await productsRepository.updateUnit(id, name, symbol) }
+      return {
+        data: await productsRepository.updateUnit(
+          id,
+          name,
+          symbol,
+          organizationId,
+        ),
+      }
     } catch (error) {
       return mapPersistenceError(error)
     }
   },
 
-  async updateCategoryStatus(id: string, active: boolean) {
+  async updateCategoryStatus(
+    id: string,
+    active: boolean,
+    organizationId: string,
+  ) {
     try {
-      return { data: await productsRepository.updateCategoryStatus(id, active) }
+      return {
+        data: await productsRepository.updateCategoryStatus(
+          id,
+          active,
+          organizationId,
+        ),
+      }
     } catch (error) {
       return mapPersistenceError(error)
     }
   },
 
-  async updateBrandStatus(id: string, active: boolean) {
+  async updateBrandStatus(id: string, active: boolean, organizationId: string) {
     try {
-      return { data: await productsRepository.updateBrandStatus(id, active) }
+      return {
+        data: await productsRepository.updateBrandStatus(
+          id,
+          active,
+          organizationId,
+        ),
+      }
     } catch (error) {
       return mapPersistenceError(error)
     }
   },
 
-  async updateUnitStatus(id: string, active: boolean) {
+  async updateUnitStatus(id: string, active: boolean, organizationId: string) {
     try {
-      return { data: await productsRepository.updateUnitStatus(id, active) }
+      return {
+        data: await productsRepository.updateUnitStatus(
+          id,
+          active,
+          organizationId,
+        ),
+      }
     } catch (error) {
       return mapPersistenceError(error)
     }

@@ -19,6 +19,7 @@ import type {
 
 const runSelect = {
   id: true,
+  organizationId: true,
   code: true,
   strategyVersion: true,
   fromDate: true,
@@ -118,9 +119,11 @@ async function nextCode(
 
 function buildHistoryWhere(
   filters: ReplenishmentRunHistoryFilters,
+  organizationId: string,
 ): Prisma.ReplenishmentRunWhereInput {
-  if (!filters.from && !filters.to) return {}
+  if (!filters.from && !filters.to) return { organizationId }
   return {
+    organizationId,
     executedAt: {
       ...(filters.from
         ? { gte: new Date(`${filters.from}T00:00:00.000Z`) }
@@ -131,15 +134,19 @@ function buildHistoryWhere(
 }
 
 export const replenishmentRepository = {
-  async loadInputs(period: {
-    from: string
-    to: string
-  }): Promise<ReplenishmentInputs> {
+  async loadInputs(
+    period: {
+      from: string
+      to: string
+    },
+    organizationId: string,
+  ): Promise<ReplenishmentInputs> {
     return databaseService.transaction(async (transaction) => {
       const range = dayRange(period.from, period.to)
       const [products, stockGroups, saleDemand, consumptionDemand] =
         await Promise.all([
           transaction.product.findMany({
+            where: { organizationId },
             select: {
               id: true,
               code: true,
@@ -152,7 +159,7 @@ export const replenishmentRepository = {
           }),
           transaction.inventoryMovement.groupBy({
             by: ['productId', 'type'],
-            where: { status: 'CONFIRMED' },
+            where: { organizationId, status: 'CONFIRMED' },
             _sum: { quantity: true },
           }),
           transaction.saleLine.groupBy({
@@ -163,6 +170,7 @@ export const replenishmentRepository = {
               sale: {
                 is: {
                   status: 'CONFIRMED',
+                  organizationId,
                   confirmedAt: range,
                 },
               },
@@ -176,6 +184,7 @@ export const replenishmentRepository = {
               type: 'CONSUMPTION',
               occurredAt: range,
               inventoryMovement: { is: { status: 'CONFIRMED' } },
+              workOrder: { is: { organizationId } },
             },
             _sum: { quantity: true },
             _count: { _all: true },
@@ -240,21 +249,32 @@ export const replenishmentRepository = {
     input: ReplenishmentRunCreateInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<{ run: ReplenishmentRunSummary; replayed: boolean }> {
     return databaseService.transaction(async (transaction) => {
-      await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:replenishment:runs`}))`
+      await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:replenishment:runs:${organizationId}`}))`
 
       if (input.idempotencyKey) {
         const existing = await transaction.replenishmentRun.findUnique({
           where: { idempotencyKey: input.idempotencyKey },
           select: runSelect,
         })
-        if (existing) return { run: toRunSummary(existing), replayed: true }
+        if (existing) {
+          if (existing.organizationId !== organizationId) {
+            throw new AppError(
+              409,
+              'IDEMPOTENCY_KEY_REUSED',
+              'La clave de idempotencia ya fue usada en otra organización.',
+            )
+          }
+          return { run: toRunSummary(existing), replayed: true }
+        }
       }
 
       const code = await nextCode(transaction)
       const run = await transaction.replenishmentRun.create({
         data: {
+          organizationId,
           code,
           strategyVersion: input.strategyVersion,
           fromDate: new Date(`${input.period.from}T00:00:00.000Z`),
@@ -299,6 +319,7 @@ export const replenishmentRepository = {
         data: {
           event: 'REPLENISHMENT_RUN_EXECUTED',
           userId: actor.id,
+          organizationId,
           identifier: code,
           requestId: context.requestId,
           ipAddress: context.ipAddress,
@@ -318,12 +339,15 @@ export const replenishmentRepository = {
     })
   },
 
-  async listRuns(filters: ReplenishmentRunHistoryFilters): Promise<{
+  async listRuns(
+    filters: ReplenishmentRunHistoryFilters,
+    organizationId: string,
+  ): Promise<{
     items: ReplenishmentRunSummary[]
     total: number
   }> {
     return databaseService.transaction(async (transaction) => {
-      const where = buildHistoryWhere(filters)
+      const where = buildHistoryWhere(filters, organizationId)
       const [runs, total] = await Promise.all([
         transaction.replenishmentRun.findMany({
           select: runSelect,
@@ -341,14 +365,15 @@ export const replenishmentRepository = {
   async loadRunDetail(
     code: string,
     filters: ReplenishmentRunDetailFilters,
+    organizationId: string,
   ): Promise<{
     run: ReplenishmentRunSummary
     items: ReplenishmentRecommendation[]
     total: number
   }> {
     return databaseService.transaction(async (transaction) => {
-      const run = await transaction.replenishmentRun.findUnique({
-        where: { code },
+      const run = await transaction.replenishmentRun.findFirst({
+        where: { code, organizationId },
         select: runSelect,
       })
       if (!run) {

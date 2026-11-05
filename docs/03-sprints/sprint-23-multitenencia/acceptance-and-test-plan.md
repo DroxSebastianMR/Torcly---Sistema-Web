@@ -16,8 +16,11 @@
 
 1. La cuenta global no debe aparecer como técnico, cliente ni administrador de
    una organización.
-2. Puede crear/desactivar organizaciones y gestionar membresías.
-3. Toda entrada de soporte a una organización registra actor, organización,
+2. Puede crear, activar y desactivar organizaciones; puede registrar miembros,
+   modificar su rol y activar o desactivar su membresía.
+3. Al desactivar un taller o miembro, sus sesiones existentes quedan revocadas
+   y un nuevo inicio de sesión debe ser rechazado hasta reactivarlo.
+4. Toda entrada de soporte a una organización registra actor, organización,
    motivo, momento y dirección IP cuando esté disponible.
 
 ## Modelo de roles
@@ -34,3 +37,15 @@
 3. Ejecutar backfill hacia la organización de transición.
 4. Comparar los conteos antes/después y ejecutar pruebas de lectura.
 5. Sólo entonces volver obligatorios los campos e índices compuestos.
+
+## Verificación automatizada
+
+- [x] Los fixtures unitarios e integraciones declaran una organización y sus
+      membresías de forma explícita.
+- [x] API: `prisma validate`, typecheck, lint y 439 pruebas unitarias aprobadas.
+- [x] Web: typecheck, lint, 428 pruebas en 88 archivos y build de producción.
+- [x] Formato Prettier y diff estructural (`git diff --check`) en verde.
+- [x] Prueba de aislamiento manual ejecutada y verificada: - Creación y administración de Taller Validación A y Taller Validación B desde `/plataforma`. - Consulta cruzada de UUID de cliente/recurso entre organizaciones devuelve `404 Not Found` (`CUSTOMER_NOT_FOUND`) sin exponer datos ni confirmar existencia. - Edición de organizaciones permite actualizar nombre del taller, código, rol, nombre y correo del responsable. - Depuración completada: 30 usuarios temporales y 25 roles residuales eliminados de PostgreSQL, conservando únicamente las organizaciones y usuarios operativos válidos.
+- [ ] Ejecutar las 111 integraciones con `DATABASE_TESTS=true` contra una
+      PostgreSQL de pruebas aislada; esta acción no se ejecutó para no tocar
+      desarrollo ni producción.

@@ -181,8 +181,8 @@ export async function seedDatabase(database: PrismaClient, input: SeedInput) {
 
   const administratorRole = await database.role.upsert({
     where: { code: roleCode },
-    update: { name: 'Administrador', active: true },
-    create: { code: roleCode, name: 'Administrador' },
+    update: { name: 'Dueño del taller', active: true },
+    create: { code: roleCode, name: 'Dueño del taller' },
   })
 
   await database.rolePermission.createMany({
@@ -296,10 +296,16 @@ export async function seedDatabase(database: PrismaClient, input: SeedInput) {
   if (input.includeDemoTechnicians ?? true) {
     for (const technician of demoTechnicians) {
       await database.technician.upsert({
-        where: { code: technician.code },
+        where: {
+          organizationId_code: {
+            organizationId: organization.id,
+            code: technician.code,
+          },
+        },
         update: { ...technician, active: true, updatedBy: administrator.id },
         create: {
           ...technician,
+          organizationId: organization.id,
           createdBy: administrator.id,
           updatedBy: administrator.id,
         },

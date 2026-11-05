@@ -114,6 +114,7 @@ function auditData(
   return {
     event,
     userId: actorId,
+    organizationId: context.organizationId,
     identifier,
     requestId: context.requestId,
     ipAddress: context.ipAddress,
@@ -127,9 +128,11 @@ async function lockSale(transaction: Prisma.TransactionClient, saleId: string) {
 
 function buildObligationWhere(
   filters: Pick<PaymentFilters, 'search' | 'from' | 'to'>,
+  organizationId: string,
 ): Prisma.SaleWhereInput {
   const search = filters.search?.trim()
   const where: Prisma.SaleWhereInput = {
+    organizationId,
     status: 'CONFIRMED',
     total: { gt: 0 },
     ...(search
@@ -164,14 +167,15 @@ function buildObligationWhere(
 async function loadObligation(
   transaction: Prisma.TransactionClient,
   saleId: string,
+  organizationId: string,
 ): Promise<ObligationDetailRow | null> {
-  const sale = await transaction.sale.findUnique({
-    where: { id: saleId },
+  const sale = await transaction.sale.findFirst({
+    where: { id: saleId, organizationId },
     select: obligationSaleSelect,
   })
   if (!sale) return null
   const events = await transaction.payment.findMany({
-    where: { saleId },
+    where: { saleId, organizationId },
     select: obligationEventSelect,
     orderBy: { occurredAt: 'asc' },
   })
@@ -201,16 +205,17 @@ async function nextCode(
 export const paymentsRepository = {
   async listObligations(
     filters: Pick<PaymentFilters, 'search' | 'from' | 'to'>,
+    organizationId: string,
   ): Promise<ObligationRow[]> {
     const sales = await databaseService.client.sale.findMany({
-      where: buildObligationWhere(filters),
+      where: buildObligationWhere(filters, organizationId),
       select: obligationSaleSelect,
       orderBy: { confirmedAt: 'desc' },
     })
     if (!sales.length) return []
 
     const payments = await databaseService.client.payment.findMany({
-      where: { saleId: { in: sales.map((sale) => sale.id) } },
+      where: { organizationId, saleId: { in: sales.map((sale) => sale.id) } },
       select: {
         saleId: true,
         type: true,
@@ -249,9 +254,12 @@ export const paymentsRepository = {
     }))
   },
 
-  async findById(id: string): Promise<ObligationDetailRow | null> {
+  async findById(
+    id: string,
+    organizationId: string,
+  ): Promise<ObligationDetailRow | null> {
     return databaseService.transaction(async (transaction) => {
-      return loadObligation(transaction, id)
+      return loadObligation(transaction, id, organizationId)
     })
   },
 
@@ -260,12 +268,13 @@ export const paymentsRepository = {
     input: PaymentRegisterInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<ObligationDetailRow> {
     return databaseService.transaction(async (transaction) => {
-      await lockCashSession(transaction)
+      await lockCashSession(transaction, organizationId)
       await lockSale(transaction, saleId)
-      const sale = await transaction.sale.findUnique({
-        where: { id: saleId },
+      const sale = await transaction.sale.findFirst({
+        where: { id: saleId, organizationId },
         select: {
           id: true,
           code: true,
@@ -292,18 +301,28 @@ export const paymentsRepository = {
       const idempotencyKey = `payment:${saleId}:${input.requestId}`
       const replay = await transaction.payment.findUnique({
         where: { idempotencyKey },
-        select: { id: true },
+        select: { id: true, organizationId: true },
       })
-      if (replay)
+      if (replay) {
+        if (replay.organizationId !== organizationId)
+          throw new AppError(
+            409,
+            'IDEMPOTENCY_KEY_CONFLICT',
+            'La solicitud ya fue usada en otra organización.',
+          )
         return loadObligation(
           transaction,
           saleId,
+          organizationId,
         ) as Promise<ObligationDetailRow>
+      }
 
-      const cashSession =
-        await cashSessionsRepository.requireOpenSession(transaction)
+      const cashSession = await cashSessionsRepository.requireOpenSession(
+        transaction,
+        organizationId,
+      )
       const payments = await transaction.payment.findMany({
-        where: { saleId },
+        where: { saleId, organizationId },
         select: { type: true, amount: true },
       })
       const paid = computePaidAmount(payments)
@@ -314,6 +333,7 @@ export const paymentsRepository = {
       const code = await nextCode(transaction, 'PAGO')
       const payment = await transaction.payment.create({
         data: {
+          organizationId,
           code,
           saleId,
           customerId: sale.customerId,
@@ -342,7 +362,11 @@ export const paymentsRepository = {
         }),
       })
 
-      return loadObligation(transaction, saleId) as Promise<ObligationDetailRow>
+      return loadObligation(
+        transaction,
+        saleId,
+        organizationId,
+      ) as Promise<ObligationDetailRow>
     })
   },
 
@@ -351,12 +375,13 @@ export const paymentsRepository = {
     input: SplitPaymentRegisterInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<ObligationDetailRow> {
     return databaseService.transaction(async (transaction) => {
-      await lockCashSession(transaction)
+      await lockCashSession(transaction, organizationId)
       await lockSale(transaction, saleId)
-      const sale = await transaction.sale.findUnique({
-        where: { id: saleId },
+      const sale = await transaction.sale.findFirst({
+        where: { id: saleId, organizationId },
         select: {
           id: true,
           code: true,
@@ -383,18 +408,28 @@ export const paymentsRepository = {
       const idempotencyPrefix = `payment-split:${saleId}:${input.requestId}`
       const replay = await transaction.payment.findUnique({
         where: { idempotencyKey: `${idempotencyPrefix}:0` },
-        select: { id: true },
+        select: { id: true, organizationId: true },
       })
-      if (replay)
+      if (replay) {
+        if (replay.organizationId !== organizationId)
+          throw new AppError(
+            409,
+            'IDEMPOTENCY_KEY_CONFLICT',
+            'La solicitud ya fue usada en otra organización.',
+          )
         return loadObligation(
           transaction,
           saleId,
+          organizationId,
         ) as Promise<ObligationDetailRow>
+      }
 
-      const cashSession =
-        await cashSessionsRepository.requireOpenSession(transaction)
+      const cashSession = await cashSessionsRepository.requireOpenSession(
+        transaction,
+        organizationId,
+      )
       const payments = await transaction.payment.findMany({
-        where: { saleId },
+        where: { saleId, organizationId },
         select: { type: true, amount: true },
       })
       const paid = computePaidAmount(payments)
@@ -418,6 +453,7 @@ export const paymentsRepository = {
         const code = await nextCode(transaction, 'PAGO')
         const payment = await transaction.payment.create({
           data: {
+            organizationId,
             code,
             saleId,
             customerId: sale.customerId,
@@ -452,7 +488,11 @@ export const paymentsRepository = {
         }),
       })
 
-      return loadObligation(transaction, saleId) as Promise<ObligationDetailRow>
+      return loadObligation(
+        transaction,
+        saleId,
+        organizationId,
+      ) as Promise<ObligationDetailRow>
     })
   },
 
@@ -461,10 +501,11 @@ export const paymentsRepository = {
     input: PaymentCompensateInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<ObligationDetailRow> {
     return databaseService.transaction(async (transaction) => {
-      const paymentRow = await transaction.payment.findUnique({
-        where: { id: paymentId },
+      const paymentRow = await transaction.payment.findFirst({
+        where: { id: paymentId, organizationId },
         select: {
           id: true,
           code: true,
@@ -484,10 +525,10 @@ export const paymentsRepository = {
           'Una compensación solo se aplica sobre un pago registrado.',
         )
 
-      await lockCashSession(transaction)
+      await lockCashSession(transaction, organizationId)
       await lockSale(transaction, paymentRow.saleId)
-      const locked = await transaction.payment.findUnique({
-        where: { id: paymentId },
+      const locked = await transaction.payment.findFirst({
+        where: { id: paymentId, organizationId },
         select: { id: true, type: true, amount: true, saleId: true },
       })
       if (!locked || locked.type !== 'PAYMENT')
@@ -496,18 +537,28 @@ export const paymentsRepository = {
       const idempotencyKey = `payment-compensation:${paymentId}:${input.requestId}`
       const replay = await transaction.payment.findUnique({
         where: { idempotencyKey },
-        select: { id: true },
+        select: { id: true, organizationId: true },
       })
-      if (replay)
+      if (replay) {
+        if (replay.organizationId !== organizationId)
+          throw new AppError(
+            409,
+            'IDEMPOTENCY_KEY_CONFLICT',
+            'La solicitud ya fue usada en otra organización.',
+          )
         return loadObligation(
           transaction,
           locked.saleId,
+          organizationId,
         ) as Promise<ObligationDetailRow>
+      }
 
-      const cashSession =
-        await cashSessionsRepository.requireOpenSession(transaction)
+      const cashSession = await cashSessionsRepository.requireOpenSession(
+        transaction,
+        organizationId,
+      )
       const compensations = await transaction.payment.findMany({
-        where: { originalPaymentId: paymentId },
+        where: { originalPaymentId: paymentId, organizationId },
         select: { amount: true },
       })
       const alreadyCompensated = compensations.reduce(
@@ -524,6 +575,7 @@ export const paymentsRepository = {
       const code = await nextCode(transaction, 'COMP')
       const compensation = await transaction.payment.create({
         data: {
+          organizationId,
           code,
           saleId: locked.saleId,
           cashSessionId: cashSession.id,
@@ -562,6 +614,7 @@ export const paymentsRepository = {
       return loadObligation(
         transaction,
         locked.saleId,
+        organizationId,
       ) as Promise<ObligationDetailRow>
     })
   },

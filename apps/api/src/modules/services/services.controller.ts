@@ -1,5 +1,6 @@
 import type { RequestHandler } from 'express'
 import { getRequestContext } from '../auth/auth.middleware.js'
+import { requireOrganizationContext } from '../auth/organization-context.js'
 import {
   serviceCodeAvailabilitySchema,
   serviceIdSchema,
@@ -12,13 +13,21 @@ import { servicesService } from './services.service.js'
 
 export const listServices: RequestHandler = async (request, response) => {
   response.json(
-    await servicesService.list(serviceQuerySchema.parse(request.query)),
+    await servicesService.list(
+      serviceQuerySchema.parse(request.query),
+      requireOrganizationContext(request.auth).id,
+    ),
   )
 }
 
 export const getService: RequestHandler = async (request, response) => {
   const { id } = serviceIdSchema.parse(request.params)
-  response.json(await servicesService.getById(id))
+  response.json(
+    await servicesService.getById(
+      id,
+      requireOrganizationContext(request.auth).id,
+    ),
+  )
 }
 
 export const checkServiceCodeAvailability: RequestHandler = async (
@@ -26,11 +35,21 @@ export const checkServiceCodeAvailability: RequestHandler = async (
   response,
 ) => {
   const { code, excludeId } = serviceCodeAvailabilitySchema.parse(request.query)
-  response.json(await servicesService.checkCodeAvailability(code, excludeId))
+  response.json(
+    await servicesService.checkCodeAvailability(
+      code,
+      requireOrganizationContext(request.auth).id,
+      excludeId,
+    ),
+  )
 }
 
-export const getServiceOptions: RequestHandler = async (_request, response) => {
-  response.json(await servicesService.getOptions())
+export const getServiceOptions: RequestHandler = async (request, response) => {
+  response.json(
+    await servicesService.getOptions(
+      requireOrganizationContext(request.auth).id,
+    ),
+  )
 }
 
 export const createService: RequestHandler = async (request, response) => {
@@ -40,6 +59,7 @@ export const createService: RequestHandler = async (request, response) => {
       await servicesService.create(
         serviceInputSchema.parse(request.body),
         request.auth!.id,
+        requireOrganizationContext(request.auth).id,
         getRequestContext(request, response),
       ),
     )
@@ -52,6 +72,7 @@ export const updateService: RequestHandler = async (request, response) => {
       id,
       serviceUpdateSchema.parse(request.body),
       request.auth!.id,
+      requireOrganizationContext(request.auth).id,
       getRequestContext(request, response),
     ),
   )
@@ -68,6 +89,7 @@ export const updateServiceStatus: RequestHandler = async (
       id,
       active,
       request.auth!.id,
+      requireOrganizationContext(request.auth).id,
       getRequestContext(request, response),
     ),
   )

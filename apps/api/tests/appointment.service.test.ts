@@ -30,6 +30,7 @@ const context = {
   requestId: 'req-appointment-1',
   ipAddress: '127.0.0.1',
 }
+const organizationId = 'organization-1'
 
 const customerId = 'a0000000-0000-4000-8000-000000000001'
 const vehicleId = 'a0000000-0000-4000-8000-000000000002'
@@ -97,17 +98,15 @@ describe('Servicio de citas', () => {
       hoy: 0,
     })
 
-    const result = await appointmentsService.list({
+    const filters = {
       status: 'all',
       page: 1,
       pageSize: 20,
-    })
+    } as const
+    const result = await appointmentsService.list(filters, organizationId)
 
-    expect(repository.list).toHaveBeenCalledWith({
-      status: 'all',
-      page: 1,
-      pageSize: 20,
-    })
+    expect(repository.list).toHaveBeenCalledWith(filters, organizationId)
+    expect(repository.getStats).toHaveBeenCalledWith(organizationId)
     expect(result).toEqual({
       data: [
         {
@@ -143,7 +142,10 @@ describe('Servicio de citas', () => {
   it('devuelve una cita por identificador', async () => {
     repository.findById.mockResolvedValue(record())
 
-    const result = await appointmentsService.getById('appointment-1')
+    const result = await appointmentsService.getById(
+      'appointment-1',
+      organizationId,
+    )
     expect(result.data.code).toBe('CITA-000001')
     expect(result.data.date).toBe('2099-12-31')
     expect(result.data.time).toBe('09:30')
@@ -152,7 +154,9 @@ describe('Servicio de citas', () => {
   it('lanza 404 cuando la cita no existe', async () => {
     repository.findById.mockResolvedValue(null)
 
-    await expect(appointmentsService.getById('missing')).rejects.toThrowError(
+    await expect(
+      appointmentsService.getById('missing', organizationId),
+    ).rejects.toThrowError(
       expect.objectContaining({
         status: 404,
         code: 'APPOINTMENT_NOT_FOUND',
@@ -165,11 +169,17 @@ describe('Servicio de citas', () => {
     repository.findVehicleOfCustomer.mockResolvedValue(vehicleRef)
     repository.create.mockResolvedValue(record())
 
-    const result = await appointmentsService.create(input, actor, context)
+    const result = await appointmentsService.create(
+      input,
+      actor,
+      context,
+      organizationId,
+    )
 
     expect(repository.findVehicleOfCustomer).toHaveBeenCalledWith(
       vehicleId,
       customerId,
+      organizationId,
     )
     expect(repository.create).toHaveBeenCalledWith(
       {
@@ -181,6 +191,7 @@ describe('Servicio de citas', () => {
       },
       actor,
       context,
+      organizationId,
     )
     expect(result.data.status).toBe('PROGRAMADA')
   })
@@ -189,7 +200,7 @@ describe('Servicio de citas', () => {
     repository.findCustomerRef.mockResolvedValue(null)
 
     await expect(
-      appointmentsService.create(input, actor, context),
+      appointmentsService.create(input, actor, context, organizationId),
     ).rejects.toThrowError(
       expect.objectContaining({
         status: 404,
@@ -204,7 +215,7 @@ describe('Servicio de citas', () => {
     repository.findVehicleOfCustomer.mockResolvedValue(null)
 
     await expect(
-      appointmentsService.create(input, actor, context),
+      appointmentsService.create(input, actor, context, organizationId),
     ).rejects.toThrowError(
       expect.objectContaining({
         status: 400,
@@ -223,6 +234,7 @@ describe('Servicio de citas', () => {
         { ...input, date: '2020-01-01' },
         actor,
         context,
+        organizationId,
       ),
     ).rejects.toThrowError(
       expect.objectContaining({
@@ -247,6 +259,7 @@ describe('Servicio de citas', () => {
       { date: '2099-12-31', time: '14:00' },
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.reschedule).toHaveBeenCalledWith(
@@ -254,6 +267,7 @@ describe('Servicio de citas', () => {
       { dateISO: '2099-12-31', time: '14:00' },
       actor,
       context,
+      organizationId,
     )
     expect(result.data.time).toBe('14:00')
     expect(result.data.rescheduledBy).toBe('Ana Pérez')
@@ -266,6 +280,7 @@ describe('Servicio de citas', () => {
         { date: '2020-01-01', time: '10:00' },
         actor,
         context,
+        organizationId,
       ),
     ).rejects.toThrowError(
       expect.objectContaining({
@@ -288,12 +303,14 @@ describe('Servicio de citas', () => {
       'appointment-1',
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.cancel).toHaveBeenCalledWith(
       'appointment-1',
       actor,
       context,
+      organizationId,
     )
     expect(result.data.status).toBe('CANCELADA')
     expect(result.data.cancelledBy).toBe('Ana Pérez')

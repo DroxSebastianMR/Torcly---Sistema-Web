@@ -1,5 +1,6 @@
 import type { Request, RequestHandler } from 'express'
 import { getRequestContext } from '../auth/auth.middleware.js'
+import { requireOrganizationContext } from '../auth/organization-context.js'
 import {
   adjustmentSchema,
   entrySchema,
@@ -14,10 +15,15 @@ function actor(request: Request) {
   return { id: request.auth!.id, name: request.auth!.name }
 }
 
+function organizationId(request: Request) {
+  return requireOrganizationContext(request.auth!).id
+}
+
 export const listExistence: RequestHandler = async (request, response) => {
   response.json(
     await inventoryService.listExistence(
       existenceQuerySchema.parse(request.query),
+      organizationId(request),
     ),
   )
 }
@@ -26,6 +32,7 @@ export const listMovements: RequestHandler = async (request, response) => {
   response.json(
     await inventoryService.listMovements(
       movementQuerySchema.parse(request.query),
+      organizationId(request),
     ),
   )
 }
@@ -41,6 +48,7 @@ export const registerInitialStock: RequestHandler = async (
         initialStockSchema.parse(request.body),
         actor(request),
         getRequestContext(request, response),
+        organizationId(request),
       ),
     )
 }
@@ -53,6 +61,7 @@ export const registerEntry: RequestHandler = async (request, response) => {
         entrySchema.parse(request.body),
         actor(request),
         getRequestContext(request, response),
+        organizationId(request),
       ),
     )
 }
@@ -65,6 +74,7 @@ export const registerExit: RequestHandler = async (request, response) => {
         exitSchema.parse(request.body),
         actor(request),
         getRequestContext(request, response),
+        organizationId(request),
       ),
     )
 }
@@ -77,6 +87,7 @@ export const registerAdjustment: RequestHandler = async (request, response) => {
         adjustmentSchema.parse(request.body),
         actor(request),
         getRequestContext(request, response),
+        organizationId(request),
       ),
     )
 }

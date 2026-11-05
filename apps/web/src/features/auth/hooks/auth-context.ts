@@ -6,7 +6,7 @@ export interface AuthContextValue {
   error: boolean
   errorDetail?: unknown
   retry: () => void
-  login: (input: LoginInput) => Promise<void>
+  login: (input: LoginInput) => Promise<User>
   logout: () => Promise<void>
 }
 export const AuthContext = createContext<AuthContextValue | null>(null)

@@ -24,6 +24,7 @@ const context = {
   requestId: 'req-inv-1',
   ipAddress: '127.0.0.1',
 }
+const organizationId = 'organization-1'
 
 const actor = { id: 'actor-1', name: 'Operador Torcly' }
 
@@ -83,17 +84,19 @@ describe('Servicio de inventario', () => {
       total: 1,
     })
 
-    const result = await inventoryService.listExistence({
-      search: 'filtro',
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await inventoryService.listExistence(
+      { search: 'filtro', page: 1, pageSize: 20 },
+      organizationId,
+    )
 
-    expect(repository.listExistence).toHaveBeenCalledWith({
-      search: 'filtro',
-      page: 1,
-      pageSize: 20,
-    })
+    expect(repository.listExistence).toHaveBeenCalledWith(
+      {
+        search: 'filtro',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
     expect(result).toEqual({
       data: [
         {
@@ -118,13 +121,16 @@ describe('Servicio de inventario', () => {
       total: 1,
     })
 
-    const result = await inventoryService.listMovements({
-      type: 'ENTRY',
-      from: '2026-09-01',
-      to: '2026-09-30',
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await inventoryService.listMovements(
+      {
+        type: 'ENTRY',
+        from: '2026-09-01',
+        to: '2026-09-30',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
 
     expect(result.data[0]).toMatchObject({
       id: 'mov1',
@@ -146,10 +152,10 @@ describe('Servicio de inventario', () => {
       { id: operatorId, displayName: 'Arian' },
     ])
 
-    const result = await inventoryService.listMovements({
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await inventoryService.listMovements(
+      { page: 1, pageSize: 20 },
+      organizationId,
+    )
 
     expect(repository.findUserDisplayNames).toHaveBeenCalledWith([operatorId])
     expect(result.data[0]?.performedBy).toBe('Arian')
@@ -168,6 +174,7 @@ describe('Servicio de inventario', () => {
       },
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.registerMovement).toHaveBeenCalledWith(
@@ -179,6 +186,7 @@ describe('Servicio de inventario', () => {
       'INITIAL',
       actor,
       context,
+      organizationId,
     )
     expect(result.data.type).toBe('INITIAL')
 
@@ -191,12 +199,14 @@ describe('Servicio de inventario', () => {
       },
       actor,
       context,
+      organizationId,
     )
     expect(repository.registerMovement).toHaveBeenCalledWith(
       expect.any(Object),
       'ENTRY',
       actor,
       context,
+      organizationId,
     )
 
     await inventoryService.registerExit(
@@ -207,12 +217,14 @@ describe('Servicio de inventario', () => {
       },
       actor,
       context,
+      organizationId,
     )
     expect(repository.registerMovement).toHaveBeenCalledWith(
       expect.any(Object),
       'EXIT',
       actor,
       context,
+      organizationId,
     )
   })
 
@@ -234,6 +246,7 @@ describe('Servicio de inventario', () => {
       },
       actor,
       context,
+      organizationId,
     )
 
     expect(notifications.notifyUsersSafely).toHaveBeenCalledWith(
@@ -257,12 +270,14 @@ describe('Servicio de inventario', () => {
       },
       actor,
       context,
+      organizationId,
     )
     expect(repository.registerMovement).toHaveBeenCalledWith(
       expect.objectContaining({ quantity: 6 }),
       'ADJUSTMENT_IN',
       actor,
       context,
+      organizationId,
     )
 
     await inventoryService.registerAdjustment(
@@ -273,12 +288,14 @@ describe('Servicio de inventario', () => {
       },
       actor,
       context,
+      organizationId,
     )
     expect(repository.registerMovement).toHaveBeenCalledWith(
       expect.objectContaining({ quantity: 4 }),
       'ADJUSTMENT_OUT',
       actor,
       context,
+      organizationId,
     )
   })
 
@@ -299,9 +316,13 @@ describe('Servicio de inventario', () => {
       },
       actor,
       context,
+      organizationId,
     )
 
-    expect(repository.findByKey).toHaveBeenCalledWith('key-entry-retry')
+    expect(repository.findByKey).toHaveBeenCalledWith(
+      'key-entry-retry',
+      organizationId,
+    )
     expect(result.data.id).toBe('mov1')
   })
 
@@ -323,6 +344,7 @@ describe('Servicio de inventario', () => {
         },
         actor,
         context,
+        organizationId,
       ),
     ).rejects.toMatchObject({
       status: 409,
@@ -346,6 +368,7 @@ describe('Servicio de inventario', () => {
         },
         actor,
         context,
+        organizationId,
       ),
     ).rejects.toMatchObject({
       status: 400,
@@ -367,6 +390,7 @@ describe('Servicio de inventario', () => {
         },
         actor,
         context,
+        organizationId,
       ),
     ).rejects.toMatchObject({
       status: 404,
@@ -388,6 +412,7 @@ describe('Servicio de inventario', () => {
         },
         actor,
         context,
+        organizationId,
       ),
     ).rejects.toMatchObject({
       status: 409,

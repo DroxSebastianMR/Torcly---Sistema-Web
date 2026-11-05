@@ -11,9 +11,13 @@ const describeWithDatabase = describe.runIf(runDatabaseTests)
 describeWithDatabase('Clientes integrados con PostgreSQL', () => {
   const app = createApp()
   const suffix = randomUUID().slice(0, 8)
+  const numericSuffix = randomUUID()
+    .replace(/\D/g, '')
+    .padEnd(8, '0')
+    .slice(0, 8)
   const password = `Clave-clientes-${suffix}!`
-  const documentNumber = `12345${suffix.slice(0, 3)}`
-  const ruc = `20123${suffix.slice(0, 6)}`
+  const documentNumber = numericSuffix
+  const ruc = `20${numericSuffix}1`
 
   const adminOrder = { roleCode: `admin-customers-${suffix}` }
   const readerOrder = { roleCode: `reader-customers-${suffix}` }
@@ -41,6 +45,7 @@ describeWithDatabase('Clientes integrados con PostgreSQL', () => {
   const createdIds = { naturalId: '', legalId: '' }
   const cleanupRoleIds: string[] = []
   let sharedPasswordHash = ''
+  let organizationId = ''
 
   beforeAll(async () => {
     await databaseService.connect()
@@ -126,6 +131,32 @@ describeWithDatabase('Clientes integrados con PostgreSQL', () => {
       userId: noAccess.id,
       roleId: noAccessRole.id,
     })
+    const organization = await databaseService.client.organization.create({
+      data: {
+        code: `it-customers-${suffix}`,
+        name: 'Organización de clientes',
+      },
+    })
+    organizationId = organization.id
+    await databaseService.client.organizationMembership.createMany({
+      data: [
+        {
+          organizationId,
+          userId: admin.id,
+          roleId: adminRole.id,
+        },
+        {
+          organizationId,
+          userId: reader.id,
+          roleId: readerRole.id,
+        },
+        {
+          organizationId,
+          userId: noAccess.id,
+          roleId: noAccessRole.id,
+        },
+      ],
+    })
     cleanupRoleIds.push(adminRole.id, readerRole.id, noAccessRole.id)
   }, 60_000)
 
@@ -140,14 +171,15 @@ describeWithDatabase('Clientes integrados con PostgreSQL', () => {
       where: { identifier: { in: [documentNumber, ruc] } },
     })
     await databaseService.client.customer.deleteMany({
-      where: {
-        id: { in: [createdIds.naturalId, createdIds.legalId].filter(Boolean) },
-      },
+      where: { organizationId },
     })
     await databaseService.client.auditLog.deleteMany({
       where: { userId: { in: userIds } },
     })
     await databaseService.client.authSession.deleteMany({
+      where: { userId: { in: userIds } },
+    })
+    await databaseService.client.organizationMembership.deleteMany({
       where: { userId: { in: userIds } },
     })
     await databaseService.client.userRole.deleteMany({
@@ -161,6 +193,9 @@ describeWithDatabase('Clientes integrados con PostgreSQL', () => {
     })
     await databaseService.client.role.deleteMany({
       where: { id: { in: cleanupRoleIds } },
+    })
+    await databaseService.client.organization.deleteMany({
+      where: { id: organizationId },
     })
     await databaseService.disconnect()
   }, 60_000)
@@ -212,7 +247,7 @@ describeWithDatabase('Clientes integrados con PostgreSQL', () => {
     expect(created.status).toBe(201)
     expect(created.body.data.type).toBe('NATURAL')
     expect(created.body.data.documentNumber).toBe(documentNumber)
-    expect(created.body.data.email).toBe(`maria_${suffix}@torcly.local`)
+    expect(created.body.data.email).toBe(`Maria_${suffix}@Torcly.Local`)
     createdIds.naturalId = created.body.data.id
 
     const invalidDni = await adminAgent.post('/api/v1/customers').send({
@@ -271,7 +306,7 @@ describeWithDatabase('Clientes integrados con PostgreSQL', () => {
     ).toBe(true)
 
     const byPhone = await adminAgent.get(
-      `/api/v1/customers?search=9874561&pageSize=50`,
+      `/api/v1/customers?search=%2B51987456123&pageSize=50`,
     )
     expect(byPhone.status).toBe(200)
     expect(

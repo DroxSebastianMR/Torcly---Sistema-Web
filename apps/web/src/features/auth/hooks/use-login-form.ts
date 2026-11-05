@@ -6,7 +6,7 @@ import { toast } from '@/components/ui/toast-manager'
 import { paths } from '@/app/router/constants/paths'
 import { loginSchema } from '@/features/auth/forms/auth.schema'
 import { useAuth } from '@/features/auth/hooks/auth-context'
-import type { LoginInput } from '@/features/auth/types/auth.types'
+import type { LoginInput, User } from '@/features/auth/types/auth.types'
 import { getLoginFeedback } from '../utils/login-feedback'
 
 const rememberedIdentifierKey = 'torcly.remembered-identifier'
@@ -33,8 +33,9 @@ export function useLoginForm() {
   })
 
   const submitCredentials = handleSubmit(async (values) => {
+    let user: User
     try {
-      await login(values)
+      user = await login(values)
     } catch (error) {
       const feedback = getLoginFeedback(error)
       toast.add({
@@ -61,8 +62,11 @@ export function useLoginForm() {
     })
 
     const from: unknown = location.state?.from
-    const destination =
-      typeof from === 'string' && from.startsWith('/') && !from.startsWith('//')
+    const destination = user.isPlatformAdmin
+      ? paths.platform
+      : typeof from === 'string' &&
+          from.startsWith('/') &&
+          !from.startsWith('//')
         ? from
         : paths.dashboard
 

@@ -1,4 +1,5 @@
 import type { RequestHandler } from 'express'
+import { requireOrganizationContext } from '../auth/organization-context.js'
 import {
   assistantChatSchema,
   assistantConversationParamsSchema,
@@ -13,6 +14,7 @@ export const askAssistant: RequestHandler = async (request, response) => {
       {
         id: request.auth!.id,
         permissions: request.auth!.permissions,
+        organizationId: requireOrganizationContext(request.auth!).id,
       },
     ),
   )
@@ -22,7 +24,12 @@ export const listAssistantConversations: RequestHandler = async (
   request,
   response,
 ) => {
-  response.json(await assistantService.listConversations(request.auth!.id))
+  response.json(
+    await assistantService.listConversations(
+      request.auth!.id,
+      requireOrganizationContext(request.auth!).id,
+    ),
+  )
 }
 
 export const getAssistantConversation: RequestHandler = async (
@@ -30,5 +37,11 @@ export const getAssistantConversation: RequestHandler = async (
   response,
 ) => {
   const { id } = assistantConversationParamsSchema.parse(request.params)
-  response.json(await assistantService.getConversation(request.auth!.id, id))
+  response.json(
+    await assistantService.getConversation(
+      request.auth!.id,
+      requireOrganizationContext(request.auth!).id,
+      id,
+    ),
+  )
 }

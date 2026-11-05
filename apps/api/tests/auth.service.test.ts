@@ -70,7 +70,38 @@ function userRecord(passwordHash: string) {
         },
       },
     ],
-    organizationMemberships: [],
+    organizationMemberships: [
+      {
+        organizationId: '8d4e3c62-2a85-4d4d-8fce-a15dcce68712',
+        userId: '70c3d238-3fd5-42c7-9a3e-d1eea534899e',
+        roleId: '93fb24de-8f46-474b-a452-16147258ee79',
+        active: true,
+        joinedAt: new Date(),
+        organization: {
+          id: '8d4e3c62-2a85-4d4d-8fce-a15dcce68712',
+          code: 'taller-pruebas',
+          name: 'Taller de pruebas',
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        role: {
+          id: '93fb24de-8f46-474b-a452-16147258ee79',
+          code: 'administrator',
+          name: 'Administrador',
+          active: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          permissions: [
+            {
+              roleId: '93fb24de-8f46-474b-a452-16147258ee79',
+              permissionId: 'b2f7b118-dc47-4a6a-b225-a7294268b4e6',
+              permission: { code: 'products:read' },
+            },
+          ],
+        },
+      },
+    ],
   }
 }
 
@@ -150,6 +181,7 @@ describe('Servicio de autenticación', () => {
     const user = {
       ...userRecord(await hashPassword('Clave-segura-2026')),
       isPlatformAdmin: true,
+      organizationMemberships: [],
     }
     repository.findUserByIdentifier.mockResolvedValue(user)
     repository.createSession.mockResolvedValue(user)

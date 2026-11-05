@@ -6,6 +6,11 @@ vi.mock('../src/modules/notifications/notifications.repository.js')
 
 const dummyUser = {
   id: '11111111-1111-4111-8111-111111111111',
+  organization: {
+    id: 'organization-1',
+    code: 'taller-prueba',
+    name: 'Taller de prueba',
+  },
   name: 'Usuario Notif',
   email: 'notif@torcly.com',
   username: 'notif',
@@ -52,6 +57,7 @@ describe('notificationsService', () => {
       })
 
       expect(notificationsRepository.listNotifications).toHaveBeenCalledWith(
+        dummyUser.organization.id,
         dummyUser.id,
         { read: 'all', page: 1, pageSize: 20 },
         dummyUser.permissions,
@@ -70,6 +76,7 @@ describe('notificationsService', () => {
       const result = await notificationsService.getUnreadCount(dummyUser)
 
       expect(notificationsRepository.getUnreadCount).toHaveBeenCalledWith(
+        dummyUser.organization.id,
         dummyUser.id,
         dummyUser.permissions,
       )
@@ -101,6 +108,7 @@ describe('notificationsService', () => {
       expect(result.read).toBe(true)
       expect(notificationsRepository.markAsRead).toHaveBeenCalledWith(
         'notif-1',
+        dummyUser.organization.id,
         dummyUser.id,
         dummyUser.permissions,
         dummyContext,
@@ -153,6 +161,7 @@ describe('notificationsService', () => {
 
       expect(result.updatedCount).toBe(4)
       expect(notificationsRepository.markAllAsRead).toHaveBeenCalledWith(
+        dummyUser.organization.id,
         dummyUser.id,
         dummyUser.permissions,
         dummyContext,
@@ -183,6 +192,7 @@ describe('notificationsService', () => {
       ])
 
       await notificationsService.notifyUsersSafely({
+        organizationId: 'organization-1',
         permission: 'purchases:read',
         type: 'PURCHASE_RECEIVED',
         preferenceKey: 'purchaseReceived',
@@ -195,6 +205,7 @@ describe('notificationsService', () => {
         notificationsRepository.createNotificationsBatch,
       ).toHaveBeenCalledWith([
         {
+          organizationId: 'organization-1',
           userId: 'user-1',
           title: 'Compra recibida',
           message: 'COMPRA-001',
@@ -203,6 +214,7 @@ describe('notificationsService', () => {
           permissionRequired: 'purchases:read',
         },
         {
+          organizationId: 'organization-1',
           userId: 'user-2',
           title: 'Compra recibida',
           message: 'COMPRA-001',
@@ -223,6 +235,7 @@ describe('notificationsService', () => {
       // Debe resolver limpiamente sin propagar el error a la transacción de negocio
       await expect(
         notificationsService.notifyUsersSafely({
+          organizationId: 'organization-1',
           permission: 'purchases:read',
           type: 'PURCHASE_RECEIVED',
           title: 'Compra recibida',

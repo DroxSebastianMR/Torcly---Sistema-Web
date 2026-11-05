@@ -25,6 +25,7 @@ const context = {
   requestId: 'req-1',
   ipAddress: '127.0.0.1',
 }
+const organizationId = 'organization-1'
 
 function record(overrides: Record<string, unknown> = {}) {
   return {
@@ -61,21 +62,27 @@ describe('Servicio de productos', () => {
   it('lista productos con stock derivado de movimientos y paginación', async () => {
     repository.list.mockResolvedValue({ items: [record()], total: 1 })
 
-    const result = await productsService.list({
-      search: 'filtro',
-      categoryId: '',
-      status: 'all',
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await productsService.list(
+      {
+        search: 'filtro',
+        categoryId: '',
+        status: 'all',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
 
-    expect(repository.list).toHaveBeenCalledWith({
-      search: 'filtro',
-      categoryId: '',
-      status: 'all',
-      page: 1,
-      pageSize: 20,
-    })
+    expect(repository.list).toHaveBeenCalledWith(
+      {
+        search: 'filtro',
+        categoryId: '',
+        status: 'all',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
     expect(result).toEqual({
       data: [
         {
@@ -106,13 +113,16 @@ describe('Servicio de productos', () => {
   it('marca stock bajo cuando el nivel disponible no supera el mínimo', async () => {
     repository.list.mockResolvedValue({ items: [record()], total: 1 })
 
-    const result = await productsService.list({
-      search: '',
-      categoryId: '',
-      status: 'all',
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await productsService.list(
+      {
+        search: '',
+        categoryId: '',
+        status: 'all',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
 
     expect(result.data[0].lowStock).toBe(false)
 
@@ -121,13 +131,16 @@ describe('Servicio de productos', () => {
       total: 1,
     })
 
-    const critical = await productsService.list({
-      search: '',
-      categoryId: '',
-      status: 'all',
-      page: 1,
-      pageSize: 20,
-    })
+    const critical = await productsService.list(
+      {
+        search: '',
+        categoryId: '',
+        status: 'all',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
 
     expect(critical.data[0].stock).toBe(0)
     expect(critical.data[0].lowStock).toBe(true)
@@ -149,6 +162,7 @@ describe('Servicio de productos', () => {
         minimumStock: 4,
       },
       'actor-1',
+      organizationId,
       context,
     )
 
@@ -165,6 +179,7 @@ describe('Servicio de productos', () => {
         minimumStock: 4,
       },
       'actor-1',
+      organizationId,
       context,
     )
     expect(result.data.id).toBe('p1')
@@ -174,11 +189,15 @@ describe('Servicio de productos', () => {
     repository.isCodeAvailable.mockResolvedValue(false)
 
     await expect(
-      productsService.checkCodeAvailability('REP-001', 'p1'),
+      productsService.checkCodeAvailability('REP-001', organizationId, 'p1'),
     ).resolves.toEqual({
       data: { code: 'REP-001', available: false },
     })
-    expect(repository.isCodeAvailable).toHaveBeenCalledWith('REP-001', 'p1')
+    expect(repository.isCodeAvailable).toHaveBeenCalledWith(
+      'REP-001',
+      organizationId,
+      'p1',
+    )
   })
 
   it('mapea un código duplicado a un error accionable', async () => {
@@ -203,6 +222,7 @@ describe('Servicio de productos', () => {
           minimumStock: 1,
         },
         'actor-1',
+        organizationId,
         context,
       ),
     ).rejects.toBeInstanceOf(AppError)
@@ -220,6 +240,7 @@ describe('Servicio de productos', () => {
           minimumStock: 1,
         },
         'actor-1',
+        organizationId,
         context,
       ),
     ).rejects.toMatchObject({
@@ -250,6 +271,7 @@ describe('Servicio de productos', () => {
           minimumStock: 1,
         },
         'actor-1',
+        organizationId,
         context,
       ),
     ).rejects.toMatchObject({
@@ -275,6 +297,7 @@ describe('Servicio de productos', () => {
         minimumStock: 4,
       },
       'actor-1',
+      organizationId,
       context,
     )
 
@@ -282,6 +305,7 @@ describe('Servicio de productos', () => {
       'p1',
       expect.objectContaining({ salePrice: 42 }),
       'actor-1',
+      organizationId,
       context,
     )
     expect(result.data.salePrice).toBe(42)
@@ -310,6 +334,7 @@ describe('Servicio de productos', () => {
           minimumStock: 1,
         },
         'actor-1',
+        organizationId,
         context,
       ),
     ).rejects.toMatchObject({
@@ -325,6 +350,7 @@ describe('Servicio de productos', () => {
       'p1',
       false,
       'actor-1',
+      organizationId,
       context,
     )
 
@@ -332,6 +358,7 @@ describe('Servicio de productos', () => {
       'p1',
       false,
       'actor-1',
+      organizationId,
       context,
     )
     expect(result.data.active).toBe(false)
@@ -340,7 +367,9 @@ describe('Servicio de productos', () => {
   it('rechaza productos inexistentes en el detalle', async () => {
     repository.findById.mockResolvedValue(null)
 
-    await expect(productsService.getById('p1')).rejects.toMatchObject({
+    await expect(
+      productsService.getById('p1', organizationId),
+    ).rejects.toMatchObject({
       status: 404,
       code: 'PRODUCT_NOT_FOUND',
     })
@@ -349,10 +378,10 @@ describe('Servicio de productos', () => {
   it('mapea la consulta de detalle y expone el stock de solo lectura', async () => {
     repository.findById.mockResolvedValue(record())
 
-    const result = await productsService.getById('p1')
+    const result = await productsService.getById('p1', organizationId)
     expect(result.data.code).toBe('REP-001')
     expect(result.data.stock).toBe(12)
-    expect(repository.findById).toHaveBeenCalledWith('p1')
+    expect(repository.findById).toHaveBeenCalledWith('p1', organizationId)
   })
 
   it('consulta opciones de catálogo y crea categoría, marca y unidad', async () => {
@@ -369,20 +398,26 @@ describe('Servicio de productos', () => {
       symbol: 'und',
     })
 
-    await expect(productsService.getOptions()).resolves.toEqual({
+    await expect(productsService.getOptions(organizationId)).resolves.toEqual({
       data: {
         categories: [{ id: 'cat1', name: 'Filtros' }],
         brands: [],
         units: [{ id: 'unit1', name: 'Unidad', symbol: 'und' }],
       },
     })
-    await expect(productsService.createCategory('Filtros')).resolves.toEqual({
+    await expect(
+      productsService.createCategory('Filtros', organizationId),
+    ).resolves.toEqual({
       data: { id: 'c1', name: 'Filtros' },
     })
-    await expect(productsService.createBrand('ACDelco')).resolves.toEqual({
+    await expect(
+      productsService.createBrand('ACDelco', organizationId),
+    ).resolves.toEqual({
       data: { id: 'b1', name: 'ACDelco' },
     })
-    await expect(productsService.createUnit('Unidad', 'und')).resolves.toEqual({
+    await expect(
+      productsService.createUnit('Unidad', 'und', organizationId),
+    ).resolves.toEqual({
       data: { id: 'u1', name: 'Unidad', symbol: 'und' },
     })
   })

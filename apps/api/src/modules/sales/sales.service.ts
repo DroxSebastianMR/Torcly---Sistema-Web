@@ -182,11 +182,15 @@ function mapPersistenceError(error: unknown): never {
 
 async function resolveLines(
   lines: SaleLineInput[],
+  organizationId: string,
 ): Promise<Prisma.SaleLineCreateManySaleInput[]> {
   return Promise.all(
     lines.map(async (line) => {
       if (line.type === 'PRODUCT' && line.productId) {
-        const product = await salesRepository.findProductRef(line.productId)
+        const product = await salesRepository.findProductRef(
+          line.productId,
+          organizationId,
+        )
         if (!product)
           throw new AppError(
             404,
@@ -214,7 +218,10 @@ async function resolveLines(
       }
 
       if (line.type === 'SERVICE' && line.serviceId) {
-        const service = await salesRepository.findServiceRef(line.serviceId)
+        const service = await salesRepository.findServiceRef(
+          line.serviceId,
+          organizationId,
+        )
         if (!service)
           throw new AppError(
             404,
@@ -254,8 +261,8 @@ function roundLineSubtotal(unitPrice: number, quantity: number): number {
 }
 
 export const salesService = {
-  async list(filters: SaleFilters) {
-    const result = await salesRepository.list(filters)
+  async list(filters: SaleFilters, organizationId: string) {
+    const result = await salesRepository.list(filters, organizationId)
     const actorNames = await resolveActorNames(result.items)
     return {
       data: result.items.map((sale) => toSummary(sale, actorNames)),
@@ -268,31 +275,35 @@ export const salesService = {
     }
   },
 
-  async getById(id: string) {
-    const sale = await salesRepository.findById(id)
+  async getById(id: string, organizationId: string) {
+    const sale = await salesRepository.findById(id, organizationId)
     if (!sale) throw new AppError(404, 'SALE_NOT_FOUND', 'Venta no encontrada.')
     return { data: toDetail(sale, await resolveActorNames([sale])) }
   },
 
-  async getCatalog(): Promise<{ data: SaleCatalog }> {
-    return { data: await salesRepository.getCatalog() }
+  async getCatalog(organizationId: string): Promise<{ data: SaleCatalog }> {
+    return { data: await salesRepository.getCatalog(organizationId) }
   },
 
   async create(
     input: SaleInput,
     actor: SaleActor | string,
     context: RequestContext,
+    organizationId: string,
     confirm = false,
   ) {
     const customerId = input.customerId ?? null
     if (customerId) {
-      const customer = await salesRepository.findCustomerRef(customerId)
+      const customer = await salesRepository.findCustomerRef(
+        customerId,
+        organizationId,
+      )
       if (!customer)
         throw new AppError(404, 'CUSTOMER_NOT_FOUND', 'Cliente no encontrado.')
     }
 
     assertHasLines(input.lines)
-    const lines = await resolveLines(input.lines)
+    const lines = await resolveLines(input.lines, organizationId)
     const { subtotal, total } = computeSaleTotals(lines)
     const normalizedActor = normalizeActor(actor)
 
@@ -307,6 +318,7 @@ export const salesService = {
         },
         normalizedActor,
         context,
+        organizationId,
       )
       return { data: toDetail(sale) }
     } catch (error) {
@@ -319,25 +331,33 @@ export const salesService = {
     input: SaleInput,
     _actorId: string,
     _context: RequestContext,
+    organizationId: string,
   ) {
     const customerId = input.customerId ?? null
     if (customerId) {
-      const customer = await salesRepository.findCustomerRef(customerId)
+      const customer = await salesRepository.findCustomerRef(
+        customerId,
+        organizationId,
+      )
       if (!customer)
         throw new AppError(404, 'CUSTOMER_NOT_FOUND', 'Cliente no encontrado.')
     }
 
     assertHasLines(input.lines)
-    const lines = await resolveLines(input.lines)
+    const lines = await resolveLines(input.lines, organizationId)
     const { subtotal, total } = computeSaleTotals(lines)
 
     try {
-      const sale = await salesRepository.update(id, {
-        customerId,
-        subtotal,
-        total,
-        lines,
-      })
+      const sale = await salesRepository.update(
+        id,
+        {
+          customerId,
+          subtotal,
+          total,
+          lines,
+        },
+        organizationId,
+      )
       return { data: toDetail(sale) }
     } catch (error) {
       return mapPersistenceError(error)
@@ -348,10 +368,16 @@ export const salesService = {
     id: string,
     actor: SaleActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const normalizedActor = normalizeActor(actor)
     try {
-      const sale = await salesRepository.confirm(id, normalizedActor, context)
+      const sale = await salesRepository.confirm(
+        id,
+        normalizedActor,
+        context,
+        organizationId,
+      )
       return { data: toDetail(sale) }
     } catch (error) {
       return mapPersistenceError(error)
@@ -363,12 +389,14 @@ export const salesService = {
     input: { reason: string },
     actor: SaleActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const sale = await salesRepository.cancel(
       id,
       input.reason,
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return { data: toDetail(sale) }
   },

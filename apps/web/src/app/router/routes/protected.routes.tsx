@@ -2,6 +2,7 @@ import type { RouteObject } from 'react-router-dom'
 import { AppLayout } from '@/layouts/app/app-layout'
 import { ProtectedRoute } from '../guards/protected-route'
 import { PermissionRoute } from '../guards/permission-route'
+import { PlatformRoute } from '../guards/platform-route'
 import { paths } from '../constants/paths'
 export const protectedRoutes: RouteObject[] = [
   {
@@ -10,6 +11,19 @@ export const protectedRoutes: RouteObject[] = [
       {
         element: <AppLayout />,
         children: [
+          {
+            element: <PlatformRoute />,
+            children: [
+              {
+                path: paths.platform,
+                lazy: async () => ({
+                  Component: (
+                    await import('@/features/platform/pages/platform-page')
+                  ).default,
+                }),
+              },
+            ],
+          },
           {
             element: <PermissionRoute permission="dashboard:read" />,
             children: [

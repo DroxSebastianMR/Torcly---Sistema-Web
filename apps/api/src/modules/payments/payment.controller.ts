@@ -1,5 +1,6 @@
 import type { Request, RequestHandler } from 'express'
 import { getRequestContext } from '../auth/auth.middleware.js'
+import { requireOrganizationContext } from '../auth/organization-context.js'
 import {
   paymentCompensateSchema,
   paymentIdParamSchema,
@@ -14,20 +15,27 @@ function actor(request: Request) {
   return { id: request.auth!.id, name: request.auth!.name }
 }
 
+function organizationId(request: Request) {
+  return requireOrganizationContext(request.auth!).id
+}
+
 export const listPayments: RequestHandler = async (request, response) => {
   const parsed = paymentQuerySchema.parse(request.query)
   response.json(
-    await paymentsService.list({
-      ...parsed,
-      from: parsed.from ?? null,
-      to: parsed.to ?? null,
-    }),
+    await paymentsService.list(
+      {
+        ...parsed,
+        from: parsed.from ?? null,
+        to: parsed.to ?? null,
+      },
+      organizationId(request),
+    ),
   )
 }
 
 export const getPayment: RequestHandler = async (request, response) => {
   const { id } = paymentIdSchema.parse(request.params)
-  response.json(await paymentsService.getById(id))
+  response.json(await paymentsService.getById(id, organizationId(request)))
 }
 
 export const createPayment: RequestHandler = async (request, response) => {
@@ -40,6 +48,7 @@ export const createPayment: RequestHandler = async (request, response) => {
         paymentRegisterSchema.parse(request.body),
         actor(request),
         getRequestContext(request, response),
+        organizationId(request),
       ),
     )
 }
@@ -54,6 +63,7 @@ export const createSplitPayment: RequestHandler = async (request, response) => {
         splitPaymentRegisterSchema.parse(request.body),
         actor(request),
         getRequestContext(request, response),
+        organizationId(request),
       ),
     )
 }
@@ -68,6 +78,7 @@ export const compensatePayment: RequestHandler = async (request, response) => {
         paymentCompensateSchema.parse(request.body),
         actor(request),
         getRequestContext(request, response),
+        organizationId(request),
       ),
     )
 }

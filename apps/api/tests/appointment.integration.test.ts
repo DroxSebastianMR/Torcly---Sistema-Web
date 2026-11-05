@@ -19,6 +19,7 @@ function isoInDays(days: number) {
 describeWithDatabase('Citas integradas con PostgreSQL', () => {
   const app = createApp()
   const suffix = randomUUID().slice(0, 8)
+  const organizationCode = `citas-${suffix}`
   const password = `Clave-cit-${suffix}!`
 
   const adminOrder = { roleCode: `admin-citas-${suffix}` }
@@ -54,6 +55,7 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
   }
   const cleanupRoleIds: string[] = []
   const capacityVehicleIds: string[] = []
+  let organizationId = ''
   let sharedPasswordHash = ''
 
   const capacityDate = isoInDays(20)
@@ -68,6 +70,13 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
   beforeAll(async () => {
     await databaseService.connect()
     sharedPasswordHash = await hashPassword(password)
+    const organization = await databaseService.client.organization.create({
+      data: {
+        code: organizationCode,
+        name: `Organización de citas ${suffix}`,
+      },
+    })
+    organizationId = organization.id
 
     const [readPermission, writePermission] = await Promise.all([
       databaseService.client.permission.upsert({
@@ -143,8 +152,17 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
       }),
     ])
 
+    await databaseService.client.organizationMembership.createMany({
+      data: [
+        { organizationId, userId: admin.id, roleId: adminRole.id },
+        { organizationId, userId: reader.id, roleId: readerRole.id },
+        { organizationId, userId: noAccess.id, roleId: noAccessRole.id },
+      ],
+    })
+
     const customerA = await databaseService.client.customer.create({
       data: {
+        organizationId,
         type: 'NATURAL',
         documentNumber: `78${suffix.slice(0, 8)}`,
         firstName: `Cliente A ${suffix}`,
@@ -155,6 +173,7 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
     })
     const customerB = await databaseService.client.customer.create({
       data: {
+        organizationId,
         type: 'LEGAL',
         documentNumber: `20${suffix.slice(0, 8)}`,
         legalName: `Empresa B ${suffix}`,
@@ -164,6 +183,7 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
     })
     const vehicleA = await databaseService.client.vehicle.create({
       data: {
+        organizationId,
         plate: `A-${suffix.slice(0, 6).toUpperCase()}`,
         brand: 'Toyota',
         model: 'Corolla',
@@ -173,6 +193,7 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
     })
     const vehicleB = await databaseService.client.vehicle.create({
       data: {
+        organizationId,
         plate: `B-${suffix.slice(0, 6).toUpperCase()}`,
         brand: 'Hyundai',
         model: 'Accent',
@@ -184,6 +205,7 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
       Array.from({ length: 8 }, (_, index) =>
         databaseService.client.vehicle.create({
           data: {
+            organizationId,
             plate: `C${index}-${suffix.slice(0, 5).toUpperCase()}`,
             brand: 'Toyota',
             model: `Corolla ${index + 1}`,
@@ -235,6 +257,9 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
     await databaseService.client.authSession.deleteMany({
       where: { userId: { in: userIds } },
     })
+    await databaseService.client.organizationMembership.deleteMany({
+      where: { userId: { in: userIds } },
+    })
     await databaseService.client.userRole.deleteMany({
       where: { userId: { in: userIds } },
     })
@@ -246,6 +271,9 @@ describeWithDatabase('Citas integradas con PostgreSQL', () => {
     })
     await databaseService.client.role.deleteMany({
       where: { id: { in: cleanupRoleIds } },
+    })
+    await databaseService.client.organization.deleteMany({
+      where: { id: organizationId },
     })
     await databaseService.disconnect()
   }, 60_000)

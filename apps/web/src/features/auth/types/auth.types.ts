@@ -5,6 +5,13 @@ export interface User {
   email: string
   username: string
   permissions: Permission[]
+  /** Cuenta interna de Torcly, separada de los permisos de un taller. */
+  isPlatformAdmin?: boolean
+  organization?: {
+    id: string
+    code: string
+    name: string
+  }
 }
 export interface LoginInput {
   identifier: string

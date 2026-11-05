@@ -44,6 +44,7 @@ const productId = 'a0000000-0000-4000-8000-000000000003'
 const serviceId = 'a0000000-0000-4000-8000-000000000004'
 const technicianId = 'a0000000-0000-4000-8000-000000000005'
 const appointmentId = 'a0000000-0000-4000-8000-000000000006'
+const organizationId = 'a0000000-0000-4000-8000-000000000007'
 
 const customerRef = {
   id: customerId,
@@ -143,17 +144,23 @@ describe('Servicio de órdenes de taller', () => {
       entregadas: 0,
     })
 
-    const result = await workOrdersService.list({
-      status: 'all',
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await workOrdersService.list(
+      {
+        status: 'all',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
 
-    expect(repository.list).toHaveBeenCalledWith({
-      status: 'all',
-      page: 1,
-      pageSize: 20,
-    })
+    expect(repository.list).toHaveBeenCalledWith(
+      {
+        status: 'all',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
     expect(result).toEqual({
       data: [
         {
@@ -209,14 +216,19 @@ describe('Servicio de órdenes de taller', () => {
 
   it('devuelve una orden por identificador', async () => {
     repository.findById.mockResolvedValue(record())
-    const result = await workOrdersService.getById('work-order-1')
+    const result = await workOrdersService.getById(
+      'work-order-1',
+      organizationId,
+    )
     expect(result.data.code).toBe('OT-000001')
     expect(result.data.diagnosis).toBeNull()
   })
 
   it('lanza 404 cuando la orden no existe', async () => {
     repository.findById.mockResolvedValue(null)
-    await expect(workOrdersService.getById('missing')).rejects.toThrowError(
+    await expect(
+      workOrdersService.getById('missing', organizationId),
+    ).rejects.toThrowError(
       expect.objectContaining({
         status: 404,
         code: 'WORK_ORDER_NOT_FOUND',
@@ -231,7 +243,12 @@ describe('Servicio de órdenes de taller', () => {
     })
     repository.createFromAppointment.mockRejectedValue(error)
     await expect(
-      workOrdersService.createFromAppointment(appointmentId, actor, context),
+      workOrdersService.createFromAppointment(
+        appointmentId,
+        actor,
+        context,
+        organizationId,
+      ),
     ).rejects.toThrowError(
       expect.objectContaining({
         status: 404,
@@ -242,6 +259,7 @@ describe('Servicio de órdenes de taller', () => {
       appointmentId,
       actor,
       context,
+      organizationId,
     )
   })
 
@@ -252,12 +270,14 @@ describe('Servicio de órdenes de taller', () => {
       appointmentId,
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.createFromAppointment).toHaveBeenCalledWith(
       appointmentId,
       actor,
       context,
+      organizationId,
     )
     expect(result.data.code).toBe('OT-000001')
   })
@@ -272,6 +292,7 @@ describe('Servicio de órdenes de taller', () => {
       'Falla en frenos',
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.updateDiagnosis).toHaveBeenCalledWith(
@@ -279,6 +300,7 @@ describe('Servicio de órdenes de taller', () => {
       'Falla en frenos',
       actor,
       context,
+      organizationId,
     )
     expect(result.data.status).toBe('EN_DIAGNOSTICO')
     expect(result.data.diagnosis).toBe('Falla en frenos')
@@ -291,6 +313,7 @@ describe('Servicio de órdenes de taller', () => {
         { lines: [] },
         actor,
         context,
+        organizationId,
       ),
     ).rejects.toThrowError(
       expect.objectContaining({
@@ -349,15 +372,23 @@ describe('Servicio de órdenes de taller', () => {
       },
       actor,
       context,
+      organizationId,
     )
 
-    expect(repository.findProductRef).toHaveBeenCalledWith(productId)
-    expect(repository.findServiceRef).toHaveBeenCalledWith(serviceId)
+    expect(repository.findProductRef).toHaveBeenCalledWith(
+      productId,
+      organizationId,
+    )
+    expect(repository.findServiceRef).toHaveBeenCalledWith(
+      serviceId,
+      organizationId,
+    )
     expect(repository.saveBudget).toHaveBeenCalledWith(
       'work-order-1',
       expect.objectContaining({ subtotal: 200.5, total: 200.5 }),
       actor,
       context,
+      organizationId,
     )
     expect(result.data.subtotal).toBe(200.5)
     expect(result.data.lines).toHaveLength(2)
@@ -398,6 +429,7 @@ describe('Servicio de órdenes de taller', () => {
       },
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.findProductRef).toHaveBeenCalledTimes(1)
@@ -417,6 +449,7 @@ describe('Servicio de órdenes de taller', () => {
       }),
       actor,
       context,
+      organizationId,
     )
   })
 
@@ -432,6 +465,7 @@ describe('Servicio de órdenes de taller', () => {
         },
         actor,
         context,
+        organizationId,
       ),
     ).rejects.toThrowError(
       expect.objectContaining({
@@ -454,6 +488,7 @@ describe('Servicio de órdenes de taller', () => {
         { lines: [{ type: 'PRODUCT', productId, quantity: 1 }] },
         actor,
         context,
+        organizationId,
       ),
     ).rejects.toThrowError(
       expect.objectContaining({
@@ -476,12 +511,14 @@ describe('Servicio de órdenes de taller', () => {
       'work-order-1',
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.sendBudget).toHaveBeenCalledWith(
       'work-order-1',
       actor,
       context,
+      organizationId,
     )
     expect(result.data.status).toBe('PENDIENTE_APROBACION')
   })
@@ -500,6 +537,7 @@ describe('Servicio de órdenes de taller', () => {
       { decision: 'APPROVED' },
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.decide).toHaveBeenCalledWith(
@@ -508,6 +546,7 @@ describe('Servicio de órdenes de taller', () => {
       null,
       actor,
       context,
+      organizationId,
     )
     expect(result.data.status).toBe('APROBADA')
     expect(result.data.approvedBy).toBe('Ana Pérez')
@@ -531,6 +570,7 @@ describe('Servicio de órdenes de taller', () => {
       { technicianId },
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.updateTechnician).toHaveBeenCalledWith(
@@ -538,6 +578,7 @@ describe('Servicio de órdenes de taller', () => {
       technicianId,
       actor,
       context,
+      organizationId,
     )
     expect(result.data.technician).toBe('Luis Torres')
   })
@@ -550,6 +591,7 @@ describe('Servicio de órdenes de taller', () => {
         { technicianId },
         actor,
         context,
+        organizationId,
       ),
     ).rejects.toThrowError(
       expect.objectContaining({
@@ -569,6 +611,7 @@ describe('Servicio de órdenes de taller', () => {
         { technicianId },
         actor,
         context,
+        organizationId,
       ),
     ).rejects.toThrowError(
       expect.objectContaining({
@@ -587,6 +630,7 @@ describe('Servicio de órdenes de taller', () => {
       { technicianId: null },
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.updateTechnician).toHaveBeenCalledWith(
@@ -594,6 +638,7 @@ describe('Servicio de órdenes de taller', () => {
       null,
       actor,
       context,
+      organizationId,
     )
   })
 
@@ -610,12 +655,14 @@ describe('Servicio de órdenes de taller', () => {
       'work-order-1',
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.startExecution).toHaveBeenCalledWith(
       'work-order-1',
       actor,
       context,
+      organizationId,
     )
     expect(result.data.status).toBe('EN_EJECUCION')
     expect(result.data.executionStartedBy).toBe('Ana Pérez')
@@ -640,6 +687,7 @@ describe('Servicio de órdenes de taller', () => {
       { description: 'Revisar frenos traseros', occurredAt: '2026-09-20' },
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.addActivity).toHaveBeenCalledWith(
@@ -647,6 +695,7 @@ describe('Servicio de órdenes de taller', () => {
       { description: 'Revisar frenos traseros', occurredAt: '2026-09-20' },
       actor,
       context,
+      organizationId,
     )
     expect(result.data).toMatchObject({
       id: 'activity-1',
@@ -675,6 +724,7 @@ describe('Servicio de órdenes de taller', () => {
       'activity-1',
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.completeActivity).toHaveBeenCalledWith(
@@ -682,6 +732,7 @@ describe('Servicio de órdenes de taller', () => {
       'activity-1',
       actor,
       context,
+      organizationId,
     )
     expect(result.data.status).toBe('COMPLETADA')
     expect(result.data.completedBy).toBe('Ana Pérez')
@@ -746,9 +797,15 @@ describe('Servicio de órdenes de taller', () => {
       ],
     })
 
-    const result = await workOrdersService.getExecution('work-order-1')
+    const result = await workOrdersService.getExecution(
+      'work-order-1',
+      organizationId,
+    )
 
-    expect(repository.getExecution).toHaveBeenCalledWith('work-order-1')
+    expect(repository.getExecution).toHaveBeenCalledWith(
+      'work-order-1',
+      organizationId,
+    )
     expect(result.data).toMatchObject({
       workOrderId: 'work-order-1',
       code: 'OT-000001',
@@ -788,6 +845,7 @@ describe('Servicio de órdenes de taller', () => {
       { requestId, items: [{ lineId: 'line-1', quantity: 1 }] },
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.consume).toHaveBeenCalledWith(
@@ -795,6 +853,7 @@ describe('Servicio de órdenes de taller', () => {
       { requestId, items: [{ lineId: 'line-1', quantity: 1 }] },
       actor,
       context,
+      organizationId,
     )
     expect(result.data.registrations).toEqual([
       {
@@ -829,6 +888,7 @@ describe('Servicio de órdenes de taller', () => {
       },
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.returnProducts).toHaveBeenCalledWith(
@@ -839,6 +899,7 @@ describe('Servicio de órdenes de taller', () => {
       },
       actor,
       context,
+      organizationId,
     )
     expect(result.data.registrations).toHaveLength(1)
   })
@@ -856,6 +917,7 @@ describe('Servicio de órdenes de taller', () => {
       {},
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.finalize).toHaveBeenCalledWith(
@@ -863,6 +925,7 @@ describe('Servicio de órdenes de taller', () => {
       {},
       actor,
       context,
+      organizationId,
     )
     expect(result.data.status).toBe('LISTA_PARA_ENTREGA')
     expect(result.data.readyForDeliveryAt).toBe('2026-09-27T00:00:00.000Z')
@@ -883,6 +946,7 @@ describe('Servicio de órdenes de taller', () => {
       { notes: 'Cliente retiró el vehículo' },
       actor,
       context,
+      organizationId,
     )
 
     expect(repository.deliver).toHaveBeenCalledWith(
@@ -890,6 +954,7 @@ describe('Servicio de órdenes de taller', () => {
       'Cliente retiró el vehículo',
       actor,
       context,
+      organizationId,
     )
     expect(result.data.status).toBe('ENTREGADA')
     expect(result.data.deliveredBy).toBe('Ana Pérez')
@@ -916,6 +981,7 @@ describe('Servicio de órdenes de taller', () => {
       {},
       actor,
       context,
+      organizationId,
     )
 
     expect(result.data.billing).toEqual({
@@ -979,15 +1045,23 @@ describe('Servicio de órdenes de taller', () => {
       total: 1,
     })
 
-    const result = await workOrdersService.getVehicleHistory(vehicleId, {
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await workOrdersService.getVehicleHistory(
+      vehicleId,
+      {
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
 
-    expect(repository.listVehicleHistory).toHaveBeenCalledWith(vehicleId, {
-      page: 1,
-      pageSize: 20,
-    })
+    expect(repository.listVehicleHistory).toHaveBeenCalledWith(
+      vehicleId,
+      {
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
     expect(result.data[0]).toMatchObject({
       code: 'OT-000001',
       diagnosis: 'Falla en el sistema de frenos',

@@ -29,6 +29,7 @@ export interface NotificationFilters {
 }
 
 export interface NotificationCreateInput {
+  organizationId: string
   userId: string
   title: string
   message: string
@@ -38,6 +39,11 @@ export interface NotificationCreateInput {
 }
 
 export interface OperationalNotificationEvent {
+  /**
+   * Las notificaciones operativas pertenecen siempre a un taller. La
+   * plataforma no recibe eventos de la operación de sus organizaciones.
+   */
+  organizationId: string
   permission: string
   type: NotificationType
   preferenceKey?: keyof NotificationPreferences

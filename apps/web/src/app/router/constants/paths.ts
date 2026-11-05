@@ -2,6 +2,7 @@ export const paths = {
   login: '/login',
   forgotPassword: '/recuperar-contrasena',
   resetPassword: '/restablecer-contrasena',
+  platform: '/plataforma',
   dashboard: '/dashboard',
   assistantHistory: '/historial-ia',
   products: '/productos',

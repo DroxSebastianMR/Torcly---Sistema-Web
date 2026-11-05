@@ -5,6 +5,11 @@ import {
   operationsSummaryQuerySchema,
 } from './operations.schemas.js'
 import { operationsService } from './operations.service.js'
+import { requireOrganizationContext } from '../auth/organization-context.js'
+
+function organizationId(request: Parameters<RequestHandler>[0]) {
+  return requireOrganizationContext(request.auth!).id
+}
 
 export const getOperationsSummary: RequestHandler = async (
   request,
@@ -15,6 +20,7 @@ export const getOperationsSummary: RequestHandler = async (
     await operationsService.getSummary(
       { from: parsed.from ?? null, to: parsed.to ?? null },
       request.auth?.permissions ?? [],
+      organizationId(request),
     ),
   )
 }
@@ -35,6 +41,7 @@ export const getOperationsAttention: RequestHandler = async (
         pageSize: parsed.pageSize,
       },
       request.auth?.permissions ?? [],
+      organizationId(request),
     ),
   )
 }

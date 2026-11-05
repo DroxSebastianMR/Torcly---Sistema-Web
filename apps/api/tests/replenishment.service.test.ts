@@ -19,6 +19,8 @@ import type {
   ReplenishmentRunDetailFilters,
 } from '../src/modules/replenishment/replenishment.types.js'
 
+const organizationId = 'organization-1'
+
 const inputs: ReplenishmentInputs = {
   products: [
     {
@@ -104,8 +106,10 @@ describe('Servicio de reabastecimiento', () => {
   it('calcula elegibilidad ordenada, conteos y sin exponer UUIDs', async () => {
     repository.loadInputs.mockResolvedValue(inputs)
 
-    const result =
-      await replenishmentService.getEligibility(eligibilityFilters())
+    const result = await replenishmentService.getEligibility(
+      eligibilityFilters(),
+      organizationId,
+    )
 
     expect(result.period).toEqual({ from: '2026-10-01', to: '2026-10-30' })
     expect(result.periodDays).toBe(30)
@@ -148,10 +152,13 @@ describe('Servicio de reabastecimiento', () => {
       total: 4,
       totalPages: 1,
     })
-    expect(repository.loadInputs).toHaveBeenCalledWith({
-      from: '2026-10-01',
-      to: '2026-10-30',
-    })
+    expect(repository.loadInputs).toHaveBeenCalledWith(
+      {
+        from: '2026-10-01',
+        to: '2026-10-30',
+      },
+      organizationId,
+    )
   })
 
   it('filtra por búsqueda, prioridad y elegibilidad sobre el total', async () => {
@@ -159,18 +166,21 @@ describe('Servicio de reabastecimiento', () => {
 
     const searched = await replenishmentService.getEligibility(
       eligibilityFilters({ search: 'aceite' }),
+      organizationId,
     )
     expect(searched.items.map((item) => item.code)).toEqual(['P-002'])
     expect(searched.counts.total).toBe(4)
 
     const critical = await replenishmentService.getEligibility(
       eligibilityFilters({ priority: 'CRITICA' }),
+      organizationId,
     )
     expect(critical.items).toEqual([])
     expect(critical.pagination.total).toBe(0)
 
     const ineligible = await replenishmentService.getEligibility(
       eligibilityFilters({ eligible: false }),
+      organizationId,
     )
     expect(ineligible.items.map((item) => item.code)).toEqual([
       'P-004',
@@ -183,6 +193,7 @@ describe('Servicio de reabastecimiento', () => {
 
     const first = await replenishmentService.getEligibility(
       eligibilityFilters({ page: 1, pageSize: 2 }),
+      organizationId,
     )
     expect(first.items).toHaveLength(2)
     expect(first.pagination).toEqual({
@@ -194,6 +205,7 @@ describe('Servicio de reabastecimiento', () => {
 
     const outside = await replenishmentService.getEligibility(
       eligibilityFilters({ page: 5, pageSize: 2 }),
+      organizationId,
     )
     expect(outside.items).toEqual([])
     expect(outside.pagination.totalPages).toBe(2)
@@ -203,6 +215,7 @@ describe('Servicio de reabastecimiento', () => {
     const inverted = await replenishmentService
       .getEligibility(
         eligibilityFilters({ from: '2026-10-10', to: '2026-10-01' }),
+        organizationId,
       )
       .catch((caught: unknown) => caught)
     expect(inverted).toMatchObject({
@@ -211,7 +224,7 @@ describe('Servicio de reabastecimiento', () => {
     })
 
     const coverage = await replenishmentService
-      .getEligibility(eligibilityFilters({ coverageDays: 0 }))
+      .getEligibility(eligibilityFilters({ coverageDays: 0 }), organizationId)
       .catch((caught: unknown) => caught)
     expect(coverage).toMatchObject({
       status: 400,
@@ -233,14 +246,17 @@ describe('Servicio de reabastecimiento', () => {
       },
       { id: 'user-1', name: 'Admin Demo' },
       { requestId: 'req-1', ipAddress: '127.0.0.1' },
+      organizationId,
     )
 
     expect(result).toEqual({ run: runSummary, replayed: false })
     expect(repository.createRun).toHaveBeenCalledTimes(1)
-    const [input, actor, context] = repository.createRun.mock.calls[0] as [
+    const [input, actor, context, organization] = repository.createRun.mock
+      .calls[0] as [
       ReplenishmentRunCreateInput,
       { id: string; name: string },
       unknown,
+      string,
     ]
     expect(input).toMatchObject({
       strategyVersion: 'v1',
@@ -261,6 +277,7 @@ describe('Servicio de reabastecimiento', () => {
     ])
     expect(actor).toEqual({ id: 'user-1', name: 'Admin Demo' })
     expect(context).toEqual({ requestId: 'req-1', ipAddress: '127.0.0.1' })
+    expect(organization).toBe(organizationId)
   })
 
   it('propaga el replay de una clave de idempotencia existente', async () => {
@@ -276,6 +293,7 @@ describe('Servicio de reabastecimiento', () => {
       },
       { id: 'user-1', name: 'Admin Demo' },
       {},
+      organizationId,
     )
 
     expect(result.replayed).toBe(true)
@@ -283,12 +301,15 @@ describe('Servicio de reabastecimiento', () => {
 
   it('pagina el historial y el detalle persistido', async () => {
     repository.listRuns.mockResolvedValue({ items: [runSummary], total: 3 })
-    const history = await replenishmentService.listRuns({
-      from: null,
-      to: null,
-      page: 2,
-      pageSize: 1,
-    })
+    const history = await replenishmentService.listRuns(
+      {
+        from: null,
+        to: null,
+        page: 2,
+        pageSize: 1,
+      },
+      organizationId,
+    )
     expect(history.items).toEqual([runSummary])
     expect(history.pagination).toEqual({
       page: 2,
@@ -333,6 +354,7 @@ describe('Servicio de reabastecimiento', () => {
     const detail = await replenishmentService.getRunDetail(
       'RAB-000007',
       detailFilters,
+      organizationId,
     )
     expect(detail.run).toEqual(runSummary)
     expect(detail.items).toHaveLength(1)
@@ -340,6 +362,7 @@ describe('Servicio de reabastecimiento', () => {
     expect(repository.loadRunDetail).toHaveBeenCalledWith(
       'RAB-000007',
       detailFilters,
+      organizationId,
     )
   })
 })

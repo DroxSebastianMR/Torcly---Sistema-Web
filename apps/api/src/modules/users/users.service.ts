@@ -12,7 +12,7 @@ import type {
 } from './users.types.js'
 
 function toResponse(user: UserRecord): UserResponse {
-  const roles = user.roles.map(({ role }) => ({
+  const roles = user.organizationMemberships.map(({ role }) => ({
     id: role.id,
     code: role.code,
     name: role.name,
@@ -71,15 +71,15 @@ async function assertRoleAvailable(roleId: string) {
   return role
 }
 
-async function assertUserExists(id: string) {
-  const user = await usersRepository.findById(id)
+async function assertUserExists(id: string, organizationId: string) {
+  const user = await usersRepository.findById(id, organizationId)
   if (!user) throw new AppError(404, 'USER_NOT_FOUND', 'Usuario no encontrado.')
   return user
 }
 
 export const usersService = {
-  async list(filters: UserListFilters) {
-    const result = await usersRepository.list(filters)
+  async list(filters: UserListFilters, organizationId: string) {
+    const result = await usersRepository.list(filters, organizationId)
     return {
       data: result.items.map(toResponse),
       pagination: {
@@ -91,11 +91,15 @@ export const usersService = {
     }
   },
 
-  async getById(id: string) {
-    return { data: toResponse(await assertUserExists(id)) }
+  async getById(id: string, organizationId: string) {
+    return { data: toResponse(await assertUserExists(id, organizationId)) }
   },
 
-  async create(input: CreateUserInput, context: RequestContext) {
+  async create(
+    input: CreateUserInput,
+    context: RequestContext,
+    organizationId: string,
+  ) {
     await assertRoleAvailable(input.roleId)
     const passwordHash = await hashPassword(input.password)
 
@@ -111,6 +115,7 @@ export const usersService = {
               roleId: input.roleId,
             },
             context,
+            organizationId,
           ),
         ),
       }
@@ -119,11 +124,21 @@ export const usersService = {
     }
   },
 
-  async update(id: string, input: UpdateUserInput, context: RequestContext) {
-    await assertUserExists(id)
+  async update(
+    id: string,
+    input: UpdateUserInput,
+    context: RequestContext,
+    organizationId: string,
+  ) {
+    await assertUserExists(id, organizationId)
 
     try {
-      const user = await usersRepository.update(id, input, context)
+      const user = await usersRepository.update(
+        id,
+        input,
+        context,
+        organizationId,
+      )
       authService.invalidateUserSessions(user.id)
       return {
         data: toResponse(user),
@@ -138,6 +153,7 @@ export const usersService = {
     roleId: string,
     actorId: string,
     context: RequestContext,
+    organizationId: string,
   ) {
     if (actorId === id) {
       throw new AppError(
@@ -147,16 +163,19 @@ export const usersService = {
       )
     }
 
-    const current = await assertUserExists(id)
+    const current = await assertUserExists(id, organizationId)
     const target = await assertRoleAvailable(roleId)
-    const fromRoleCode = current.roles[0]?.role.code
+    const fromRoleCode = current.organizationMemberships[0]?.role.code
     const toRoleCode = target.code
 
     try {
-      const user = await usersRepository.updateRole(id, roleId, context, {
-        fromRoleCode,
-        toRoleCode,
-      })
+      const user = await usersRepository.updateRole(
+        id,
+        roleId,
+        context,
+        { fromRoleCode, toRoleCode },
+        organizationId,
+      )
       authService.invalidateUserSessions(user.id)
       return {
         data: toResponse(user),
@@ -171,6 +190,7 @@ export const usersService = {
     active: boolean,
     actorId: string,
     context: RequestContext,
+    organizationId: string,
   ) {
     if (!active && actorId === id) {
       throw new AppError(
@@ -180,10 +200,15 @@ export const usersService = {
       )
     }
 
-    await assertUserExists(id)
+    await assertUserExists(id, organizationId)
 
     try {
-      const user = await usersRepository.updateStatus(id, active, context)
+      const user = await usersRepository.updateStatus(
+        id,
+        active,
+        context,
+        organizationId,
+      )
       authService.invalidateUserSessions(user.id)
       return {
         data: toResponse(user),

@@ -19,6 +19,7 @@ const context = {
   requestId: 'req-1',
   ipAddress: '127.0.0.1',
 }
+const organizationId = 'organization-1'
 
 function record(overrides: Record<string, unknown> = {}) {
   return {
@@ -47,19 +48,15 @@ describe('Servicio de clientes', () => {
   it('lista clientes con la respuesta mapeada y paginación', async () => {
     repository.list.mockResolvedValue({ items: [record()], total: 1 })
 
-    const result = await customersService.list({
+    const filters = {
       search: 'maria',
-      type: 'all',
+      type: 'all' as const,
       page: 1,
       pageSize: 20,
-    })
+    }
+    const result = await customersService.list(filters, organizationId)
 
-    expect(repository.list).toHaveBeenCalledWith({
-      search: 'maria',
-      type: 'all',
-      page: 1,
-      pageSize: 20,
-    })
+    expect(repository.list).toHaveBeenCalledWith(filters, organizationId)
     expect(result).toEqual({
       data: [
         {
@@ -92,6 +89,7 @@ describe('Servicio de clientes', () => {
         email: 'maria@torcly.local',
       },
       'actor-1',
+      organizationId,
       context,
     )
 
@@ -104,6 +102,7 @@ describe('Servicio de clientes', () => {
         legalName: null,
         phone: '987654321',
         email: 'maria@torcly.local',
+        organizationId,
       },
       'actor-1',
       context,
@@ -130,6 +129,7 @@ describe('Servicio de clientes', () => {
         phone: '+51987654321',
       },
       'actor-1',
+      organizationId,
       context,
     )
 
@@ -142,6 +142,7 @@ describe('Servicio de clientes', () => {
         legalName: 'Torcly Repuestos S.A.C.',
         phone: '+51987654321',
         email: null,
+        organizationId,
       },
       'actor-1',
       context,
@@ -167,6 +168,7 @@ describe('Servicio de clientes', () => {
           phone: '987654321',
         },
         'actor-1',
+        organizationId,
         context,
       ),
     ).rejects.toMatchObject({
@@ -192,6 +194,7 @@ describe('Servicio de clientes', () => {
           phone: '987654321',
         },
         'actor-1',
+        organizationId,
         context,
       ),
     ).rejects.toBeInstanceOf(AppError)
@@ -204,6 +207,7 @@ describe('Servicio de clientes', () => {
           phone: '987654321',
         },
         'actor-1',
+        organizationId,
         context,
       ),
     ).rejects.toMatchObject({
@@ -215,8 +219,8 @@ describe('Servicio de clientes', () => {
   it('consulta el detalle y mapea las fechas', async () => {
     repository.findById.mockResolvedValue(record())
 
-    const result = await customersService.getById('c1')
+    const result = await customersService.getById('c1', organizationId)
     expect(result.data.createdAt).toBe('2026-01-02T00:00:00.000Z')
-    expect(repository.findById).toHaveBeenCalledWith('c1')
+    expect(repository.findById).toHaveBeenCalledWith('c1', organizationId)
   })
 })

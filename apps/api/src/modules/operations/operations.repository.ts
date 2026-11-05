@@ -106,10 +106,11 @@ export const operationsRepository = {
   async countAppointmentsByStatus(
     from: string | null,
     to: string | null,
+    organizationId: string,
   ): Promise<Record<AppointmentStatus, number>> {
     const grouped = await databaseService.client.appointment.groupBy({
       by: ['status'],
-      where: { ...datePeriodWhere(from, to) },
+      where: { organizationId, ...datePeriodWhere(from, to) },
       _count: { _all: true },
     })
     const result: Record<AppointmentStatus, number> = {
@@ -126,8 +127,10 @@ export const operationsRepository = {
     to: string | null,
     skip: number,
     take: number,
+    organizationId: string,
   ): Promise<{ items: AppointmentAttentionRow[]; total: number }> {
     const where: Prisma.AppointmentWhereInput = {
+      organizationId,
       ...datePeriodWhere(from, to),
       status: 'PROGRAMADA',
     }
@@ -155,10 +158,11 @@ export const operationsRepository = {
   async countWorkOrdersByStatus(
     from: string | null,
     to: string | null,
+    organizationId: string,
   ): Promise<Record<WorkOrderStatus, number>> {
     const grouped = await databaseService.client.workOrder.groupBy({
       by: ['status'],
-      where: { ...createdAtPeriod(from, to) },
+      where: { organizationId, ...createdAtPeriod(from, to) },
       _count: { _all: true },
     })
     const result = Object.fromEntries(
@@ -173,8 +177,10 @@ export const operationsRepository = {
     to: string | null,
     skip: number,
     take: number,
+    organizationId: string,
   ): Promise<{ items: WorkOrderAttentionRow[]; total: number }> {
     const where: Prisma.WorkOrderWhereInput = {
+      organizationId,
       ...createdAtPeriod(from, to),
       status: { in: [...WORK_ORDER_ATTENTION_STATUSES] },
     }
@@ -201,9 +207,14 @@ export const operationsRepository = {
   async summarizeSales(
     from: string | null,
     to: string | null,
+    organizationId: string,
   ): Promise<{ confirmedCount: number; confirmedAmount: number }> {
     const aggregate = await databaseService.client.sale.aggregate({
-      where: { status: 'CONFIRMED', ...confirmedAtPeriod(from, to) },
+      where: {
+        organizationId,
+        status: 'CONFIRMED',
+        ...confirmedAtPeriod(from, to),
+      },
       _count: { _all: true },
       _sum: { total: true },
     })
@@ -218,8 +229,10 @@ export const operationsRepository = {
     to: string | null,
     skip: number,
     take: number,
+    organizationId: string,
   ): Promise<{ items: SaleAttentionRow[]; total: number }> {
     const where: Prisma.SaleWhereInput = {
+      organizationId,
       status: 'CONFIRMED',
       ...confirmedAtPeriod(from, to),
     }
@@ -252,12 +265,17 @@ export const operationsRepository = {
     }
   },
 
-  async listPendingObligations(): Promise<PendingObligationRow[]> {
-    const rows = await paymentsRepository.listObligations({
-      search: '',
-      from: null,
-      to: null,
-    })
+  async listPendingObligations(
+    organizationId: string,
+  ): Promise<PendingObligationRow[]> {
+    const rows = await paymentsRepository.listObligations(
+      {
+        search: '',
+        from: null,
+        to: null,
+      },
+      organizationId,
+    )
     return rows.map((row) => ({
       id: row.id,
       code: row.code,
@@ -268,7 +286,7 @@ export const operationsRepository = {
     }))
   },
 
-  async summarizePendingObligations(): Promise<{
+  async summarizePendingObligations(organizationId: string): Promise<{
     pendingCount: number
     pendingAmount: number
   }> {
@@ -276,7 +294,7 @@ export const operationsRepository = {
       'operations.payments.confirmed_sales',
       () =>
         databaseService.client.sale.findMany({
-          where: { status: 'CONFIRMED', total: { gt: 0 } },
+          where: { organizationId, status: 'CONFIRMED', total: { gt: 0 } },
           select: { id: true, total: true },
         }),
     )
@@ -287,7 +305,10 @@ export const operationsRepository = {
       () =>
         databaseService.client.payment.groupBy({
           by: ['saleId', 'type'],
-          where: { saleId: { in: sales.map((sale) => sale.id) } },
+          where: {
+            organizationId,
+            saleId: { in: sales.map((sale) => sale.id) },
+          },
           _sum: { amount: true },
         }),
     )
@@ -314,10 +335,10 @@ export const operationsRepository = {
     )
   },
 
-  async listLowStockProducts(): Promise<LowStockRow[]> {
+  async listLowStockProducts(organizationId: string): Promise<LowStockRow[]> {
     const [products, grouped] = await Promise.all([
       databaseService.client.product.findMany({
-        where: { active: true },
+        where: { organizationId, active: true },
         select: {
           id: true,
           code: true,
@@ -329,7 +350,7 @@ export const operationsRepository = {
       }),
       databaseService.client.inventoryMovement.groupBy({
         by: ['productId', 'type'],
-        where: { status: 'CONFIRMED' },
+        where: { organizationId, status: 'CONFIRMED' },
         _sum: { quantity: true },
       }),
     ])
@@ -357,18 +378,18 @@ export const operationsRepository = {
       .sort((a, b) => a.name.localeCompare(b.name))
   },
 
-  async countLowStockProducts(): Promise<number> {
+  async countLowStockProducts(organizationId: string): Promise<number> {
     const [products, grouped] = await Promise.all([
       databaseService.measure('operations.inventory.active_products', () =>
         databaseService.client.product.findMany({
-          where: { active: true },
+          where: { organizationId, active: true },
           select: { id: true, minimumStock: true },
         }),
       ),
       databaseService.measure('operations.inventory.grouped_movements', () =>
         databaseService.client.inventoryMovement.groupBy({
           by: ['productId', 'type'],
-          where: { status: 'CONFIRMED' },
+          where: { organizationId, status: 'CONFIRMED' },
           _sum: { quantity: true },
         }),
       ),

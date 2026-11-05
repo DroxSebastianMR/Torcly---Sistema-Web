@@ -510,12 +510,14 @@ function assertNoDuplicateServices(lines: WorkOrderLineInput[]) {
 
 async function resolveLines(
   lines: WorkOrderLineInput[],
+  organizationId: string,
 ): Promise<Prisma.WorkOrderLineCreateManyWorkOrderInput[]> {
   return Promise.all(
     lines.map(async (line) => {
       if (line.type === 'PRODUCT' && line.productId) {
         const product = await workOrdersRepository.findProductRef(
           line.productId,
+          organizationId,
         )
         if (!product)
           throw new AppError(
@@ -546,6 +548,7 @@ async function resolveLines(
       if (line.type === 'SERVICE' && line.serviceId) {
         const service = await workOrdersRepository.findServiceRef(
           line.serviceId,
+          organizationId,
         )
         if (!service)
           throw new AppError(
@@ -582,11 +585,11 @@ async function resolveLines(
 }
 
 export const workOrdersService = {
-  async list(filters: WorkOrderFilters) {
-    const result = await workOrdersRepository.list(filters)
+  async list(filters: WorkOrderFilters, organizationId: string) {
+    const result = await workOrdersRepository.list(filters, organizationId)
     const [actorNames, stats] = await Promise.all([
       resolveActorNames(result.items),
-      workOrdersRepository.getStats(),
+      workOrdersRepository.getStats(organizationId),
     ])
     return {
       data: result.items.map((item) => toSummary(item, actorNames)),
@@ -600,8 +603,8 @@ export const workOrdersService = {
     }
   },
 
-  async getById(id: string) {
-    const order = await workOrdersRepository.findById(id)
+  async getById(id: string, organizationId: string) {
+    const order = await workOrdersRepository.findById(id, organizationId)
     if (!order)
       throw new AppError(
         404,
@@ -611,13 +614,13 @@ export const workOrdersService = {
     return { data: toDetail(order, await resolveActorNames([order])) }
   },
 
-  async getCatalog() {
-    return { data: await workOrdersRepository.getCatalog() }
+  async getCatalog(organizationId: string) {
+    return { data: await workOrdersRepository.getCatalog(organizationId) }
   },
 
-  async getTechnicians() {
+  async getTechnicians(organizationId: string) {
     return {
-      data: (await workOrdersRepository.listTechnicians()).map(
+      data: (await workOrdersRepository.listTechnicians(organizationId)).map(
         (technician) => ({
           id: technician.id,
           displayName: technician.fullName,
@@ -630,12 +633,14 @@ export const workOrdersService = {
     appointmentId: string,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     try {
       const order = await workOrdersRepository.createFromAppointment(
         appointmentId,
         normalizeActor(actor),
         context,
+        organizationId,
       )
       return { data: order }
     } catch (error) {
@@ -648,12 +653,14 @@ export const workOrdersService = {
     diagnosis: string,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const order = await workOrdersRepository.updateDiagnosis(
       id,
       diagnosis,
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return { data: toDetail(order, await resolveActorNames([order])) }
   },
@@ -663,16 +670,21 @@ export const workOrdersService = {
     input: WorkOrderBudgetInput,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     assertHasLines(input.lines)
     assertNoDuplicateServices(input.lines)
-    const lines = await resolveLines(consolidateBudgetProductLines(input.lines))
+    const lines = await resolveLines(
+      consolidateBudgetProductLines(input.lines),
+      organizationId,
+    )
     const { subtotal, total } = computeWorkOrderTotals(lines)
     const order = await workOrdersRepository.saveBudget(
       id,
       { lines, subtotal, total },
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return { data: toDetail(order, await resolveActorNames([order])) }
   },
@@ -681,11 +693,13 @@ export const workOrdersService = {
     id: string,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const order = await workOrdersRepository.sendBudget(
       id,
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return { data: toDetail(order, await resolveActorNames([order])) }
   },
@@ -695,6 +709,7 @@ export const workOrdersService = {
     input: WorkOrderDecisionInput,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const order = await workOrdersRepository.decide(
       id,
@@ -702,6 +717,7 @@ export const workOrdersService = {
       input.notes ?? null,
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return { data: toDetail(order, await resolveActorNames([order])) }
   },
@@ -711,10 +727,12 @@ export const workOrdersService = {
     input: WorkOrderTechnicianInput,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     if (input.technicianId) {
       const technician = await workOrdersRepository.findTechnicianRef(
         input.technicianId,
+        organizationId,
       )
       if (!technician)
         throw new AppError(
@@ -735,6 +753,7 @@ export const workOrdersService = {
       input.technicianId,
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return { data: toDetail(order, await resolveActorNames([order])) }
   },
@@ -743,17 +762,22 @@ export const workOrdersService = {
     id: string,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const order = await workOrdersRepository.startExecution(
       id,
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return { data: toDetail(order, await resolveActorNames([order])) }
   },
 
-  async getExecution(id: string) {
-    const execution = await workOrdersRepository.getExecution(id)
+  async getExecution(id: string, organizationId: string) {
+    const execution = await workOrdersRepository.getExecution(
+      id,
+      organizationId,
+    )
     return { data: toExecutionResponse(execution) }
   },
 
@@ -762,6 +786,7 @@ export const workOrdersService = {
     input: WorkOrderActivityInput,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const activity = await workOrdersRepository.addActivity(
       id,
@@ -771,6 +796,7 @@ export const workOrdersService = {
       },
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return { data: toActivityResponse(activity) }
   },
@@ -780,12 +806,14 @@ export const workOrdersService = {
     activityId: string,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const activity = await workOrdersRepository.completeActivity(
       id,
       activityId,
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return { data: toActivityResponse(activity) }
   },
@@ -795,12 +823,14 @@ export const workOrdersService = {
     input: WorkOrderConsumptionInput,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const result = await workOrdersRepository.consume(
       id,
       input,
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return {
       data: {
@@ -815,12 +845,14 @@ export const workOrdersService = {
     input: WorkOrderReturnInput,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const result = await workOrdersRepository.returnProducts(
       id,
       input,
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return {
       data: {
@@ -835,14 +867,17 @@ export const workOrdersService = {
     input: WorkOrderFinalizeInput,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const order = await workOrdersRepository.finalize(
       id,
       input,
       normalizeActor(actor),
       context,
+      organizationId,
     )
     await notificationsService.notifyUsersSafely({
+      organizationId,
       permission: 'workshop:read',
       type: 'WORK_ORDER_READY',
       preferenceKey: 'workOrderReady',
@@ -858,12 +893,14 @@ export const workOrdersService = {
     input: WorkOrderDeliveryInput,
     actor: WorkOrderActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const order = await workOrdersRepository.deliver(
       id,
       input.notes ?? null,
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return { data: toDetail(order, await resolveActorNames([order])) }
   },
@@ -871,10 +908,12 @@ export const workOrdersService = {
   async getVehicleHistory(
     vehicleId: string,
     filters: WorkOrderVehicleHistoryFilters,
+    organizationId: string,
   ) {
     const result = await workOrdersRepository.listVehicleHistory(
       vehicleId,
       filters,
+      organizationId,
     )
     return {
       data: result.items.map(toVehicleHistoryItem),

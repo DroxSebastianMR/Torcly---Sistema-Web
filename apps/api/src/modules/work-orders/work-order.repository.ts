@@ -198,9 +198,13 @@ export interface WorkOrderConsumeResult {
   registrations: WorkOrderMovementRegistration[]
 }
 
-function buildWhere(filters: WorkOrderFilters): Prisma.WorkOrderWhereInput {
+function buildWhere(
+  filters: WorkOrderFilters,
+  organizationId: string,
+): Prisma.WorkOrderWhereInput {
   const search = filters.search?.trim()
   return {
+    organizationId,
     ...(filters.status === 'all' ? {} : { status: filters.status }),
     ...(filters.technicianId ? { technicianId: filters.technicianId } : {}),
     ...(search
@@ -242,6 +246,7 @@ function auditData(
   return {
     event,
     userId: actorId,
+    organizationId: context.organizationId,
     identifier,
     requestId: context.requestId,
     ipAddress: context.ipAddress,
@@ -266,9 +271,10 @@ async function lockAppointment(
 async function requireOrder(
   transaction: Prisma.TransactionClient,
   orderId: string,
+  organizationId: string,
 ): Promise<WorkOrderOrderRow> {
-  const order = await transaction.workOrder.findUnique({
-    where: { id: orderId },
+  const order = await transaction.workOrder.findFirst({
+    where: { id: orderId, organizationId },
     select: { id: true, code: true, status: true },
   })
   if (!order)
@@ -281,8 +287,8 @@ async function requireOrder(
 }
 
 export const workOrdersRepository = {
-  async list(filters: WorkOrderFilters) {
-    const where = buildWhere(filters)
+  async list(filters: WorkOrderFilters, organizationId: string) {
+    const where = buildWhere(filters, organizationId)
     const [items, total] = await Promise.all([
       databaseService.client.workOrder.findMany({
         select: workOrderSummarySelect,
@@ -296,16 +302,19 @@ export const workOrdersRepository = {
     return { items, total }
   },
 
-  findById(id: string): Promise<WorkOrderRecord | null> {
-    return databaseService.client.workOrder.findUnique({
-      where: { id },
+  findById(
+    id: string,
+    organizationId: string,
+  ): Promise<WorkOrderRecord | null> {
+    return databaseService.client.workOrder.findFirst({
+      where: { id, organizationId },
       include: workOrderDetailInclude,
     })
   },
 
-  findProductRef(id: string) {
-    return databaseService.client.product.findUnique({
-      where: { id },
+  findProductRef(id: string, organizationId: string) {
+    return databaseService.client.product.findFirst({
+      where: { id, organizationId },
       select: {
         id: true,
         code: true,
@@ -317,9 +326,9 @@ export const workOrdersRepository = {
     })
   },
 
-  findServiceRef(id: string) {
-    return databaseService.client.service.findUnique({
-      where: { id },
+  findServiceRef(id: string, organizationId: string) {
+    return databaseService.client.service.findFirst({
+      where: { id, organizationId },
       select: {
         id: true,
         code: true,
@@ -330,9 +339,9 @@ export const workOrdersRepository = {
     })
   },
 
-  findTechnicianRef(id: string) {
-    return databaseService.client.technician.findUnique({
-      where: { id },
+  findTechnicianRef(id: string, organizationId: string) {
+    return databaseService.client.technician.findFirst({
+      where: { id, organizationId },
       select: { id: true, active: true, fullName: true },
     })
   },
@@ -344,10 +353,11 @@ export const workOrdersRepository = {
     })
   },
 
-  async getStats() {
+  async getStats(organizationId: string) {
     const grouped = await databaseService.client.workOrder.groupBy({
       by: ['status'],
       _count: { _all: true },
+      where: { organizationId },
     })
     const counts = new Map(
       grouped.map((item) => [item.status, item._count._all]),
@@ -365,10 +375,10 @@ export const workOrdersRepository = {
     }
   },
 
-  async getCatalog() {
+  async getCatalog(organizationId: string) {
     const [products, services] = await Promise.all([
       databaseService.client.product.findMany({
-        where: { active: true },
+        where: { active: true, organizationId },
         select: {
           id: true,
           code: true,
@@ -379,7 +389,7 @@ export const workOrdersRepository = {
         orderBy: { name: 'asc' },
       }),
       databaseService.client.service.findMany({
-        where: { active: true },
+        where: { active: true, organizationId },
         select: { id: true, code: true, name: true, price: true },
         orderBy: { name: 'asc' },
       }),
@@ -401,9 +411,9 @@ export const workOrdersRepository = {
     }
   },
 
-  listTechnicians() {
+  listTechnicians(organizationId: string) {
     return databaseService.client.technician.findMany({
-      where: { active: true },
+      where: { active: true, organizationId },
       select: { id: true, fullName: true },
       orderBy: { fullName: 'asc' },
     })
@@ -413,12 +423,13 @@ export const workOrdersRepository = {
     appointmentId: string,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<CreatedWorkOrderRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockAppointment(transaction, appointmentId)
 
-      const appointment = await transaction.appointment.findUnique({
-        where: { id: appointmentId },
+      const appointment = await transaction.appointment.findFirst({
+        where: { id: appointmentId, organizationId },
         select: {
           id: true,
           code: true,
@@ -468,6 +479,7 @@ export const workOrdersRepository = {
       const workOrder = await transaction.workOrder.create({
         data: {
           code,
+          organizationId,
           appointmentId: appointment.id,
           customerId: appointment.customerId,
           vehicleId: appointment.vehicleId,
@@ -520,10 +532,11 @@ export const workOrdersRepository = {
     diagnosis: string,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<WorkOrderRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockOrder(transaction, id)
-      const order = await requireOrder(transaction, id)
+      const order = await requireOrder(transaction, id, organizationId)
       assertBudgetEditable(order)
 
       const nextStatus = shouldMoveToDiagnosis(order.status)
@@ -567,10 +580,11 @@ export const workOrdersRepository = {
     },
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<WorkOrderRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockOrder(transaction, orderId)
-      const order = await requireOrder(transaction, orderId)
+      const order = await requireOrder(transaction, orderId, organizationId)
       assertBudgetEditable(order)
 
       await transaction.workOrderLine.deleteMany({
@@ -611,10 +625,11 @@ export const workOrdersRepository = {
     orderId: string,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<WorkOrderRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockOrder(transaction, orderId)
-      const order = await requireOrder(transaction, orderId)
+      const order = await requireOrder(transaction, orderId, organizationId)
       assertBudgetEditable(order)
 
       const lineCount = await transaction.workOrderLine.count({
@@ -658,11 +673,12 @@ export const workOrdersRepository = {
     notes: string | null,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<WorkOrderRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockOrder(transaction, orderId)
-      const order = await transaction.workOrder.findUnique({
-        where: { id: orderId },
+      const order = await transaction.workOrder.findFirst({
+        where: { id: orderId, organizationId },
         select: { id: true, code: true, status: true, budgetSentAt: true },
       })
       if (!order)
@@ -713,10 +729,11 @@ export const workOrdersRepository = {
     technicianId: string | null,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<WorkOrderRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockOrder(transaction, orderId)
-      const order = await requireOrder(transaction, orderId)
+      const order = await requireOrder(transaction, orderId, organizationId)
       assertTechnicianEditable(order)
 
       await transaction.workOrder.update({
@@ -749,11 +766,12 @@ export const workOrdersRepository = {
     orderId: string,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<WorkOrderRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockOrder(transaction, orderId)
-      const order = await transaction.workOrder.findUnique({
-        where: { id: orderId },
+      const order = await transaction.workOrder.findFirst({
+        where: { id: orderId, organizationId },
         select: { id: true, code: true, status: true },
       })
       if (!order)
@@ -795,13 +813,14 @@ export const workOrdersRepository = {
     input: { description: string; occurredAt?: string },
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     const occurredAt = input.occurredAt
       ? new Date(`${input.occurredAt}T00:00:00.000Z`)
       : new Date()
     return databaseService.transaction(async (transaction) => {
       await lockOrder(transaction, orderId)
-      const order = await requireOrder(transaction, orderId)
+      const order = await requireOrder(transaction, orderId, organizationId)
       assertCanRegisterActivity(order)
 
       const activity = await transaction.workOrderActivity.create({
@@ -847,10 +866,11 @@ export const workOrdersRepository = {
     activityId: string,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     return databaseService.transaction(async (transaction) => {
       await lockOrder(transaction, orderId)
-      const order = await requireOrder(transaction, orderId)
+      const order = await requireOrder(transaction, orderId, organizationId)
       assertCanCompleteActivity(order)
 
       const activity = await transaction.workOrderActivity.findFirst({
@@ -917,11 +937,12 @@ export const workOrdersRepository = {
     },
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<WorkOrderConsumeResult> {
     return databaseService.transaction(async (transaction) => {
       await lockOrder(transaction, orderId)
-      const order = await transaction.workOrder.findUnique({
-        where: { id: orderId },
+      const order = await transaction.workOrder.findFirst({
+        where: { id: orderId, organizationId },
         select: { id: true, code: true, status: true },
       })
       if (!order)
@@ -945,7 +966,7 @@ export const workOrdersRepository = {
       ]
       const products = productIds.length
         ? await transaction.product.findMany({
-            where: { id: { in: productIds } },
+            where: { id: { in: productIds }, organizationId },
             select: { id: true, code: true, active: true },
           })
         : []
@@ -1028,7 +1049,7 @@ export const workOrdersRepository = {
 
         const confirmed = await transaction.inventoryMovement.groupBy({
           by: ['type'],
-          where: { productId, status: 'CONFIRMED' },
+          where: { organizationId, productId, status: 'CONFIRMED' },
           _sum: { quantity: true },
         })
         const stockMovements = confirmed.map((movement) => ({
@@ -1048,6 +1069,7 @@ export const workOrdersRepository = {
 
         const movement = await transaction.inventoryMovement.create({
           data: {
+            organizationId,
             productId,
             type: 'EXIT',
             status: 'CONFIRMED',
@@ -1135,8 +1157,8 @@ export const workOrdersRepository = {
         })
       }
 
-      const workOrder = await transaction.workOrder.findUnique({
-        where: { id: orderId },
+      const workOrder = await transaction.workOrder.findFirst({
+        where: { id: orderId, organizationId },
         include: workOrderDetailInclude,
       })
       return { order: workOrder as WorkOrderRecord, registrations }
@@ -1151,11 +1173,12 @@ export const workOrdersRepository = {
     },
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<WorkOrderConsumeResult> {
     return databaseService.transaction(async (transaction) => {
       await lockOrder(transaction, orderId)
-      const order = await transaction.workOrder.findUnique({
-        where: { id: orderId },
+      const order = await transaction.workOrder.findFirst({
+        where: { id: orderId, organizationId },
         select: { id: true, code: true, status: true },
       })
       if (!order)
@@ -1179,7 +1202,7 @@ export const workOrdersRepository = {
       ]
       const products = productIds.length
         ? await transaction.product.findMany({
-            where: { id: { in: productIds } },
+            where: { id: { in: productIds }, organizationId },
             select: { id: true, code: true, active: true },
           })
         : []
@@ -1224,19 +1247,6 @@ export const workOrdersRepository = {
             'El producto está inactivo.',
           )
 
-        const netConsumed = computeNetConsumed(
-          existing.filter(
-            (consumption) => consumption.workOrderLineId === line.id,
-          ),
-        )
-        const quantity = roundQuantity(item.quantity)
-        if (quantity > netConsumed)
-          throw new AppError(
-            409,
-            'WORK_ORDER_RETURN_EXCEEDS_CONSUMED',
-            `La devolución no puede superar el neto consumido de la línea: se han consumido ${netConsumed} y se devuelven ${quantity}.`,
-          )
-
         const idempotencyKey = workOrderOperationKey(
           'wo-return',
           orderId,
@@ -1257,11 +1267,24 @@ export const workOrdersRepository = {
           continue
         }
 
+        const netConsumed = computeNetConsumed(
+          existing.filter(
+            (consumption) => consumption.workOrderLineId === line.id,
+          ),
+        )
+        const quantity = roundQuantity(item.quantity)
+        if (quantity > netConsumed)
+          throw new AppError(
+            409,
+            'WORK_ORDER_RETURN_EXCEEDS_CONSUMED',
+            `La devolución no puede superar el neto consumido de la línea: se han consumido ${netConsumed} y se devuelven ${quantity}.`,
+          )
+
         await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:inventory:${productId}`}))`
 
         const confirmed = await transaction.inventoryMovement.groupBy({
           by: ['type'],
-          where: { productId, status: 'CONFIRMED' },
+          where: { organizationId, productId, status: 'CONFIRMED' },
           _sum: { quantity: true },
         })
         const stockMovements = confirmed.map((movement) => ({
@@ -1271,6 +1294,7 @@ export const workOrdersRepository = {
         const stockBefore = computeStock(stockMovements)
         const movement = await transaction.inventoryMovement.create({
           data: {
+            organizationId,
             productId,
             type: 'ADJUSTMENT_IN',
             status: 'CONFIRMED',
@@ -1356,8 +1380,8 @@ export const workOrdersRepository = {
         existing.push({ workOrderLineId: line.id, type: 'RETURN', quantity })
       }
 
-      const workOrder = await transaction.workOrder.findUnique({
-        where: { id: orderId },
+      const workOrder = await transaction.workOrder.findFirst({
+        where: { id: orderId, organizationId },
         include: workOrderDetailInclude,
       })
       return { order: workOrder as WorkOrderRecord, registrations }
@@ -1369,10 +1393,11 @@ export const workOrdersRepository = {
     input: { confirmPendingProducts?: boolean },
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<WorkOrderRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockOrder(transaction, orderId)
-      const order = await requireOrder(transaction, orderId)
+      const order = await requireOrder(transaction, orderId, organizationId)
       assertCanFinalize(order)
 
       const productLines = await transaction.workOrderLine.findMany({
@@ -1421,8 +1446,8 @@ export const workOrdersRepository = {
         ),
       })
 
-      const workOrder = await transaction.workOrder.findUnique({
-        where: { id: orderId },
+      const workOrder = await transaction.workOrder.findFirst({
+        where: { id: orderId, organizationId },
         include: workOrderDetailInclude,
       })
       return workOrder as WorkOrderRecord
@@ -1434,14 +1459,15 @@ export const workOrdersRepository = {
     notes: string | null,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<WorkOrderRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockOrder(transaction, orderId)
-      const order = await requireOrder(transaction, orderId)
+      const order = await requireOrder(transaction, orderId, organizationId)
       assertCanDeliver(order)
 
-      const billingSource = await transaction.workOrder.findUnique({
-        where: { id: orderId },
+      const billingSource = await transaction.workOrder.findFirst({
+        where: { id: orderId, organizationId },
         select: {
           customerId: true,
           lines: {
@@ -1503,6 +1529,7 @@ export const workOrdersRepository = {
         const code = `VENTA-${String(Number(rows[0].seq)).padStart(6, '0')}`
         sale = await transaction.sale.create({
           data: {
+            organizationId,
             code,
             customerId: billingSource.customerId,
             workOrderId: orderId,
@@ -1558,17 +1585,20 @@ export const workOrdersRepository = {
         ],
       })
 
-      const workOrder = await transaction.workOrder.findUnique({
-        where: { id: orderId },
+      const workOrder = await transaction.workOrder.findFirst({
+        where: { id: orderId, organizationId },
         include: workOrderDetailInclude,
       })
       return workOrder as WorkOrderRecord
     })
   },
 
-  async getExecution(orderId: string): Promise<WorkOrderExecutionRecord> {
-    const order = await databaseService.client.workOrder.findUnique({
-      where: { id: orderId },
+  async getExecution(
+    orderId: string,
+    organizationId: string,
+  ): Promise<WorkOrderExecutionRecord> {
+    const order = await databaseService.client.workOrder.findFirst({
+      where: { id: orderId, organizationId },
       select: workOrderExecutionSelect,
     })
     if (!order)
@@ -1583,10 +1613,11 @@ export const workOrdersRepository = {
   async listVehicleHistory(
     vehicleId: string,
     filters: { page: number; pageSize: number },
+    organizationId: string,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const vehicle = await transaction.vehicle.findUnique({
-        where: { id: vehicleId },
+      const vehicle = await transaction.vehicle.findFirst({
+        where: { id: vehicleId, organizationId },
         select: { id: true },
       })
       if (!vehicle)
@@ -1594,6 +1625,7 @@ export const workOrdersRepository = {
 
       const where: Prisma.WorkOrderWhereInput = {
         vehicleId,
+        organizationId,
         status: 'ENTREGADA',
       }
       const [items, total] = await Promise.all([

@@ -34,6 +34,7 @@ function auditData(
   return {
     event,
     userId: actorId,
+    organizationId: context.organizationId,
     identifier,
     requestId: context.requestId,
     ipAddress: context.ipAddress,
@@ -101,10 +102,14 @@ function withMovementSummaries(
   return { ...product, inventoryMovements }
 }
 
-function buildWhere(filters: ProductFilters): Prisma.ProductWhereInput {
+function buildWhere(
+  filters: ProductFilters,
+  organizationId: string,
+): Prisma.ProductWhereInput {
   const search = filters.search?.trim()
 
   return {
+    organizationId,
     ...(filters.categoryId ? { categoryId: filters.categoryId } : {}),
     ...(filters.status === 'active'
       ? { active: true }
@@ -125,8 +130,8 @@ function buildWhere(filters: ProductFilters): Prisma.ProductWhereInput {
 }
 
 export const productsRepository = {
-  async list(filters: ProductFilters) {
-    const where = buildWhere(filters)
+  async list(filters: ProductFilters, organizationId: string) {
+    const where = buildWhere(filters, organizationId)
     const [items, total] = await Promise.all([
       databaseService.measure('products.list.records', () =>
         databaseService.client.product.findMany({
@@ -173,16 +178,21 @@ export const productsRepository = {
     }
   },
 
-  findById(id: string) {
-    return databaseService.client.product.findUnique({
+  findById(id: string, organizationId: string) {
+    return databaseService.client.product.findFirst({
       ...productSelect,
-      where: { id },
+      where: { id, organizationId },
     })
   },
 
-  async isCodeAvailable(code: string, excludeId?: string) {
+  async isCodeAvailable(
+    code: string,
+    organizationId: string,
+    excludeId?: string,
+  ) {
     const product = await databaseService.client.product.findFirst({
       where: {
+        organizationId,
         code: { equals: code, mode: 'insensitive' },
         ...(excludeId ? { id: { not: excludeId } } : {}),
       },
@@ -191,14 +201,41 @@ export const productsRepository = {
     return product === null
   },
 
-  create(input: ProductInput, actorId: string, context: RequestContext) {
+  create(
+    input: ProductInput,
+    actorId: string,
+    organizationId: string,
+    context: RequestContext,
+  ) {
     return databaseService.transaction(async (transaction) => {
+      const [category, unit, brand] = await Promise.all([
+        transaction.productCategory.findFirst({
+          where: { id: input.categoryId, organizationId, active: true },
+          select: { id: true },
+        }),
+        transaction.productUnit.findFirst({
+          where: { id: input.unitId, organizationId, active: true },
+          select: { id: true },
+        }),
+        input.brandId
+          ? transaction.productBrand.findFirst({
+              where: { id: input.brandId, organizationId, active: true },
+              select: { id: true },
+            })
+          : Promise.resolve(null),
+      ])
+      if (!category || !unit || (input.brandId && !brand)) {
+        throw new Prisma.PrismaClientKnownRequestError(
+          'Product reference not found',
+          { code: 'P2003', clientVersion: Prisma.prismaVersion.client },
+        )
+      }
       const product = await databaseService.measure(
         'products.create.record',
         () =>
           transaction.product.create({
             ...productListSelect,
-            data: input,
+            data: { ...input, organizationId },
           }),
       )
       await databaseService.measure('products.create.audit', () =>
@@ -220,9 +257,42 @@ export const productsRepository = {
     id: string,
     input: ProductInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
+      const [category, unit, brand] = await Promise.all([
+        transaction.productCategory.findFirst({
+          where: { id: input.categoryId, organizationId, active: true },
+          select: { id: true },
+        }),
+        transaction.productUnit.findFirst({
+          where: { id: input.unitId, organizationId, active: true },
+          select: { id: true },
+        }),
+        input.brandId
+          ? transaction.productBrand.findFirst({
+              where: { id: input.brandId, organizationId, active: true },
+              select: { id: true },
+            })
+          : Promise.resolve(null),
+      ])
+      if (!category || !unit || (input.brandId && !brand)) {
+        throw new Prisma.PrismaClientKnownRequestError(
+          'Product reference not found',
+          { code: 'P2003', clientVersion: Prisma.prismaVersion.client },
+        )
+      }
+      const existing = await transaction.product.findFirst({
+        where: { id, organizationId },
+        select: { id: true },
+      })
+      if (!existing) {
+        throw new Prisma.PrismaClientKnownRequestError('Product not found', {
+          code: 'P2025',
+          clientVersion: Prisma.prismaVersion.client,
+        })
+      }
       const product = await databaseService.measure(
         'products.update.record',
         () =>
@@ -254,9 +324,20 @@ export const productsRepository = {
     id: string,
     active: boolean,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
+      const existing = await transaction.product.findFirst({
+        where: { id, organizationId },
+        select: { id: true },
+      })
+      if (!existing) {
+        throw new Prisma.PrismaClientKnownRequestError('Product not found', {
+          code: 'P2025',
+          clientVersion: Prisma.prismaVersion.client,
+        })
+      }
       const product = await databaseService.measure(
         'products.status.record',
         () =>
@@ -284,25 +365,25 @@ export const productsRepository = {
     })
   },
 
-  async getOptions() {
+  async getOptions(organizationId: string) {
     const [categories, brands, units] = await Promise.all([
       databaseService.measure('products.options.categories', () =>
         databaseService.client.productCategory.findMany({
-          where: { active: true },
+          where: { active: true, organizationId },
           select: { id: true, name: true },
           orderBy: { name: 'asc' },
         }),
       ),
       databaseService.measure('products.options.brands', () =>
         databaseService.client.productBrand.findMany({
-          where: { active: true },
+          where: { active: true, organizationId },
           select: { id: true, name: true },
           orderBy: { name: 'asc' },
         }),
       ),
       databaseService.measure('products.options.units', () =>
         databaseService.client.productUnit.findMany({
-          where: { active: true },
+          where: { active: true, organizationId },
           select: { id: true, name: true, symbol: true },
           orderBy: { name: 'asc' },
         }),
@@ -312,22 +393,25 @@ export const productsRepository = {
     return { categories, brands, units }
   },
 
-  async getCatalog() {
+  async getCatalog(organizationId: string) {
     const [categories, brands, units] = await Promise.all([
       databaseService.measure('products.catalog.categories', () =>
         databaseService.client.productCategory.findMany({
+          where: { organizationId },
           select: { id: true, name: true, active: true },
           orderBy: { name: 'asc' },
         }),
       ),
       databaseService.measure('products.catalog.brands', () =>
         databaseService.client.productBrand.findMany({
+          where: { organizationId },
           select: { id: true, name: true, active: true },
           orderBy: { name: 'asc' },
         }),
       ),
       databaseService.measure('products.catalog.units', () =>
         databaseService.client.productUnit.findMany({
+          where: { organizationId },
           select: { id: true, name: true, symbol: true, active: true },
           orderBy: { name: 'asc' },
         }),
@@ -337,71 +421,134 @@ export const productsRepository = {
     return { categories, brands, units }
   },
 
-  createCategory(name: string) {
+  createCategory(name: string, organizationId: string) {
     return databaseService.client.productCategory.create({
-      data: { name },
+      data: { name, organizationId },
       select: { id: true, name: true },
     })
   },
 
-  createBrand(name: string) {
+  createBrand(name: string, organizationId: string) {
     return databaseService.client.productBrand.create({
-      data: { name },
+      data: { name, organizationId },
       select: { id: true, name: true },
     })
   },
 
-  createUnit(name: string, symbol: string) {
+  createUnit(name: string, symbol: string, organizationId: string) {
     return databaseService.client.productUnit.create({
-      data: { name, symbol },
+      data: { name, symbol, organizationId },
       select: { id: true, name: true, symbol: true },
     })
   },
 
-  updateCategory(id: string, name: string) {
-    return databaseService.client.productCategory.update({
-      where: { id },
+  async updateCategory(id: string, name: string, organizationId: string) {
+    const result = await databaseService.client.productCategory.updateMany({
+      where: { id, organizationId },
       data: { name },
+    })
+    if (!result.count) {
+      throw new Prisma.PrismaClientKnownRequestError('Category not found', {
+        code: 'P2025',
+        clientVersion: Prisma.prismaVersion.client,
+      })
+    }
+    return databaseService.client.productCategory.findFirstOrThrow({
+      where: { id, organizationId },
       select: { id: true, name: true, active: true },
     })
   },
 
-  updateBrand(id: string, name: string) {
-    return databaseService.client.productBrand.update({
-      where: { id },
+  async updateBrand(id: string, name: string, organizationId: string) {
+    const result = await databaseService.client.productBrand.updateMany({
+      where: { id, organizationId },
       data: { name },
+    })
+    if (!result.count) {
+      throw new Prisma.PrismaClientKnownRequestError('Brand not found', {
+        code: 'P2025',
+        clientVersion: Prisma.prismaVersion.client,
+      })
+    }
+    return databaseService.client.productBrand.findFirstOrThrow({
+      where: { id, organizationId },
       select: { id: true, name: true, active: true },
     })
   },
 
-  updateUnit(id: string, name: string, symbol: string) {
-    return databaseService.client.productUnit.update({
-      where: { id },
+  async updateUnit(
+    id: string,
+    name: string,
+    symbol: string,
+    organizationId: string,
+  ) {
+    const result = await databaseService.client.productUnit.updateMany({
+      where: { id, organizationId },
       data: { name, symbol },
+    })
+    if (!result.count) {
+      throw new Prisma.PrismaClientKnownRequestError('Unit not found', {
+        code: 'P2025',
+        clientVersion: Prisma.prismaVersion.client,
+      })
+    }
+    return databaseService.client.productUnit.findFirstOrThrow({
+      where: { id, organizationId },
       select: { id: true, name: true, symbol: true, active: true },
     })
   },
 
-  updateCategoryStatus(id: string, active: boolean) {
-    return databaseService.client.productCategory.update({
-      where: { id },
+  async updateCategoryStatus(
+    id: string,
+    active: boolean,
+    organizationId: string,
+  ) {
+    const result = await databaseService.client.productCategory.updateMany({
+      where: { id, organizationId },
       data: { active },
+    })
+    if (!result.count) {
+      throw new Prisma.PrismaClientKnownRequestError('Category not found', {
+        code: 'P2025',
+        clientVersion: Prisma.prismaVersion.client,
+      })
+    }
+    return databaseService.client.productCategory.findFirstOrThrow({
+      where: { id, organizationId },
       select: { id: true, name: true, active: true },
     })
   },
 
-  updateBrandStatus(id: string, active: boolean) {
-    return databaseService.client.productBrand.update({
-      where: { id },
+  async updateBrandStatus(id: string, active: boolean, organizationId: string) {
+    const result = await databaseService.client.productBrand.updateMany({
+      where: { id, organizationId },
       data: { active },
+    })
+    if (!result.count) {
+      throw new Prisma.PrismaClientKnownRequestError('Brand not found', {
+        code: 'P2025',
+        clientVersion: Prisma.prismaVersion.client,
+      })
+    }
+    return databaseService.client.productBrand.findFirstOrThrow({
+      where: { id, organizationId },
       select: { id: true, name: true, active: true },
     })
   },
 
-  updateUnitStatus(id: string, active: boolean) {
-    return databaseService.client.productUnit.update({
-      where: { id },
+  async updateUnitStatus(id: string, active: boolean, organizationId: string) {
+    const result = await databaseService.client.productUnit.updateMany({
+      where: { id, organizationId },
       data: { active },
+    })
+    if (!result.count) {
+      throw new Prisma.PrismaClientKnownRequestError('Unit not found', {
+        code: 'P2025',
+        clientVersion: Prisma.prismaVersion.client,
+      })
+    }
+    return databaseService.client.productUnit.findFirstOrThrow({
+      where: { id, organizationId },
       select: { id: true, name: true, symbol: true, active: true },
     })
   },

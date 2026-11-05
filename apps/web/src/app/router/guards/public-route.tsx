@@ -11,5 +11,12 @@ export function PublicRoute() {
         description="Estamos preparando tu acceso a Torcly."
       />
     )
-  return user ? <Navigate to={paths.dashboard} replace /> : <Outlet />
+  return user ? (
+    <Navigate
+      to={user.isPlatformAdmin ? paths.platform : paths.dashboard}
+      replace
+    />
+  ) : (
+    <Outlet />
+  )
 }

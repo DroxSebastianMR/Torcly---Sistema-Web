@@ -112,19 +112,23 @@ function toAuthUser(
   user: AuthUserRecord,
   activeOrganizationId?: string | null,
 ): AuthUser {
-  // Durante la transición, las sesiones históricas y los dobles de prueba aún
-  // pueden no traer membresías. La ausencia no concede permisos de tenant.
   const memberships = user.organizationMemberships ?? []
-  const membership = activeOrganizationId
+  const selectedMembership = activeOrganizationId
     ? memberships.find(
         (candidate) => candidate.organizationId === activeOrganizationId,
       )
     : memberships[0]
+  const membership =
+    selectedMembership?.active && selectedMembership.organization.active
+      ? selectedMembership
+      : undefined
   const roleAssignments = membership
     ? [membership]
     : user.isPlatformAdmin
       ? []
-      : user.roles
+      : memberships.length === 0
+        ? user.roles
+        : []
   const permissions = new Set(
     roleAssignments.flatMap(({ role }) =>
       role.permissions.map(({ permission }) => permission.code),
@@ -189,7 +193,16 @@ async function loadAuthentication(
   const lookup = authRepository
     .findSession(tokenHash)
     .then((session) => {
-      if (!session || session.revokedAt || !session.user.active) {
+      if (
+        !session ||
+        session.revokedAt ||
+        !session.user.active ||
+        (session.activeOrganization && !session.activeOrganization.active) ||
+        (!session.user.isPlatformAdmin &&
+          !session.user.organizationMemberships.some(
+            (membership) => membership.active && membership.organization.active,
+          ))
+      ) {
         authenticationCache.delete(tokenHash)
         return null
       }
@@ -220,6 +233,19 @@ function invalidateUserSessions(userId: string) {
   }
   for (const [tokenHash, entry] of authenticationCache) {
     if (entry.userId === userId) sessionTokenRenewals.delete(tokenHash)
+  }
+}
+
+function invalidateOrganizationSessions(organizationId: string) {
+  for (const [tokenHash, entry] of authenticationCache) {
+    if (entry.user.organization?.id === organizationId) {
+      invalidateSession(tokenHash)
+    }
+  }
+  for (const [tokenHash, replacement] of sessionReplacements) {
+    if (replacement.user.organization?.id === organizationId) {
+      sessionReplacements.delete(tokenHash)
+    }
   }
 }
 
@@ -266,6 +292,14 @@ export const authService = {
       throw invalidCredentials(
         Math.max(0, env.LOGIN_MAX_ATTEMPTS - failure.failedLoginAttempts),
       )
+    }
+
+    const hasActiveOrganization = user.organizationMemberships.some(
+      (membership) => membership.active && membership.organization.active,
+    )
+    if (!user.isPlatformAdmin && !hasActiveOrganization) {
+      await authRepository.recordRejectedLogin(user.id, identifier, context)
+      throw invalidCredentials()
     }
 
     const token = createSessionToken()
@@ -450,6 +484,8 @@ export const authService = {
   },
 
   invalidateUserSessions,
+
+  invalidateOrganizationSessions,
 
   clearAuthenticationCacheForTests() {
     authenticationCache.clear()

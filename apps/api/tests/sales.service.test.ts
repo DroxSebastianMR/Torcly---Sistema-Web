@@ -29,6 +29,7 @@ const context = {
 const productId = 'a0000000-0000-4000-8000-000000000001'
 const serviceId = 'a0000000-0000-4000-8000-000000000002'
 const customerId = 'a0000000-0000-4000-8000-000000000003'
+const organizationId = 'a0000000-0000-4000-8000-000000000004'
 
 function line(overrides: Record<string, unknown> = {}) {
   return {
@@ -96,19 +97,25 @@ describe('Servicio de ventas', () => {
       total: 1,
     })
 
-    const result = await salesService.list({
-      search: 'ana',
-      status: 'all',
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await salesService.list(
+      {
+        search: 'ana',
+        status: 'all',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
 
-    expect(repository.list).toHaveBeenCalledWith({
-      search: 'ana',
-      status: 'all',
-      page: 1,
-      pageSize: 20,
-    })
+    expect(repository.list).toHaveBeenCalledWith(
+      {
+        search: 'ana',
+        status: 'all',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
     expect(result).toEqual({
       data: [
         {
@@ -139,7 +146,9 @@ describe('Servicio de ventas', () => {
 
   it('informa una venta inexistente en el detalle', async () => {
     repository.findById.mockResolvedValue(null)
-    await expect(salesService.getById('sale-1')).rejects.toMatchObject({
+    await expect(
+      salesService.getById('sale-1', organizationId),
+    ).rejects.toMatchObject({
       status: 404,
       code: 'SALE_NOT_FOUND',
     })
@@ -147,7 +156,7 @@ describe('Servicio de ventas', () => {
 
   it('consume el detalle y expone el catálogo de venta', async () => {
     repository.findById.mockResolvedValue(record())
-    const detail = await salesService.getById('sale-1')
+    const detail = await salesService.getById('sale-1', organizationId)
     expect(detail.data.code).toBe('VENTA-000001')
     expect(detail.data.lines[0]).toMatchObject({
       unitPrice: 35.5,
@@ -172,7 +181,7 @@ describe('Servicio de ventas', () => {
         { id: serviceId, code: 'SVC-1', name: 'Cambio de aceite', price: 20 },
       ],
     })
-    const catalog = await salesService.getCatalog()
+    const catalog = await salesService.getCatalog(organizationId)
     expect(catalog.data.products[0].stock).toBe(10)
     expect(catalog.data.services[0].price).toBe(20)
   })
@@ -186,7 +195,7 @@ describe('Servicio de ventas', () => {
       { id: userId, displayName: 'Arian Bautista' },
     ])
 
-    const result = await salesService.getById('sale-1')
+    const result = await salesService.getById('sale-1', organizationId)
 
     expect(result.data.performedBy).toBe('Arian Bautista')
     expect(result.data.confirmedBy).toBe('Arian Bautista')
@@ -203,7 +212,12 @@ describe('Servicio de ventas', () => {
     })
     repository.create.mockResolvedValue(record())
 
-    const result = await salesService.create(input, 'actor-1', context)
+    const result = await salesService.create(
+      input,
+      'actor-1',
+      context,
+      organizationId,
+    )
 
     expect(repository.create).toHaveBeenCalledWith(
       {
@@ -223,6 +237,7 @@ describe('Servicio de ventas', () => {
       },
       { id: 'actor-1', name: 'actor-1' },
       context,
+      organizationId,
     )
     expect(result.data.status).toBe('DRAFT')
   })
@@ -255,6 +270,7 @@ describe('Servicio de ventas', () => {
       },
       'actor-1',
       context,
+      organizationId,
     )
 
     const [inputPayload] = repository.create.mock.calls[0]
@@ -264,7 +280,7 @@ describe('Servicio de ventas', () => {
   it('rechaza productos y servicios inexistentes o inactivos', async () => {
     repository.findProductRef.mockResolvedValue(null)
     await expect(
-      salesService.create(input, 'actor-1', context),
+      salesService.create(input, 'actor-1', context, organizationId),
     ).rejects.toMatchObject({ status: 404, code: 'PRODUCT_NOT_FOUND' })
 
     repository.findProductRef.mockResolvedValue({
@@ -276,7 +292,7 @@ describe('Servicio de ventas', () => {
       unit: { name: 'Unidad', symbol: 'ud' },
     })
     await expect(
-      salesService.create(input, 'actor-1', context),
+      salesService.create(input, 'actor-1', context, organizationId),
     ).rejects.toMatchObject({ status: 409, code: 'PRODUCT_INACTIVE' })
 
     repository.findServiceRef.mockResolvedValue(null)
@@ -288,6 +304,7 @@ describe('Servicio de ventas', () => {
         },
         'actor-1',
         context,
+        organizationId,
       ),
     ).rejects.toMatchObject({ status: 404, code: 'SERVICE_NOT_FOUND' })
   })
@@ -302,13 +319,19 @@ describe('Servicio de ventas', () => {
         },
         'actor-1',
         context,
+        organizationId,
       ),
     ).rejects.toMatchObject({ status: 404, code: 'CUSTOMER_NOT_FOUND' })
   })
 
   it('rechaza una venta sin líneas', async () => {
     await expect(
-      salesService.create({ customerId: null, lines: [] }, 'actor-1', context),
+      salesService.create(
+        { customerId: null, lines: [] },
+        'actor-1',
+        context,
+        organizationId,
+      ),
     ).rejects.toMatchObject({ status: 400, code: 'SALE_NO_LINES' })
   })
 
@@ -342,22 +365,27 @@ describe('Servicio de ventas', () => {
       { customerId: null, lines: [{ type: 'SERVICE', serviceId }] },
       'actor-1',
       context,
+      organizationId,
     )
 
-    expect(repository.update).toHaveBeenCalledWith('sale-1', {
-      customerId: null,
-      subtotal: 20,
-      total: 20,
-      lines: [
-        expect.objectContaining({
-          type: 'SERVICE',
-          serviceId,
-          unitPrice: 20,
-          quantity: 1,
-          subtotal: 20,
-        }),
-      ],
-    })
+    expect(repository.update).toHaveBeenCalledWith(
+      'sale-1',
+      {
+        customerId: null,
+        subtotal: 20,
+        total: 20,
+        lines: [
+          expect.objectContaining({
+            type: 'SERVICE',
+            serviceId,
+            unitPrice: 20,
+            quantity: 1,
+            subtotal: 20,
+          }),
+        ],
+      },
+      organizationId,
+    )
     expect(result.data.status).toBe('CONFIRMED')
   })
 
@@ -382,6 +410,7 @@ describe('Servicio de ventas', () => {
         { customerId: null, lines: [{ type: 'SERVICE', serviceId }] },
         'actor-1',
         context,
+        organizationId,
       ),
     ).rejects.toMatchObject({ status: 409, code: 'SALE_READONLY' })
   })
@@ -395,12 +424,18 @@ describe('Servicio de ventas', () => {
       }),
     )
 
-    const result = await salesService.confirm('sale-1', 'actor-1', context)
+    const result = await salesService.confirm(
+      'sale-1',
+      'actor-1',
+      context,
+      organizationId,
+    )
 
     expect(repository.confirm).toHaveBeenCalledWith(
       'sale-1',
       { id: 'actor-1', name: 'actor-1' },
       context,
+      organizationId,
     )
     expect(result.data.status).toBe('CONFIRMED')
   })
@@ -422,12 +457,13 @@ describe('Servicio de ventas', () => {
       }),
     )
 
-    await salesService.create(input, 'actor-1', context, true)
+    await salesService.create(input, 'actor-1', context, organizationId, true)
 
     expect(repository.create).toHaveBeenCalledWith(
       expect.objectContaining({ confirm: true }),
       { id: 'actor-1', name: 'actor-1' },
       context,
+      organizationId,
     )
     expect(repository.confirm).not.toHaveBeenCalled()
   })
@@ -440,6 +476,7 @@ describe('Servicio de ventas', () => {
       { reason: 'Cliente desistió de la compra.' },
       'actor-1',
       context,
+      organizationId,
     )
 
     expect(repository.cancel).toHaveBeenCalledWith(
@@ -447,6 +484,7 @@ describe('Servicio de ventas', () => {
       'Cliente desistió de la compra.',
       { id: 'actor-1', name: 'actor-1' },
       context,
+      organizationId,
     )
     expect(result.data.status).toBe('CANCELLED')
   })
@@ -468,7 +506,7 @@ describe('Servicio de ventas', () => {
     )
 
     await expect(
-      salesService.create(input, 'actor-1', context),
+      salesService.create(input, 'actor-1', context, organizationId),
     ).rejects.toMatchObject({
       status: 400,
       code: 'SALE_REFERENCE_INVALID',
@@ -492,7 +530,7 @@ describe('Servicio de ventas', () => {
     )
 
     await expect(
-      salesService.create(input, 'actor-1', context, true),
+      salesService.create(input, 'actor-1', context, organizationId, true),
     ).rejects.toMatchObject({
       status: 503,
       code: 'SALE_TRANSACTION_TIMEOUT',
@@ -508,7 +546,7 @@ describe('Servicio de ventas', () => {
     )
 
     await expect(
-      salesService.confirm('sale-1', 'actor-1', context),
+      salesService.confirm('sale-1', 'actor-1', context, organizationId),
     ).rejects.toMatchObject({
       status: 503,
       code: 'SALE_TRANSACTION_TIMEOUT',

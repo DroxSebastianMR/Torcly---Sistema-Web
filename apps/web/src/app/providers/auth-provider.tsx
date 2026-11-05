@@ -50,6 +50,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
           const user = await authService.login(input)
           clearBusinessQueries()
           client.setQueryData(['auth', 'session'], user)
+          return user
         },
         logout: async () => {
           await authService.logout()

@@ -41,6 +41,15 @@ vuelve obligatorio `organization_id` y se cambian los únicos globales por
 
 ## Estado
 
-En implementación. Esta fase no autoriza aún una migración de producción ni
-el backfill. Se requiere respaldo, preflight y aprobación explícita antes de
-aplicar cualquier migración.
+Implementado en código y listo para validación controlada. La consola
+`/plataforma` administra organizaciones y membresías; desactivar una de ellas
+revoca las sesiones afectadas. Esta fase no autoriza aún una migración de
+producción ni el backfill. Se requiere respaldo, preflight y aprobación
+explícita antes de aplicar cualquier migración.
+
+La compilación de producción de API y web, el lint, la validación de Prisma y
+las suites unitarias están en verde. Los fixtures heredados ya proporcionan un
+`organizationId` explícito; el typecheck completo confirma el contrato
+estricto. Antes del cierre formal sólo restan las integraciones con PostgreSQL,
+el backfill controlado y la aceptación manual A/B. No se hará opcional el
+tenant en los contratos de producción para ocultar esa deuda.

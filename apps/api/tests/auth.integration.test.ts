@@ -37,6 +37,7 @@ describeWithDatabase('Autenticación integrada con PostgreSQL', () => {
   let seededUserId = ''
   let seededRoleId = ''
   let seededPermissionId = ''
+  let organizationId = ''
 
   beforeAll(async () => {
     await databaseService.connect()
@@ -50,6 +51,12 @@ describeWithDatabase('Autenticación integrada con PostgreSQL', () => {
         permissions: {
           create: { permissionId: permission.id },
         },
+      },
+    })
+    const organization = await databaseService.client.organization.create({
+      data: {
+        code: `it-auth-${suffix}`,
+        name: 'Organización de autenticación',
       },
     })
     const passwordHash = await hashPassword(password)
@@ -85,6 +92,10 @@ describeWithDatabase('Autenticación integrada con PostgreSQL', () => {
     inactiveUserId = inactiveUser.id
     roleId = role.id
     permissionId = permission.id
+    organizationId = organization.id
+    await databaseService.client.organizationMembership.create({
+      data: { organizationId, userId, roleId },
+    })
   }, 60_000)
 
   afterAll(async () => {
@@ -113,11 +124,17 @@ describeWithDatabase('Autenticación integrada con PostgreSQL', () => {
         },
       },
     })
+    await databaseService.client.organizationMembership.deleteMany({
+      where: { organizationId },
+    })
     await databaseService.client.role.deleteMany({
       where: { id: { in: [roleId, seededRoleId].filter(Boolean) } },
     })
     await databaseService.client.permission.deleteMany({
       where: { id: { in: [permissionId, seededPermissionId].filter(Boolean) } },
+    })
+    await databaseService.client.organization.deleteMany({
+      where: { id: organizationId },
     })
     await databaseService.disconnect()
   }, 60_000)

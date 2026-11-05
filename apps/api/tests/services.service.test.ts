@@ -21,6 +21,7 @@ const context = {
   requestId: 'req-srv-1',
   ipAddress: '127.0.0.1',
 }
+const organizationId = 'organization-1'
 
 function record(overrides: Record<string, unknown> = {}) {
   return {
@@ -51,19 +52,25 @@ describe('Servicio de servicios', () => {
   it('lista servicios con estado y paginación', async () => {
     repository.list.mockResolvedValue({ items: [record()], total: 1 })
 
-    const result = await servicesService.list({
-      search: 'aceite',
-      status: 'active',
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await servicesService.list(
+      {
+        search: 'aceite',
+        status: 'active',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
 
-    expect(repository.list).toHaveBeenCalledWith({
-      search: 'aceite',
-      status: 'active',
-      page: 1,
-      pageSize: 20,
-    })
+    expect(repository.list).toHaveBeenCalledWith(
+      {
+        search: 'aceite',
+        status: 'active',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
     expect(result).toEqual({
       data: [
         {
@@ -83,7 +90,9 @@ describe('Servicio de servicios', () => {
 
   it('informa un servicio inexistente en el detalle', async () => {
     repository.findById.mockResolvedValue(null)
-    await expect(servicesService.getById('s1')).rejects.toMatchObject({
+    await expect(
+      servicesService.getById('s1', organizationId),
+    ).rejects.toMatchObject({
       status: 404,
       code: 'SERVICE_NOT_FOUND',
     })
@@ -95,10 +104,10 @@ describe('Servicio de servicios', () => {
       { id: 's1', code: 'CAMBIO-ACEITE', name: 'Cambio de aceite' },
     ])
 
-    const detail = await servicesService.getById('s1')
+    const detail = await servicesService.getById('s1', organizationId)
     expect(detail.data.code).toBe('CAMBIO-ACEITE')
 
-    const options = await servicesService.getOptions()
+    const options = await servicesService.getOptions(organizationId)
     expect(options.data).toEqual([
       { id: 's1', code: 'CAMBIO-ACEITE', name: 'Cambio de aceite' },
     ])
@@ -108,42 +117,57 @@ describe('Servicio de servicios', () => {
     repository.isCodeAvailable.mockResolvedValue(true)
 
     await expect(
-      servicesService.checkCodeAvailability('SERV-TOR'),
+      servicesService.checkCodeAvailability('SERV-TOR', organizationId),
     ).resolves.toEqual({
       data: { code: 'SERV-TOR', available: true },
     })
     expect(repository.isCodeAvailable).toHaveBeenCalledWith(
       'SERV-TOR',
+      organizationId,
       undefined,
     )
   })
 
   it('crea, actualiza y cambia el estado auditando con actor y contexto', async () => {
     repository.create.mockResolvedValue(record())
-    await servicesService.create(input, 'actor-1', context)
-    expect(repository.create).toHaveBeenCalledWith(input, 'actor-1', context)
+    await servicesService.create(input, 'actor-1', organizationId, context)
+    expect(repository.create).toHaveBeenCalledWith(
+      input,
+      'actor-1',
+      organizationId,
+      context,
+    )
 
     repository.update.mockResolvedValue(record({ price: 42 }))
     const updated = await servicesService.update(
       's1',
       { ...input, price: 42 },
       'actor-1',
+      organizationId,
       context,
     )
     expect(repository.update).toHaveBeenCalledWith(
       's1',
       expect.objectContaining({ price: 42 }),
       'actor-1',
+      organizationId,
       context,
     )
     expect(updated.data.price).toBe(42)
 
     repository.updateStatus.mockResolvedValue(record({ active: false }))
-    await servicesService.updateStatus('s1', false, 'actor-1', context)
+    await servicesService.updateStatus(
+      's1',
+      false,
+      'actor-1',
+      organizationId,
+      context,
+    )
     expect(repository.updateStatus).toHaveBeenCalledWith(
       's1',
       false,
       'actor-1',
+      organizationId,
       context,
     )
   })
@@ -157,7 +181,7 @@ describe('Servicio de servicios', () => {
     )
 
     await expect(
-      servicesService.create(input, 'actor-1', context),
+      servicesService.create(input, 'actor-1', organizationId, context),
     ).rejects.toMatchObject({
       status: 409,
       code: 'SERVICE_DUPLICATE',
@@ -172,7 +196,7 @@ describe('Servicio de servicios', () => {
       }),
     )
     await expect(
-      servicesService.update('s1', input, 'actor-1', context),
+      servicesService.update('s1', input, 'actor-1', organizationId, context),
     ).rejects.toMatchObject({
       status: 404,
       code: 'SERVICE_NOT_FOUND',
@@ -185,7 +209,13 @@ describe('Servicio de servicios', () => {
       }),
     )
     await expect(
-      servicesService.updateStatus('s1', false, 'actor-1', context),
+      servicesService.updateStatus(
+        's1',
+        false,
+        'actor-1',
+        organizationId,
+        context,
+      ),
     ).rejects.toMatchObject({
       status: 404,
       code: 'SERVICE_NOT_FOUND',

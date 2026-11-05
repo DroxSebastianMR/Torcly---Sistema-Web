@@ -21,6 +21,7 @@ import { operationsService } from '../src/modules/operations/operations.service.
 import { OPERATIONAL_SECTIONS } from '../src/modules/operations/operations.types.js'
 
 const filters = { from: null, to: null, page: 1, pageSize: 10 }
+const organizationId = 'organization-1'
 
 function obligation(overrides: Record<string, unknown> = {}) {
   return {
@@ -52,6 +53,7 @@ describe('Servicio de consulta operativa', () => {
     const result = await operationsService.getSummary(
       { from: '2026-10-01', to: '2026-10-31' },
       ['sales:read'],
+      organizationId,
     )
 
     expect(Object.keys(result.sections)).toEqual(['sales'])
@@ -63,6 +65,7 @@ describe('Servicio de consulta operativa', () => {
     expect(repository.summarizeSales).toHaveBeenCalledWith(
       '2026-10-01',
       '2026-10-31',
+      organizationId,
     )
     expect(repository.countAppointmentsByStatus).not.toHaveBeenCalled()
     expect(repository.listLowStockProducts).not.toHaveBeenCalled()
@@ -93,6 +96,7 @@ describe('Servicio de consulta operativa', () => {
     const result = await operationsService.getSummary(
       { from: null, to: null },
       ['appointments:read', 'workshop:read'],
+      organizationId,
     )
 
     expect(result.sections.appointments).toEqual({
@@ -106,7 +110,11 @@ describe('Servicio de consulta operativa', () => {
       attentionCount: 13,
       byStatus: { ENTREGADA: 6, RECHAZADA: 1, RECEPCIONADA: 2 },
     })
-    expect(repository.countWorkOrdersByStatus).toHaveBeenCalledWith(null, null)
+    expect(repository.countWorkOrdersByStatus).toHaveBeenCalledWith(
+      null,
+      null,
+      organizationId,
+    )
   })
 
   it('usa el resumen de saldos del read-model para el Dashboard', async () => {
@@ -122,6 +130,7 @@ describe('Servicio de consulta operativa', () => {
     const result = await operationsService.getSummary(
       { from: null, to: null },
       ['cash:read', 'sales:read'],
+      organizationId,
     )
 
     expect(result.sections.payments).toEqual({
@@ -138,6 +147,7 @@ describe('Servicio de consulta operativa', () => {
     const result = await operationsService.getSummary(
       { from: null, to: null },
       ['inventory:read'],
+      organizationId,
     )
 
     expect(result.sections.inventory).toEqual({
@@ -149,7 +159,7 @@ describe('Servicio de consulta operativa', () => {
 
   it('rechaza una lista de atención sin permiso de la sección', async () => {
     const error = await operationsService
-      .getAttention('payments', filters, ['sales:read'])
+      .getAttention('payments', filters, ['sales:read'], organizationId)
       .catch((caught: unknown) => caught)
 
     expect(error).toMatchObject({
@@ -183,6 +193,7 @@ describe('Servicio de consulta operativa', () => {
       'payments',
       { ...filters, page: 2, pageSize: 1 },
       ['cash:read', 'sales:read'],
+      organizationId,
     )
 
     expect(result.section).toBe('payments')
@@ -223,6 +234,7 @@ describe('Servicio de consulta operativa', () => {
       'appointments',
       filters,
       ['appointments:read'],
+      organizationId,
     )
 
     expect(repository.listAppointmentAttention).toHaveBeenCalledWith(
@@ -230,6 +242,7 @@ describe('Servicio de consulta operativa', () => {
       null,
       0,
       10,
+      organizationId,
     )
     expect(result.data).toEqual([
       {
@@ -246,7 +259,11 @@ describe('Servicio de consulta operativa', () => {
 
   it('rechaza un período invertido en el resumen y en las listas', async () => {
     const summaryError = await operationsService
-      .getSummary({ from: '2026-10-05', to: '2026-10-01' }, ['sales:read'])
+      .getSummary(
+        { from: '2026-10-05', to: '2026-10-01' },
+        ['sales:read'],
+        organizationId,
+      )
       .catch((caught: unknown) => caught)
     expect(summaryError).toMatchObject({
       status: 400,
@@ -258,6 +275,7 @@ describe('Servicio de consulta operativa', () => {
         'inventory',
         { ...filters, from: '2026-10-05', to: '2026-10-01' },
         ['inventory:read'],
+        organizationId,
       )
       .catch((caught: unknown) => caught)
     expect(attentionError).toMatchObject({

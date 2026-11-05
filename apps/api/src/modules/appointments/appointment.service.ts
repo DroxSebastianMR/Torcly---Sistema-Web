@@ -147,10 +147,10 @@ function mapPersistenceError(error: unknown): never {
 }
 
 export const appointmentsService = {
-  async list(filters: AppointmentFilters) {
+  async list(filters: AppointmentFilters, organizationId: string) {
     const [result, stats] = await Promise.all([
-      appointmentsRepository.list(filters),
-      appointmentsRepository.getStats(),
+      appointmentsRepository.list(filters, organizationId),
+      appointmentsRepository.getStats(organizationId),
     ])
     const actorNames = await resolveActorNames(result.items)
     return {
@@ -165,8 +165,11 @@ export const appointmentsService = {
     }
   },
 
-  async getById(id: string) {
-    const appointment = await appointmentsRepository.findById(id)
+  async getById(id: string, organizationId: string) {
+    const appointment = await appointmentsRepository.findById(
+      id,
+      organizationId,
+    )
     if (!appointment)
       throw new AppError(404, 'APPOINTMENT_NOT_FOUND', 'Cita no encontrada.')
     return {
@@ -178,12 +181,14 @@ export const appointmentsService = {
     input: AppointmentInput,
     actor: AppointmentActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const [customer, vehicle] = await Promise.all([
-      appointmentsRepository.findCustomerRef(input.customerId),
+      appointmentsRepository.findCustomerRef(input.customerId, organizationId),
       appointmentsRepository.findVehicleOfCustomer(
         input.vehicleId,
         input.customerId,
+        organizationId,
       ),
     ])
     if (!customer)
@@ -209,8 +214,10 @@ export const appointmentsService = {
         },
         normalizeActor(actor),
         context,
+        organizationId,
       )
       await notificationsService.notifyUsersSafely({
+        organizationId,
         permission: 'appointments:read',
         type: 'APPOINTMENT_SCHEDULED',
         preferenceKey: 'appointmentUpdates',
@@ -229,6 +236,7 @@ export const appointmentsService = {
     input: AppointmentRescheduleInput,
     actor: AppointmentActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     assertAppointmentTimeAllowed(input.time)
     assertNotPast(input.date, input.time)
@@ -237,8 +245,10 @@ export const appointmentsService = {
       { dateISO: input.date, time: input.time },
       normalizeActor(actor),
       context,
+      organizationId,
     )
     await notificationsService.notifyUsersSafely({
+      organizationId,
       permission: 'appointments:read',
       type: 'APPOINTMENT_RESCHEDULED',
       preferenceKey: 'appointmentUpdates',
@@ -253,11 +263,13 @@ export const appointmentsService = {
     id: string,
     actor: AppointmentActor | string,
     context: RequestContext,
+    organizationId: string,
   ) {
     const appointment = await appointmentsRepository.cancel(
       id,
       normalizeActor(actor),
       context,
+      organizationId,
     )
     return { data: toItem(appointment) }
   },

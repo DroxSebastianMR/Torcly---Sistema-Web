@@ -16,6 +16,18 @@ const userProfileInclude = {
       },
     },
   },
+  organizationMemberships: {
+    where: { active: true },
+    include: {
+      role: {
+        include: {
+          permissions: {
+            include: { permission: { select: { code: true } } },
+          },
+        },
+      },
+    },
+  },
 } satisfies Prisma.UserInclude
 
 export type UserProfileRecord = NonNullable<
@@ -51,6 +63,7 @@ export const profileRepository = {
         data: {
           event: 'PROFILE_UPDATED',
           userId,
+          organizationId: context.organizationId,
           requestId: context.requestId,
           ipAddress: context.ipAddress,
           metadata: {
@@ -89,6 +102,7 @@ export const profileRepository = {
         data: {
           event: 'PASSWORD_CHANGED',
           userId,
+          organizationId: context.organizationId,
           requestId: context.requestId,
           ipAddress: context.ipAddress,
         },

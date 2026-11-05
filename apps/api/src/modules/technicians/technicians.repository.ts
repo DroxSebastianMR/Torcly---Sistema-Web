@@ -1,4 +1,4 @@
-import type { AuditEventType, Prisma } from '../../generated/prisma/client.js'
+import { type AuditEventType, Prisma } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import type { TechnicianFilters, TechnicianInput } from './technicians.types.js'
@@ -6,9 +6,13 @@ import type { TechnicianFilters, TechnicianInput } from './technicians.types.js'
 const auditEvent = (active: boolean): AuditEventType =>
   active ? 'TECHNICIAN_ACTIVATED' : 'TECHNICIAN_DEACTIVATED'
 
-function where(filters: TechnicianFilters): Prisma.TechnicianWhereInput {
+function where(
+  filters: TechnicianFilters,
+  organizationId: string,
+): Prisma.TechnicianWhereInput {
   const search = filters.search?.trim()
   return {
+    organizationId,
     ...(filters.status === 'active'
       ? { active: true }
       : filters.status === 'inactive'
@@ -49,6 +53,7 @@ const audit = (
 ) => ({
   event,
   userId: actorId,
+  organizationId: context.organizationId,
   identifier,
   requestId: context.requestId,
   ipAddress: context.ipAddress,
@@ -56,8 +61,8 @@ const audit = (
 })
 
 export const techniciansRepository = {
-  async list(filters: TechnicianFilters) {
-    const criteria = where(filters)
+  async list(filters: TechnicianFilters, organizationId: string) {
+    const criteria = where(filters, organizationId)
     const [items, total] = await Promise.all([
       databaseService.measure('technicians.list.records', () =>
         databaseService.client.technician.findMany({
@@ -73,17 +78,24 @@ export const techniciansRepository = {
     ])
     return { items, total }
   },
-  findById(id: string) {
-    return databaseService.client.technician.findUnique({ where: { id } })
+  findById(id: string, organizationId: string) {
+    return databaseService.client.technician.findFirst({
+      where: { id, organizationId },
+    })
   },
-  listActive() {
+  listActive(organizationId: string) {
     return databaseService.client.technician.findMany({
-      where: { active: true },
+      where: { active: true, organizationId },
       select: { id: true, code: true, fullName: true },
       orderBy: { fullName: 'asc' },
     })
   },
-  create(input: TechnicianInput, actorId: string, context: RequestContext) {
+  create(
+    input: TechnicianInput,
+    actorId: string,
+    organizationId: string,
+    context: RequestContext,
+  ) {
     return databaseService.transaction(async (tx) => {
       const sequence = await tx.$queryRaw<
         Array<{ value: bigint }>
@@ -91,6 +103,7 @@ export const techniciansRepository = {
       const technician = await tx.technician.create({
         data: {
           ...input,
+          organizationId,
           code: `TEC-${String(sequence[0].value).padStart(6, '0')}`,
           createdBy: actorId,
           updatedBy: actorId,
@@ -112,12 +125,22 @@ export const techniciansRepository = {
     id: string,
     input: TechnicianInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     return databaseService.transaction(async (tx) => {
-      const technician = await tx.technician.update({
-        where: { id },
+      const result = await tx.technician.updateMany({
+        where: { id, organizationId },
         data: { ...input, updatedBy: actorId },
+      })
+      if (result.count === 0) {
+        throw new Prisma.PrismaClientKnownRequestError('Technician not found', {
+          code: 'P2025',
+          clientVersion: Prisma.prismaVersion.client,
+        })
+      }
+      const technician = await tx.technician.findFirstOrThrow({
+        where: { id, organizationId },
       })
       await tx.auditLog.create({
         data: audit(
@@ -135,12 +158,22 @@ export const techniciansRepository = {
     id: string,
     active: boolean,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     return databaseService.transaction(async (tx) => {
-      const technician = await tx.technician.update({
-        where: { id },
+      const result = await tx.technician.updateMany({
+        where: { id, organizationId },
         data: { active, updatedBy: actorId },
+      })
+      if (result.count === 0) {
+        throw new Prisma.PrismaClientKnownRequestError('Technician not found', {
+          code: 'P2025',
+          clientVersion: Prisma.prismaVersion.client,
+        })
+      }
+      const technician = await tx.technician.findFirstOrThrow({
+        where: { id, organizationId },
       })
       await tx.auditLog.create({
         data: audit(

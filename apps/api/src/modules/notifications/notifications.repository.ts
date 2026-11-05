@@ -25,11 +25,13 @@ export type NotificationRecord = Prisma.NotificationGetPayload<{
 }>
 
 function buildWhere(
+  organizationId: string,
   userId: string,
   filters: NotificationFilters,
   userPermissions: string[],
 ): Prisma.NotificationWhereInput {
   const where: Prisma.NotificationWhereInput = {
+    organizationId,
     userId,
     OR: [
       { permissionRequired: null },
@@ -46,11 +48,12 @@ function buildWhere(
 
 export const notificationsRepository = {
   async listNotifications(
+    organizationId: string,
     userId: string,
     filters: NotificationFilters,
     userPermissions: string[],
   ) {
-    const where = buildWhere(userId, filters, userPermissions)
+    const where = buildWhere(organizationId, userId, filters, userPermissions)
     const [items, total] = await Promise.all([
       databaseService.client.notification.findMany({
         where,
@@ -64,9 +67,14 @@ export const notificationsRepository = {
     return { items, total }
   },
 
-  async getUnreadCount(userId: string, userPermissions: string[]) {
+  async getUnreadCount(
+    organizationId: string,
+    userId: string,
+    userPermissions: string[],
+  ) {
     return databaseService.client.notification.count({
       where: {
+        organizationId,
         userId,
         read: false,
         OR: [
@@ -77,15 +85,20 @@ export const notificationsRepository = {
     })
   },
 
-  async findNotificationById(id: string, userId: string) {
+  async findNotificationById(
+    id: string,
+    userId: string,
+    organizationId: string,
+  ) {
     return databaseService.client.notification.findFirst({
-      where: { id, userId },
+      where: { id, userId, organizationId },
       select: notificationSelect,
     })
   },
 
   async markAsRead(
     id: string,
+    organizationId: string,
     userId: string,
     userPermissions: string[],
     context: RequestContext,
@@ -94,6 +107,7 @@ export const notificationsRepository = {
       const existing = await tx.notification.findFirst({
         where: {
           id,
+          organizationId,
           userId,
           OR: [
             { permissionRequired: null },
@@ -120,6 +134,7 @@ export const notificationsRepository = {
         data: {
           event: 'NOTIFICATION_READ',
           userId,
+          organizationId,
           requestId: context.requestId,
           ipAddress: context.ipAddress,
           metadata: { notificationId: id, type: updated.type },
@@ -131,12 +146,14 @@ export const notificationsRepository = {
   },
 
   async markAllAsRead(
+    organizationId: string,
     userId: string,
     userPermissions: string[],
     context: RequestContext,
   ) {
     return databaseService.transaction(async (tx) => {
       const where: Prisma.NotificationWhereInput = {
+        organizationId,
         userId,
         read: false,
         OR: [
@@ -161,6 +178,7 @@ export const notificationsRepository = {
         data: {
           event: 'ALL_NOTIFICATIONS_READ',
           userId,
+          organizationId,
           requestId: context.requestId,
           ipAddress: context.ipAddress,
           metadata: { markedCount: count },
@@ -175,6 +193,7 @@ export const notificationsRepository = {
     if (!items.length) return
     return databaseService.client.notification.createMany({
       data: items.map((item) => ({
+        organizationId: item.organizationId,
         userId: item.userId,
         title: item.title,
         message: item.message,
@@ -187,6 +206,7 @@ export const notificationsRepository = {
   },
 
   async findUsersEligibleForNotification(
+    organizationId: string,
     permission: string,
     preferenceKey?: keyof NotificationPreferences,
   ) {
@@ -194,8 +214,10 @@ export const notificationsRepository = {
       const users = await databaseService.client.user.findMany({
         where: {
           active: true,
-          roles: {
+          organizationMemberships: {
             some: {
+              organizationId,
+              active: true,
               role: {
                 active: true,
                 permissions: {

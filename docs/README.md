@@ -15,11 +15,11 @@ Este directorio separa las fuentes aprobadas, las decisiones vigentes, la arquit
 
 En caso de contradicción se aplica este orden:
 
-1. requerimientos y cambios formalmente aprobados;
-2. reglas de negocio del SRS;
-3. documentación del sprint aprobado;
-4. arquitectura técnica vigente;
-5. documentos históricos de estado.
+1.  requerimientos y cambios formalmente aprobados;
+2.  reglas de negocio del SRS;
+3.  documentación del sprint aprobado;
+4.  arquitectura técnica vigente;
+5.  documentos históricos de estado.
 
 Un estado declarado en un informe no reemplaza la evidencia del repositorio. Una historia solo se considera terminada cuando cumple la Definition of Done y el usuario aprueba el sprint.
 
@@ -29,4 +29,4 @@ La meta preparada es completar 29 de las 92 historias del backlog: 31,52%. Véas
 
 ## Versión operativa
 
-La versión operativa vigente está documentada en las [notas de versión 1.0.1](04-operaciones/release-1.0.1.md).
+La versión operativa vigente está documentada en las [notas de versión 1.1.1](04-operaciones/release-1.1.1.md) (versión previa: [1.0.1](04-operaciones/release-1.0.1.md)).

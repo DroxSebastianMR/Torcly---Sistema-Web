@@ -16,7 +16,6 @@ const authUserInclude = {
     },
   },
   organizationMemberships: {
-    where: { active: true, organization: { active: true } },
     orderBy: { joinedAt: 'asc' },
     include: {
       organization: true,

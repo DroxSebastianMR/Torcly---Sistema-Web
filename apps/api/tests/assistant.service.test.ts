@@ -20,6 +20,8 @@ vi.mock('../src/modules/assistant/assistant.repository.js', () => ({
 
 import { assistantService } from '../src/modules/assistant/assistant.service.js'
 
+const organizationId = 'organization-1'
+
 beforeEach(() => {
   assistantService.resetRateLimits()
   operations.getSummary.mockReset().mockResolvedValue({
@@ -38,16 +40,18 @@ describe('Servicio del asistente', () => {
   it('genera contexto agregado solo de las fuentes autorizadas', async () => {
     const result = await assistantService.ask(
       { message: '¿Cómo van las ventas?', from: null, to: null },
-      { id: 'user-1', permissions: ['sales:read'] },
+      { id: 'user-1', permissions: ['sales:read'], organizationId },
     )
     expect(operations.getSummary).toHaveBeenCalledWith(
       { from: null, to: null },
       ['sales:read'],
+      organizationId,
     )
     expect(operations.getAttention).toHaveBeenCalledWith(
       'sales',
       { from: null, to: null, page: 1, pageSize: 10 },
       ['sales:read'],
+      organizationId,
     )
     expect(result.sources).toEqual([
       { module: 'sales', label: 'Ventas', path: '/ventas' },
@@ -62,6 +66,7 @@ describe('Servicio del asistente', () => {
       {
         id: 'user-1',
         permissions: ['appointments:read', 'workshop:read', 'inventory:read'],
+        organizationId,
       },
     )
 
@@ -69,16 +74,19 @@ describe('Servicio del asistente', () => {
       'appointments',
       { from: null, to: null, page: 1, pageSize: 10 },
       ['appointments:read', 'workshop:read', 'inventory:read'],
+      organizationId,
     )
     expect(operations.getAttention).toHaveBeenCalledWith(
       'workOrders',
       { from: null, to: null, page: 1, pageSize: 10 },
       ['appointments:read', 'workshop:read', 'inventory:read'],
+      organizationId,
     )
     expect(operations.getAttention).toHaveBeenCalledWith(
       'inventory',
       { from: null, to: null, page: 1, pageSize: 10 },
       ['appointments:read', 'workshop:read', 'inventory:read'],
+      organizationId,
     )
   })
 
@@ -86,7 +94,7 @@ describe('Servicio del asistente', () => {
     await expect(
       assistantService.ask(
         { message: 'Cancela la cita de mañana', from: null, to: null },
-        { id: 'user-1', permissions: ['appointments:read'] },
+        { id: 'user-1', permissions: ['appointments:read'], organizationId },
       ),
     ).rejects.toMatchObject({ code: 'ASSISTANT_READ_ONLY' })
     expect(operations.getSummary).not.toHaveBeenCalled()

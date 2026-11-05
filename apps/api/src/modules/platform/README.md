@@ -7,9 +7,12 @@ datos operativos con un taller.
 
 - Todas las rutas requieren sesión autenticada y `User.isPlatformAdmin = true`.
 - Una membresía de organización no basta para entrar.
-- El primer endpoint (`GET /api/v1/platform/access`) solo confirma acceso; no
-  expone todavía organizaciones, miembros ni métricas.
+- La consola permite consultar, crear, activar o desactivar organizaciones y
+  administrar sus miembros con roles de taller, sin acceder a los datos
+  operativos de ningún taller.
+- Desactivar una organización o una membresía revoca sus sesiones activas y
+  bloquea sus nuevas autenticaciones hasta que se reactive.
 
-Las capacidades analíticas, organizaciones, planes y suscripciones se
-incorporarán después de completar el aislamiento por `organizationId` de los
-módulos operativos.
+Los módulos operativos resuelven la organización exclusivamente desde la
+sesión y consultan sus propios registros. Planes, suscripciones, analítica
+agregada y soporte auditado siguen fuera de este módulo.

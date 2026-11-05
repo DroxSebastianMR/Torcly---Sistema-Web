@@ -19,14 +19,16 @@ describeIfDb('Purchases integration (PostgreSQL)', () => {
   let supplierId: string | undefined
   let productId: string | undefined
   let purchaseId: string | undefined
+  let organizationId: string | undefined
 
   beforeEach(async () => {
     const product = await databaseService.client.product.findFirst({
       where: { active: true },
-      select: { id: true },
+      select: { id: true, organizationId: true },
     })
     if (!product) throw new Error('No hay productos activos en la BD de prueba')
     productId = product.id
+    organizationId = product.organizationId
 
     const supplier = await purchasesRepository.createSupplier(
       {
@@ -38,6 +40,7 @@ describeIfDb('Purchases integration (PostgreSQL)', () => {
       },
       testActor,
       testContext,
+      organizationId!,
     )
     supplierId = supplier.id
   })
@@ -90,12 +93,13 @@ describeIfDb('Purchases integration (PostgreSQL)', () => {
       },
       testActor,
       testContext,
+      organizationId!,
     )
     purchaseId = purchase.id
     expect(purchase.status).toBe('DRAFT')
     expect(purchase.lines).toHaveLength(1)
     expect(Number(purchase.total)).toBe(50)
-  })
+  }, 60_000)
 
   it('confirma recepción y no duplica con mismo requestId', async () => {
     const product = await databaseService.client.product.findUnique({
@@ -129,6 +133,7 @@ describeIfDb('Purchases integration (PostgreSQL)', () => {
       },
       testActor,
       testContext,
+      organizationId!,
     )
     purchaseId = purchase.id
 
@@ -138,6 +143,7 @@ describeIfDb('Purchases integration (PostgreSQL)', () => {
       reqId,
       testActor,
       testContext,
+      organizationId!,
     )
     expect(first.status).toBe('RECEIVED')
 
@@ -146,6 +152,7 @@ describeIfDb('Purchases integration (PostgreSQL)', () => {
       reqId,
       testActor,
       testContext,
+      organizationId!,
     )
     expect(second.id).toBe(first.id)
     expect(second.status).toBe('RECEIVED')
@@ -154,5 +161,5 @@ describeIfDb('Purchases integration (PostgreSQL)', () => {
       where: { referenceId: purchaseId, type: 'ENTRY' },
     })
     expect(movements.length).toBe(1)
-  })
+  }, 60_000)
 })

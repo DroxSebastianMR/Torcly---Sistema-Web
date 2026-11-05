@@ -36,7 +36,8 @@ const operationalTables = [
 
 function requireProductionUrl() {
   const productionUrl = process.env.PRODUCTION_DIRECT_URL
-  if (!productionUrl) throw new Error('PRODUCTION_DIRECT_URL no está configurada.')
+  if (!productionUrl)
+    throw new Error('PRODUCTION_DIRECT_URL no está configurada.')
   if (productionUrl === process.env.DIRECT_URL) {
     throw new Error('La URL productiva no puede coincidir con DIRECT_URL.')
   }
@@ -150,8 +151,12 @@ try {
         operationalTotal: counts.reduce((sum, entry) => sum + entry.count, 0),
         rls: {
           enabled: rls.rows.filter((table) => table.enabled).length,
-          disabled: rls.rows.filter((table) => !table.enabled).map((table) => table.table_name),
-          forced: rls.rows.filter((table) => table.forced).map((table) => table.table_name),
+          disabled: rls.rows
+            .filter((table) => !table.enabled)
+            .map((table) => table.table_name),
+          forced: rls.rows
+            .filter((table) => table.forced)
+            .map((table) => table.table_name),
         },
         migrations: migrations.rows[0],
         runtimeAccess: runtimeAccess.rows[0],

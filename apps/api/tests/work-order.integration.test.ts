@@ -20,6 +20,7 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
   const app = createApp()
   const suffix = randomUUID().slice(0, 8)
   const password = `Clave-ot-${suffix}!`
+  const organizationCode = `work-order-${suffix}`
 
   const adminOrder = { roleCode: `admin-ot-${suffix}` }
   const readerOrder = { roleCode: `reader-ot-${suffix}` }
@@ -54,8 +55,8 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
   const adminIds = { userId: '', roleId: '' }
   const readerIds = { userId: '', roleId: '' }
   const noAccessIds = { userId: '', roleId: '' }
-  const technicianUserId = { id: '' }
-  const inactiveTechUserId = { id: '' }
+  const technicianId = { id: '' }
+  const inactiveTechnicianId = { id: '' }
   const state = {
     customerId: '',
     vehicleAId: '',
@@ -72,6 +73,7 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     activities: [] as string[],
   }
   const cleanupRoleIds: string[] = []
+  let organizationId = ''
   let sharedPasswordHash = ''
 
   async function loginAs(identifier: string) {
@@ -101,8 +103,17 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
   beforeAll(async () => {
     await databaseService.connect()
     sharedPasswordHash = await hashPassword(password)
+    const organization = await databaseService.client.organization.create({
+      data: { code: organizationCode, name: `Organización OT ${suffix}` },
+    })
+    organizationId = organization.id
 
-    const [readPermission, writePermission] = await Promise.all([
+    const [
+      readPermission,
+      writePermission,
+      appointmentReadPermission,
+      appointmentWritePermission,
+    ] = await Promise.all([
       databaseService.client.permission.upsert({
         where: { code: 'workshop:read' },
         create: {
@@ -116,6 +127,19 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
         create: { code: 'workshop:write', description: 'Registro de órdenes' },
         update: {},
       }),
+      databaseService.client.permission.upsert({
+        where: { code: 'appointments:read' },
+        create: { code: 'appointments:read', description: 'Consulta de citas' },
+        update: {},
+      }),
+      databaseService.client.permission.upsert({
+        where: { code: 'appointments:write' },
+        create: {
+          code: 'appointments:write',
+          description: 'Registro de citas',
+        },
+        update: {},
+      }),
     ])
 
     const [adminRole, readerRole, noAccessRole] = await Promise.all([
@@ -127,6 +151,8 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
             create: [
               { permissionId: readPermission.id },
               { permissionId: writePermission.id },
+              { permissionId: appointmentReadPermission.id },
+              { permissionId: appointmentWritePermission.id },
             ],
           },
         },
@@ -171,29 +197,43 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
           roles: { create: { roleId: noAccessRole.id } },
         },
       }),
-      databaseService.client.user.create({
+    ])
+
+    const [admin, reader, noAccess] = users
+
+    await databaseService.client.organizationMembership.createMany({
+      data: [
+        { organizationId, userId: admin.id, roleId: adminRole.id },
+        { organizationId, userId: reader.id, roleId: readerRole.id },
+        { organizationId, userId: noAccess.id, roleId: noAccessRole.id },
+      ],
+    })
+
+    const [technician, inactiveTechnician] = await Promise.all([
+      databaseService.client.technician.create({
         data: {
-          username: technicianIdentity.username,
+          organizationId,
+          code: `TEC-OT-${suffix}`,
+          fullName: technicianIdentity.name,
           email: technicianIdentity.email,
-          displayName: technicianIdentity.name,
-          passwordHash: sharedPasswordHash,
+          createdBy: identity.name,
         },
       }),
-      databaseService.client.user.create({
+      databaseService.client.technician.create({
         data: {
-          username: inactiveTechIdentity.username,
+          organizationId,
+          code: `TEC-IN-${suffix}`,
+          fullName: inactiveTechIdentity.name,
           email: inactiveTechIdentity.email,
-          displayName: inactiveTechIdentity.name,
-          passwordHash: sharedPasswordHash,
           active: false,
+          createdBy: identity.name,
         },
       }),
     ])
 
-    const [admin, reader, noAccess, technicianUser, inactiveTechUser] = users
-
     const customer = await databaseService.client.customer.create({
       data: {
+        organizationId,
         type: 'NATURAL',
         documentNumber: `77${suffix.slice(0, 8)}`,
         firstName: `Cliente OT ${suffix}`,
@@ -204,6 +244,7 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     })
     const vehicleA = await databaseService.client.vehicle.create({
       data: {
+        organizationId,
         plate: `A-${suffix.slice(0, 6).toUpperCase()}`,
         brand: 'Toyota',
         model: 'Corolla',
@@ -213,6 +254,7 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     })
     const vehicleB = await databaseService.client.vehicle.create({
       data: {
+        organizationId,
         plate: `B-${suffix.slice(0, 6).toUpperCase()}`,
         brand: 'Hyundai',
         model: 'Accent',
@@ -221,21 +263,43 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
       },
     })
 
+    const [category, brand, unit] = await Promise.all([
+      databaseService.client.productCategory.create({
+        data: { organizationId, name: `Categoría OT ${suffix}` },
+      }),
+      databaseService.client.productBrand.create({
+        data: { organizationId, name: `Marca OT ${suffix}` },
+      }),
+      databaseService.client.productUnit.create({
+        data: {
+          organizationId,
+          name: `Unidad OT ${suffix}`,
+          symbol: 'btl',
+        },
+      }),
+    ])
+
     const productActive = await databaseService.client.product.upsert({
-      where: { code: `P-OT-${suffix}` },
+      where: {
+        organizationId_code: { organizationId, code: `P-OT-${suffix}` },
+      },
       create: {
+        organizationId,
         code: `P-OT-${suffix}`,
         name: `Producto OT ${suffix}`,
         salePrice: 120.5,
-        category: { create: { name: `Categoría OT ${suffix}` } },
-        brand: { create: { name: `Marca OT ${suffix}` } },
-        unit: { create: { name: `Unidad OT ${suffix}`, symbol: 'btl' } },
+        categoryId: category.id,
+        brandId: brand.id,
+        unitId: unit.id,
       },
       update: {},
     })
     const productInactive = await databaseService.client.product.upsert({
-      where: { code: `P-OTI-${suffix}` },
+      where: {
+        organizationId_code: { organizationId, code: `P-OTI-${suffix}` },
+      },
       create: {
+        organizationId,
         code: `P-OTI-${suffix}`,
         name: `Producto inactivo OT ${suffix}`,
         salePrice: 50,
@@ -247,8 +311,11 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
       update: {},
     })
     const service = await databaseService.client.service.upsert({
-      where: { code: `S-OT-${suffix}` },
+      where: {
+        organizationId_code: { organizationId, code: `S-OT-${suffix}` },
+      },
       create: {
+        organizationId,
         code: `S-OT-${suffix}`,
         name: `Servicio OT ${suffix}`,
         price: 80,
@@ -259,8 +326,8 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     Object.assign(adminIds, { userId: admin.id, roleId: adminRole.id })
     Object.assign(readerIds, { userId: reader.id, roleId: readerRole.id })
     Object.assign(noAccessIds, { userId: noAccess.id, roleId: noAccessRole.id })
-    Object.assign(technicianUserId, { id: technicianUser.id })
-    Object.assign(inactiveTechUserId, { id: inactiveTechUser.id })
+    Object.assign(technicianId, { id: technician.id })
+    Object.assign(inactiveTechnicianId, { id: inactiveTechnician.id })
     Object.assign(state, {
       customerId: customer.id,
       vehicleAId: vehicleA.id,
@@ -277,16 +344,35 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
       adminIds.userId,
       readerIds.userId,
       noAccessIds.userId,
-      technicianUserId.id,
-      inactiveTechUserId.id,
     ].filter(Boolean)
 
-    const workOrderIds = [
-      state.order1Id,
-      state.order2Id,
-      state.order3Id,
-    ].filter(Boolean)
+    const workOrders = await databaseService.client.workOrder.findMany({
+      where: { organizationId },
+      select: { id: true },
+    })
+    const workOrderIds = workOrders.map((workOrder) => workOrder.id)
+    const sales = await databaseService.client.sale.findMany({
+      where: { organizationId },
+      select: { id: true },
+    })
+    const saleIds = sales.map((sale) => sale.id)
+
+    if (saleIds.length) {
+      await databaseService.client.payment.updateMany({
+        where: { organizationId, originalPaymentId: { not: null } },
+        data: { originalPaymentId: null },
+      })
+      await databaseService.client.payment.deleteMany({
+        where: { saleId: { in: saleIds } },
+      })
+      await databaseService.client.sale.deleteMany({
+        where: { id: { in: saleIds } },
+      })
+    }
     if (workOrderIds.length) {
+      await databaseService.client.workOrderConsumption.deleteMany({
+        where: { workOrderId: { in: workOrderIds } },
+      })
       await databaseService.client.workOrderLine.deleteMany({
         where: { workOrderId: { in: workOrderIds } },
       })
@@ -301,13 +387,8 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
       where: { userId: { in: userIds } },
     })
     await databaseService.client.inventoryMovement.deleteMany({
-      where: { referenceId: { in: workOrderIds } },
+      where: { organizationId },
     })
-    if (state.initialMovementId) {
-      await databaseService.client.inventoryMovement.delete({
-        where: { id: state.initialMovementId },
-      })
-    }
     await databaseService.client.vehicle.deleteMany({
       where: { customerId: state.customerId },
     })
@@ -320,8 +401,23 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     await databaseService.client.service.deleteMany({
       where: { id: state.serviceId },
     })
+    await databaseService.client.technician.deleteMany({
+      where: { organizationId },
+    })
+    await databaseService.client.productCategory.deleteMany({
+      where: { organizationId },
+    })
+    await databaseService.client.productBrand.deleteMany({
+      where: { organizationId },
+    })
+    await databaseService.client.productUnit.deleteMany({
+      where: { organizationId },
+    })
     await databaseService.client.authSession.deleteMany({
       where: { userId: { in: userIds } },
+    })
+    await databaseService.client.organizationMembership.deleteMany({
+      where: { organizationId },
     })
     await databaseService.client.userRole.deleteMany({
       where: { userId: { in: userIds } },
@@ -334,6 +430,9 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     })
     await databaseService.client.role.deleteMany({
       where: { id: { in: cleanupRoleIds } },
+    })
+    await databaseService.client.organization.deleteMany({
+      where: { id: organizationId },
     })
     await databaseService.disconnect()
   }, 60_000)
@@ -370,12 +469,17 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     })
     expect(created.status).toBe(201)
     expect(created.body.data.code).toMatch(/^OT-\d{6}$/)
-    expect(created.body.data.status).toBe('RECEPCIONADA')
-    expect(created.body.data.performedBy).toBe(identity.name)
-    expect(created.body.data.appointment.code).toMatch(/^CITA-\d{6}$/)
-    expect(created.body.data.vehicle.plate).toMatch(/^A-/)
 
     state.order1Id = created.body.data.id
+
+    const orderAfterCreate = await adminAgent.get(
+      `/api/v1/work-orders/${state.order1Id}`,
+    )
+    expect(orderAfterCreate.status).toBe(200)
+    expect(orderAfterCreate.body.data.status).toBe('RECEPCIONADA')
+    expect(orderAfterCreate.body.data.performedBy).toBe(identity.name)
+    expect(orderAfterCreate.body.data.appointment.code).toMatch(/^CITA-\d{6}$/)
+    expect(orderAfterCreate.body.data.vehicle.plate).toMatch(/^A-/)
 
     const appointmentAfter = await adminAgent.get(
       `/api/v1/appointments/${appointment.id}`,
@@ -530,13 +634,13 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     const adminAgent = await loginAs(identity.username)
     const inactive = await adminAgent
       .put(`/api/v1/work-orders/${state.order1Id}/technician`)
-      .send({ technicianId: inactiveTechUserId.id })
+      .send({ technicianId: inactiveTechnicianId.id })
     expect(inactive.status).toBe(409)
     expect(inactive.body.error.code).toBe('TECHNICIAN_INACTIVE')
 
     const assigned = await adminAgent
       .put(`/api/v1/work-orders/${state.order1Id}/technician`)
-      .send({ technicianId: technicianUserId.id })
+      .send({ technicianId: technicianId.id })
     expect(assigned.status).toBe(200)
     expect(assigned.body.data.technician).toBe(technicianIdentity.name)
 
@@ -584,7 +688,7 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
 
     const technician = await adminAgent
       .put(`/api/v1/work-orders/${order2Id}/technician`)
-      .send({ technicianId: technicianUserId.id })
+      .send({ technicianId: technicianId.id })
     expect(technician.status).toBe(409)
     expect(technician.body.error.code).toBe('WORK_ORDER_STATUS_INVALID')
 
@@ -626,11 +730,11 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
 
     const assigned = await adminAgent
       .put(`/api/v1/work-orders/${state.order1Id}/technician`)
-      .send({ technicianId: technicianUserId.id })
+      .send({ technicianId: technicianId.id })
     expect(assigned.status).toBe(200)
 
     const byTechnician = await adminAgent.get(
-      `/api/v1/work-orders?technicianId=${technicianUserId.id}`,
+      `/api/v1/work-orders?technicianId=${technicianId.id}`,
     )
     expect(byTechnician.status).toBe(200)
     expect(
@@ -659,17 +763,17 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
       .send({ technicianId: null })
     expect(unassigned.status).toBe(200)
 
-    const withoutTechnician = await adminAgent.post(
-      `/api/v1/work-orders/${state.order1Id}/execution/start`,
-    )
+    const withoutTechnician = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/execution/start`)
+      .send({})
     expect(withoutTechnician.status).toBe(200)
     expect(withoutTechnician.body.data.status).toBe('EN_EJECUCION')
     expect(withoutTechnician.body.data.executionStartedBy).toBe(identity.name)
     expect(withoutTechnician.body.data.executionStartedAt).toBeTruthy()
 
-    const repeated = await adminAgent.post(
-      `/api/v1/work-orders/${state.order1Id}/execution/start`,
-    )
+    const repeated = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/execution/start`)
+      .send({})
     expect(repeated.status).toBe(409)
     expect(repeated.body.error.code).toBe('WORK_ORDER_STATUS_INVALID')
   }, 60_000)
@@ -692,9 +796,9 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     expect(consumption.status).toBe(409)
     expect(consumption.body.error.code).toBe('WORK_ORDER_STATUS_INVALID')
 
-    const finalized = await adminAgent.post(
-      `/api/v1/work-orders/${state.order2Id}/finalize`,
-    )
+    const finalized = await adminAgent
+      .post(`/api/v1/work-orders/${state.order2Id}/finalize`)
+      .send({})
     expect(finalized.status).toBe(409)
     expect(finalized.body.error.code).toBe('WORK_ORDER_STATUS_INVALID')
   }, 60_000)
@@ -705,7 +809,7 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
       .post(`/api/v1/work-orders/${state.order1Id}/activities`)
       .send({ description: 'Revisar sistema de frenos' })
     expect(first.status).toBe(200)
-    expect(first.body.data.status).toBe('PENDIENTE')
+    expect(first.body.data.status).toBe('COMPLETADA')
     expect(first.body.data.performedBy).toBe(identity.name)
     state.activities.push(first.body.data.id)
 
@@ -728,6 +832,7 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
 
     const initial = await databaseService.client.inventoryMovement.create({
       data: {
+        organizationId,
         productId: state.productActiveId,
         type: 'INITIAL',
         status: 'CONFIRMED',
@@ -812,7 +917,7 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
         requestId,
         items: [{ lineId: state.lineId, quantity: 1, notes: 'Sobró repuesto' }],
       })
-    expect(returned.status).toBe(200)
+    expect(returned.status, JSON.stringify(returned.body)).toBe(200)
     expect(returned.body.data.registrations).toHaveLength(1)
     expect(returned.body.data.registrations[0].quantity).toBe(1)
 
@@ -858,7 +963,7 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     expect(response.body.data.registrations).toHaveLength(1)
   }, 60_000)
 
-  it('finaliza sin exigir actividades completadas', async () => {
+  it('finaliza sin exigir actividades completadas al confirmar repuestos pendientes', async () => {
     const adminAgent = await loginAs(identity.username)
 
     const execution = await adminAgent.get(
@@ -878,9 +983,9 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
       pending: 1,
     })
 
-    const finished = await adminAgent.post(
-      `/api/v1/work-orders/${state.order1Id}/finalize`,
-    )
+    const finished = await adminAgent
+      .post(`/api/v1/work-orders/${state.order1Id}/finalize`)
+      .send({ confirmPendingProducts: true })
     expect(finished.status).toBe(200)
     expect(finished.body.data.status).toBe('LISTA_PARA_ENTREGA')
     expect(finished.body.data.readyForDeliveryAt).toBeTruthy()
@@ -889,24 +994,32 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
   it('finaliza sin actividades y entrega solo órdenes listas', async () => {
     const adminAgent = await loginAs(identity.username)
 
-    await adminAgent
+    const diagnosis = await adminAgent
       .put(`/api/v1/work-orders/${state.order3Id}/diagnosis`)
       .send({ diagnosis: 'Cita para actividad obligatoria' })
-    await adminAgent.put(`/api/v1/work-orders/${state.order3Id}/budget`).send({
-      lines: [{ type: 'SERVICE', serviceId: state.serviceId }],
-    })
-    await adminAgent.post(`/api/v1/work-orders/${state.order3Id}/budget/send`)
-    await adminAgent
+    expect(diagnosis.status).toBe(200)
+    const budget = await adminAgent
+      .put(`/api/v1/work-orders/${state.order3Id}/budget`)
+      .send({
+        lines: [{ type: 'SERVICE', serviceId: state.serviceId }],
+      })
+    expect(budget.status).toBe(200)
+    const sent = await adminAgent
+      .post(`/api/v1/work-orders/${state.order3Id}/budget/send`)
+      .send({})
+    expect(sent.status).toBe(200)
+    const decision = await adminAgent
       .post(`/api/v1/work-orders/${state.order3Id}/decision`)
       .send({ decision: 'APPROVED' })
-    const started = await adminAgent.post(
-      `/api/v1/work-orders/${state.order3Id}/execution/start`,
-    )
+    expect(decision.status).toBe(200)
+    const started = await adminAgent
+      .post(`/api/v1/work-orders/${state.order3Id}/execution/start`)
+      .send({})
     expect(started.status).toBe(200)
 
-    const noActivities = await adminAgent.post(
-      `/api/v1/work-orders/${state.order3Id}/finalize`,
-    )
+    const noActivities = await adminAgent
+      .post(`/api/v1/work-orders/${state.order3Id}/finalize`)
+      .send({})
     expect(noActivities.status).toBe(200)
     expect(noActivities.body.data.status).toBe('LISTA_PARA_ENTREGA')
 
@@ -946,12 +1059,15 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     )
     expect(Number(generatedSale?.total)).toBeGreaterThan(0)
     expect(Number(generatedSale?.total)).toBe(200.5)
-    expect(generatedSale?.lines).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ type: 'PRODUCT', quantity: 1 }),
-        expect.objectContaining({ type: 'SERVICE', quantity: 1 }),
-      ]),
-    )
+    expect(
+      generatedSale?.lines.map((line) => ({
+        type: line.type,
+        quantity: String(line.quantity),
+      })),
+    ).toEqual([
+      { type: 'PRODUCT', quantity: '1' },
+      { type: 'SERVICE', quantity: '1' },
+    ])
 
     const double = await adminAgent
       .post(`/api/v1/work-orders/${state.order1Id}/delivery`)
@@ -970,7 +1086,8 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
       (item: { id: string }) => item.id === state.order1Id,
     )
     expect(order).toBeDefined()
-    expect(order.technician).toBe(technicianIdentity.name)
+    // La orden se inició deliberadamente sin técnico: el flujo lo permite.
+    expect(order.technician).toBeNull()
     expect(order.deliveredAt).toBeTruthy()
     expect(order.products).toEqual([expect.objectContaining({ quantity: 1 })])
     expect(order.activities.length).toBeGreaterThanOrEqual(1)
@@ -1002,7 +1119,6 @@ describeWithDatabase('Órdenes de taller integradas con PostgreSQL', () => {
     expect(codes).toContain('WORK_ORDER_TECHNICIAN_ASSIGNED')
     expect(codes).toContain('WORK_ORDER_EXECUTION_STARTED')
     expect(codes).toContain('WORK_ORDER_ACTIVITY_CREATED')
-    expect(codes).toContain('WORK_ORDER_ACTIVITY_COMPLETED')
     expect(codes).toContain('WORK_ORDER_PRODUCT_CONSUMED')
     expect(codes).toContain('WORK_ORDER_PRODUCT_RETURNED')
     expect(codes).toContain('WORK_ORDER_READY_FOR_DELIVERY')

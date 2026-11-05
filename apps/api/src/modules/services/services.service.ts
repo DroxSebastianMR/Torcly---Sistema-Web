@@ -43,8 +43,8 @@ function mapPersistenceError(error: unknown): never {
 }
 
 export const servicesService = {
-  async list(filters: ServiceFilters) {
-    const result = await servicesRepository.list(filters)
+  async list(filters: ServiceFilters, organizationId: string) {
+    const result = await servicesRepository.list(filters, organizationId)
     return {
       data: result.items.map(toResponse),
       pagination: {
@@ -56,31 +56,49 @@ export const servicesService = {
     }
   },
 
-  async getById(id: string) {
-    const service = await servicesRepository.findById(id)
+  async getById(id: string, organizationId: string) {
+    const service = await servicesRepository.findById(id, organizationId)
     if (!service)
       throw new AppError(404, 'SERVICE_NOT_FOUND', 'Servicio no encontrado.')
     return { data: toResponse(service) }
   },
 
-  async checkCodeAvailability(code: string, excludeId?: string) {
+  async checkCodeAvailability(
+    code: string,
+    organizationId: string,
+    excludeId?: string,
+  ) {
     return {
       data: {
         code,
-        available: await servicesRepository.isCodeAvailable(code, excludeId),
+        available: await servicesRepository.isCodeAvailable(
+          code,
+          organizationId,
+          excludeId,
+        ),
       },
     }
   },
 
-  async getOptions() {
-    return { data: await servicesRepository.listActive() }
+  async getOptions(organizationId: string) {
+    return { data: await servicesRepository.listActive(organizationId) }
   },
 
-  async create(input: ServiceInput, actorId: string, context: RequestContext) {
+  async create(
+    input: ServiceInput,
+    actorId: string,
+    organizationId: string,
+    context: RequestContext,
+  ) {
     try {
       return {
         data: toResponse(
-          await servicesRepository.create(input, actorId, context),
+          await servicesRepository.create(
+            input,
+            actorId,
+            organizationId,
+            context,
+          ),
         ),
       }
     } catch (error) {
@@ -92,12 +110,19 @@ export const servicesService = {
     id: string,
     input: ServiceInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     try {
       return {
         data: toResponse(
-          await servicesRepository.update(id, input, actorId, context),
+          await servicesRepository.update(
+            id,
+            input,
+            actorId,
+            organizationId,
+            context,
+          ),
         ),
       }
     } catch (error) {
@@ -109,12 +134,19 @@ export const servicesService = {
     id: string,
     active: boolean,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     try {
       return {
         data: toResponse(
-          await servicesRepository.updateStatus(id, active, actorId, context),
+          await servicesRepository.updateStatus(
+            id,
+            active,
+            actorId,
+            organizationId,
+            context,
+          ),
         ),
       }
     } catch (error) {

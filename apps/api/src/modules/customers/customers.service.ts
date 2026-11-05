@@ -29,9 +29,11 @@ function toResponse(customer: CustomerRecord): CustomerIdentity {
 
 function normalizeFields(
   input: CreateCustomerInput,
+  organizationId: string,
 ): Prisma.CustomerUncheckedCreateInput {
   if (input.type === 'NATURAL') {
     return {
+      organizationId,
       type: 'NATURAL',
       documentNumber: input.documentNumber,
       firstName: input.firstName,
@@ -43,6 +45,7 @@ function normalizeFields(
   }
 
   return {
+    organizationId,
     type: 'LEGAL',
     documentNumber: input.documentNumber,
     legalName: input.legalName,
@@ -71,8 +74,8 @@ function mapPersistenceError(error: unknown): never {
   throw error
 }
 
-async function assertCustomerExists(id: string) {
-  const customer = await customersRepository.findById(id)
+async function assertCustomerExists(id: string, organizationId: string) {
+  const customer = await customersRepository.findById(id, organizationId)
   if (!customer) {
     throw new AppError(404, 'CUSTOMER_NOT_FOUND', 'Cliente no encontrado.')
   }
@@ -80,8 +83,8 @@ async function assertCustomerExists(id: string) {
 }
 
 export const customersService = {
-  async list(filters: CustomerListFilters) {
-    const result = await customersRepository.list(filters)
+  async list(filters: CustomerListFilters, organizationId: string) {
+    const result = await customersRepository.list(filters, organizationId)
     return {
       data: result.items.map(toResponse),
       pagination: {
@@ -93,20 +96,21 @@ export const customersService = {
     }
   },
 
-  async getById(id: string) {
-    return { data: toResponse(await assertCustomerExists(id)) }
+  async getById(id: string, organizationId: string) {
+    return { data: toResponse(await assertCustomerExists(id, organizationId)) }
   },
 
   async create(
     input: CreateCustomerInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     try {
       return {
         data: toResponse(
           await customersRepository.create(
-            normalizeFields(input),
+            normalizeFields(input, organizationId),
             actorId,
             context,
           ),
@@ -121,6 +125,7 @@ export const customersService = {
     id: string,
     input: UpdateCustomerInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     try {
@@ -128,8 +133,9 @@ export const customersService = {
         data: toResponse(
           await customersRepository.update(
             id,
-            normalizeFields(input),
+            normalizeFields(input, organizationId),
             actorId,
+            organizationId,
             context,
           ),
         ),

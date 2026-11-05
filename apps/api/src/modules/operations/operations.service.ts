@@ -53,12 +53,18 @@ async function buildSection(
   section: OperationalSection,
   from: string | null,
   to: string | null,
+  organizationId: string,
 ): Promise<OperationalSectionSummary> {
   switch (section) {
     case 'appointments': {
       const byStatus = await databaseService.measure(
         'operations.summary.appointments',
-        () => operationsRepository.countAppointmentsByStatus(from, to),
+        () =>
+          operationsRepository.countAppointmentsByStatus(
+            from,
+            to,
+            organizationId,
+          ),
       )
       return {
         section: 'appointments',
@@ -70,7 +76,12 @@ async function buildSection(
     case 'workOrders': {
       const byStatus = await databaseService.measure(
         'operations.summary.work_orders',
-        () => operationsRepository.countWorkOrdersByStatus(from, to),
+        () =>
+          operationsRepository.countWorkOrdersByStatus(
+            from,
+            to,
+            organizationId,
+          ),
       )
       const total = Object.values(byStatus).reduce(
         (sum, value) => sum + value,
@@ -88,14 +99,14 @@ async function buildSection(
     case 'sales': {
       const { confirmedCount, confirmedAmount } = await databaseService.measure(
         'operations.summary.sales',
-        () => operationsRepository.summarizeSales(from, to),
+        () => operationsRepository.summarizeSales(from, to, organizationId),
       )
       return { section: 'sales', confirmedCount, confirmedAmount }
     }
     case 'payments': {
       const pending = await databaseService.measure(
         'operations.summary.payments',
-        () => operationsRepository.summarizePendingObligations(),
+        () => operationsRepository.summarizePendingObligations(organizationId),
       )
       return {
         section: 'payments',
@@ -106,7 +117,7 @@ async function buildSection(
     case 'inventory': {
       const lowStockCount = await databaseService.measure(
         'operations.summary.inventory',
-        () => operationsRepository.countLowStockProducts(),
+        () => operationsRepository.countLowStockProducts(organizationId),
       )
       return { section: 'inventory', lowStockCount }
     }
@@ -116,6 +127,7 @@ async function buildSection(
 async function buildAttention(
   section: OperationalSection,
   filters: OperationalFilters,
+  organizationId: string,
 ): Promise<{ data: AttentionItem[]; pagination: Pagination }> {
   const { from, to } = assertValidPeriod(filters.from, filters.to)
   const { page, pageSize } = filters
@@ -129,6 +141,7 @@ async function buildAttention(
           to,
           skip,
           pageSize,
+          organizationId,
         )
       return {
         data: items.map((item) => ({
@@ -149,6 +162,7 @@ async function buildAttention(
           to,
           skip,
           pageSize,
+          organizationId,
         )
       return {
         data: items.map((item) => ({
@@ -167,6 +181,7 @@ async function buildAttention(
         to,
         skip,
         pageSize,
+        organizationId,
       )
       return {
         data: items.map((item) => ({
@@ -179,7 +194,8 @@ async function buildAttention(
       }
     }
     case 'payments': {
-      const obligations = await operationsRepository.listPendingObligations()
+      const obligations =
+        await operationsRepository.listPendingObligations(organizationId)
       const pending = obligations
         .map((obligation) => {
           const paid = computePaidAmount(obligation.payments)
@@ -200,7 +216,8 @@ async function buildAttention(
       return paginate(pending, page, pageSize)
     }
     case 'inventory': {
-      const products = await operationsRepository.listLowStockProducts()
+      const products =
+        await operationsRepository.listLowStockProducts(organizationId)
       return paginate(products, page, pageSize)
     }
   }
@@ -210,13 +227,17 @@ export const operationsService = {
   async getSummary(
     filters: Pick<OperationalFilters, 'from' | 'to'>,
     permissions: readonly string[],
+    organizationId: string,
   ): Promise<OperationalSummary> {
     const { from, to } = assertValidPeriod(filters.from, filters.to)
     const allowed = authorizedSections(permissions)
     const entries = await Promise.all(
       allowed.map(
         async (section) =>
-          [section, await buildSection(section, from, to)] as const,
+          [
+            section,
+            await buildSection(section, from, to, organizationId),
+          ] as const,
       ),
     )
     const sections = Object.fromEntries(
@@ -234,10 +255,15 @@ export const operationsService = {
     section: OperationalSection,
     filters: OperationalFilters,
     permissions: readonly string[],
+    organizationId: string,
   ): Promise<OperationalAttentionResponse> {
     assertSectionAccess(section, permissions)
     const { from, to } = assertValidPeriod(filters.from, filters.to)
-    const { data, pagination } = await buildAttention(section, filters)
+    const { data, pagination } = await buildAttention(
+      section,
+      filters,
+      organizationId,
+    )
     return {
       section,
       descriptor: SECTION_DESCRIPTORS[section],

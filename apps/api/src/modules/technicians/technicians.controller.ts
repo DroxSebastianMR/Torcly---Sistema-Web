@@ -1,5 +1,6 @@
 import type { RequestHandler } from 'express'
 import { getRequestContext } from '../auth/auth.middleware.js'
+import { requireOrganizationContext } from '../auth/organization-context.js'
 import {
   technicianIdSchema,
   technicianInputSchema,
@@ -9,16 +10,26 @@ import {
 import { techniciansService } from './technicians.service.js'
 export const listTechnicians: RequestHandler = async (req, res) => {
   res.json(
-    await techniciansService.list(technicianQuerySchema.parse(req.query)),
+    await techniciansService.list(
+      technicianQuerySchema.parse(req.query),
+      requireOrganizationContext(req.auth).id,
+    ),
   )
 }
 export const getTechnician: RequestHandler = async (req, res) => {
   res.json(
-    await techniciansService.getById(technicianIdSchema.parse(req.params).id),
+    await techniciansService.getById(
+      technicianIdSchema.parse(req.params).id,
+      requireOrganizationContext(req.auth).id,
+    ),
   )
 }
-export const getTechnicianOptions: RequestHandler = async (_req, res) => {
-  res.json(await techniciansService.getOptions())
+export const getTechnicianOptions: RequestHandler = async (req, res) => {
+  res.json(
+    await techniciansService.getOptions(
+      requireOrganizationContext(req.auth).id,
+    ),
+  )
 }
 export const createTechnician: RequestHandler = async (req, res) => {
   res
@@ -27,6 +38,7 @@ export const createTechnician: RequestHandler = async (req, res) => {
       await techniciansService.create(
         technicianInputSchema.parse(req.body),
         req.auth!.id,
+        requireOrganizationContext(req.auth).id,
         getRequestContext(req, res),
       ),
     )
@@ -37,6 +49,7 @@ export const updateTechnician: RequestHandler = async (req, res) => {
       technicianIdSchema.parse(req.params).id,
       technicianInputSchema.parse(req.body),
       req.auth!.id,
+      requireOrganizationContext(req.auth).id,
       getRequestContext(req, res),
     ),
   )
@@ -47,6 +60,7 @@ export const updateTechnicianStatus: RequestHandler = async (req, res) => {
       technicianIdSchema.parse(req.params).id,
       technicianStatusSchema.parse(req.body).active,
       req.auth!.id,
+      requireOrganizationContext(req.auth).id,
       getRequestContext(req, res),
     ),
   )

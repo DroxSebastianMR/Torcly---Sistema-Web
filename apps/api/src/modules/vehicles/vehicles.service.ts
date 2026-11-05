@@ -57,8 +57,8 @@ function mapPersistenceError(error: unknown): never {
   throw error
 }
 
-async function assertVehicleExists(id: string) {
-  const vehicle = await vehiclesRepository.findById(id)
+async function assertVehicleExists(id: string, organizationId: string) {
+  const vehicle = await vehiclesRepository.findById(id, organizationId)
   if (!vehicle) {
     throw new AppError(404, 'VEHICLE_NOT_FOUND', 'Vehículo no encontrado.')
   }
@@ -66,8 +66,11 @@ async function assertVehicleExists(id: string) {
 }
 
 export const vehiclesService = {
-  async list(filters: VehicleListFilters): Promise<VehicleListResponse> {
-    const result = await vehiclesRepository.list(filters)
+  async list(
+    filters: VehicleListFilters,
+    organizationId: string,
+  ): Promise<VehicleListResponse> {
+    const result = await vehiclesRepository.list(filters, organizationId)
     return {
       data: result.items.map(toResponse),
       pagination: {
@@ -79,21 +82,23 @@ export const vehiclesService = {
     }
   },
 
-  async getById(id: string) {
-    return { data: toResponse(await assertVehicleExists(id)) }
+  async getById(id: string, organizationId: string) {
+    return { data: toResponse(await assertVehicleExists(id, organizationId)) }
   },
 
   async create(
     input: VehicleCreateInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     try {
       return {
         data: toResponse(
           await vehiclesRepository.create(
-            { ...input, plate: normalizePlate(input.plate) },
+            { ...input, organizationId, plate: normalizePlate(input.plate) },
             actorId,
+            organizationId,
             context,
           ),
         ),
@@ -107,6 +112,7 @@ export const vehiclesService = {
     id: string,
     input: VehicleUpdateInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     try {
@@ -116,6 +122,7 @@ export const vehiclesService = {
             id,
             { ...input, plate: normalizePlate(input.plate) },
             actorId,
+            organizationId,
             context,
           ),
         ),

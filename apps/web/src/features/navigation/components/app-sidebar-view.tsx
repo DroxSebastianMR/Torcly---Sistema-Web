@@ -39,7 +39,7 @@ export function AppSidebarView({ groups, onNavigate }: SidebarViewProps) {
         ))}
       </nav>
       <footer className="shrink-0 px-6 py-4 text-[10px] font-medium tracking-[0.12em] text-white/35">
-        v1.0.1
+        v1.1.1
       </footer>
     </>
   )

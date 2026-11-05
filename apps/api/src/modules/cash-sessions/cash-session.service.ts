@@ -47,13 +47,13 @@ function serialize(
 }
 
 export const cashSessionsService = {
-  async current() {
-    const result = await cashSessionsRepository.current()
+  async current(organizationId: string) {
+    const result = await cashSessionsRepository.current(organizationId)
     return { data: result ? serialize(result.row, result.totals) : null }
   },
 
-  async getById(id: string) {
-    const result = await cashSessionsRepository.findById(id)
+  async getById(id: string, organizationId: string) {
+    const result = await cashSessionsRepository.findById(id, organizationId)
     if (!result)
       throw new AppError(404, 'CASH_SESSION_NOT_FOUND', 'Caja no encontrada.')
     return { data: serialize(result.row, result.totals) }
@@ -61,8 +61,12 @@ export const cashSessionsService = {
 
   async list(
     filters: CashSessionListFilters,
+    organizationId: string,
   ): Promise<CashSessionListResponse> {
-    const result = await cashSessionsRepository.listClosed(filters)
+    const result = await cashSessionsRepository.listClosed(
+      filters,
+      organizationId,
+    )
     const totalPages = Math.max(1, Math.ceil(result.total / filters.pageSize))
     return {
       data: result.rows.map(({ row, totals }) => serialize(row, totals)),
@@ -79,8 +83,14 @@ export const cashSessionsService = {
     input: CashSessionOpenInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
-    const result = await cashSessionsRepository.open(input, actor, context)
+    const result = await cashSessionsRepository.open(
+      input,
+      actor,
+      context,
+      organizationId,
+    )
     return { data: serialize(result.row, result.totals) }
   },
 
@@ -89,8 +99,15 @@ export const cashSessionsService = {
     input: CashSessionCloseInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
-    const result = await cashSessionsRepository.close(id, input, actor, context)
+    const result = await cashSessionsRepository.close(
+      id,
+      input,
+      actor,
+      context,
+      organizationId,
+    )
     return { data: serialize(result.row, result.totals) }
   },
 }

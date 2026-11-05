@@ -38,8 +38,8 @@ function persistence(error: unknown): never {
   throw error
 }
 export const techniciansService = {
-  async list(filters: TechnicianFilters) {
-    const result = await techniciansRepository.list(filters)
+  async list(filters: TechnicianFilters, organizationId: string) {
+    const result = await techniciansRepository.list(filters, organizationId)
     return {
       data: result.items.map(toResponse),
       pagination: {
@@ -50,24 +50,30 @@ export const techniciansService = {
       },
     }
   },
-  async getById(id: string) {
-    const item = await techniciansRepository.findById(id)
+  async getById(id: string, organizationId: string) {
+    const item = await techniciansRepository.findById(id, organizationId)
     if (!item)
       throw new AppError(404, 'TECHNICIAN_NOT_FOUND', 'Técnico no encontrado.')
     return { data: toResponse(item) }
   },
-  async getOptions() {
-    return { data: await techniciansRepository.listActive() }
+  async getOptions(organizationId: string) {
+    return { data: await techniciansRepository.listActive(organizationId) }
   },
   async create(
     input: TechnicianInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     try {
       return {
         data: toResponse(
-          await techniciansRepository.create(input, actorId, context),
+          await techniciansRepository.create(
+            input,
+            actorId,
+            organizationId,
+            context,
+          ),
         ),
       }
     } catch (error) {
@@ -78,12 +84,19 @@ export const techniciansService = {
     id: string,
     input: TechnicianInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     try {
       return {
         data: toResponse(
-          await techniciansRepository.update(id, input, actorId, context),
+          await techniciansRepository.update(
+            id,
+            input,
+            actorId,
+            organizationId,
+            context,
+          ),
         ),
       }
     } catch (error) {
@@ -94,6 +107,7 @@ export const techniciansService = {
     id: string,
     active: boolean,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     try {
@@ -103,6 +117,7 @@ export const techniciansService = {
             id,
             active,
             actorId,
+            organizationId,
             context,
           ),
         ),

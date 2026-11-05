@@ -67,6 +67,7 @@ function paginate(total: number, page: number, pageSize: number) {
 async function handleMovementPersistenceError(
   error: unknown,
   idempotencyKey: string,
+  organizationId: string,
 ): Promise<InventoryMovementRecord> {
   if (error instanceof AppError) throw error
 
@@ -84,7 +85,10 @@ async function handleMovementPersistenceError(
     }
 
     if (error.code === 'P2002') {
-      const existing = await inventoryRepository.findByKey(idempotencyKey)
+      const existing = await inventoryRepository.findByKey(
+        idempotencyKey,
+        organizationId,
+      )
       if (existing) return existing
       throw new AppError(
         409,
@@ -98,16 +102,25 @@ async function handleMovementPersistenceError(
 }
 
 export const inventoryService = {
-  async listExistence(filters: ExistenceFilters) {
-    const result = await inventoryRepository.listExistence(filters)
+  async listExistence(filters: ExistenceFilters, organizationId: string) {
+    const result = await inventoryRepository.listExistence(
+      filters,
+      organizationId,
+    )
     return {
       data: result.items,
       pagination: paginate(result.total, filters.page, filters.pageSize),
     }
   },
 
-  async listMovements(filters: InventoryMovementFilters) {
-    const result = await inventoryRepository.listMovements(filters)
+  async listMovements(
+    filters: InventoryMovementFilters,
+    organizationId: string,
+  ) {
+    const result = await inventoryRepository.listMovements(
+      filters,
+      organizationId,
+    )
     const actorNames = await resolveActorNames(result.items)
     return {
       data: result.items.map((movement) => toResponse(movement, actorNames)),
@@ -119,34 +132,50 @@ export const inventoryService = {
     input: MovementInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
-    return this.registerMovement(input, 'INITIAL', actor, context)
+    return this.registerMovement(
+      input,
+      'INITIAL',
+      actor,
+      context,
+      organizationId,
+    )
   },
 
   async registerEntry(
     input: MovementInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
-    return this.registerMovement(input, 'ENTRY', actor, context)
+    return this.registerMovement(input, 'ENTRY', actor, context, organizationId)
   },
 
   async registerExit(
     input: MovementInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
-    return this.registerMovement(input, 'EXIT', actor, context)
+    return this.registerMovement(input, 'EXIT', actor, context, organizationId)
   },
 
   async registerAdjustment(
     input: MovementInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     const type = resolveAdjustmentType(input.quantity)
     const quantity = Math.abs(input.quantity)
-    return this.registerMovement({ ...input, quantity }, type, actor, context)
+    return this.registerMovement(
+      { ...input, quantity },
+      type,
+      actor,
+      context,
+      organizationId,
+    )
   },
 
   async registerMovement(
@@ -154,6 +183,7 @@ export const inventoryService = {
     type: MovementType,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     try {
       const registration = await inventoryRepository.registerMovement(
@@ -161,6 +191,7 @@ export const inventoryService = {
         type,
         actor,
         context,
+        organizationId,
       )
       const { movement } = registration
 
@@ -172,6 +203,7 @@ export const inventoryService = {
         try {
           await databaseService.measure('inventory.low_stock.notify', () =>
             notificationsService.notifyUsersSafely({
+              organizationId,
               permission: 'inventory:read',
               type: 'STOCK_LOW',
               preferenceKey: 'stockLow',
@@ -190,6 +222,7 @@ export const inventoryService = {
       const movement = await handleMovementPersistenceError(
         error,
         input.idempotencyKey,
+        organizationId,
       )
       return { data: toResponse(movement) }
     }

@@ -18,6 +18,7 @@ const context = {
   requestId: 'req-pay-1',
   ipAddress: '127.0.0.1',
 }
+const organizationId = 'organization-1'
 
 const customer = {
   id: 'a0000000-0000-4000-8000-000000000001',
@@ -95,15 +96,18 @@ describe('Servicio de cobros', () => {
       }),
     ])
 
-    const result = await paymentsService.list({
-      search: '',
-      status: 'all',
-      method: 'all',
-      from: null,
-      to: null,
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await paymentsService.list(
+      {
+        search: '',
+        status: 'all',
+        method: 'all',
+        from: null,
+        to: null,
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
 
     expect(result.summary).toEqual({
       pendingCount: 2,
@@ -140,15 +144,18 @@ describe('Servicio de cobros', () => {
       obligation({ id: 'sale-2', code: 'VENTA-000002' }),
     ])
 
-    const result = await paymentsService.list({
-      search: '',
-      status: 'PENDING',
-      method: 'all',
-      from: null,
-      to: null,
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await paymentsService.list(
+      {
+        search: '',
+        status: 'PENDING',
+        method: 'all',
+        from: null,
+        to: null,
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
 
     expect(result.data).toHaveLength(1)
     expect(result.data[0].id).toBe('sale-2')
@@ -176,15 +183,18 @@ describe('Servicio de cobros', () => {
       }),
     ])
 
-    const result = await paymentsService.list({
-      search: '',
-      status: 'all',
-      method: 'CARD',
-      from: '2026-10-03',
-      to: '2026-10-03',
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await paymentsService.list(
+      {
+        search: '',
+        status: 'all',
+        method: 'CARD',
+        from: '2026-10-03',
+        to: '2026-10-03',
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
 
     expect(result.data[0].id).toBe('sale-1')
     expect(result.summary.collectedAmount).toBe(30)
@@ -193,15 +203,18 @@ describe('Servicio de cobros', () => {
   it('no cobra por período las obligaciones y exige rango válido', async () => {
     repository.listObligations.mockResolvedValue([])
     await expect(
-      paymentsService.list({
-        search: '',
-        status: 'all',
-        method: 'all',
-        from: '2026-10-05',
-        to: '2026-10-01',
-        page: 1,
-        pageSize: 20,
-      }),
+      paymentsService.list(
+        {
+          search: '',
+          status: 'all',
+          method: 'all',
+          from: '2026-10-05',
+          to: '2026-10-01',
+          page: 1,
+          pageSize: 20,
+        },
+        organizationId,
+      ),
     ).rejects.toMatchObject({
       status: 400,
       code: 'PAYMENT_DATE_RANGE_INVALID',
@@ -225,7 +238,7 @@ describe('Servicio de cobros', () => {
       }),
     )
 
-    const result = await paymentsService.getById('sale-1')
+    const result = await paymentsService.getById('sale-1', organizationId)
 
     expect(result.data).toMatchObject({
       paid: 30,
@@ -240,7 +253,9 @@ describe('Servicio de cobros', () => {
 
   it('informa una venta inexistente en el detalle', async () => {
     repository.findById.mockResolvedValue(null)
-    await expect(paymentsService.getById('sale-1')).rejects.toMatchObject({
+    await expect(
+      paymentsService.getById('sale-1', organizationId),
+    ).rejects.toMatchObject({
       status: 404,
       code: 'SALE_NOT_FOUND',
     })
@@ -259,6 +274,7 @@ describe('Servicio de cobros', () => {
       { requestId: 'uuid', amount: 50, method: 'CASH' },
       { id: 'user-1', name: 'Cajero' },
       context,
+      organizationId,
     )
 
     expect(repository.registerPayment).toHaveBeenCalledWith(
@@ -266,6 +282,7 @@ describe('Servicio de cobros', () => {
       { requestId: 'uuid', amount: 50, method: 'CASH' },
       { id: 'user-1', name: 'Cajero' },
       context,
+      organizationId,
     )
     expect(result.data.paid).toBe(50)
     expect(result.data.balance).toBe(80)
@@ -299,6 +316,7 @@ describe('Servicio de cobros', () => {
       input,
       { id: 'user-1', name: 'Cajero' },
       context,
+      organizationId,
     )
 
     expect(repository.registerSplitPayment).toHaveBeenCalledWith(
@@ -306,6 +324,7 @@ describe('Servicio de cobros', () => {
       input,
       { id: 'user-1', name: 'Cajero' },
       context,
+      organizationId,
     )
     expect(result.data.paid).toBe(100)
     expect(result.data.balance).toBe(30)
@@ -335,6 +354,7 @@ describe('Servicio de cobros', () => {
       { requestId: 'uuid', amount: 20, reason: 'Cobro duplicado' },
       { id: 'user-1', name: 'Cajero' },
       context,
+      organizationId,
     )
 
     expect(repository.compensatePayment).toHaveBeenCalledWith(
@@ -342,6 +362,7 @@ describe('Servicio de cobros', () => {
       { requestId: 'uuid', amount: 20, reason: 'Cobro duplicado' },
       { id: 'user-1', name: 'Cajero' },
       context,
+      organizationId,
     )
     expect(result.data.events[1].netAmount).toBe(-20)
     expect(result.data.balance).toBe(100)
@@ -357,15 +378,18 @@ describe('Servicio de cobros', () => {
       ),
     )
 
-    const result = await paymentsService.list({
-      search: '',
-      status: 'all',
-      method: 'all',
-      from: null,
-      to: null,
-      page: 2,
-      pageSize: 10,
-    })
+    const result = await paymentsService.list(
+      {
+        search: '',
+        status: 'all',
+        method: 'all',
+        from: null,
+        to: null,
+        page: 2,
+        pageSize: 10,
+      },
+      organizationId,
+    )
 
     expect(result.data).toHaveLength(10)
     expect(result.data[0].id).toBe('sale-11')

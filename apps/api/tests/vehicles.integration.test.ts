@@ -14,6 +14,7 @@ describeWithDatabase('Vehículos integrados con PostgreSQL', () => {
   const password = `Clave-vehiculos-${suffix}!`
   const documentNumber = `87654${suffix.slice(0, 3)}`
   const plate = `ABC${suffix.slice(0, 5).toUpperCase()}`
+  const organizationCode = `vehicles-${suffix}`
 
   const adminOrder = { roleCode: `admin-vehicles-${suffix}` }
   const readerOrder = { roleCode: `reader-vehicles-${suffix}` }
@@ -40,11 +41,19 @@ describeWithDatabase('Vehículos integrados con PostgreSQL', () => {
   const noAccessIds = { userId: '', roleId: '' }
   const createdIds = { vehicleId: '', customerId: '' }
   const cleanupRoleIds: string[] = []
+  let organizationId = ''
   let sharedPasswordHash = ''
 
   beforeAll(async () => {
     await databaseService.connect()
     sharedPasswordHash = await hashPassword(password)
+    const organization = await databaseService.client.organization.create({
+      data: {
+        code: organizationCode,
+        name: `Organización vehículos ${suffix}`,
+      },
+    })
+    organizationId = organization.id
 
     const [readPermission, writePermission] = await Promise.all([
       databaseService.client.permission.upsert({
@@ -122,6 +131,7 @@ describeWithDatabase('Vehículos integrados con PostgreSQL', () => {
 
     const customer = await databaseService.client.customer.create({
       data: {
+        organizationId,
         type: 'NATURAL',
         documentNumber,
         firstName: 'María',
@@ -138,6 +148,13 @@ describeWithDatabase('Vehículos integrados con PostgreSQL', () => {
     })
     createdIds.customerId = customer.id
     cleanupRoleIds.push(adminRole.id, readerRole.id, noAccessRole.id)
+    await databaseService.client.organizationMembership.createMany({
+      data: [
+        { organizationId, userId: admin.id, roleId: adminRole.id },
+        { organizationId, userId: reader.id, roleId: readerRole.id },
+        { organizationId, userId: noAccess.id, roleId: noAccessRole.id },
+      ],
+    })
   }, 60_000)
 
   afterAll(async () => {
@@ -162,6 +179,9 @@ describeWithDatabase('Vehículos integrados con PostgreSQL', () => {
     await databaseService.client.authSession.deleteMany({
       where: { userId: { in: userIds } },
     })
+    await databaseService.client.organizationMembership.deleteMany({
+      where: { organizationId },
+    })
     await databaseService.client.userRole.deleteMany({
       where: { userId: { in: userIds } },
     })
@@ -173,6 +193,9 @@ describeWithDatabase('Vehículos integrados con PostgreSQL', () => {
     })
     await databaseService.client.role.deleteMany({
       where: { id: { in: cleanupRoleIds } },
+    })
+    await databaseService.client.organization.deleteMany({
+      where: { id: organizationId },
     })
     await databaseService.disconnect()
   }, 60_000)

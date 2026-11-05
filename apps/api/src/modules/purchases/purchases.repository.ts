@@ -73,9 +73,10 @@ export type PurchaseDetailRecord = Prisma.PurchaseGetPayload<{
 
 function buildSupplierWhere(
   filters: Pick<SupplierFilters, 'search' | 'active'>,
+  organizationId: string,
 ): Prisma.SupplierWhereInput {
   const search = filters.search?.trim()
-  const where: Prisma.SupplierWhereInput = {}
+  const where: Prisma.SupplierWhereInput = { organizationId }
   if (filters.active === 'true') where.active = true
   if (filters.active === 'false') where.active = false
   if (search) {
@@ -90,8 +91,9 @@ function buildSupplierWhere(
 
 function buildPurchaseWhere(
   filters: Omit<PurchaseFilters, 'page' | 'pageSize'>,
+  organizationId: string,
 ): Prisma.PurchaseWhereInput {
-  const where: Prisma.PurchaseWhereInput = {}
+  const where: Prisma.PurchaseWhereInput = { organizationId }
   if (filters.supplierId) where.supplierId = filters.supplierId
   if (filters.status !== 'all') where.status = filters.status
   if (filters.from || filters.to) {
@@ -112,6 +114,7 @@ function auditData(
   return {
     event,
     userId: isUserId(actorId) ? actorId : null,
+    organizationId: context.organizationId,
     identifier,
     requestId: context.requestId,
     ipAddress: context.ipAddress,
@@ -135,8 +138,8 @@ async function lockProduct(
 
 export const purchasesRepository = {
   // ── Suppliers ──────────────────────────────────────────
-  async listSuppliers(filters: SupplierFilters) {
-    const where = buildSupplierWhere(filters)
+  async listSuppliers(filters: SupplierFilters, organizationId: string) {
+    const where = buildSupplierWhere(filters, organizationId)
     const [items, total] = await Promise.all([
       databaseService.client.supplier.findMany({
         select: supplierSelect,
@@ -150,24 +153,24 @@ export const purchasesRepository = {
     return { items, total }
   },
 
-  async listActiveSuppliers() {
+  async listActiveSuppliers(organizationId: string) {
     return databaseService.client.supplier.findMany({
-      where: { active: true },
+      where: { organizationId, active: true },
       select: { id: true, legalName: true, documentNumber: true },
       orderBy: { legalName: 'asc' },
     })
   },
 
-  findSupplierById(id: string) {
-    return databaseService.client.supplier.findUnique({
-      where: { id },
+  findSupplierById(id: string, organizationId: string) {
+    return databaseService.client.supplier.findFirst({
+      where: { id, organizationId },
       select: supplierSelect,
     })
   },
 
-  findProductRef(id: string) {
-    return databaseService.client.product.findUnique({
-      where: { id },
+  findProductRef(id: string, organizationId: string) {
+    return databaseService.client.product.findFirst({
+      where: { id, organizationId },
       select: {
         id: true,
         code: true,
@@ -188,10 +191,11 @@ export const purchasesRepository = {
     },
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     return databaseService.transaction(async (transaction) => {
       const supplier = await transaction.supplier.create({
-        data: input,
+        data: { ...input, organizationId },
         select: supplierSelect,
       })
       await transaction.auditLog.create({
@@ -218,10 +222,11 @@ export const purchasesRepository = {
     },
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const existing = await transaction.supplier.findUnique({
-        where: { id },
+      const existing = await transaction.supplier.findFirst({
+        where: { id, organizationId },
         select: { id: true },
       })
       if (!existing) {
@@ -255,10 +260,11 @@ export const purchasesRepository = {
     active: boolean,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const existing = await transaction.supplier.findUnique({
-        where: { id },
+      const existing = await transaction.supplier.findFirst({
+        where: { id, organizationId },
         select: { id: true, documentNumber: true },
       })
       if (!existing) {
@@ -288,8 +294,8 @@ export const purchasesRepository = {
   },
 
   // ── Purchases ──────────────────────────────────────────
-  async listPurchases(filters: PurchaseFilters) {
-    const where = buildPurchaseWhere(filters)
+  async listPurchases(filters: PurchaseFilters, organizationId: string) {
+    const where = buildPurchaseWhere(filters, organizationId)
     const [items, total] = await Promise.all([
       databaseService.client.purchase.findMany({
         select: purchaseSummarySelect,
@@ -303,9 +309,12 @@ export const purchasesRepository = {
     return { items, total }
   },
 
-  async findPurchaseById(id: string): Promise<PurchaseDetailRecord | null> {
-    return databaseService.client.purchase.findUnique({
-      where: { id },
+  async findPurchaseById(
+    id: string,
+    organizationId: string,
+  ): Promise<PurchaseDetailRecord | null> {
+    return databaseService.client.purchase.findFirst({
+      where: { id, organizationId },
       include: purchaseDetailInclude,
     }) as Promise<PurchaseDetailRecord | null>
   },
@@ -329,6 +338,7 @@ export const purchasesRepository = {
     },
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<PurchaseDetailRecord> {
     return databaseService.transaction(async (transaction) => {
       const rows = await transaction.$queryRaw<
@@ -338,6 +348,7 @@ export const purchasesRepository = {
 
       const purchase = await transaction.purchase.create({
         data: {
+          organizationId,
           code,
           supplierId: input.supplierId,
           purchaseDate: input.purchaseDate,
@@ -394,12 +405,13 @@ export const purchasesRepository = {
     },
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<PurchaseDetailRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockPurchase(transaction, id)
 
-      const existing = await transaction.purchase.findUnique({
-        where: { id },
+      const existing = await transaction.purchase.findFirst({
+        where: { id, organizationId },
         select: { id: true, status: true, code: true },
       })
       if (!existing) {
@@ -454,19 +466,20 @@ export const purchasesRepository = {
     requestId: string,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<PurchaseDetailRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockPurchase(transaction, id)
 
       const idempotencyKey = `confirm:${requestId}`
-      const byKey = await transaction.purchase.findUnique({
-        where: { idempotencyKey },
+      const byKey = await transaction.purchase.findFirst({
+        where: { organizationId, idempotencyKey },
         include: purchaseDetailInclude,
       })
       if (byKey) return byKey as PurchaseDetailRecord
 
-      const purchase = await transaction.purchase.findUnique({
-        where: { id },
+      const purchase = await transaction.purchase.findFirst({
+        where: { id, organizationId },
         include: purchaseDetailInclude,
       })
       if (!purchase) {
@@ -495,8 +508,21 @@ export const purchasesRepository = {
       for (const line of purchase.lines) {
         await lockProduct(transaction, line.productId)
 
+        const product = await transaction.product.findFirst({
+          where: { id: line.productId, organizationId },
+          select: { organizationId: true },
+        })
+        if (!product) {
+          throw new AppError(
+            404,
+            'PRODUCT_NOT_FOUND',
+            'Producto no encontrado.',
+          )
+        }
+
         await transaction.inventoryMovement.create({
           data: {
+            organizationId: product.organizationId,
             productId: line.productId,
             type: 'ENTRY',
             status: 'CONFIRMED',
@@ -513,7 +539,11 @@ export const purchasesRepository = {
 
         const confirmed = await transaction.inventoryMovement.groupBy({
           by: ['type'],
-          where: { productId: line.productId, status: 'CONFIRMED' },
+          where: {
+            organizationId,
+            productId: line.productId,
+            status: 'CONFIRMED',
+          },
           _sum: { quantity: true },
         })
         const stockAfter = computeStock(
@@ -570,12 +600,13 @@ export const purchasesRepository = {
     id: string,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<PurchaseDetailRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockPurchase(transaction, id)
 
-      const existing = await transaction.purchase.findUnique({
-        where: { id },
+      const existing = await transaction.purchase.findFirst({
+        where: { id, organizationId },
         select: { id: true, status: true, code: true },
       })
       if (!existing) {

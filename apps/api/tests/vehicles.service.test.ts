@@ -20,6 +20,7 @@ const context = {
   requestId: 'req-1',
   ipAddress: '127.0.0.1',
 }
+const organizationId = 'organization-1'
 
 const OWNER = {
   id: 'c1',
@@ -57,19 +58,25 @@ describe('Servicio de vehículos', () => {
   it('lista vehículos con propietario mapeado y paginación', async () => {
     repository.list.mockResolvedValue({ items: [record()], total: 1 })
 
-    const result = await vehiclesService.list({
-      search: 'toyota',
-      customerId: undefined,
-      page: 1,
-      pageSize: 20,
-    })
+    const result = await vehiclesService.list(
+      {
+        search: 'toyota',
+        customerId: undefined,
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
 
-    expect(repository.list).toHaveBeenCalledWith({
-      search: 'toyota',
-      customerId: undefined,
-      page: 1,
-      pageSize: 20,
-    })
+    expect(repository.list).toHaveBeenCalledWith(
+      {
+        search: 'toyota',
+        customerId: undefined,
+        page: 1,
+        pageSize: 20,
+      },
+      organizationId,
+    )
     expect(result).toEqual({
       data: [
         {
@@ -100,6 +107,7 @@ describe('Servicio de vehículos', () => {
         customerId: 'c1',
       },
       'actor-1',
+      organizationId,
       context,
     )
 
@@ -110,8 +118,10 @@ describe('Servicio de vehículos', () => {
         model: 'Corolla',
         year: 2021,
         customerId: 'c1',
+        organizationId,
       },
       'actor-1',
+      organizationId,
       context,
     )
     expect(result.data.plate).toBe('ABC123')
@@ -135,6 +145,7 @@ describe('Servicio de vehículos', () => {
           customerId: 'c1',
         },
         'actor-1',
+        organizationId,
         context,
       ),
     ).rejects.toMatchObject({
@@ -162,6 +173,7 @@ describe('Servicio de vehículos', () => {
           customerId: 'c1',
         },
         'actor-1',
+        organizationId,
         context,
       ),
     ).rejects.toBeInstanceOf(AppError)
@@ -175,6 +187,7 @@ describe('Servicio de vehículos', () => {
           customerId: 'c1',
         },
         'actor-1',
+        organizationId,
         context,
       ),
     ).rejects.toMatchObject({
@@ -196,6 +209,7 @@ describe('Servicio de vehículos', () => {
         'v1',
         { plate: 'ABC123', brand: 'Toyota', model: 'Corolla', year: 2021 },
         'actor-1',
+        organizationId,
         context,
       ),
     ).rejects.toMatchObject({
@@ -207,9 +221,9 @@ describe('Servicio de vehículos', () => {
   it('consulta el detalle y mapea las fechas y el propietario', async () => {
     repository.findById.mockResolvedValue(record())
 
-    const result = await vehiclesService.getById('v1')
+    const result = await vehiclesService.getById('v1', organizationId)
     expect(result.data.createdAt).toBe('2026-01-02T00:00:00.000Z')
     expect(result.data.owner.id).toBe('c1')
-    expect(repository.findById).toHaveBeenCalledWith('v1')
+    expect(repository.findById).toHaveBeenCalledWith('v1', organizationId)
   })
 })

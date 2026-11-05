@@ -1,4 +1,4 @@
-import type { AuditEventType, Prisma } from '../../generated/prisma/client.js'
+import { type AuditEventType, Prisma } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import type { ServiceFilters, ServiceInput } from './services.types.js'
@@ -17,6 +17,7 @@ function auditData(
   return {
     event,
     userId: actorId,
+    organizationId: context.organizationId,
     identifier,
     requestId: context.requestId,
     ipAddress: context.ipAddress,
@@ -40,10 +41,14 @@ function serviceAuditMetadata(service: {
   }
 }
 
-function buildWhere(filters: ServiceFilters): Prisma.ServiceWhereInput {
+function buildWhere(
+  filters: ServiceFilters,
+  organizationId: string,
+): Prisma.ServiceWhereInput {
   const search = filters.search?.trim()
 
   return {
+    organizationId,
     ...(filters.status === 'active'
       ? { active: true }
       : filters.status === 'inactive'
@@ -61,8 +66,8 @@ function buildWhere(filters: ServiceFilters): Prisma.ServiceWhereInput {
 }
 
 export const servicesRepository = {
-  async list(filters: ServiceFilters) {
-    const where = buildWhere(filters)
+  async list(filters: ServiceFilters, organizationId: string) {
+    const where = buildWhere(filters, organizationId)
     const [items, total] = await Promise.all([
       databaseService.measure('services.list.records', () =>
         databaseService.client.service.findMany({
@@ -79,13 +84,20 @@ export const servicesRepository = {
     return { items, total }
   },
 
-  findById(id: string) {
-    return databaseService.client.service.findUnique({ where: { id } })
+  findById(id: string, organizationId: string) {
+    return databaseService.client.service.findFirst({
+      where: { id, organizationId },
+    })
   },
 
-  async isCodeAvailable(code: string, excludeId?: string) {
+  async isCodeAvailable(
+    code: string,
+    organizationId: string,
+    excludeId?: string,
+  ) {
     const service = await databaseService.client.service.findFirst({
       where: {
+        organizationId,
         code: { equals: code, mode: 'insensitive' },
         ...(excludeId ? { id: { not: excludeId } } : {}),
       },
@@ -94,17 +106,24 @@ export const servicesRepository = {
     return service === null
   },
 
-  listActive() {
+  listActive(organizationId: string) {
     return databaseService.client.service.findMany({
-      where: { active: true },
+      where: { organizationId, active: true },
       select: { id: true, code: true, name: true },
       orderBy: { name: 'asc' },
     })
   },
 
-  create(input: ServiceInput, actorId: string, context: RequestContext) {
+  create(
+    input: ServiceInput,
+    actorId: string,
+    organizationId: string,
+    context: RequestContext,
+  ) {
     return databaseService.transaction(async (transaction) => {
-      const service = await transaction.service.create({ data: input })
+      const service = await transaction.service.create({
+        data: { ...input, organizationId },
+      })
       await transaction.auditLog.create({
         data: auditData(
           'SERVICE_CREATED',
@@ -122,12 +141,22 @@ export const servicesRepository = {
     id: string,
     input: ServiceInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const service = await transaction.service.update({
-        where: { id },
+      const result = await transaction.service.updateMany({
+        where: { id, organizationId },
         data: input,
+      })
+      if (result.count === 0) {
+        throw new Prisma.PrismaClientKnownRequestError('Service not found', {
+          code: 'P2025',
+          clientVersion: Prisma.prismaVersion.client,
+        })
+      }
+      const service = await transaction.service.findFirstOrThrow({
+        where: { id, organizationId },
       })
       await transaction.auditLog.create({
         data: auditData(
@@ -146,12 +175,22 @@ export const servicesRepository = {
     id: string,
     active: boolean,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const service = await transaction.service.update({
-        where: { id },
+      const result = await transaction.service.updateMany({
+        where: { id, organizationId },
         data: { active },
+      })
+      if (result.count === 0) {
+        throw new Prisma.PrismaClientKnownRequestError('Service not found', {
+          code: 'P2025',
+          clientVersion: Prisma.prismaVersion.client,
+        })
+      }
+      const service = await transaction.service.findFirstOrThrow({
+        where: { id, organizationId },
       })
       await transaction.auditLog.create({
         data: auditData(

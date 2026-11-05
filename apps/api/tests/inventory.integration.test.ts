@@ -11,6 +11,7 @@ const describeWithDatabase = describe.runIf(runDatabaseTests)
 describeWithDatabase('Inventario integrado con PostgreSQL', () => {
   const app = createApp()
   const suffix = randomUUID().slice(0, 8)
+  const organizationCode = `inventario-${suffix}`
   const password = `Clave-inv-${suffix}!`
   const code = `REP-${suffix.slice(0, 6).toUpperCase()}`
   const identifierPrefix = `REP-${suffix.slice(0, 6).toUpperCase()}`
@@ -41,10 +42,18 @@ describeWithDatabase('Inventario integrado con PostgreSQL', () => {
   const createdIds = { productId: '', categoryId: '', brandId: '', unitId: '' }
   const cleanupRoleIds: string[] = []
   let sharedPasswordHash = ''
+  let organizationId = ''
 
   beforeAll(async () => {
     await databaseService.connect()
     sharedPasswordHash = await hashPassword(password)
+    const organization = await databaseService.client.organization.create({
+      data: {
+        code: organizationCode,
+        name: `Organización inventario ${suffix}`,
+      },
+    })
+    organizationId = organization.id
 
     const [readPermission, writePermission] = await Promise.all([
       databaseService.client.permission.upsert({
@@ -120,20 +129,30 @@ describeWithDatabase('Inventario integrado con PostgreSQL', () => {
       }),
     ])
 
+    await databaseService.client.organizationMembership.createMany({
+      data: [
+        { organizationId, userId: admin.id, roleId: adminRole.id },
+        { organizationId, userId: reader.id, roleId: readerRole.id },
+        { organizationId, userId: noAccess.id, roleId: noAccessRole.id },
+      ],
+    })
+
     const category = await databaseService.client.productCategory.create({
-      data: { name: `Categoría inv ${suffix}` },
+      data: { organizationId, name: `Categoría inv ${suffix}` },
     })
     const brand = await databaseService.client.productBrand.create({
-      data: { name: `Marca inv ${suffix}` },
+      data: { organizationId, name: `Marca inv ${suffix}` },
     })
     const unit = await databaseService.client.productUnit.create({
       data: {
+        organizationId,
         name: `Unidad inv ${suffix}`,
         symbol: `ud${suffix.slice(0, 3)}`,
       },
     })
     const product = await databaseService.client.product.create({
       data: {
+        organizationId,
         code,
         name: 'Filtro de aceite',
         description: 'Repuesto para inventario',
@@ -193,6 +212,9 @@ describeWithDatabase('Inventario integrado con PostgreSQL', () => {
     await databaseService.client.authSession.deleteMany({
       where: { userId: { in: userIds } },
     })
+    await databaseService.client.organizationMembership.deleteMany({
+      where: { userId: { in: userIds } },
+    })
     await databaseService.client.userRole.deleteMany({
       where: { userId: { in: userIds } },
     })
@@ -204,6 +226,9 @@ describeWithDatabase('Inventario integrado con PostgreSQL', () => {
     })
     await databaseService.client.role.deleteMany({
       where: { id: { in: cleanupRoleIds } },
+    })
+    await databaseService.client.organization.deleteMany({
+      where: { id: organizationId },
     })
     await databaseService.disconnect()
   }, 60_000)

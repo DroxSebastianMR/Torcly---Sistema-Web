@@ -151,12 +151,16 @@ function toPublicRecommendation(
 export const replenishmentService = {
   async getEligibility(
     filters: ReplenishmentEligibilityFilters,
+    organizationId: string,
   ): Promise<ReplenishmentEligibility> {
     const period = resolveReplenishmentPeriod(filters.from, filters.to)
     const coverageTargetDays = assertCoverageTargetDays(filters.coverageDays)
     const periodDays = daysBetween(period.from, period.to)
 
-    const inputs = await replenishmentRepository.loadInputs(period)
+    const inputs = await replenishmentRepository.loadInputs(
+      period,
+      organizationId,
+    )
     const all = toComputed(inputs, periodDays, coverageTargetDays)
     const filtered = all
       .filter((item) => matchesFilters(item, filters))
@@ -181,12 +185,16 @@ export const replenishmentService = {
     input: ReplenishmentRunInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<{ run: ReplenishmentRunSummary; replayed: boolean }> {
     const period = resolveReplenishmentPeriod(input.from, input.to)
     const coverageTargetDays = assertCoverageTargetDays(input.coverageDays)
     const periodDays = daysBetween(period.from, period.to)
 
-    const inputs = await replenishmentRepository.loadInputs(period)
+    const inputs = await replenishmentRepository.loadInputs(
+      period,
+      organizationId,
+    )
     const recommendations = toComputed(inputs, periodDays, coverageTargetDays)
 
     return replenishmentRepository.createRun(
@@ -206,14 +214,21 @@ export const replenishmentService = {
       },
       actor,
       context,
+      organizationId,
     )
   },
 
-  async listRuns(filters: ReplenishmentRunHistoryFilters): Promise<{
+  async listRuns(
+    filters: ReplenishmentRunHistoryFilters,
+    organizationId: string,
+  ): Promise<{
     items: ReplenishmentRunSummary[]
     pagination: ReplenishmentPagination
   }> {
-    const { items, total } = await replenishmentRepository.listRuns(filters)
+    const { items, total } = await replenishmentRepository.listRuns(
+      filters,
+      organizationId,
+    )
     return {
       items,
       pagination: paginate(total, filters.page, filters.pageSize),
@@ -223,10 +238,12 @@ export const replenishmentService = {
   async getRunDetail(
     code: string,
     filters: ReplenishmentRunDetailFilters,
+    organizationId: string,
   ): Promise<ReplenishmentRunDetail> {
     const { run, items, total } = await replenishmentRepository.loadRunDetail(
       code,
       filters,
+      organizationId,
     )
     return {
       run,

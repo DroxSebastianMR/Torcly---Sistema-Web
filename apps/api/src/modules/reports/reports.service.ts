@@ -78,10 +78,15 @@ function buildTrend<TRow>(
 async function buildSalesBlock(
   period: ReportPeriod,
   granularity: ReportGranularity,
+  organizationId: string,
 ): Promise<BlockData<'sales'>> {
   const [salesRows, lines] = await Promise.all([
-    reportsRepository.listSalesInPeriod(period.from, period.to),
-    reportsRepository.listSaleLinesInPeriod(period.from, period.to),
+    reportsRepository.listSalesInPeriod(period.from, period.to, organizationId),
+    reportsRepository.listSaleLinesInPeriod(
+      period.from,
+      period.to,
+      organizationId,
+    ),
   ])
   const count = salesRows.length
   const amount = sumAmount(salesRows.map((row) => row.total))
@@ -109,10 +114,15 @@ async function buildSalesBlock(
 async function buildPaymentsBlock(
   period: ReportPeriod,
   granularity: ReportGranularity,
+  organizationId: string,
 ): Promise<BlockData<'payments'>> {
   const [paymentRows, obligations] = await Promise.all([
-    reportsRepository.listPaymentsInPeriod(period.from, period.to),
-    reportsRepository.listPendingObligations(),
+    reportsRepository.listPaymentsInPeriod(
+      period.from,
+      period.to,
+      organizationId,
+    ),
+    reportsRepository.listPendingObligations(organizationId),
   ])
   const grossCollected = sumAmount(
     paymentRows
@@ -166,10 +176,15 @@ async function buildPaymentsBlock(
 async function buildInventoryBlock(
   period: ReportPeriod,
   granularity: ReportGranularity,
+  organizationId: string,
 ): Promise<BlockData<'inventory'>> {
   const [movementRows, lowStock] = await Promise.all([
-    reportsRepository.listMovementsInPeriod(period.from, period.to),
-    reportsRepository.listLowStockProducts(),
+    reportsRepository.listMovementsInPeriod(
+      period.from,
+      period.to,
+      organizationId,
+    ),
+    reportsRepository.listLowStockProducts(organizationId),
   ])
   const byType = Object.fromEntries(
     MOVEMENT_TYPES.map((type) => [type, 0]),
@@ -247,10 +262,12 @@ async function buildInventoryBlock(
 async function buildServicesBlock(
   period: ReportPeriod,
   granularity: ReportGranularity,
+  organizationId: string,
 ): Promise<BlockData<'services'>> {
   const serviceRows = await reportsRepository.listServiceLinesInPeriod(
     period.from,
     period.to,
+    organizationId,
   )
   const aggregated = new Map<
     string,
@@ -307,11 +324,24 @@ async function buildServicesBlock(
 async function buildWorkshopBlock(
   period: ReportPeriod,
   granularity: ReportGranularity,
+  organizationId: string,
 ): Promise<BlockData<'workshop'>> {
   const [workOrders, deliveries, appointmentsByStatus] = await Promise.all([
-    reportsRepository.listWorkOrdersInPeriod(period.from, period.to),
-    reportsRepository.listDeliveredWorkOrdersInPeriod(period.from, period.to),
-    reportsRepository.countAppointmentsInPeriod(period.from, period.to),
+    reportsRepository.listWorkOrdersInPeriod(
+      period.from,
+      period.to,
+      organizationId,
+    ),
+    reportsRepository.listDeliveredWorkOrdersInPeriod(
+      period.from,
+      period.to,
+      organizationId,
+    ),
+    reportsRepository.countAppointmentsInPeriod(
+      period.from,
+      period.to,
+      organizationId,
+    ),
   ])
   const workOrdersByStatus = Object.fromEntries(
     WORK_ORDER_STATUSES.map((status) => [status, 0]),
@@ -378,22 +408,35 @@ async function buildBlock(
   block: ReportBlock,
   period: ReportPeriod,
   granularity: ReportGranularity,
+  organizationId: string,
 ): Promise<ReportBlockData> {
   const generatedAt = new Date().toISOString()
   switch (block) {
     case 'sales':
-      return { ...(await buildSalesBlock(period, granularity)), generatedAt }
+      return {
+        ...(await buildSalesBlock(period, granularity, organizationId)),
+        generatedAt,
+      }
     case 'payments':
-      return { ...(await buildPaymentsBlock(period, granularity)), generatedAt }
+      return {
+        ...(await buildPaymentsBlock(period, granularity, organizationId)),
+        generatedAt,
+      }
     case 'inventory':
       return {
-        ...(await buildInventoryBlock(period, granularity)),
+        ...(await buildInventoryBlock(period, granularity, organizationId)),
         generatedAt,
       }
     case 'services':
-      return { ...(await buildServicesBlock(period, granularity)), generatedAt }
+      return {
+        ...(await buildServicesBlock(period, granularity, organizationId)),
+        generatedAt,
+      }
     case 'workshop':
-      return { ...(await buildWorkshopBlock(period, granularity)), generatedAt }
+      return {
+        ...(await buildWorkshopBlock(period, granularity, organizationId)),
+        generatedAt,
+      }
   }
 }
 
@@ -401,6 +444,7 @@ export const reportsService = {
   async getSummary(
     filters: { from: string | null; to: string | null },
     permissions: readonly string[],
+    _organizationId: string,
   ): Promise<ReportSummary> {
     const period = resolvePeriod(filters.from, filters.to)
     const allowed = authorizedBlocks(permissions)
@@ -417,22 +461,24 @@ export const reportsService = {
     block: ReportBlock,
     filters: { from: string | null; to: string | null },
     permissions: readonly string[],
+    organizationId: string,
   ): Promise<ReportBlockData> {
     assertBlockAccess(block, permissions)
     const period = resolvePeriod(filters.from, filters.to)
     const granularity = resolveGranularity(period.from, period.to)
-    return buildBlock(block, period, granularity)
+    return buildBlock(block, period, granularity, organizationId)
   },
 
   async exportWorkbook(
     filters: { from: string | null; to: string | null },
     permissions: readonly string[],
+    organizationId: string,
   ): Promise<{ file: Buffer; period: ReportPeriod }> {
     const period = resolvePeriod(filters.from, filters.to)
     const granularity = resolveGranularity(period.from, period.to)
     const blocks = await Promise.all(
       authorizedBlocks(permissions).map((block) =>
-        buildBlock(block, period, granularity),
+        buildBlock(block, period, granularity, organizationId),
       ),
     )
     const generatedAt = new Date().toISOString()

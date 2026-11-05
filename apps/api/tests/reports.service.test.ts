@@ -24,6 +24,7 @@ import type {
 } from '../src/modules/reports/reports.types.js'
 
 type ReportFilters = { from: string | null; to: string | null }
+const organizationId = 'organization-1'
 
 async function getBlock<B extends ReportBlock>(
   block: B,
@@ -34,6 +35,7 @@ async function getBlock<B extends ReportBlock>(
     block,
     filters,
     permissions,
+    organizationId,
   )) as Extract<ReportBlockData, { block: B }>
 }
 
@@ -68,6 +70,7 @@ describe('Servicio de reportes', () => {
     const result = await reportsService.getSummary(
       { from: '2026-10-01', to: '2026-10-31' },
       salesOnly,
+      organizationId,
     )
 
     expect(result.period).toEqual({ from: '2026-10-01', to: '2026-10-31' })
@@ -87,6 +90,7 @@ describe('Servicio de reportes', () => {
     const result = await reportsService.exportWorkbook(
       { from: '2026-10-01', to: '2026-10-02' },
       salesOnly,
+      organizationId,
     )
 
     expect(result.period).toEqual({ from: '2026-10-01', to: '2026-10-02' })
@@ -99,7 +103,7 @@ describe('Servicio de reportes', () => {
 
   it('rechaza un bloque sin sus permisos sin consultar datos', async () => {
     const error = await reportsService
-      .getBlock('payments', { from: null, to: null }, salesOnly)
+      .getBlock('payments', { from: null, to: null }, salesOnly, organizationId)
       .catch((caught: unknown) => caught)
 
     expect(error).toMatchObject({
@@ -153,6 +157,7 @@ describe('Servicio de reportes', () => {
     expect(repository.listSaleLinesInPeriod).toHaveBeenCalledWith(
       '2026-10-01',
       '2026-10-02',
+      organizationId,
     )
   })
 
@@ -498,6 +503,7 @@ describe('Servicio de reportes', () => {
         'sales',
         { from: '2026-10-05', to: '2026-10-01' },
         allPermissions,
+        organizationId,
       )
       .catch((caught: unknown) => caught)
     expect(error).toMatchObject({

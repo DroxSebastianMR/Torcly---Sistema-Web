@@ -148,11 +148,17 @@ function mapPersistenceError(error: unknown): never {
   throw error
 }
 
-async function resolveLineInputs(lines: PurchaseInput['lines']) {
+async function resolveLineInputs(
+  lines: PurchaseInput['lines'],
+  organizationId: string,
+) {
   assertHasPurchaseLines(lines)
   return Promise.all(
     lines.map(async (line) => {
-      const product = await purchasesRepository.findProductRef(line.productId)
+      const product = await purchasesRepository.findProductRef(
+        line.productId,
+        organizationId,
+      )
 
       if (!product) {
         throw new AppError(404, 'PRODUCT_NOT_FOUND', 'Producto no encontrado.')
@@ -195,21 +201,27 @@ function paginate(total: number, page: number, pageSize: number) {
 
 export const purchasesService = {
   // ── Suppliers ──────────────────────────────────────────
-  async listSuppliers(filters: SupplierFilters) {
-    const result = await purchasesRepository.listSuppliers(filters)
+  async listSuppliers(filters: SupplierFilters, organizationId: string) {
+    const result = await purchasesRepository.listSuppliers(
+      filters,
+      organizationId,
+    )
     return {
       data: result.items.map(toSupplierSummary),
       pagination: paginate(result.total, filters.page, filters.pageSize),
     }
   },
 
-  async listActiveSuppliers() {
-    const items = await purchasesRepository.listActiveSuppliers()
+  async listActiveSuppliers(organizationId: string) {
+    const items = await purchasesRepository.listActiveSuppliers(organizationId)
     return { data: items }
   },
 
-  async getSupplierById(id: string) {
-    const supplier = await purchasesRepository.findSupplierById(id)
+  async getSupplierById(id: string, organizationId: string) {
+    const supplier = await purchasesRepository.findSupplierById(
+      id,
+      organizationId,
+    )
     if (!supplier) {
       throw new AppError(404, 'SUPPLIER_NOT_FOUND', 'Proveedor no encontrado.')
     }
@@ -220,6 +232,7 @@ export const purchasesService = {
     input: SupplierInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     try {
       const supplier = await purchasesRepository.createSupplier(
@@ -232,6 +245,7 @@ export const purchasesService = {
         },
         actor,
         context,
+        organizationId,
       )
       return { data: toSupplierSummary(supplier) }
     } catch (error) {
@@ -244,6 +258,7 @@ export const purchasesService = {
     input: SupplierInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     try {
       const supplier = await purchasesRepository.updateSupplier(
@@ -257,6 +272,7 @@ export const purchasesService = {
         },
         actor,
         context,
+        organizationId,
       )
       return { data: toSupplierSummary(supplier) }
     } catch (error) {
@@ -269,27 +285,35 @@ export const purchasesService = {
     active: boolean,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     const supplier = await purchasesRepository.updateSupplierStatus(
       id,
       active,
       actor,
       context,
+      organizationId,
     )
     return { data: toSupplierSummary(supplier) }
   },
 
   // ── Purchases ──────────────────────────────────────────
-  async listPurchases(filters: PurchaseFilters) {
-    const result = await purchasesRepository.listPurchases(filters)
+  async listPurchases(filters: PurchaseFilters, organizationId: string) {
+    const result = await purchasesRepository.listPurchases(
+      filters,
+      organizationId,
+    )
     return {
       data: result.items.map((p) => toSummary(p)),
       pagination: paginate(result.total, filters.page, filters.pageSize),
     }
   },
 
-  async getPurchaseById(id: string) {
-    const purchase = await purchasesRepository.findPurchaseById(id)
+  async getPurchaseById(id: string, organizationId: string) {
+    const purchase = await purchasesRepository.findPurchaseById(
+      id,
+      organizationId,
+    )
     if (!purchase) {
       throw new AppError(404, 'PURCHASE_NOT_FOUND', 'Compra no encontrada.')
     }
@@ -300,9 +324,11 @@ export const purchasesService = {
     input: PurchaseInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     const supplier = await purchasesRepository.findSupplierById(
       input.supplierId,
+      organizationId,
     )
     if (!supplier) {
       throw new AppError(404, 'SUPPLIER_NOT_FOUND', 'Proveedor no encontrado.')
@@ -315,7 +341,7 @@ export const purchasesService = {
       )
     }
 
-    const resolvedLines = await resolveLineInputs(input.lines)
+    const resolvedLines = await resolveLineInputs(input.lines, organizationId)
     const total = computePurchaseTotal(resolvedLines)
 
     try {
@@ -330,6 +356,7 @@ export const purchasesService = {
         },
         actor,
         context,
+        organizationId,
       )
       return { data: toDetail(purchase) }
     } catch (error) {
@@ -342,9 +369,11 @@ export const purchasesService = {
     input: PurchaseInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     const supplier = await purchasesRepository.findSupplierById(
       input.supplierId,
+      organizationId,
     )
     if (!supplier) {
       throw new AppError(404, 'SUPPLIER_NOT_FOUND', 'Proveedor no encontrado.')
@@ -357,7 +386,7 @@ export const purchasesService = {
       )
     }
 
-    const resolvedLines = await resolveLineInputs(input.lines)
+    const resolvedLines = await resolveLineInputs(input.lines, organizationId)
     const total = computePurchaseTotal(resolvedLines)
 
     try {
@@ -373,6 +402,7 @@ export const purchasesService = {
         },
         actor,
         context,
+        organizationId,
       )
       return { data: toDetail(purchase) }
     } catch (error) {
@@ -385,14 +415,17 @@ export const purchasesService = {
     requestId: string,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     const purchase = await purchasesRepository.confirmPurchase(
       id,
       requestId,
       actor,
       context,
+      organizationId,
     )
     await notificationsService.notifyUsersSafely({
+      organizationId,
       permission: 'purchases:read',
       type: 'PURCHASE_RECEIVED',
       preferenceKey: 'purchaseReceived',
@@ -407,11 +440,13 @@ export const purchasesService = {
     id: string,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ) {
     const purchase = await purchasesRepository.cancelPurchase(
       id,
       actor,
       context,
+      organizationId,
     )
     return { data: toDetail(purchase) }
   },

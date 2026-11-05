@@ -1,5 +1,6 @@
 import type { Request, RequestHandler } from 'express'
 import { getRequestContext } from '../auth/auth.middleware.js'
+import { requireOrganizationContext } from '../auth/organization-context.js'
 import {
   createWorkOrderSchema,
   workOrderActivityIdSchema,
@@ -25,29 +26,36 @@ function actor(request: Request) {
   return { id: request.auth!.id, name: request.auth!.name }
 }
 
+function organizationId(request: Request) {
+  return requireOrganizationContext(request.auth!).id
+}
+
 export const listWorkOrders: RequestHandler = async (request, response) => {
   response.json(
-    await workOrdersService.list(workOrderQuerySchema.parse(request.query)),
+    await workOrdersService.list(
+      workOrderQuerySchema.parse(request.query),
+      organizationId(request),
+    ),
   )
 }
 
 export const getWorkOrder: RequestHandler = async (request, response) => {
   const { id } = workOrderIdSchema.parse(request.params)
-  response.json(await workOrdersService.getById(id))
+  response.json(await workOrdersService.getById(id, organizationId(request)))
 }
 
 export const getWorkOrderCatalog: RequestHandler = async (
-  _request,
+  request,
   response,
 ) => {
-  response.json(await workOrdersService.getCatalog())
+  response.json(await workOrdersService.getCatalog(organizationId(request)))
 }
 
 export const getWorkOrderTechnicians: RequestHandler = async (
-  _request,
+  request,
   response,
 ) => {
-  response.json(await workOrdersService.getTechnicians())
+  response.json(await workOrdersService.getTechnicians(organizationId(request)))
 }
 
 export const createWorkOrder: RequestHandler = async (request, response) => {
@@ -59,6 +67,7 @@ export const createWorkOrder: RequestHandler = async (request, response) => {
         appointmentId,
         actor(request),
         getRequestContext(request, response),
+        organizationId(request),
       ),
     )
 }
@@ -75,6 +84,7 @@ export const updateWorkOrderDiagnosis: RequestHandler = async (
       diagnosis,
       actor(request),
       getRequestContext(request, response),
+      organizationId(request),
     ),
   )
 }
@@ -90,6 +100,7 @@ export const saveWorkOrderBudget: RequestHandler = async (
       workOrderBudgetSchema.parse(request.body),
       actor(request),
       getRequestContext(request, response),
+      organizationId(request),
     ),
   )
 }
@@ -104,6 +115,7 @@ export const sendWorkOrderBudget: RequestHandler = async (
       id,
       actor(request),
       getRequestContext(request, response),
+      organizationId(request),
     ),
   )
 }
@@ -116,6 +128,7 @@ export const decideWorkOrder: RequestHandler = async (request, response) => {
       workOrderDecisionSchema.parse(request.body),
       actor(request),
       getRequestContext(request, response),
+      organizationId(request),
     ),
   )
 }
@@ -131,6 +144,7 @@ export const updateWorkOrderTechnician: RequestHandler = async (
       workOrderTechnicianSchema.parse(request.body),
       actor(request),
       getRequestContext(request, response),
+      organizationId(request),
     ),
   )
 }
@@ -146,6 +160,7 @@ export const startWorkOrderExecution: RequestHandler = async (
       id,
       actor(request),
       getRequestContext(request, response),
+      organizationId(request),
     ),
   )
 }
@@ -155,7 +170,9 @@ export const getWorkOrderExecution: RequestHandler = async (
   response,
 ) => {
   const { id } = workOrderIdSchema.parse(request.params)
-  response.json(await workOrdersService.getExecution(id))
+  response.json(
+    await workOrdersService.getExecution(id, organizationId(request)),
+  )
 }
 
 export const createWorkOrderActivity: RequestHandler = async (
@@ -169,6 +186,7 @@ export const createWorkOrderActivity: RequestHandler = async (
       workOrderActivitySchema.parse(request.body),
       actor(request),
       getRequestContext(request, response),
+      organizationId(request),
     ),
   )
 }
@@ -185,6 +203,7 @@ export const completeWorkOrderActivity: RequestHandler = async (
       activityId,
       actor(request),
       getRequestContext(request, response),
+      organizationId(request),
     ),
   )
 }
@@ -200,6 +219,7 @@ export const consumeWorkOrderProduct: RequestHandler = async (
       workOrderConsumptionSchema.parse(request.body),
       actor(request),
       getRequestContext(request, response),
+      organizationId(request),
     ),
   )
 }
@@ -215,6 +235,7 @@ export const returnWorkOrderProduct: RequestHandler = async (
       workOrderReturnSchema.parse(request.body),
       actor(request),
       getRequestContext(request, response),
+      organizationId(request),
     ),
   )
 }
@@ -227,6 +248,7 @@ export const finalizeWorkOrder: RequestHandler = async (request, response) => {
       workOrderFinalizeSchema.parse(request.body),
       actor(request),
       getRequestContext(request, response),
+      organizationId(request),
     ),
   )
 }
@@ -239,6 +261,7 @@ export const deliverWorkOrder: RequestHandler = async (request, response) => {
       workOrderDeliverySchema.parse(request.body),
       actor(request),
       getRequestContext(request, response),
+      organizationId(request),
     ),
   )
 }
@@ -252,6 +275,7 @@ export const getWorkOrderVehicleHistory: RequestHandler = async (
     await workOrdersService.getVehicleHistory(
       vehicleId,
       workOrderVehicleHistoryQuerySchema.parse(request.query),
+      organizationId(request),
     ),
   )
 }

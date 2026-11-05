@@ -23,9 +23,20 @@ describeWithDatabase('Recuperación de contraseña con PostgreSQL', () => {
   const newPassword = `Nueva-${suffix}-2026!`
   const captured: PasswordResetMessage[] = []
   let userId = ''
+  let organizationId = ''
+  let roleId = ''
 
   beforeAll(async () => {
     await databaseService.connect()
+    const role = await databaseService.client.role.create({
+      data: { code: `recovery-${suffix}`, name: 'Rol recuperación' },
+    })
+    const organization = await databaseService.client.organization.create({
+      data: {
+        code: `it-recovery-${suffix}`,
+        name: 'Organización de recuperación',
+      },
+    })
     const user = await databaseService.client.user.create({
       data: {
         username: identity.username,
@@ -35,6 +46,11 @@ describeWithDatabase('Recuperación de contraseña con PostgreSQL', () => {
       },
     })
     userId = user.id
+    roleId = role.id
+    organizationId = organization.id
+    await databaseService.client.organizationMembership.create({
+      data: { organizationId, userId, roleId },
+    })
     setPasswordResetNotifier({
       send: async (message) => {
         captured.push(message)
@@ -46,7 +62,14 @@ describeWithDatabase('Recuperación de contraseña con PostgreSQL', () => {
     await databaseService.client.auditLog.deleteMany({
       where: { userId },
     })
+    await databaseService.client.organizationMembership.deleteMany({
+      where: { userId },
+    })
     await databaseService.client.user.deleteMany({ where: { id: userId } })
+    await databaseService.client.role.deleteMany({ where: { id: roleId } })
+    await databaseService.client.organization.deleteMany({
+      where: { id: organizationId },
+    })
     await databaseService.disconnect()
   }, 60_000)
 

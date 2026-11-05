@@ -109,9 +109,15 @@ function fromQuery(query: PaymentFilters): PaymentFilters {
 }
 
 export const paymentsService = {
-  async list(filters: PaymentFilters): Promise<PaymentsResponse> {
+  async list(
+    filters: PaymentFilters,
+    organizationId: string,
+  ): Promise<PaymentsResponse> {
     const normalized = fromQuery(filters)
-    const rows = await paymentsRepository.listObligations(normalized)
+    const rows = await paymentsRepository.listObligations(
+      normalized,
+      organizationId,
+    )
     const methodFilter = normalized.method !== 'all' ? normalized.method : null
 
     let filtered = rows.map(toSummary)
@@ -179,8 +185,11 @@ export const paymentsService = {
     }
   },
 
-  async getById(id: string): Promise<{ data: PaymentDetail }> {
-    const row = await paymentsRepository.findById(id)
+  async getById(
+    id: string,
+    organizationId: string,
+  ): Promise<{ data: PaymentDetail }> {
+    const row = await paymentsRepository.findById(id, organizationId)
     if (!row) throw new AppError(404, 'SALE_NOT_FOUND', 'Venta no encontrada.')
     return { data: toDetail(row) }
   },
@@ -190,12 +199,14 @@ export const paymentsService = {
     input: PaymentRegisterInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<{ data: PaymentDetail }> {
     const row = await paymentsRepository.registerPayment(
       saleId,
       input,
       actor,
       context,
+      organizationId,
     )
     return { data: toDetail(row) }
   },
@@ -205,12 +216,14 @@ export const paymentsService = {
     input: SplitPaymentRegisterInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<{ data: PaymentDetail }> {
     const row = await paymentsRepository.registerSplitPayment(
       saleId,
       input,
       actor,
       context,
+      organizationId,
     )
     return { data: toDetail(row) }
   },
@@ -220,14 +233,17 @@ export const paymentsService = {
     input: PaymentCompensateInput,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<{ data: PaymentDetail }> {
     const row = await paymentsRepository.compensatePayment(
       paymentId,
       input,
       actor,
       context,
+      organizationId,
     )
     await notificationsService.notifyUsersSafely({
+      organizationId,
       permission: 'cash:read',
       type: 'PAYMENT_COMPENSATED',
       preferenceKey: 'paymentCompensated',

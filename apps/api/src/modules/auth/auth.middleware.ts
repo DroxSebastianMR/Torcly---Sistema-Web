@@ -17,6 +17,7 @@ export function getRequestContext(
     requestId: response.locals.requestId,
     ipAddress: request.ip,
     userAgent: request.get('user-agent')?.slice(0, 300),
+    organizationId: request.auth?.organization?.id,
   }
 }
 

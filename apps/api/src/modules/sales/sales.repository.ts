@@ -52,10 +52,12 @@ const saleDetailInclude = {
 
 function buildSaleWhere(
   filters: Pick<SaleFilters, 'search' | 'status'>,
+  organizationId: string,
 ): Prisma.SaleWhereInput {
   const search = filters.search?.trim()
   const isExactSaleCode = Boolean(search && /^VENTA-\d{6,}$/i.test(search))
   return {
+    organizationId,
     ...(filters.status === 'all' ? {} : { status: filters.status }),
     ...(isExactSaleCode
       ? { code: search!.toUpperCase() }
@@ -91,6 +93,7 @@ function auditData(
   return {
     event,
     userId: actorId,
+    organizationId: context.organizationId,
     identifier,
     requestId: context.requestId,
     ipAddress: context.ipAddress,
@@ -105,13 +108,14 @@ async function lockSale(transaction: Prisma.TransactionClient, saleId: string) {
 async function confirmSaleWithinTransaction(
   transaction: Prisma.TransactionClient,
   id: string,
+  organizationId: string,
   actor: { id: string; name: string },
   context: RequestContext,
 ): Promise<SaleDetailRecord> {
   await lockSale(transaction, id)
 
-  const sale = await transaction.sale.findUnique({
-    where: { id },
+  const sale = await transaction.sale.findFirst({
+    where: { id, organizationId },
     include: saleDetailInclude,
   })
   if (!sale) throw new AppError(404, 'SALE_NOT_FOUND', 'Venta no encontrada.')
@@ -127,8 +131,8 @@ async function confirmSaleWithinTransaction(
   assertHasLines(sale.lines)
   const aggregates = aggregateProductQuantities(sale.lines)
   for (const [productId, quantity] of aggregates) {
-    const product = await transaction.product.findUnique({
-      where: { id: productId },
+    const product = await transaction.product.findFirst({
+      where: { id: productId, organizationId },
       select: { id: true, code: true, name: true, active: true },
     })
     if (!product) {
@@ -149,7 +153,7 @@ async function confirmSaleWithinTransaction(
     await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:inventory:${productId}`}))`
     const confirmed = await transaction.inventoryMovement.groupBy({
       by: ['type'],
-      where: { productId, status: 'CONFIRMED' },
+      where: { organizationId, productId, status: 'CONFIRMED' },
       _sum: { quantity: true },
     })
     const stockMovements = confirmed.map((movement) => ({
@@ -169,6 +173,7 @@ async function confirmSaleWithinTransaction(
 
     const movement = await transaction.inventoryMovement.create({
       data: {
+        organizationId,
         productId,
         type: 'EXIT',
         status: 'CONFIRMED',
@@ -231,8 +236,8 @@ export type SaleDetailRecord = Prisma.SaleGetPayload<{
 }>
 
 export const salesRepository = {
-  async list(filters: SaleFilters) {
-    const where = buildSaleWhere(filters)
+  async list(filters: SaleFilters, organizationId: string) {
+    const where = buildSaleWhere(filters, organizationId)
     const [items, total] = await Promise.all([
       databaseService.client.sale.findMany({
         select: saleSummarySelect,
@@ -246,16 +251,19 @@ export const salesRepository = {
     return { items, total }
   },
 
-  findById(id: string): Promise<SaleDetailRecord | null> {
-    return databaseService.client.sale.findUnique({
-      where: { id },
+  findById(
+    id: string,
+    organizationId: string,
+  ): Promise<SaleDetailRecord | null> {
+    return databaseService.client.sale.findFirst({
+      where: { id, organizationId },
       include: saleDetailInclude,
     })
   },
 
-  findCustomerRef(id: string) {
-    return databaseService.client.customer.findUnique({
-      where: { id },
+  findCustomerRef(id: string, organizationId: string) {
+    return databaseService.client.customer.findFirst({
+      where: { id, organizationId },
       select: {
         id: true,
         documentNumber: true,
@@ -266,9 +274,9 @@ export const salesRepository = {
     })
   },
 
-  findProductRef(id: string) {
-    return databaseService.client.product.findUnique({
-      where: { id },
+  findProductRef(id: string, organizationId: string) {
+    return databaseService.client.product.findFirst({
+      where: { id, organizationId },
       select: {
         id: true,
         code: true,
@@ -280,9 +288,9 @@ export const salesRepository = {
     })
   },
 
-  findServiceRef(id: string) {
-    return databaseService.client.service.findUnique({
-      where: { id },
+  findServiceRef(id: string, organizationId: string) {
+    return databaseService.client.service.findFirst({
+      where: { id, organizationId },
       select: {
         id: true,
         code: true,
@@ -310,6 +318,7 @@ export const salesRepository = {
     },
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<SaleDetailRecord> {
     return databaseService.transaction(async (transaction) => {
       const rows = await transaction.$queryRaw<
@@ -319,6 +328,7 @@ export const salesRepository = {
 
       const sale = await transaction.sale.create({
         data: {
+          organizationId,
           code,
           customerId: input.customerId,
           status: 'DRAFT',
@@ -341,7 +351,13 @@ export const salesRepository = {
       })
 
       return input.confirm
-        ? confirmSaleWithinTransaction(transaction, sale.id, actor, context)
+        ? confirmSaleWithinTransaction(
+            transaction,
+            sale.id,
+            organizationId,
+            actor,
+            context,
+          )
         : sale
     })
   },
@@ -354,11 +370,12 @@ export const salesRepository = {
       total: number
       lines: Prisma.SaleLineCreateManySaleInput[]
     },
+    organizationId: string,
   ): Promise<SaleDetailRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockSale(transaction, id)
-      const existing = await transaction.sale.findUnique({
-        where: { id },
+      const existing = await transaction.sale.findFirst({
+        where: { id, organizationId },
         select: { id: true, status: true },
       })
       if (!existing)
@@ -383,8 +400,8 @@ export const salesRepository = {
         },
       })
 
-      const sale = await transaction.sale.findUnique({
-        where: { id },
+      const sale = await transaction.sale.findFirst({
+        where: { id, organizationId },
         include: saleDetailInclude,
       })
       return sale as SaleDetailRecord
@@ -395,12 +412,13 @@ export const salesRepository = {
     id: string,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<SaleDetailRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockSale(transaction, id)
 
-      const sale = await transaction.sale.findUnique({
-        where: { id },
+      const sale = await transaction.sale.findFirst({
+        where: { id, organizationId },
         include: {
           customer: {
             select: {
@@ -444,8 +462,8 @@ export const salesRepository = {
 
       const aggregates = aggregateProductQuantities(sale.lines)
       for (const [productId, quantity] of aggregates) {
-        const product = await transaction.product.findUnique({
-          where: { id: productId },
+        const product = await transaction.product.findFirst({
+          where: { id: productId, organizationId },
           select: { id: true, code: true, name: true, active: true },
         })
         if (!product)
@@ -465,7 +483,7 @@ export const salesRepository = {
 
         const confirmed = await transaction.inventoryMovement.groupBy({
           by: ['type'],
-          where: { productId, status: 'CONFIRMED' },
+          where: { organizationId, productId, status: 'CONFIRMED' },
           _sum: { quantity: true },
         })
         const stockMovements = confirmed.map((movement) => ({
@@ -485,6 +503,7 @@ export const salesRepository = {
 
         const movement = await transaction.inventoryMovement.create({
           data: {
+            organizationId,
             productId,
             type: 'EXIT',
             status: 'CONFIRMED',
@@ -552,11 +571,12 @@ export const salesRepository = {
     reason: string,
     actor: { id: string; name: string },
     context: RequestContext,
+    organizationId: string,
   ): Promise<SaleDetailRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockSale(transaction, id)
-      const sale = await transaction.sale.findUnique({
-        where: { id },
+      const sale = await transaction.sale.findFirst({
+        where: { id, organizationId },
         include: saleDetailInclude,
       })
       if (!sale)
@@ -564,7 +584,7 @@ export const salesRepository = {
       if (sale.status === 'CANCELLED') return sale as SaleDetailRecord
 
       const payments = await transaction.payment.findMany({
-        where: { saleId: id },
+        where: { saleId: id, organizationId },
         select: { type: true, amount: true },
       })
       const netPaid = payments.reduce(
@@ -587,14 +607,15 @@ export const salesRepository = {
         const aggregates = aggregateProductQuantities(sale.lines)
         for (const [productId, quantity] of aggregates) {
           await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:inventory:${productId}`}))`
-          const product = await transaction.product.findUnique({
-            where: { id: productId },
+          const product = await transaction.product.findFirst({
+            where: { id: productId, organizationId },
             select: { code: true },
           })
           if (!product) continue
 
           const movement = await transaction.inventoryMovement.create({
             data: {
+              organizationId,
               productId,
               type: 'ADJUSTMENT_IN',
               status: 'CONFIRMED',
@@ -654,10 +675,10 @@ export const salesRepository = {
     })
   },
 
-  async getCatalog() {
+  async getCatalog(organizationId: string) {
     return databaseService.transaction(async (transaction) => {
       const products = await transaction.product.findMany({
-        where: { active: true },
+        where: { organizationId, active: true },
         select: {
           id: true,
           code: true,
@@ -675,6 +696,7 @@ export const salesRepository = {
         const movements = await transaction.inventoryMovement.groupBy({
           by: ['productId', 'type'],
           where: {
+            organizationId,
             productId: { in: products.map((product) => product.id) },
             status: 'CONFIRMED',
           },
@@ -701,7 +723,7 @@ export const salesRepository = {
       }
 
       const services = await transaction.service.findMany({
-        where: { active: true },
+        where: { organizationId, active: true },
         select: { id: true, code: true, name: true, price: true },
         orderBy: { name: 'asc' },
       })

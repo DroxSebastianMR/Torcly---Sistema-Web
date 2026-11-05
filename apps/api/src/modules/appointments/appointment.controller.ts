@@ -1,5 +1,6 @@
 import type { Request, RequestHandler } from 'express'
 import { getRequestContext } from '../auth/auth.middleware.js'
+import { requireOrganizationContext } from '../auth/organization-context.js'
 import {
   appointmentIdSchema,
   appointmentInputSchema,
@@ -14,13 +15,21 @@ function actor(request: Request) {
 
 export const listAppointments: RequestHandler = async (request, response) => {
   response.json(
-    await appointmentsService.list(appointmentQuerySchema.parse(request.query)),
+    await appointmentsService.list(
+      appointmentQuerySchema.parse(request.query),
+      requireOrganizationContext(request.auth!).id,
+    ),
   )
 }
 
 export const getAppointment: RequestHandler = async (request, response) => {
   const { id } = appointmentIdSchema.parse(request.params)
-  response.json(await appointmentsService.getById(id))
+  response.json(
+    await appointmentsService.getById(
+      id,
+      requireOrganizationContext(request.auth!).id,
+    ),
+  )
 }
 
 export const createAppointment: RequestHandler = async (request, response) => {
@@ -31,6 +40,7 @@ export const createAppointment: RequestHandler = async (request, response) => {
         appointmentInputSchema.parse(request.body),
         actor(request),
         getRequestContext(request, response),
+        requireOrganizationContext(request.auth!).id,
       ),
     )
 }
@@ -46,6 +56,7 @@ export const rescheduleAppointment: RequestHandler = async (
       appointmentRescheduleSchema.parse(request.body),
       actor(request),
       getRequestContext(request, response),
+      requireOrganizationContext(request.auth!).id,
     ),
   )
 }
@@ -57,6 +68,7 @@ export const cancelAppointment: RequestHandler = async (request, response) => {
       id,
       actor(request),
       getRequestContext(request, response),
+      requireOrganizationContext(request.auth!).id,
     ),
   )
 }

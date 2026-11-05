@@ -6,6 +6,7 @@ function titleFrom(message: string) {
 
 export const assistantRepository = {
   async saveExchange(input: {
+    organizationId: string
     userId: string
     conversationId?: string
     question: string
@@ -14,11 +15,19 @@ export const assistantRepository = {
     return databaseService.transaction(async (transaction) => {
       const conversation = input.conversationId
         ? await transaction.assistantConversation.findFirst({
-            where: { id: input.conversationId, userId: input.userId },
+            where: {
+              id: input.conversationId,
+              userId: input.userId,
+              organizationId: input.organizationId,
+            },
             select: { id: true },
           })
         : await transaction.assistantConversation.create({
-            data: { userId: input.userId, title: titleFrom(input.question) },
+            data: {
+              organizationId: input.organizationId,
+              userId: input.userId,
+              title: titleFrom(input.question),
+            },
             select: { id: true },
           })
 
@@ -45,10 +54,10 @@ export const assistantRepository = {
     })
   },
 
-  listConversations(userId: string) {
+  listConversations(userId: string, organizationId: string) {
     return databaseService.measure('assistant.conversations.list', () =>
       databaseService.client.assistantConversation.findMany({
-        where: { userId },
+        where: { userId, organizationId },
         orderBy: { updatedAt: 'desc' },
         take: 50,
         select: {
@@ -65,10 +74,10 @@ export const assistantRepository = {
     )
   },
 
-  getConversation(userId: string, id: string) {
+  getConversation(userId: string, organizationId: string, id: string) {
     return databaseService.measure('assistant.conversation.detail', () =>
       databaseService.client.assistantConversation.findFirst({
-        where: { id, userId },
+        where: { id, userId, organizationId },
         select: {
           id: true,
           title: true,
@@ -83,10 +92,14 @@ export const assistantRepository = {
     )
   },
 
-  async getRecentMessages(userId: string, conversationId: string) {
+  async getRecentMessages(
+    userId: string,
+    organizationId: string,
+    conversationId: string,
+  ) {
     const conversation =
       await databaseService.client.assistantConversation.findFirst({
-        where: { id: conversationId, userId },
+        where: { id: conversationId, userId, organizationId },
         select: {
           messages: {
             orderBy: { createdAt: 'desc' },

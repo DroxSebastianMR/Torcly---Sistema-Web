@@ -1,4 +1,4 @@
-import type { AuditEventType, Prisma } from '../../generated/prisma/client.js'
+import { type AuditEventType, Prisma } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import type { VehicleListFilters } from './vehicles.types.js'
@@ -27,6 +27,7 @@ function auditData(
   return {
     event,
     userId: actorId,
+    organizationId: context.organizationId,
     identifier: plate,
     requestId: context.requestId,
     ipAddress: context.ipAddress,
@@ -34,11 +35,15 @@ function auditData(
   }
 }
 
-function buildWhere(filters: VehicleListFilters): Prisma.VehicleWhereInput {
+function buildWhere(
+  filters: VehicleListFilters,
+  organizationId: string,
+): Prisma.VehicleWhereInput {
   const search = filters.search?.trim()
   const ownerTerms = search?.split(/\s+/).filter(Boolean) ?? []
 
   return {
+    organizationId,
     ...(filters.customerId ? { customerId: filters.customerId } : {}),
     ...(search
       ? {
@@ -68,8 +73,8 @@ function buildWhere(filters: VehicleListFilters): Prisma.VehicleWhereInput {
 }
 
 export const vehiclesRepository = {
-  async list(filters: VehicleListFilters) {
-    const where = buildWhere(filters)
+  async list(filters: VehicleListFilters, organizationId: string) {
+    const where = buildWhere(filters, organizationId)
     const [items, total] = await Promise.all([
       databaseService.measure('vehicles.list.records', () =>
         databaseService.client.vehicle.findMany({
@@ -88,23 +93,35 @@ export const vehiclesRepository = {
     return { items, total }
   },
 
-  findById(id: string) {
-    return databaseService.client.vehicle.findUnique({
-      where: { id },
+  findById(id: string, organizationId: string) {
+    return databaseService.client.vehicle.findFirst({
+      where: { id, organizationId },
       include: findUniqueInclude,
     })
   },
 
-  findCustomerById(id: string) {
-    return databaseService.client.customer.findUnique({ where: { id } })
+  findCustomerById(id: string, organizationId: string) {
+    return databaseService.client.customer.findFirst({
+      where: { id, organizationId },
+    })
   },
 
   create(
     input: Prisma.VehicleUncheckedCreateInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
+      const customer = await transaction.customer.findFirst({
+        where: { id: input.customerId, organizationId },
+      })
+      if (!customer) {
+        throw new Prisma.PrismaClientKnownRequestError('Customer not found', {
+          code: 'P2003',
+          clientVersion: Prisma.prismaVersion.client,
+        })
+      }
       const vehicle = await databaseService.measure(
         'vehicles.create.record',
         () =>
@@ -129,18 +146,39 @@ export const vehiclesRepository = {
     id: string,
     input: Prisma.VehicleUncheckedUpdateInput,
     actorId: string,
+    organizationId: string,
     context: RequestContext,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const vehicle = await databaseService.measure(
+      if (input.customerId) {
+        const customer = await transaction.customer.findFirst({
+          where: { id: String(input.customerId), organizationId },
+        })
+        if (!customer) {
+          throw new Prisma.PrismaClientKnownRequestError('Customer not found', {
+            code: 'P2003',
+            clientVersion: Prisma.prismaVersion.client,
+          })
+        }
+      }
+      const result = await databaseService.measure(
         'vehicles.update.record',
         () =>
-          transaction.vehicle.update({
-            where: { id },
+          transaction.vehicle.updateMany({
+            where: { id, organizationId },
             data: input,
-            include: findUniqueInclude,
           }),
       )
+      if (result.count === 0) {
+        throw new Prisma.PrismaClientKnownRequestError('Vehicle not found', {
+          code: 'P2025',
+          clientVersion: Prisma.prismaVersion.client,
+        })
+      }
+      const vehicle = await transaction.vehicle.findFirstOrThrow({
+        where: { id, organizationId },
+        include: findUniqueInclude,
+      })
       await databaseService.measure('vehicles.update.audit', () =>
         transaction.auditLog.create({
           data: auditData('VEHICLE_UPDATED', actorId, vehicle.plate, context, {

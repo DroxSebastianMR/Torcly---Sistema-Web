@@ -38,6 +38,7 @@ describeWithDatabase('Reportes integrados con PostgreSQL', () => {
   const noAccessIds = { userId: '', roleId: '' }
   const cleanupRoleIds: string[] = []
   let sharedPasswordHash = ''
+  let organizationId = ''
 
   async function loginAs(identifier: string) {
     const agent = request.agent(app)
@@ -133,6 +134,20 @@ describeWithDatabase('Reportes integrados con PostgreSQL', () => {
     Object.assign(adminIds, { userId: admin.id, roleId: adminRole.id })
     Object.assign(partialIds, { userId: partial.id, roleId: partialRole.id })
     Object.assign(noAccessIds, { userId: noAccess.id, roleId: noAccessRole.id })
+    const organization = await databaseService.client.organization.create({
+      data: {
+        code: `it-reports-${suffix}`,
+        name: 'Organización de reportes',
+      },
+    })
+    organizationId = organization.id
+    await databaseService.client.organizationMembership.createMany({
+      data: [
+        { organizationId, userId: admin.id, roleId: adminRole.id },
+        { organizationId, userId: partial.id, roleId: partialRole.id },
+        { organizationId, userId: noAccess.id, roleId: noAccessRole.id },
+      ],
+    })
     cleanupRoleIds.push(adminRole.id, partialRole.id, noAccessRole.id)
   }, 60_000)
 
@@ -149,6 +164,9 @@ describeWithDatabase('Reportes integrados con PostgreSQL', () => {
     await databaseService.client.authSession.deleteMany({
       where: { userId: { in: userIds } },
     })
+    await databaseService.client.organizationMembership.deleteMany({
+      where: { userId: { in: userIds } },
+    })
     await databaseService.client.userRole.deleteMany({
       where: { userId: { in: userIds } },
     })
@@ -160,6 +178,9 @@ describeWithDatabase('Reportes integrados con PostgreSQL', () => {
     })
     await databaseService.client.role.deleteMany({
       where: { id: { in: cleanupRoleIds } },
+    })
+    await databaseService.client.organization.deleteMany({
+      where: { id: organizationId },
     })
     await databaseService.disconnect()
   }, 60_000)

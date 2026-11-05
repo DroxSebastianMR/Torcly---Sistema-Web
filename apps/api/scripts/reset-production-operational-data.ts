@@ -57,7 +57,8 @@ const preservedTables = [
 
 function requireProductionUrl() {
   const productionUrl = process.env.PRODUCTION_DIRECT_URL
-  if (!productionUrl) throw new Error('PRODUCTION_DIRECT_URL no está configurada.')
+  if (!productionUrl)
+    throw new Error('PRODUCTION_DIRECT_URL no está configurada.')
   if (productionUrl === process.env.DIRECT_URL) {
     throw new Error('La URL productiva no puede coincidir con DIRECT_URL.')
   }
@@ -111,9 +112,7 @@ try {
   const tableList = operationalTables
     .map((table) => `public.${quoteIdentifier(table)}`)
     .join(', ')
-  await client.query(
-    `TRUNCATE TABLE ${tableList} RESTART IDENTITY CASCADE`,
-  )
+  await client.query(`TRUNCATE TABLE ${tableList} RESTART IDENTITY CASCADE`)
 
   for (const sequence of codeSequences) {
     await client.query(

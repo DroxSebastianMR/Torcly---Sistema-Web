@@ -21,6 +21,7 @@ type Actor = { id: string; name: string }
 
 const sessionSelect = {
   id: true,
+  organizationId: true,
   code: true,
   status: true,
   openingAmount: true,
@@ -41,8 +42,9 @@ export type CashSessionRow = Prisma.CashSessionGetPayload<{
 
 export async function lockCashSession(
   transaction: Prisma.TransactionClient,
+  organizationId: string,
 ): Promise<void> {
-  await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('torcly:cash-session:primary'))`
+  await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:cash-session:${organizationId}`}))`
 }
 
 function auditData(
@@ -55,6 +57,7 @@ function auditData(
   return {
     event,
     userId: actorId,
+    organizationId: context.organizationId,
     identifier,
     requestId: context.requestId,
     ipAddress: context.ipAddress,
@@ -74,9 +77,10 @@ async function nextCode(
 async function totalsFor(
   transaction: Prisma.TransactionClient,
   sessionId: string,
+  organizationId: string,
 ): Promise<CashSessionTotals> {
   const rows = await transaction.payment.findMany({
-    where: { cashSessionId: sessionId },
+    where: { cashSessionId: sessionId, organizationId },
     select: { type: true, method: true, amount: true },
   })
   const payments = zeroMethodTotals()
@@ -98,50 +102,53 @@ async function totalsFor(
 }
 
 export const cashSessionsRepository = {
-  async current(): Promise<{
+  async current(organizationId: string): Promise<{
     row: CashSessionRow
     totals: CashSessionTotals
   } | null> {
     const row = await databaseService.client.cashSession.findFirst({
-      where: { status: 'OPEN' },
+      where: { status: 'OPEN', organizationId },
       select: sessionSelect,
     })
     if (!row) return null
     const totals = await databaseService.transaction((transaction) =>
-      totalsFor(transaction, row.id),
+      totalsFor(transaction, row.id, organizationId),
     )
     return { row, totals }
   },
 
   async findById(
     id: string,
+    organizationId: string,
   ): Promise<{ row: CashSessionRow; totals: CashSessionTotals } | null> {
-    const row = await databaseService.client.cashSession.findUnique({
-      where: { id },
+    const row = await databaseService.client.cashSession.findFirst({
+      where: { id, organizationId },
       select: sessionSelect,
     })
     if (!row) return null
     const totals = await databaseService.transaction((transaction) =>
-      totalsFor(transaction, id),
+      totalsFor(transaction, id, organizationId),
     )
     return { row, totals }
   },
 
-  async listClosed(filters: CashSessionListFilters) {
+  async listClosed(filters: CashSessionListFilters, organizationId: string) {
     const total = await databaseService.client.cashSession.count({
-      where: { status: 'CLOSED' },
+      where: { status: 'CLOSED', organizationId },
     })
     const totalPages = Math.max(1, Math.ceil(total / filters.pageSize))
     const page = Math.min(filters.page, totalPages)
     const rows = await databaseService.client.cashSession.findMany({
-      where: { status: 'CLOSED' },
+      where: { status: 'CLOSED', organizationId },
       select: sessionSelect,
       orderBy: { closedAt: 'desc' },
       skip: (page - 1) * filters.pageSize,
       take: filters.pageSize,
     })
     const totals = await databaseService.transaction(async (transaction) =>
-      Promise.all(rows.map((row) => totalsFor(transaction, row.id))),
+      Promise.all(
+        rows.map((row) => totalsFor(transaction, row.id, organizationId)),
+      ),
     )
     return {
       total,
@@ -152,9 +159,10 @@ export const cashSessionsRepository = {
 
   async requireOpenSession(
     transaction: Prisma.TransactionClient,
+    organizationId: string,
   ): Promise<CashSessionRow> {
     const row = await transaction.cashSession.findFirst({
-      where: { status: 'OPEN' },
+      where: { status: 'OPEN', organizationId },
       select: sessionSelect,
     })
     if (!row) {
@@ -171,19 +179,31 @@ export const cashSessionsRepository = {
     input: CashSessionOpenInput,
     actor: Actor,
     context: RequestContext,
+    organizationId: string,
   ): Promise<{ row: CashSessionRow; totals: CashSessionTotals }> {
     return databaseService.transaction(async (transaction) => {
-      await lockCashSession(transaction)
+      await lockCashSession(transaction, organizationId)
       const openingIdempotencyKey = `cash-session:open:${input.requestId}`
       const replay = await transaction.cashSession.findUnique({
         where: { openingIdempotencyKey },
         select: sessionSelect,
       })
-      if (replay)
-        return { row: replay, totals: await totalsFor(transaction, replay.id) }
+      if (replay) {
+        if (replay.organizationId !== organizationId) {
+          throw new AppError(
+            409,
+            'IDEMPOTENCY_KEY_CONFLICT',
+            'La solicitud ya fue usada en otra organización.',
+          )
+        }
+        return {
+          row: replay,
+          totals: await totalsFor(transaction, replay.id, organizationId),
+        }
+      }
 
       const current = await transaction.cashSession.findFirst({
-        where: { status: 'OPEN' },
+        where: { status: 'OPEN', organizationId },
         select: { code: true },
       })
       if (current) {
@@ -197,6 +217,7 @@ export const cashSessionsRepository = {
       const code = await nextCode(transaction)
       const row = await transaction.cashSession.create({
         data: {
+          organizationId,
           code,
           status: 'OPEN',
           openingAmount: input.openingAmount,
@@ -230,19 +251,31 @@ export const cashSessionsRepository = {
     input: CashSessionCloseInput,
     actor: Actor,
     context: RequestContext,
+    organizationId: string,
   ): Promise<{ row: CashSessionRow; totals: CashSessionTotals }> {
     return databaseService.transaction(async (transaction) => {
-      await lockCashSession(transaction)
+      await lockCashSession(transaction, organizationId)
       const closingIdempotencyKey = `cash-session:close:${id}:${input.requestId}`
       const replay = await transaction.cashSession.findUnique({
         where: { closingIdempotencyKey },
         select: sessionSelect,
       })
-      if (replay)
-        return { row: replay, totals: await totalsFor(transaction, replay.id) }
+      if (replay) {
+        if (replay.organizationId !== organizationId) {
+          throw new AppError(
+            404,
+            'CASH_SESSION_NOT_FOUND',
+            'Caja no encontrada.',
+          )
+        }
+        return {
+          row: replay,
+          totals: await totalsFor(transaction, replay.id, organizationId),
+        }
+      }
 
-      const session = await transaction.cashSession.findUnique({
-        where: { id },
+      const session = await transaction.cashSession.findFirst({
+        where: { id, organizationId },
         select: sessionSelect,
       })
       if (!session)
@@ -255,7 +288,7 @@ export const cashSessionsRepository = {
         )
       }
       assertNonNegativeCashAmount(input.countedCashAmount)
-      const totals = await totalsFor(transaction, id)
+      const totals = await totalsFor(transaction, id, organizationId)
       const expectedCashAmount = roundCash(
         Number(session.openingAmount) + totals.expectedCashAmount,
       )

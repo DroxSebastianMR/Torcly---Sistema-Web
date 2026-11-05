@@ -13,7 +13,10 @@ export function PermissionRoute({ permission }: { permission: Permission }) {
       kind="permission-denied"
       primaryAction={{
         label: 'Volver al inicio',
-        onClick: () => navigate(paths.dashboard, { replace: true }),
+        onClick: () =>
+          navigate(user?.isPlatformAdmin ? paths.platform : paths.dashboard, {
+            replace: true,
+          }),
       }}
     />
   )

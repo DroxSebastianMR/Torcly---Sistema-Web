@@ -42,6 +42,7 @@ describeWithDatabase('Servicios integrados con PostgreSQL', () => {
   const createdService = { serviceId: '' }
   const cleanupRoleIds: string[] = []
   let sharedPasswordHash = ''
+  let organizationId = ''
 
   beforeAll(async () => {
     await databaseService.connect()
@@ -127,6 +128,20 @@ describeWithDatabase('Servicios integrados con PostgreSQL', () => {
       userId: noAccess.id,
       roleId: noAccessRole.id,
     })
+    const organization = await databaseService.client.organization.create({
+      data: {
+        code: `it-services-${suffix}`,
+        name: 'Organización de servicios',
+      },
+    })
+    organizationId = organization.id
+    await databaseService.client.organizationMembership.createMany({
+      data: [
+        { organizationId, userId: admin.id, roleId: adminRole.id },
+        { organizationId, userId: reader.id, roleId: readerRole.id },
+        { organizationId, userId: noAccess.id, roleId: noAccessRole.id },
+      ],
+    })
     cleanupRoleIds.push(adminRole.id, readerRole.id, noAccessRole.id)
   }, 60_000)
 
@@ -151,6 +166,9 @@ describeWithDatabase('Servicios integrados con PostgreSQL', () => {
     await databaseService.client.authSession.deleteMany({
       where: { userId: { in: userIds } },
     })
+    await databaseService.client.organizationMembership.deleteMany({
+      where: { userId: { in: userIds } },
+    })
     await databaseService.client.userRole.deleteMany({
       where: { userId: { in: userIds } },
     })
@@ -162,6 +180,9 @@ describeWithDatabase('Servicios integrados con PostgreSQL', () => {
     })
     await databaseService.client.role.deleteMany({
       where: { id: { in: cleanupRoleIds } },
+    })
+    await databaseService.client.organization.deleteMany({
+      where: { id: organizationId },
     })
     await databaseService.disconnect()
   }, 60_000)

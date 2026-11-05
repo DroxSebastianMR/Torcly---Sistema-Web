@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { appNavigation } from '../config/app-navigation'
+import { platformNavigation } from '../config/platform-navigation'
 import { filterNavigation } from '../utils/filter-navigation'
 import type { AccountSummary, NavigationGroup } from '../types/navigation.types'
 
@@ -11,7 +12,8 @@ export function useAppSidebar(
   const { user, logout } = useAuth()
   const [isSigningOut, setIsSigningOut] = useState(false)
   const pendingLogout = useRef(false)
-  const groups = user ? filterNavigation(configuration, user.permissions) : []
+  const navigation = user?.isPlatformAdmin ? platformNavigation : configuration
+  const groups = user ? filterNavigation(navigation, user.permissions) : []
   const account: AccountSummary = {
     name: user?.name ?? '',
     email: user?.email ?? '',

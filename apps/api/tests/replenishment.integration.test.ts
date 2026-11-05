@@ -20,6 +20,7 @@ function isoDay(offsetDays: number): string {
 describeWithDatabase('Reabastecimiento integrado con PostgreSQL', () => {
   const app = createApp()
   const suffix = randomUUID().slice(0, 8)
+  const organizationCode = `org-reab-${suffix}`
   const password = `Clave-reab-${suffix}!`
   const from = isoDay(-9)
   const to = isoDay(0)
@@ -61,6 +62,7 @@ describeWithDatabase('Reabastecimiento integrado con PostgreSQL', () => {
   }
   const saleCode = `V-${suffix}`
   const cleanupRoleIds: string[] = []
+  let organizationId = ''
   let sharedPasswordHash = ''
 
   async function loginAs(identifier: string) {
@@ -75,6 +77,13 @@ describeWithDatabase('Reabastecimiento integrado con PostgreSQL', () => {
   beforeAll(async () => {
     await databaseService.connect()
     sharedPasswordHash = await hashPassword(password)
+    const organization = await databaseService.client.organization.create({
+      data: {
+        code: organizationCode,
+        name: `Organización reabastecimiento ${suffix}`,
+      },
+    })
+    organizationId = organization.id
 
     const [readPermission, writePermission] = await Promise.all([
       databaseService.client.permission.upsert({
@@ -144,15 +153,28 @@ describeWithDatabase('Reabastecimiento integrado con PostgreSQL', () => {
       }),
     ])
 
+    await databaseService.client.organizationMembership.createMany({
+      data: [
+        { organizationId, userId: admin.id, roleId: adminRole.id },
+        { organizationId, userId: reader.id, roleId: readerRole.id },
+        { organizationId, userId: noAccess.id, roleId: noAccessRole.id },
+      ],
+    })
+
     const category = await databaseService.client.productCategory.create({
-      data: { name: `Categoría reabasto ${suffix}` },
+      data: { organizationId, name: `Categoría reabasto ${suffix}` },
     })
     const unit = await databaseService.client.productUnit.create({
-      data: { name: `Unidad reabasto ${suffix}`, symbol: `U${suffix}` },
+      data: {
+        organizationId,
+        name: `Unidad reabasto ${suffix}`,
+        symbol: `U${suffix}`,
+      },
     })
     const [productA, productB] = await Promise.all([
       databaseService.client.product.create({
         data: {
+          organizationId,
           code: productCodes.a,
           name: `Producto con demanda ${suffix}`,
           categoryId: category.id,
@@ -163,6 +185,7 @@ describeWithDatabase('Reabastecimiento integrado con PostgreSQL', () => {
       }),
       databaseService.client.product.create({
         data: {
+          organizationId,
           code: productCodes.b,
           name: `Producto sin demanda ${suffix}`,
           categoryId: category.id,
@@ -175,6 +198,7 @@ describeWithDatabase('Reabastecimiento integrado con PostgreSQL', () => {
 
     await databaseService.client.inventoryMovement.create({
       data: {
+        organizationId,
         productId: productA.id,
         type: 'INITIAL',
         status: 'CONFIRMED',
@@ -186,6 +210,7 @@ describeWithDatabase('Reabastecimiento integrado con PostgreSQL', () => {
 
     const sale = await databaseService.client.sale.create({
       data: {
+        organizationId,
         code: saleCode,
         status: 'CONFIRMED',
         subtotal: 200,
@@ -264,6 +289,9 @@ describeWithDatabase('Reabastecimiento integrado con PostgreSQL', () => {
     await databaseService.client.authSession.deleteMany({
       where: { userId: { in: userIds } },
     })
+    await databaseService.client.organizationMembership.deleteMany({
+      where: { organizationId },
+    })
     await databaseService.client.userRole.deleteMany({
       where: { userId: { in: userIds } },
     })
@@ -275,6 +303,9 @@ describeWithDatabase('Reabastecimiento integrado con PostgreSQL', () => {
     })
     await databaseService.client.role.deleteMany({
       where: { id: { in: cleanupRoleIds } },
+    })
+    await databaseService.client.organization.deleteMany({
+      where: { id: organizationId },
     })
     await databaseService.disconnect()
   }, 60_000)
