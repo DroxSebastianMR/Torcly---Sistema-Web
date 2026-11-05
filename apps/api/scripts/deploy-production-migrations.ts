@@ -28,9 +28,11 @@ try {
 
   console.info(output)
   console.info('✅ Migraciones aplicadas exitosamente en producción.')
-} catch (error: any) {
+} catch (error) {
   console.error('❌ Error aplicando migraciones:')
-  if (error.stdout) console.error(error.stdout)
-  if (error.stderr) console.error(error.stderr)
+  if (typeof error === 'object' && error !== null) {
+    if ('stdout' in error && error.stdout) console.error(String(error.stdout))
+    if ('stderr' in error && error.stderr) console.error(String(error.stderr))
+  }
   process.exit(1)
 }
