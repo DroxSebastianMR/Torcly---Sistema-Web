@@ -28,14 +28,14 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
         {header.organization ? (
           <div className="flex min-w-0 flex-col justify-center leading-tight">
             <span
-              className="truncate font-brand text-base font-bold tracking-tight text-primary sm:text-lg"
+              className="truncate font-brand text-[17px] font-bold tracking-tight text-primary sm:text-[19px]"
               title={header.organization.name}
             >
               {header.organization.name}
             </span>
             {header.userRole ? (
               <span
-                className="truncate text-[10px] font-normal text-muted-foreground"
+                className="truncate text-[11px] font-normal text-muted-foreground"
                 title={header.userRole}
               >
                 {header.userRole}
@@ -44,10 +44,10 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
           </div>
         ) : header.isPlatformAdmin ? (
           <div className="flex min-w-0 flex-col justify-center leading-tight">
-            <span className="truncate font-brand text-base font-bold tracking-tight text-primary sm:text-lg">
+            <span className="truncate font-brand text-[17px] font-bold tracking-tight text-primary sm:text-[19px]">
               Torcly Plataforma
             </span>
-            <span className="truncate text-[10px] font-normal text-muted-foreground">
+            <span className="truncate text-[11px] font-normal text-muted-foreground">
               Administración Global
             </span>
           </div>
