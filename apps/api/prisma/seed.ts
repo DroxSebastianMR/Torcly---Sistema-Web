@@ -193,6 +193,25 @@ export async function seedDatabase(database: PrismaClient, input: SeedInput) {
     skipDuplicates: true,
   })
 
+  const workshopManagerRole = await database.role.upsert({
+    where: { code: 'workshop_manager' },
+    update: { name: 'Administrador del taller', active: true },
+    create: { code: 'workshop_manager', name: 'Administrador del taller' },
+  })
+
+  const managerPermissions = permissions.filter(
+    (permission) =>
+      permission.code !== 'users:read' && permission.code !== 'users:write',
+  )
+
+  await database.rolePermission.createMany({
+    data: managerPermissions.map((permission) => ({
+      roleId: workshopManagerRole.id,
+      permissionId: permission.id,
+    })),
+    skipDuplicates: true,
+  })
+
   const organizationInput = input.organization ?? {
     code: 'torcly-principal',
     name: 'Torcly',

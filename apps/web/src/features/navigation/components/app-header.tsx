@@ -6,10 +6,13 @@ interface AppHeaderProps {
   sidebarOpen: boolean
   onOpenSidebar: () => void
 }
+
 export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
   const header = useAppHeader()
+
   return (
-    <header className="sticky top-0 z-10 flex min-h-[72px] items-center justify-between gap-3 border-b bg-card/95 px-4 backdrop-blur-[14px] sm:gap-4 lg:px-[26px]">
+    <header className="sticky top-0 z-10 flex min-h-[68px] items-center justify-between gap-3 border-b bg-card/95 px-4 backdrop-blur-[14px] sm:gap-4 lg:px-[26px]">
+      {/* Lado izquierdo: Nombre de la organización (verde) y Rol (gris, -2pt) */}
       <div className="flex min-w-0 items-center gap-3">
         <button
           type="button"
@@ -25,66 +28,78 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
         {header.organization ? (
           <div className="flex min-w-0 flex-col justify-center leading-tight">
             <span
-              className="truncate text-base font-bold tracking-tight text-foreground sm:text-lg"
+              className="truncate font-brand text-[17px] font-bold tracking-tight text-primary sm:text-[19px]"
               title={header.organization.name}
             >
               {header.organization.name}
             </span>
-            <span
-              className="truncate font-mono text-[11px] font-normal text-muted-foreground sm:text-xs"
-              title={header.organization.code}
-            >
-              {header.organization.code}
-            </span>
+            {header.userRole ? (
+              <span
+                className="truncate text-[11px] font-normal text-muted-foreground"
+                title={header.userRole}
+              >
+                {header.userRole}
+              </span>
+            ) : null}
           </div>
         ) : header.isPlatformAdmin ? (
           <div className="flex min-w-0 flex-col justify-center leading-tight">
-            <span className="truncate text-base font-bold tracking-tight text-foreground sm:text-lg">
+            <span className="truncate font-brand text-[17px] font-bold tracking-tight text-primary sm:text-[19px]">
               Torcly Plataforma
             </span>
-            <span className="truncate font-mono text-[11px] font-normal text-muted-foreground sm:text-xs">
+            <span className="truncate text-[11px] font-normal text-muted-foreground">
               Administración Global
             </span>
           </div>
         ) : null}
       </div>
 
-      <div className="ml-auto flex shrink-0 items-center gap-3.5">
-        <div className="flex min-w-0 items-center gap-3.5">
-          <div className="grid min-w-0 max-w-36 gap-0.5 border-r pr-3.5 text-right sm:max-w-[230px]">
-            <p
-              className="truncate text-[10px] text-muted-foreground"
-              title={header.account.email}
+      {/* Lado derecho: Nombre (gris, -2pt) y Correo (negro, -2pt) + En línea (puntito verde, texto gris en negrita, -2pt) */}
+      <div className="ml-auto flex shrink-0 items-center gap-3 sm:gap-4">
+        <div className="flex min-w-0 flex-col items-end justify-center leading-tight text-right">
+          {header.userName ? (
+            <span
+              className="truncate text-[10px] font-normal text-muted-foreground sm:text-[11px]"
+              title={header.userName}
             >
-              {header.account.email}
-            </p>
-            <div className="flex min-w-0 items-center justify-end gap-2">
-              <strong
-                className="truncate text-[11px] font-semibold text-foreground"
-                title={header.account.name}
-              >
-                {header.account.name}
-              </strong>
-              <span className="inline-flex shrink-0 items-center gap-1 text-[10px] text-muted-foreground"></span>
-            </div>
-          </div>
-          <Button
-            type="button"
-            variant="dangerOutline"
-            size="sm"
-            disabled={header.isSigningOut}
-            onClick={() => void header.onLogout()}
-            className="shrink-0"
-            aria-label={
-              header.isSigningOut ? 'Cerrando sesión' : 'Cerrar sesión'
-            }
-          >
-            <LogOut aria-hidden="true" size={17} />
-            <span>
-              {header.isSigningOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
+              {header.userName}
             </span>
-          </Button>
+          ) : null}
+          <div className="flex min-w-0 items-center justify-end gap-2">
+            <span
+              className="truncate text-[11px] font-semibold text-foreground sm:text-xs"
+              title={header.userEmail}
+            >
+              {header.userEmail}
+            </span>
+            <span
+              className="inline-flex shrink-0 items-center gap-1 text-[9px] font-semibold text-muted-foreground sm:text-[10px]"
+              title="Usuario activo en línea"
+            >
+              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>En línea</span>
+            </span>
+          </div>
         </div>
+
+        <div className="h-7 w-px bg-border" aria-hidden="true" />
+
+        <Button
+          type="button"
+          variant="dangerOutline"
+          size="sm"
+          disabled={header.isSigningOut}
+          onClick={() => void header.onLogout()}
+          className="shrink-0"
+          aria-label={
+            header.isSigningOut ? 'Cerrando sesión' : 'Cerrar sesión'
+          }
+        >
+          <LogOut aria-hidden="true" size={16} />
+          <span className="hidden md:inline">
+            {header.isSigningOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
+          </span>
+        </Button>
       </div>
     </header>
   )
