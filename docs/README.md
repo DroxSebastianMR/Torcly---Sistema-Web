@@ -9,7 +9,8 @@ Este directorio separa las fuentes aprobadas, las decisiones vigentes, la arquit
 - `02-arquitectura/`: arquitectura, frontend y estándar de módulos.
 - `03-sprints/`: alcance, aceptación, pruebas y aprobación de cada sprint.
 - `04-calidad/`: Definition of Done, medición, trazabilidad y estrategia Git.
-- `04-operaciones/`: guías de despliegue y notas de versión operativa.
+- `05-operaciones/`: guías de despliegue y manuales de operación en producción.
+- `06-versiones/`: registro histórico y notas de versión (changelog formal).
 
 ## Fuente de verdad
 
@@ -29,4 +30,4 @@ La meta preparada es completar 29 de las 92 historias del backlog: 31,52%. Véas
 
 ## Versión operativa
 
-La versión operativa vigente está documentada en las [notas de versión 1.1.1](04-operaciones/release-1.1.1.md) (versión previa: [1.0.1](04-operaciones/release-1.0.1.md)).
+La versión operativa actual en `develop` es **[v1.1.2](06-versiones/v1.1.2/README.md)** (Roles de Taller y Refinamiento de Identidad). Versión previa desplegada en `main`: [v1.1.1](05-operaciones/release-1.1.1.md).
