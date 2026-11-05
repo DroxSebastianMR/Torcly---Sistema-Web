@@ -11,21 +11,39 @@ ALTER TABLE "products" ADD COLUMN "organization_id" UUID;
 ALTER TABLE "services" ADD COLUMN "organization_id" UUID;
 ALTER TABLE "technicians" ADD COLUMN "organization_id" UUID;
 
--- Política de transición segura: el backfill solo se permite cuando existe
--- exactamente una organización. Así nunca se asignan datos legados a un
--- taller arbitrario si el entorno ya contiene más de un tenant.
+-- Política de transición segura: el backfill se aplica a la organización
+-- existente o crea la organización inicial por defecto ('torcly-principal')
+-- si el entorno aún no tiene ninguna registrada.
 DO $$
 DECLARE
   default_organization_id UUID;
   organization_count INTEGER;
 BEGIN
   SELECT COUNT(*) INTO organization_count FROM "organizations";
-  SELECT "id" INTO default_organization_id
-  FROM "organizations"
-  ORDER BY "created_at" ASC
-  LIMIT 1;
 
-  IF organization_count <> 1 THEN
+  IF organization_count = 0 THEN
+    INSERT INTO "organizations" ("code", "name", "active", "created_at", "updated_at")
+    VALUES ('torcly-principal', 'Torcly', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    RETURNING "id" INTO default_organization_id;
+
+    -- Asignar membresía con el rol de Dueño del taller a los usuarios existentes
+    INSERT INTO "organization_memberships" ("organization_id", "user_id", "role_id", "active", "joined_at")
+    SELECT default_organization_id, u."id", r."id", true, CURRENT_TIMESTAMP
+    FROM "users" u
+    CROSS JOIN (
+      SELECT "id" FROM "roles" WHERE "code" = 'administrator' LIMIT 1
+    ) r
+    WHERE NOT EXISTS (
+      SELECT 1 FROM "organization_memberships" om
+      WHERE om."organization_id" = default_organization_id AND om."user_id" = u."id"
+    )
+    ON CONFLICT DO NOTHING;
+  ELSIF organization_count = 1 THEN
+    SELECT "id" INTO default_organization_id
+    FROM "organizations"
+    ORDER BY "created_at" ASC
+    LIMIT 1;
+  ELSE
     RAISE EXCEPTION 'El backfill requiere exactamente una organización; se encontraron %', organization_count;
   END IF;
 
