@@ -12,7 +12,7 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
 
   return (
     <header className="sticky top-0 z-10 flex min-h-[68px] items-center justify-between gap-3 border-b bg-card/95 px-4 backdrop-blur-[14px] sm:gap-4 lg:px-[26px]">
-      {/* Lado izquierdo: Nombre de la organización (verde) y Rol (gris) */}
+      {/* Lado izquierdo: Nombre de la organización (verde) y Rol (gris, -2pt) */}
       <div className="flex min-w-0 items-center gap-3">
         <button
           type="button"
@@ -26,7 +26,7 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
         </button>
 
         {header.organization ? (
-          <div className="flex min-w-0 flex-col justify-center leading-snug">
+          <div className="flex min-w-0 flex-col justify-center leading-tight">
             <span
               className="truncate font-brand text-base font-bold tracking-tight text-primary sm:text-lg"
               title={header.organization.name}
@@ -35,7 +35,7 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
             </span>
             {header.userRole ? (
               <span
-                className="truncate text-xs font-normal text-muted-foreground"
+                className="truncate text-[10px] font-normal text-muted-foreground"
                 title={header.userRole}
               >
                 {header.userRole}
@@ -43,23 +43,23 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
             ) : null}
           </div>
         ) : header.isPlatformAdmin ? (
-          <div className="flex min-w-0 flex-col justify-center leading-snug">
+          <div className="flex min-w-0 flex-col justify-center leading-tight">
             <span className="truncate font-brand text-base font-bold tracking-tight text-primary sm:text-lg">
               Torcly Plataforma
             </span>
-            <span className="truncate text-xs font-normal text-muted-foreground">
+            <span className="truncate text-[10px] font-normal text-muted-foreground">
               Administración Global
             </span>
           </div>
         ) : null}
       </div>
 
-      {/* Lado derecho: Nombre de usuario (gris) y Correo (verde) + En línea (gris) */}
+      {/* Lado derecho: Nombre (gris, -2pt) y Correo (negro, -2pt) + En línea (puntito verde, texto gris en negrita, -2pt) */}
       <div className="ml-auto flex shrink-0 items-center gap-3 sm:gap-4">
-        <div className="flex min-w-0 flex-col items-end justify-center leading-snug text-right">
+        <div className="flex min-w-0 flex-col items-end justify-center leading-tight text-right">
           {header.userName ? (
             <span
-              className="truncate text-xs font-normal text-muted-foreground sm:text-[13px]"
+              className="truncate text-[10px] font-normal text-muted-foreground sm:text-[11px]"
               title={header.userName}
             >
               {header.userName}
@@ -67,16 +67,16 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
           ) : null}
           <div className="flex min-w-0 items-center justify-end gap-2">
             <span
-              className="truncate text-xs font-semibold text-primary sm:text-[13px]"
+              className="truncate text-[11px] font-medium text-foreground sm:text-xs"
               title={header.userEmail}
             >
               {header.userEmail}
             </span>
             <span
-              className="inline-flex shrink-0 items-center gap-1.5 text-[11px] font-normal text-muted-foreground"
+              className="inline-flex shrink-0 items-center gap-1 text-[9px] font-semibold text-muted-foreground sm:text-[10px]"
               title="Usuario activo en línea"
             >
-              <span className="size-1.5 rounded-full bg-muted-foreground/70" />
+              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>En línea</span>
             </span>
           </div>
