@@ -23,27 +23,18 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
         </button>
 
         {header.organization ? (
-          <div className="flex min-w-0 flex-col justify-center leading-tight">
+          <div className="flex min-w-0 items-center">
             <span
-              className="truncate text-base font-bold tracking-tight text-foreground sm:text-lg"
+              className="truncate font-brand text-xl font-bold tracking-tight text-foreground sm:text-2xl"
               title={header.organization.name}
             >
               {header.organization.name}
             </span>
-            <span
-              className="truncate font-mono text-[11px] font-normal text-muted-foreground sm:text-xs"
-              title={header.organization.code}
-            >
-              {header.organization.code}
-            </span>
           </div>
         ) : header.isPlatformAdmin ? (
-          <div className="flex min-w-0 flex-col justify-center leading-tight">
-            <span className="truncate text-base font-bold tracking-tight text-foreground sm:text-lg">
+          <div className="flex min-w-0 items-center">
+            <span className="truncate font-brand text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               Torcly Plataforma
-            </span>
-            <span className="truncate font-mono text-[11px] font-normal text-muted-foreground sm:text-xs">
-              Administración Global
             </span>
           </div>
         ) : null}
