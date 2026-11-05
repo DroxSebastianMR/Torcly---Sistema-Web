@@ -5,7 +5,7 @@ import { quickAccessIds } from '../config/header-actions'
 
 export function useAppHeader() {
   const { pathname } = useLocation()
-  const { groups, account, isSigningOut, onLogout } = useAppSidebar()
+  const { groups, account, isSigningOut, onLogout, user } = useAppSidebar()
   const links = flattenNavigation(groups)
   const current = [...links]
     .sort((a, b) => b.path.length - a.path.length)
@@ -23,5 +23,7 @@ export function useAppHeader() {
     isSigningOut,
     onLogout,
     profile: links.find((item) => item.id === 'profile'),
+    organization: user?.organization,
+    isPlatformAdmin: user?.isPlatformAdmin,
   }
 }

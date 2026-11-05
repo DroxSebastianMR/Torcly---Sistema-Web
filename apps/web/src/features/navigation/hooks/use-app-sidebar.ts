@@ -41,5 +41,5 @@ export function useAppSidebar(
     }
   }
 
-  return { groups, account, isSigningOut, onLogout }
+  return { groups, account, isSigningOut, onLogout, user }
 }

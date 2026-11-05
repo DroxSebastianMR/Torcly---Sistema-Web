@@ -9,17 +9,46 @@ interface AppHeaderProps {
 export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
   const header = useAppHeader()
   return (
-    <header className="sticky top-0 z-10 flex min-h-[72px] items-center gap-2 border-b bg-card/95 px-4 backdrop-blur-[14px] sm:gap-4 lg:px-[26px]">
-      <button
-        type="button"
-        aria-label="Abrir menú"
-        aria-controls="app-sidebar"
-        aria-expanded={sidebarOpen}
-        onClick={onOpenSidebar}
-        className="flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary lg:hidden"
-      >
-        <Menu size={20} />
-      </button>
+    <header className="sticky top-0 z-10 flex min-h-[72px] items-center justify-between gap-3 border-b bg-card/95 px-4 backdrop-blur-[14px] sm:gap-4 lg:px-[26px]">
+      <div className="flex min-w-0 items-center gap-3">
+        <button
+          type="button"
+          aria-label="Abrir menú"
+          aria-controls="app-sidebar"
+          aria-expanded={sidebarOpen}
+          onClick={onOpenSidebar}
+          className="flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary lg:hidden"
+        >
+          <Menu size={20} />
+        </button>
+
+        {header.organization ? (
+          <div className="flex min-w-0 flex-col justify-center leading-tight">
+            <span
+              className="truncate text-base font-bold tracking-tight text-foreground sm:text-lg"
+              title={header.organization.name}
+            >
+              {header.organization.name}
+            </span>
+            <span
+              className="truncate font-mono text-[11px] font-normal text-muted-foreground sm:text-xs"
+              title={header.organization.code}
+            >
+              {header.organization.code}
+            </span>
+          </div>
+        ) : header.isPlatformAdmin ? (
+          <div className="flex min-w-0 flex-col justify-center leading-tight">
+            <span className="truncate text-base font-bold tracking-tight text-foreground sm:text-lg">
+              Torcly Plataforma
+            </span>
+            <span className="truncate font-mono text-[11px] font-normal text-muted-foreground sm:text-xs">
+              Administración Global
+            </span>
+          </div>
+        ) : null}
+      </div>
+
       <div className="ml-auto flex shrink-0 items-center gap-3.5">
         <div className="flex min-w-0 items-center gap-3.5">
           <div className="grid min-w-0 max-w-36 gap-0.5 border-r pr-3.5 text-right sm:max-w-[230px]">
