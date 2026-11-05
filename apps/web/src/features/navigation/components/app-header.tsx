@@ -67,7 +67,7 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
           ) : null}
           <div className="flex min-w-0 items-center justify-end gap-2">
             <span
-              className="truncate text-[11px] font-medium text-foreground sm:text-xs"
+              className="truncate text-[11px] font-semibold text-foreground sm:text-xs"
               title={header.userEmail}
             >
               {header.userEmail}
