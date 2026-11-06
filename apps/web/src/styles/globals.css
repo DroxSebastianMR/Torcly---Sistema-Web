@@ -145,9 +145,14 @@
 }
 
 /* Keep every module reachable on short screens without a persistent scrollbar. */
-.sidebar-navigation {
+.sidebar-navigation,
+.no-scrollbar {
   scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.sidebar-navigation::-webkit-scrollbar {
+.sidebar-navigation::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
   display: none;
+  width: 0;
+  height: 0;
 }
