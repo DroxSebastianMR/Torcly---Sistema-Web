@@ -111,7 +111,7 @@ export function useAnnouncementMutations() {
   const generateVersionRelease = useMutation({
     mutationFn: () => announcementsService.generateVersionRelease(),
     onMutate: () => ({
-      toastId: startActionToast('Generando lanzamiento de versión v1.1.2…'),
+      toastId: startActionToast('Generando lanzamiento de versión v2.1.2…'),
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: announcementKeys.all })

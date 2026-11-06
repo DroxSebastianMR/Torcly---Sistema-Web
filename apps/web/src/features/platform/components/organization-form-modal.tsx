@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Building2 } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -58,11 +57,6 @@ export function OrganizationFormModal({
       open={open}
       onClose={onClose}
       busy={busy}
-      visual={
-        <span className="flex size-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-700">
-          <Building2 aria-hidden className="size-6" />
-        </span>
-      }
       title="Registrar organización"
       description="Crea el taller y su cuenta responsable. Esa cuenta solo podrá acceder al espacio operativo de su propia organización."
       className="max-w-2xl"

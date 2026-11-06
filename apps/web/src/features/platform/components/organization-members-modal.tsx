@@ -184,13 +184,6 @@ function OrganizationMembersDialog({
       busy={busy}
       title={`Miembros de ${organization.name}`}
       description="Cada miembro pertenece únicamente a este taller y recibe el rol seleccionado dentro de él."
-      footer={
-        <div className="flex justify-end">
-          <Button variant="outline" disabled={busy} onClick={onClose}>
-            Cerrar
-          </Button>
-        </div>
-      }
     >
       <div className="space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3">

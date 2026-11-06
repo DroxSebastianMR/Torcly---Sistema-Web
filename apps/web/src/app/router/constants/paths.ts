@@ -5,6 +5,7 @@ export const paths = {
   platform: '/organizaciones',
   platformOrganizations: '/organizaciones',
   platformAnnouncements: '/anuncios',
+  platformSubscriptions: '/suscripciones-saas',
   dashboard: '/dashboard',
   assistantHistory: '/historial-ia',
   products: '/productos',
@@ -22,6 +23,7 @@ export const paths = {
   users: '/usuarios',
   notifications: '/notificaciones',
   announcements: '/novedades',
+  subscription: '/suscripcion',
   profile: '/perfil',
   reports: '/reportes',
 } as const

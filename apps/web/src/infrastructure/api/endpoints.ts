@@ -20,6 +20,15 @@ export const endpoints = {
       `/platform/organizations/${organizationId}/members/${userId}`,
     organizationMemberResetPassword: (organizationId: string, userId: string) =>
       `/platform/organizations/${organizationId}/members/${userId}/reset-password`,
+    plans: '/platform/plans',
+    plan: (planId: string) => `/platform/plans/${planId}`,
+    subscriptions: '/platform/subscriptions',
+    subscriptionMetrics: '/platform/subscriptions/metrics',
+    subscription: (organizationId: string) =>
+      `/platform/subscriptions/${organizationId}`,
+  },
+  subscriptions: {
+    current: '/subscriptions/current',
   },
   products: {
     root: '/products',

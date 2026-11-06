@@ -8,12 +8,26 @@ import type {
   UpdateAnnouncementInput,
 } from './announcements.types.js'
 
-function toAnnouncementItem(record: any): AnnouncementItem {
-  const isRead = Array.isArray(record.reads) && record.reads.length > 0
-  const readAt =
-    isRead && record.reads[0]?.readAt
-      ? record.reads[0].readAt.toISOString()
-      : null
+function toAnnouncementItem(record: {
+  id: string
+  title: string
+  summary: string
+  content: string
+  type: AnnouncementItem['type']
+  status: AnnouncementItem['status']
+  versionTag: string | null
+  videoUrl: string | null
+  startsAt: Date | null
+  endsAt: Date | null
+  publishedAt: Date
+  createdBy: string
+  createdAt: Date
+  updatedAt: Date
+  reads?: Array<{ readAt: Date }>
+}): AnnouncementItem {
+  const firstRead = record.reads?.[0]
+  const readAt = firstRead?.readAt ? firstRead.readAt.toISOString() : null
+  const isRead = Boolean(firstRead)
 
   return {
     id: record.id,
@@ -44,7 +58,7 @@ function paginate(total: number, page: number, pageSize: number) {
   }
 }
 
-export const CURRENT_SAAS_VERSION = '1.1.2'
+export const CURRENT_SAAS_VERSION = '2.1.2'
 
 export const announcementsService = {
   async listAnnouncements(authUser: AuthUser, filters: AnnouncementFilters) {
@@ -107,6 +121,13 @@ export const announcementsService = {
       authUser.id,
       isPlatformAdmin,
     )
+    if (!updated) {
+      throw new AppError(
+        404,
+        'ANNOUNCEMENT_NOT_FOUND',
+        'Anuncio o novedad no encontrado.',
+      )
+    }
     return toAnnouncementItem(updated)
   },
 

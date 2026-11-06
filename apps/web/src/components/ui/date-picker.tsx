@@ -17,6 +17,7 @@ interface DatePickerProps {
   min?: string
   max?: string
   className?: string
+  align?: 'left' | 'right'
   'aria-label'?: string
   'aria-invalid'?: boolean
 }
@@ -54,6 +55,7 @@ export function DatePicker({
   min,
   max,
   className,
+  align = 'left',
   'aria-label': ariaLabel,
   'aria-invalid': ariaInvalid,
 }: DatePickerProps) {
@@ -141,7 +143,10 @@ export function DatePicker({
         <div
           role="dialog"
           aria-label="Calendario"
-          className="absolute z-30 mt-2 w-[16rem] rounded-2xl border border-border bg-card p-2.5 shadow-[0_24px_60px_rgb(16_44_37_/_18%)]"
+          className={cn(
+            'absolute z-30 mt-2 w-[16rem] rounded-2xl border border-border bg-card p-2.5 shadow-[0_24px_60px_rgb(16_44_37_/_18%)]',
+            align === 'right' ? 'right-0' : 'left-0',
+          )}
         >
           <div className="mb-3 flex items-center justify-between gap-2">
             <button

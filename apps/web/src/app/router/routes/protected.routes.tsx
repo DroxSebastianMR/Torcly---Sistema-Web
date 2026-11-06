@@ -33,12 +33,26 @@ export const protectedRoutes: RouteObject[] = [
                 }),
               },
               {
+                path: paths.platformSubscriptions,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/platform/pages/platform-subscriptions-page'
+                    )
+                  ).default,
+                }),
+              },
+              {
                 path: '/plataforma',
                 element: <Navigate to={paths.platform} replace />,
               },
               {
                 path: '/plataforma/anuncios',
                 element: <Navigate to={paths.platformAnnouncements} replace />,
+              },
+              {
+                path: '/plataforma/suscripciones',
+                element: <Navigate to={paths.platformSubscriptions} replace />,
               },
             ],
           },
@@ -212,6 +226,16 @@ export const protectedRoutes: RouteObject[] = [
                 lazy: async () => ({
                   Component: (await import('@/features/users/pages/users-page'))
                     .default,
+                }),
+              },
+              {
+                path: paths.subscription,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/subscriptions/pages/subscription-page'
+                    )
+                  ).default,
                 }),
               },
             ],

@@ -1,5 +1,4 @@
 import { useState, type ChangeEvent } from 'react'
-import { Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
@@ -175,11 +174,6 @@ export function OrganizationEditModal({
       open={Boolean(organization)}
       onClose={onClose}
       busy={busy}
-      visual={
-        <span className="flex size-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-700">
-          <Building2 aria-hidden className="size-6" />
-        </span>
-      }
       title="Editar organización"
       description="Actualiza los datos públicos del taller y de su responsable."
       className="max-w-2xl"

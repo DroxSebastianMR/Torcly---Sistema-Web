@@ -127,7 +127,7 @@ export default function AnnouncementsAdminPage() {
             disabled={mutations.generateVersionRelease.isPending}
           >
             <TrendingUp size={17} className="text-primary" />
-            <span>Generar Release v{activeVersion?.version ?? '1.1.2'}</span>
+            <span>Generar Release v{activeVersion?.version ?? '2.1.2'}</span>
           </Button>
 
           <Button onClick={handleOpenCreate}>
