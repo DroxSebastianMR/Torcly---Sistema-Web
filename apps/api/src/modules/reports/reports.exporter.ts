@@ -158,8 +158,23 @@ function addBlockSheet(workbook: ExcelJS.Workbook, data: ReportBlockData) {
     case 'workshop':
       addTable(
         sheet,
+        'WorkshopSummary',
+        ['Métrica de Flujo Vehicular', 'Cantidad'],
+        [
+          ['Total vehículos ingresados', data.metrics.workOrderCount],
+          ['Ingresos directos (Walk-in)', data.metrics.walkInsCount ?? 0],
+          [
+            'Ingresos con cita previa',
+            data.metrics.appointmentOrdersCount ?? 0,
+          ],
+          ['Vehículos entregados (Salidas)', data.metrics.deliveredCount],
+        ],
+      )
+      sheet.addRow([])
+      addTable(
+        sheet,
         'WorkshopTrend',
-        ['Período', 'Órdenes creadas', 'Entregadas'],
+        ['Período', 'Ingresos (Órdenes)', 'Entregadas (Salidas)'],
         data.trend.map((point) => [
           point.label,
           point.ordersCreated,

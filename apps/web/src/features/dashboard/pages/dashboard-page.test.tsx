@@ -11,6 +11,9 @@ const operations = vi.hoisted(() => ({
 }))
 
 vi.mock('../hooks/use-operations', () => operations)
+vi.mock('@/features/work-orders/hooks/use-work-orders', () => ({
+  useYardCapacity: () => ({ data: undefined, isLoading: false }),
+}))
 
 const query = (data: unknown) => ({ data, isError: false, isPending: false })
 

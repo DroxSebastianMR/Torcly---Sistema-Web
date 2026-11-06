@@ -23,6 +23,15 @@ export const workOrderQuerySchema = z.object({
   search: z.string().trim().max(120).optional(),
   status: workOrderStatusSchema.or(z.literal('all')).default('all'),
   technicianId: z.uuid('Técnico inválido.').optional(),
+  source: z.enum(['WALK_IN', 'APPOINTMENT']).or(z.literal('all')).optional(),
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha de inicio inválida (YYYY-MM-DD).')
+    .optional(),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha fin inválida (YYYY-MM-DD).')
+    .optional(),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(5).max(100).default(10),
 })

@@ -33,6 +33,11 @@ function buildQuery(filters: WorkOrderFilters) {
 
   if (filters.search.trim()) query.set('search', filters.search.trim())
   if (filters.technicianId) query.set('technicianId', filters.technicianId)
+  if (filters.source && filters.source !== 'all') {
+    query.set('source', filters.source)
+  }
+  if (filters.from) query.set('from', filters.from)
+  if (filters.to) query.set('to', filters.to)
   return query.toString()
 }
 

@@ -106,3 +106,58 @@ export const dateTimeFormatter = new Intl.DateTimeFormat('es-PE', {
   hour: '2-digit',
   minute: '2-digit',
 })
+
+export function formatReceptionDateTime(isoString: string): string {
+  try {
+    const date = new Date(isoString)
+    return new Intl.DateTimeFormat('es-PE', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    }).format(date)
+  } catch {
+    return isoString
+  }
+}
+
+export function getDateRangeFromPreset(
+  preset: 'all' | 'today' | 'yesterday' | 'week' | 'month',
+): {
+  from?: string
+  to?: string
+} {
+  const now = new Date()
+  const toDateStr = (d: Date) => {
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  if (preset === 'today') {
+    const today = toDateStr(now)
+    return { from: today, to: today }
+  }
+
+  if (preset === 'yesterday') {
+    const yesterday = new Date(now)
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yStr = toDateStr(yesterday)
+    return { from: yStr, to: yStr }
+  }
+
+  if (preset === 'week') {
+    const weekStart = new Date(now)
+    weekStart.setDate(weekStart.getDate() - 6)
+    return { from: toDateStr(weekStart), to: toDateStr(now) }
+  }
+
+  if (preset === 'month') {
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    return { from: toDateStr(monthStart), to: toDateStr(now) }
+  }
+
+  return { from: undefined, to: undefined }
+}

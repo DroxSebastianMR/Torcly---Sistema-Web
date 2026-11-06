@@ -1,4 +1,11 @@
-import { Building2, CalendarDays, Clock3, PackageCheck } from 'lucide-react'
+import {
+  Building2,
+  CalendarDays,
+  Car,
+  Clock3,
+  LogIn,
+  PackageCheck,
+} from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { appointmentStatusLabel } from '@/features/appointments/utils/appointment-formatters'
 import { workOrderStatusLabel } from '@/features/work-orders/utils/work-order-formatters'
@@ -33,6 +40,19 @@ export function WorkshopBlockContent({ data }: { data: WorkshopBlockData }) {
     status,
     count: data.metrics.appointmentsByStatus[status] ?? 0,
   }))
+  const sources = [
+    {
+      source: 'WALK_IN',
+      label: 'Ingreso directo (Walk-in)',
+      count: data.metrics.walkInsCount ?? 0,
+    },
+    {
+      source: 'APPOINTMENT',
+      label: 'Con cita previa',
+      count: data.metrics.appointmentOrdersCount ?? 0,
+    },
+  ]
+
   if (isEmpty) {
     return (
       <EmptyState
@@ -44,82 +64,139 @@ export function WorkshopBlockContent({ data }: { data: WorkshopBlockData }) {
   }
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <IndicatorCard
-          label="Órdenes de taller"
+          label="Vehículos ingresados"
           value={formatCount(data.metrics.workOrderCount)}
-          icon={<Building2 className="size-4" />}
+          hint="Total entradas al taller"
+          icon={<LogIn className="size-4" />}
           tone="purple"
         />
         <IndicatorCard
-          label="Entregadas"
-          value={formatCount(data.metrics.deliveredCount)}
-          icon={<PackageCheck className="size-4" />}
+          label="Ingresos directos"
+          value={formatCount(data.metrics.walkInsCount ?? 0)}
+          hint="Sin cita previa (Walk-in)"
+          icon={<Car className="size-4" />}
           tone="cyan"
         />
         <IndicatorCard
-          label="Tiempo promedio"
+          label="Ingresos con cita"
+          value={formatCount(data.metrics.appointmentOrdersCount ?? 0)}
+          hint="Citas previas atendidas"
+          icon={<CalendarDays className="size-4" />}
+          tone="amber"
+        />
+        <IndicatorCard
+          label="Vehículos entregados"
+          value={formatCount(data.metrics.deliveredCount)}
+          hint="Salidas completadas"
+          icon={<PackageCheck className="size-4" />}
+          tone="purple"
+        />
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <IndicatorCard
+          label="Tiempo promedio en taller"
           value={formatHours(data.metrics.averageDeliveryHours)}
-          hint="Entre creación y entrega"
+          hint="Desde recepción hasta entrega final"
           icon={<Clock3 className="size-4" />}
           tone="amber"
         />
         <IndicatorCard
-          label="Citas"
+          label="Citas registradas"
           value={formatCount(data.metrics.appointmentCount)}
-          icon={<CalendarDays className="size-4" />}
+          hint="En el calendario del período"
+          icon={<Building2 className="size-4" />}
           tone="red"
         />
       </div>
+
       <TrendChart
         data={data.trend}
         type="bar"
-        title="Órdenes y entregas"
-        ariaLabel="Tendencia de órdenes y entregas del período"
+        title="Flujo vehicular (Entradas vs Salidas)"
+        ariaLabel="Tendencia de ingresos y entregas de vehículos del período"
         series={[
           {
             key: 'ordersCreated',
-            label: 'Órdenes creadas',
+            label: 'Ingresos (Entradas)',
             color: '#147357',
             formatter: formatCount,
           },
           {
             key: 'delivered',
-            label: 'Entregadas',
+            label: 'Entregadas (Salidas)',
             color: '#2a79a5',
             formatter: formatCount,
           },
         ]}
       />
-      <CompositionChart
-        title="Órdenes por etapa"
-        ariaLabel="Distribución de órdenes de taller por etapa"
-        formatter={formatCount}
-        rows={workOrders.map((row, index) => ({
-          key: row.status,
-          label: workOrderStatusLabel[row.status],
-          value: row.count,
-          color: ['#147357', '#2a79a5', '#c85d00', '#7758b5'][index % 4]!,
-        }))}
-      />
-      <ReportTable
-        caption="Órdenes por etapa"
-        rows={workOrders}
-        emptyMessage="Sin órdenes en el período."
-        columns={[
-          {
-            key: 'status',
-            header: 'Etapa',
-            cell: (row) => workOrderStatusLabel[row.status],
-          },
-          {
-            key: 'count',
-            header: 'Órdenes',
-            align: 'right',
-            cell: (row) => formatCount(row.count),
-          },
-        ]}
-      />
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <CompositionChart
+          title="Ingresos por origen de recepción"
+          ariaLabel="Distribución de ingresos por directo vs cita"
+          formatter={formatCount}
+          rows={sources.map((row, index) => ({
+            key: row.source,
+            label: row.label,
+            value: row.count,
+            color: ['#147357', '#2a79a5'][index % 2]!,
+          }))}
+        />
+        <CompositionChart
+          title="Órdenes por etapa"
+          ariaLabel="Distribución de órdenes de taller por etapa"
+          formatter={formatCount}
+          rows={workOrders.map((row, index) => ({
+            key: row.status,
+            label: workOrderStatusLabel[row.status],
+            value: row.count,
+            color: ['#147357', '#2a79a5', '#c85d00', '#7758b5'][index % 4]!,
+          }))}
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <ReportTable
+          caption="Ingresos por origen"
+          rows={sources}
+          emptyMessage="Sin ingresos en el período."
+          columns={[
+            {
+              key: 'label',
+              header: 'Origen de recepción',
+              cell: (row) => row.label,
+            },
+            {
+              key: 'count',
+              header: 'Vehículos',
+              align: 'right',
+              cell: (row) => formatCount(row.count),
+            },
+          ]}
+        />
+        <ReportTable
+          caption="Órdenes por etapa"
+          rows={workOrders}
+          emptyMessage="Sin órdenes en el período."
+          columns={[
+            {
+              key: 'status',
+              header: 'Etapa',
+              cell: (row) => workOrderStatusLabel[row.status],
+            },
+            {
+              key: 'count',
+              header: 'Órdenes',
+              align: 'right',
+              cell: (row) => formatCount(row.count),
+            },
+          ]}
+        />
+      </div>
+
       <ReportTable
         caption="Citas por estado"
         rows={appointments}

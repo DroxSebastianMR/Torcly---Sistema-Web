@@ -158,6 +158,8 @@ export interface WorkshopReportData {
   granularity: ReportGranularity
   metrics: {
     workOrderCount: number
+    walkInsCount: number
+    appointmentOrdersCount: number
     workOrdersByStatus: Record<WorkOrderStatus, number>
     deliveredCount: number
     averageDeliveryHours: number | null

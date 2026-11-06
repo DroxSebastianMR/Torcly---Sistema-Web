@@ -8,6 +8,13 @@ export type WorkOrderStatus =
   | 'LISTA_PARA_ENTREGA'
   | 'ENTREGADA'
 export type WorkOrderStatusFilter = 'all' | WorkOrderStatus
+export type WorkOrderSourceFilter = 'all' | 'WALK_IN' | 'APPOINTMENT'
+export type WorkOrderPeriodPreset =
+  | 'all'
+  | 'today'
+  | 'yesterday'
+  | 'week'
+  | 'month'
 export type WorkOrderLineType = 'PRODUCT' | 'SERVICE'
 export type WorkOrderActivityStatus = 'PENDIENTE' | 'COMPLETADA'
 
@@ -15,6 +22,10 @@ export interface WorkOrderFilters {
   search: string
   status: WorkOrderStatusFilter
   technicianId: string
+  source?: WorkOrderSourceFilter
+  from?: string
+  to?: string
+  periodPreset?: WorkOrderPeriodPreset
   page: number
   pageSize: number
 }

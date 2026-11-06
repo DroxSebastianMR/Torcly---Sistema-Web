@@ -349,7 +349,16 @@ async function buildWorkshopBlock(
     ReportBlockData,
     { block: 'workshop' }
   >['metrics']['workOrdersByStatus']
-  for (const row of workOrders) workOrdersByStatus[row.status] += 1
+  let walkInsCount = 0
+  let appointmentOrdersCount = 0
+  for (const row of workOrders) {
+    workOrdersByStatus[row.status] += 1
+    if (row.source === 'WALK_IN') {
+      walkInsCount += 1
+    } else {
+      appointmentOrdersCount += 1
+    }
+  }
   const buckets = buildBuckets(period.from, period.to, granularity)
   const ordersByBucket = new Map<string, number>()
   const deliveriesByBucket = new Map<string, number>()
@@ -382,6 +391,8 @@ async function buildWorkshopBlock(
     granularity,
     metrics: {
       workOrderCount: workOrders.length,
+      walkInsCount,
+      appointmentOrdersCount,
       workOrdersByStatus,
       deliveredCount: deliveries.length,
       averageDeliveryHours,

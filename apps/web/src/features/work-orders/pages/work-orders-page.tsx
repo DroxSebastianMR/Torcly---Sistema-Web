@@ -75,6 +75,27 @@ export default function Page() {
   const [finalizeOrder, setFinalizeOrder] = useState<WorkOrderDetail | null>(
     null,
   )
+  const handleSelectTodayEntries = () => {
+    if (filters.periodPreset === 'today') {
+      setFilters((prev) => ({
+        ...prev,
+        periodPreset: 'all',
+        from: undefined,
+        to: undefined,
+        page: 1,
+      }))
+    } else {
+      const todayStr = new Date().toISOString().slice(0, 10)
+      setFilters((prev) => ({
+        ...prev,
+        periodPreset: 'today',
+        from: todayStr,
+        to: todayStr,
+        page: 1,
+      }))
+    }
+  }
+
   const [directOrderOpen, setDirectOrderOpen] = useState(false)
 
   const deferredSearch = useDeferredValue(filters.search)
@@ -227,7 +248,10 @@ export default function Page() {
         )}
       </header>
 
-      <YardCapacityWidget />
+      <YardCapacityWidget
+        isFilteringToday={filters.periodPreset === 'today'}
+        onSelectTodayEntries={handleSelectTodayEntries}
+      />
 
       <ModuleMetrics
         items={[

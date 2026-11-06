@@ -139,6 +139,8 @@ export interface WorkshopBlockData {
   granularity: 'day' | 'week' | 'month'
   metrics: {
     workOrderCount: number
+    walkInsCount?: number
+    appointmentOrdersCount?: number
     workOrdersByStatus: Record<string, number>
     deliveredCount: number
     averageDeliveryHours: number | null

@@ -7,6 +7,7 @@ import type {
 } from '../types/work-orders.types'
 import {
   currencyFormatter,
+  formatReceptionDateTime,
   workOrderStatusLabel,
 } from '../utils/work-order-formatters'
 
@@ -66,11 +67,22 @@ export function WorkOrdersTable({
                       <p className="font-mono text-xs font-semibold text-foreground">
                         {order.code}
                       </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {order.appointment
-                          ? `Cita ${order.appointment.code}`
-                          : 'Ingreso directo'}
-                      </p>
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                        <span
+                          className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                            order.source === 'WALK_IN'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : 'bg-primary/10 text-primary'
+                          }`}
+                        >
+                          {order.appointment
+                            ? `Cita ${order.appointment.code}`
+                            : 'Directo'}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {formatReceptionDateTime(order.createdAt)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </td>
@@ -87,6 +99,9 @@ export function WorkOrdersTable({
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {order.vehicle.year}
+                    {typeof order.currentMileage === 'number'
+                      ? ` · ${order.currentMileage.toLocaleString('es-PE')} km`
+                      : ''}
                   </p>
                 </td>
                 <td className="px-4 py-4">
@@ -136,6 +151,20 @@ export function WorkOrdersTable({
                 <p className="mt-1 truncate text-sm text-muted-foreground">
                   {order.customer.name} · {order.vehicle.plate}
                 </p>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                  <span
+                    className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                      order.source === 'WALK_IN'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : 'bg-primary/10 text-primary'
+                    }`}
+                  >
+                    {order.appointment
+                      ? `Cita ${order.appointment.code}`
+                      : 'Directo'}
+                  </span>
+                  <span>{formatReceptionDateTime(order.createdAt)}</span>
+                </div>
               </div>
               <StatusBadge status={order.status} />
             </div>
