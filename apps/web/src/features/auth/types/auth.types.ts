@@ -7,6 +7,7 @@ export interface User {
   permissions: Permission[]
   /** Cuenta interna de Torcly, separada de los permisos de un taller. */
   isPlatformAdmin?: boolean
+  mustChangePassword?: boolean
   role?: {
     code: string
     name: string

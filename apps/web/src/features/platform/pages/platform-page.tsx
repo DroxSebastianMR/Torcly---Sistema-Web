@@ -22,6 +22,7 @@ import {
   usePlatformOrganizationMembers,
   usePlatformOrganizations,
   usePlatformRoles,
+  useResetPlatformMemberPassword,
   useUpdatePlatformOrganizationMember,
   useUpdatePlatformOrganization,
   useUpdatePlatformOrganizationStatus,
@@ -66,6 +67,7 @@ export default function PlatformPage() {
   const updateOrganization = useUpdatePlatformOrganization()
   const createMember = useCreatePlatformOrganizationMember()
   const updateMember = useUpdatePlatformOrganizationMember()
+  const resetMember = useResetPlatformMemberPassword()
 
   const updateFilters = (next: Partial<PlatformOrganizationFilters>) => {
     setFilters((current) => ({
@@ -382,7 +384,11 @@ export default function PlatformPage() {
         roles={roles.data?.data ?? []}
         members={members.data?.data ?? []}
         loading={members.isLoading}
-        busy={createMember.isPending || updateMember.isPending}
+        busy={
+          createMember.isPending ||
+          updateMember.isPending ||
+          resetMember.isPending
+        }
         onClose={() => setSelectedOrganization(null)}
         onCreate={async (input) => {
           if (selectedOrganization) {
@@ -400,6 +406,14 @@ export default function PlatformPage() {
               input,
             })
           }
+        }}
+        onResetPassword={async (userId) => {
+          if (!selectedOrganization) throw new Error('Taller no seleccionado')
+          const res = await resetMember.mutateAsync({
+            organizationId: selectedOrganization.id,
+            userId,
+          })
+          return res.data
         }}
       />
     </section>

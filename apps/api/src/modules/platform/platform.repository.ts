@@ -1,5 +1,6 @@
-import type { Prisma } from '../../generated/prisma/client.js'
+import { Prisma } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
+import type { RequestContext } from '../auth/auth.types.js'
 import type { PlatformOrganizationFilters } from './platform.types.js'
 
 const organizationInclude = {
@@ -226,6 +227,52 @@ export const platformRepository = {
           data: { revokedAt: new Date() },
         })
       }
+      return membership
+    })
+  },
+
+  resetOrganizationMemberPassword(
+    organizationId: string,
+    userId: string,
+    passwordHash: string,
+    context?: RequestContext,
+  ) {
+    return databaseService.transaction(async (transaction) => {
+      const membership = await transaction.organizationMembership.findUnique({
+        where: { organizationId_userId: { organizationId, userId } },
+        select: organizationMemberSelect,
+      })
+      if (!membership) {
+        throw new Prisma.PrismaClientKnownRequestError(
+          'Miembro no encontrado',
+          {
+            code: 'P2025',
+            clientVersion: '7.10.0',
+          },
+        )
+      }
+      await transaction.user.update({
+        where: { id: userId },
+        data: {
+          passwordHash,
+          mustChangePassword: true,
+          failedLoginAttempts: 0,
+          lockedUntil: null,
+        },
+      })
+      await transaction.authSession.updateMany({
+        where: { userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      })
+      await transaction.auditLog.create({
+        data: {
+          event: 'PASSWORD_RESET_COMPLETED',
+          userId,
+          organizationId,
+          requestId: context?.requestId,
+          ipAddress: context?.ipAddress,
+        },
+      })
       return membership
     })
   },

@@ -116,3 +116,21 @@ export function useUpdatePlatformOrganizationMember() {
     },
   })
 }
+
+export function useResetPlatformMemberPassword() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      organizationId,
+      userId,
+    }: {
+      organizationId: string
+      userId: string
+    }) => platformService.resetMemberPassword(organizationId, userId),
+    onSuccess: (_result, variables) => {
+      void client.invalidateQueries({
+        queryKey: platformKeys.members(variables.organizationId),
+      })
+    },
+  })
+}

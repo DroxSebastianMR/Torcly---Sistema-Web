@@ -7,6 +7,7 @@ import {
   listOrganizationMembers,
   listOrganizations,
   listPlatformRoles,
+  resetOrganizationMemberPassword,
   updateOrganizationMember,
   updateOrganization,
   updateOrganizationStatus,
@@ -35,4 +36,8 @@ platformRouter.post(
 platformRouter.patch(
   '/organizations/:organizationId/members/:userId',
   updateOrganizationMember,
+)
+platformRouter.post(
+  '/organizations/:organizationId/members/:userId/reset-password',
+  resetOrganizationMemberPassword,
 )

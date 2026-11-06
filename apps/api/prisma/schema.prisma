@@ -190,6 +190,7 @@ model User {
   isPlatformAdmin          Boolean                 @default(false) @map("is_platform_admin")
   failedLoginAttempts      Int                     @default(0) @map("failed_login_attempts")
   lockedUntil              DateTime?               @map("locked_until") @db.Timestamptz(3)
+  mustChangePassword       Boolean                 @default(false) @map("must_change_password")
   roles                    UserRole[]
   sessions                 AuthSession[]
   auditLogs                AuditLog[]

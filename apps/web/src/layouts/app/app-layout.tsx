@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation, useNavigation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { AppHeader } from '@/features/navigation/components/app-header'
+import { ForcePasswordChangeModal } from '@/features/auth/components/force-password-change-modal'
 import { AppSidebar } from './components/app-sidebar'
 import { reportModuleLoad } from '@/features/navigation/utils/module-load-metrics'
 
@@ -67,6 +68,7 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
+      <ForcePasswordChangeModal />
     </div>
   )
 }

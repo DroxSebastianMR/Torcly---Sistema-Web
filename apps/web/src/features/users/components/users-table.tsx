@@ -1,4 +1,5 @@
 import {
+  KeyRound,
   MoreHorizontal,
   Pencil,
   Power,
@@ -19,6 +20,7 @@ interface UsersTableProps {
   onEdit: (user: User) => void
   onChangeRole: (user: User) => void
   onToggleStatus: (user: User) => void
+  onResetPassword: (user: User) => void
 }
 
 export function UsersTable({
@@ -29,6 +31,7 @@ export function UsersTable({
   onEdit,
   onChangeRole,
   onToggleStatus,
+  onResetPassword,
 }: UsersTableProps) {
   if (loading) return <UsersSkeleton />
 
@@ -117,6 +120,14 @@ export function UsersTable({
                         <UserRoundCog size={16} />
                       </TableActionButton>
                       <TableActionButton
+                        label={`Restablecer contraseña de ${user.displayName}`}
+                        title="Restablecer contraseña"
+                        onClick={() => onResetPassword(user)}
+                        disabled={!canWrite}
+                      >
+                        <KeyRound size={16} />
+                      </TableActionButton>
+                      <TableActionButton
                         label={`${user.active ? 'Desactivar' : 'Activar'} ${user.displayName}`}
                         title={
                           user.active ? 'Desactivar usuario' : 'Activar usuario'
@@ -177,6 +188,13 @@ export function UsersTable({
                     title="Cambiar rol"
                   >
                     <UserRoundCog size={16} />
+                  </TableActionButton>
+                  <TableActionButton
+                    onClick={() => onResetPassword(user)}
+                    label={`Restablecer contraseña de ${user.displayName}`}
+                    title="Restablecer contraseña"
+                  >
+                    <KeyRound size={16} />
                   </TableActionButton>
                   <TableActionButton
                     onClick={() => onToggleStatus(user)}

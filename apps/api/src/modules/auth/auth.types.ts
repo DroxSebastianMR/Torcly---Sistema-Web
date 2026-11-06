@@ -5,6 +5,7 @@ export interface AuthUser {
   username: string
   permissions: string[]
   isPlatformAdmin?: boolean
+  mustChangePassword?: boolean
   role?: {
     code: string
     name: string

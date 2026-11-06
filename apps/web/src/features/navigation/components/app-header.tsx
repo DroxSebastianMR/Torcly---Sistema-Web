@@ -91,9 +91,7 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
           disabled={header.isSigningOut}
           onClick={() => void header.onLogout()}
           className="shrink-0"
-          aria-label={
-            header.isSigningOut ? 'Cerrando sesión' : 'Cerrar sesión'
-          }
+          aria-label={header.isSigningOut ? 'Cerrando sesión' : 'Cerrar sesión'}
         >
           <LogOut aria-hidden="true" size={16} />
           <span className="hidden md:inline">

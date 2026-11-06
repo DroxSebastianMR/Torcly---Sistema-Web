@@ -8,6 +8,7 @@ import {
   updateUser,
   updateUserRole,
   updateUserStatus,
+  resetUserPassword,
 } from './users.controller.js'
 
 export const usersRouter = Router()
@@ -23,4 +24,9 @@ usersRouter.patch(
   '/:id/status',
   requirePermission('users:write'),
   updateUserStatus,
+)
+usersRouter.post(
+  '/:id/reset-password',
+  requirePermission('users:write'),
+  resetUserPassword,
 )

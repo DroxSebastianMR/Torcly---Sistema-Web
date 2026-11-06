@@ -59,3 +59,16 @@ export async function verifyPassword(password: string, encodedHash: string) {
     return false
   }
 }
+
+export function generateTemporaryPassword(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+  const numbers = '23456789'
+  let randomLetters = ''
+  let randomNumbers = ''
+  const bytes = randomBytes(8)
+  for (let i = 0; i < 4; i++) {
+    randomLetters += chars[bytes[i]! % chars.length]
+    randomNumbers += numbers[bytes[i + 4]! % numbers.length]
+  }
+  return `Torcly-${randomLetters}-${randomNumbers}!`
+}

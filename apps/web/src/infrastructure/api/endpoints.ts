@@ -18,6 +18,8 @@ export const endpoints = {
       `/platform/organizations/${organizationId}/status`,
     organizationMember: (organizationId: string, userId: string) =>
       `/platform/organizations/${organizationId}/members/${userId}`,
+    organizationMemberResetPassword: (organizationId: string, userId: string) =>
+      `/platform/organizations/${organizationId}/members/${userId}/reset-password`,
   },
   products: {
     root: '/products',
@@ -138,6 +140,7 @@ export const endpoints = {
     detail: (id: string) => `/users/${id}`,
     role: (id: string) => `/users/${id}/role`,
     status: (id: string) => `/users/${id}/status`,
+    resetPassword: (id: string) => `/users/${id}/reset-password`,
   },
   notifications: {
     root: '/notifications',

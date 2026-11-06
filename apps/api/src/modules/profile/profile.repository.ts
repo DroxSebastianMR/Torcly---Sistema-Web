@@ -90,6 +90,7 @@ export const profileRepository = {
           passwordHash,
           failedLoginAttempts: 0,
           lockedUntil: null,
+          mustChangePassword: false,
         },
       })
 

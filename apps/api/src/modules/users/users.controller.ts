@@ -79,6 +79,18 @@ export const updateUserStatus: RequestHandler = async (request, response) => {
   )
 }
 
+export const resetUserPassword: RequestHandler = async (request, response) => {
+  const { id } = userIdSchema.parse(request.params)
+  response.json(
+    await usersService.resetPassword(
+      id,
+      request.auth!.id,
+      getRequestContext(request, response),
+      requireOrganizationContext(request.auth!).id,
+    ),
+  )
+}
+
 export const listRoles: RequestHandler = async (_request, response) => {
   response.json(await usersService.listRoles())
 }

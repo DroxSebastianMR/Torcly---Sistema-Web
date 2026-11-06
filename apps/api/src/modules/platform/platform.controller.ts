@@ -1,4 +1,5 @@
 import type { RequestHandler } from 'express'
+import { getRequestContext } from '../auth/auth.middleware.js'
 import {
   createPlatformOrganizationMemberSchema,
   createPlatformOrganizationSchema,
@@ -106,6 +107,21 @@ export const updateOrganizationMember: RequestHandler = async (
       organizationId,
       userId,
       updatePlatformOrganizationMemberSchema.parse(request.body),
+    ),
+  )
+}
+
+export const resetOrganizationMemberPassword: RequestHandler = async (
+  request,
+  response,
+) => {
+  const { organizationId, userId } =
+    platformOrganizationMemberParamsSchema.parse(request.params)
+  response.json(
+    await platformService.resetOrganizationMemberPassword(
+      organizationId,
+      userId,
+      getRequestContext(request, response),
     ),
   )
 }
