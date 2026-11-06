@@ -1,7 +1,7 @@
 import { Prisma } from '../../generated/prisma/client.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import { authService } from '../auth/auth.service.js'
-import { hashPassword } from '../auth/password.js'
+import { generateTemporaryPassword, hashPassword } from '../auth/password.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import { usersRepository, type UserRecord } from './users.repository.js'
 import type {
@@ -212,6 +212,35 @@ export const usersService = {
       authService.invalidateUserSessions(user.id)
       return {
         data: toResponse(user),
+      }
+    } catch (error) {
+      return mapPersistenceError(error)
+    }
+  },
+
+  async resetPassword(
+    id: string,
+    _actorId: string,
+    context: RequestContext,
+    organizationId: string,
+  ) {
+    await assertUserExists(id, organizationId)
+    const temporaryPassword = generateTemporaryPassword()
+    const passwordHash = await hashPassword(temporaryPassword)
+
+    try {
+      const user = await usersRepository.resetPassword(
+        id,
+        passwordHash,
+        context,
+        organizationId,
+      )
+      authService.invalidateUserSessions(user.id)
+      return {
+        data: {
+          temporaryPassword,
+          user: toResponse(user),
+        },
       }
     } catch (error) {
       return mapPersistenceError(error)

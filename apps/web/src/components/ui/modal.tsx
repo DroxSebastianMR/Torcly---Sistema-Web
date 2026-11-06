@@ -20,6 +20,7 @@ interface ModalProps extends PropsWithChildren {
   busy?: boolean
   initialFocusRef?: RefObject<HTMLElement | null>
   closeButtonLabel?: string
+  preventClose?: boolean
   onClose: () => void
 }
 
@@ -64,6 +65,7 @@ export function Modal({
   busy = false,
   initialFocusRef,
   closeButtonLabel = 'Cerrar',
+  preventClose = false,
   onClose,
   children,
 }: ModalProps) {
@@ -88,7 +90,7 @@ export function Modal({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (!busyRef.current) onCloseRef.current()
+        if (!busyRef.current && !preventClose) onCloseRef.current()
         return
       }
       if (event.key !== 'Tab') return
@@ -132,7 +134,7 @@ export function Modal({
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-[#071c16]/45 p-0 backdrop-blur-[3px] sm:items-center sm:p-6"
       onMouseDown={(event) => {
-        if (busy) return
+        if (busy || preventClose) return
         if (event.target === event.currentTarget) onClose()
       }}
     >
@@ -151,15 +153,17 @@ export function Modal({
       >
         <header className="relative px-5 pt-5 sm:px-6 sm:pt-6">
           {visual && <div className="flex justify-start pr-12">{visual}</div>}
-          <button
-            type="button"
-            aria-label={closeButtonLabel}
-            disabled={busy}
-            onClick={onClose}
-            className="absolute top-5 right-5 flex size-10 items-center justify-center rounded-[10px] text-muted-foreground transition-[color,background-color,transform] duration-150 hover:-translate-y-px hover:bg-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-40 sm:top-6 sm:right-6"
-          >
-            <X size={18} />
-          </button>
+          {!preventClose && (
+            <button
+              type="button"
+              aria-label={closeButtonLabel}
+              disabled={busy}
+              onClick={onClose}
+              className="absolute top-5 right-5 flex size-10 items-center justify-center rounded-[10px] text-muted-foreground transition-[color,background-color,transform] duration-150 hover:-translate-y-px hover:bg-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-40 sm:top-6 sm:right-6"
+            >
+              <X size={18} />
+            </button>
+          )}
           <div className={cn('pr-12', visual && 'mt-5')}>
             <h2
               id={titleId}

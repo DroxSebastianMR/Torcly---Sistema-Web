@@ -244,6 +244,47 @@ export const usersRepository = {
     })
   },
 
+  resetPassword(
+    id: string,
+    passwordHash: string,
+    context: RequestContext,
+    organizationId: string,
+  ) {
+    const now = new Date()
+    return databaseService.transaction(async (transaction) => {
+      const updated = await transaction.user.updateMany({
+        where: { id, ...organizationWhere(organizationId) },
+        data: {
+          passwordHash,
+          mustChangePassword: true,
+          failedLoginAttempts: 0,
+          lockedUntil: null,
+        },
+      })
+      if (updated.count !== 1) {
+        throw new Prisma.PrismaClientKnownRequestError(
+          'Usuario no encontrado',
+          {
+            code: 'P2025',
+            clientVersion: '7.10.0',
+          },
+        )
+      }
+      const user = await transaction.user.findFirstOrThrow({
+        ...userInclude(organizationId),
+        where: { id, ...organizationWhere(organizationId) },
+      })
+      await transaction.authSession.updateMany({
+        where: { userId: id, revokedAt: null },
+        data: { revokedAt: now },
+      })
+      await transaction.auditLog.create({
+        data: auditData('PASSWORD_RESET_COMPLETED', user.id, context),
+      })
+      return user
+    })
+  },
+
   async listRoles() {
     const roles = await databaseService.client.role.findMany({
       where: { active: true },

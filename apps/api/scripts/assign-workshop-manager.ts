@@ -63,14 +63,18 @@ try {
   await client.query(`DELETE FROM auth_sessions WHERE user_id = $1`, [ysabelId])
 
   await client.query('COMMIT')
-  console.info('✅ Rol Administrador del taller asignado exitosamente a Ysabel Quinteros en producción.')
+  console.info(
+    '✅ Rol Administrador del taller asignado exitosamente a Ysabel Quinteros en producción.',
+  )
 
   // Consultar permisos del nuevo rol
   const permRes = await client.query<{ total: string }>(
     `SELECT COUNT(*)::text as total FROM role_permissions WHERE role_id = $1`,
     [managerRoleId],
   )
-  console.info(`Permisos asignados al rol Administrador del taller: ${permRes.rows[0].total}`)
+  console.info(
+    `Permisos asignados al rol Administrador del taller: ${permRes.rows[0].total}`,
+  )
 
   // Consultar miembros actuales de Grupo Mecatronic
   const members = await client.query(`

@@ -72,4 +72,16 @@ export const platformService = {
       endpoints.platform.organizationMember(organizationId, userId),
       input,
     ),
+  resetMemberPassword: (organizationId: string, userId: string) =>
+    api.post<{
+      data: {
+        temporaryPassword: string
+        member: PlatformOrganizationMember
+      }
+    }>(
+      endpoints.platform.organizationMemberResetPassword(
+        organizationId,
+        userId,
+      ),
+    ),
 }

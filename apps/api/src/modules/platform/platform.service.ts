@@ -1,7 +1,8 @@
 import { Prisma } from '../../generated/prisma/client.js'
 import { AppError } from '../../shared/errors/app-error.js'
-import { hashPassword } from '../auth/password.js'
+import { generateTemporaryPassword, hashPassword } from '../auth/password.js'
 import { authService } from '../auth/auth.service.js'
+import type { RequestContext } from '../auth/auth.types.js'
 import {
   platformRepository,
   type PlatformOrganizationRecord,
@@ -253,6 +254,42 @@ export const platformService = {
         authService.invalidateUserSessions(userId)
       }
       return { data: toMember(member) }
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new AppError(
+          404,
+          'PLATFORM_MEMBER_NOT_FOUND',
+          'No se encontró el miembro del taller.',
+        )
+      }
+      throw error
+    }
+  },
+
+  async resetOrganizationMemberPassword(
+    organizationId: string,
+    userId: string,
+    context?: RequestContext,
+  ) {
+    const temporaryPassword = generateTemporaryPassword()
+    const passwordHash = await hashPassword(temporaryPassword)
+    try {
+      const member = await platformRepository.resetOrganizationMemberPassword(
+        organizationId,
+        userId,
+        passwordHash,
+        context,
+      )
+      authService.invalidateUserSessions(userId)
+      return {
+        data: {
+          temporaryPassword,
+          member: toMember(member),
+        },
+      }
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&

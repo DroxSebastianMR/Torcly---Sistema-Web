@@ -17,14 +17,16 @@ export function ForgotPasswordPage() {
           Recuperación de acceso
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          La recuperación por correo no está habilitada en esta versión.
+          Restablecimiento asistido por la administración de tu taller.
         </p>
       </header>
       <div className="rounded-xl border border-primary/15 bg-primary/[0.03] p-5">
         <CircleHelp aria-hidden className="size-6 text-primary" />
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Contacta al propietario del taller o al equipo responsable de Torcly
-          para gestionar el restablecimiento de tu contraseña.
+          Solicita al dueño o administrador de tu taller que genere una{' '}
+          <strong className="text-foreground">contraseña temporal</strong> desde
+          el panel de usuarios. Al iniciar sesión con ella, el sistema te pedirá
+          definir tu nueva contraseña personal de inmediato.
         </p>
       </div>
       <footer className="mt-6 border-t pt-5 2xl:mt-8 2xl:pt-6">

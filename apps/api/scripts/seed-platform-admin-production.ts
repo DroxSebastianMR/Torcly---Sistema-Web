@@ -27,7 +27,9 @@ const pool = new Pool({
 })
 
 try {
-  console.info(`Sembrando administrador de plataforma en producción (${email})...`)
+  console.info(
+    `Sembrando administrador de plataforma en producción (${email})...`,
+  )
 
   const passwordHash = await hashPassword(password)
   const normalizedEmail = email.trim().toLowerCase()
@@ -81,10 +83,15 @@ try {
     [normalizedEmail, normalizedUsername, name, passwordHash],
   )
 
-  console.info('✅ Administrador de plataforma sembrado con éxito en producción:')
+  console.info(
+    '✅ Administrador de plataforma sembrado con éxito en producción:',
+  )
   console.info(JSON.stringify(result.rows[0], null, 2))
 } catch (error) {
-  console.error('❌ Error sembrando administrador de plataforma en producción:', error)
+  console.error(
+    '❌ Error sembrando administrador de plataforma en producción:',
+    error,
+  )
   process.exit(1)
 } finally {
   await pool.end()

@@ -46,4 +46,9 @@ export const usersService = {
   updateStatus(id: string, active: boolean) {
     return api.patch<DataResponse<User>>(endpoints.users.status(id), { active })
   },
+  resetPassword(id: string) {
+    return api.post<DataResponse<{ temporaryPassword: string; user: User }>>(
+      endpoints.users.resetPassword(id),
+    )
+  },
 }

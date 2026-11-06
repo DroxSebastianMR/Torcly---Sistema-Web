@@ -24,14 +24,20 @@ try {
   console.info('Configurando organización "Grupo Mecatronic" en producción...')
 
   // 1. Actualizar o crear la organización Grupo Mecatronic
-  const orgResult = await client.query<{ id: string; code: string; name: string }>(
-    `SELECT id, code, name FROM organizations ORDER BY created_at ASC LIMIT 1`,
-  )
+  const orgResult = await client.query<{
+    id: string
+    code: string
+    name: string
+  }>(`SELECT id, code, name FROM organizations ORDER BY created_at ASC LIMIT 1`)
 
   let organizationId: string
 
   if (orgResult.rows.length === 0) {
-    const insertOrg = await client.query<{ id: string; code: string; name: string }>(`
+    const insertOrg = await client.query<{
+      id: string
+      code: string
+      name: string
+    }>(`
       INSERT INTO organizations (code, name, active, created_at, updated_at)
       VALUES ('grupo-mecatronic', 'Grupo Mecatronic', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       RETURNING id, code, name;
@@ -51,7 +57,9 @@ try {
       `,
       [organizationId],
     )
-    console.info(`Organización actualizada a Grupo Mecatronic (${organizationId})`)
+    console.info(
+      `Organización actualizada a Grupo Mecatronic (${organizationId})`,
+    )
   }
 
   // 2. Obtener usuarios Jhon e Ysabel
@@ -82,7 +90,9 @@ try {
       `,
       [organizationId, user.id, roleId],
     )
-    console.info(`Membresía asegurada para: ${user.email} con rol Dueño del taller`)
+    console.info(
+      `Membresía asegurada para: ${user.email} con rol Dueño del taller`,
+    )
   }
 
   // 4. Eliminar la cuenta admin@torcly.com
@@ -94,17 +104,28 @@ try {
     const adminId = adminUser.rows[0].id
     console.info(`Depurando cuenta admin@torcly.com (${adminId})...`)
 
-    await client.query(`DELETE FROM auth_sessions WHERE user_id = $1`, [adminId])
+    await client.query(`DELETE FROM auth_sessions WHERE user_id = $1`, [
+      adminId,
+    ])
     await client.query(`DELETE FROM audit_logs WHERE user_id = $1`, [adminId])
-    await client.query(`DELETE FROM organization_memberships WHERE user_id = $1`, [adminId])
+    await client.query(
+      `DELETE FROM organization_memberships WHERE user_id = $1`,
+      [adminId],
+    )
     await client.query(`DELETE FROM user_roles WHERE user_id = $1`, [adminId])
-    await client.query(`DELETE FROM password_reset_tokens WHERE user_id = $1`, [adminId])
-    await client.query(`DELETE FROM notifications WHERE user_id = $1`, [adminId])
+    await client.query(`DELETE FROM password_reset_tokens WHERE user_id = $1`, [
+      adminId,
+    ])
+    await client.query(`DELETE FROM notifications WHERE user_id = $1`, [
+      adminId,
+    ])
     await client.query(`DELETE FROM users WHERE id = $1`, [adminId])
 
     console.info('✅ Cuenta admin@torcly.com eliminada correctamente.')
   } else {
-    console.info('Cuenta admin@torcly.com no encontrada en producción (ya estaba eliminada).')
+    console.info(
+      'Cuenta admin@torcly.com no encontrada en producción (ya estaba eliminada).',
+    )
   }
 
   await client.query('COMMIT')

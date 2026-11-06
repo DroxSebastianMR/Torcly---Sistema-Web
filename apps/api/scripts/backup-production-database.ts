@@ -32,13 +32,17 @@ try {
   `)
 
   const tables = tableResult.rows.map((row) => row.table_name)
-  console.info(`Encontradas ${tables.length} tablas en producción para respaldar...`)
+  console.info(
+    `Encontradas ${tables.length} tablas en producción para respaldar...`,
+  )
 
   const backupData: Record<string, unknown[]> = {}
   let totalRows = 0
 
   for (const table of tables) {
-    const rows = await pool.query(`SELECT * FROM public.${quoteIdentifier(table)}`)
+    const rows = await pool.query(
+      `SELECT * FROM public.${quoteIdentifier(table)}`,
+    )
     backupData[table] = rows.rows
     totalRows += rows.rows.length
     if (rows.rows.length > 0) {

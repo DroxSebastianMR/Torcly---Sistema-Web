@@ -12,7 +12,9 @@ if (!databaseUrl) {
   throw new Error('PRODUCTION_DATABASE_URL no está configurada.')
 }
 
-console.info('Iniciando despliegue de migraciones en la base de datos de producción...')
+console.info(
+  'Iniciando despliegue de migraciones en la base de datos de producción...',
+)
 
 try {
   const output = execSync('npx prisma migrate deploy', {

@@ -9,6 +9,7 @@ import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { UserFormModal } from '../components/user-form-modal'
+import { UserPasswordResetModal } from '../components/user-password-reset-modal'
 import { UserRoleModal } from '../components/user-role-modal'
 import { UsersTable } from '../components/users-table'
 import { UsersToolbar } from '../components/users-toolbar'
@@ -30,6 +31,7 @@ export default function Page() {
   const [filters, setFilters] = useState(initialFilters)
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [roleUser, setRoleUser] = useState<User | null>(null)
+  const [resetUser, setResetUser] = useState<User | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const [statusTarget, setStatusTarget] = useState<User | null>(null)
   const deferredSearch = useDeferredValue(filters.search)
@@ -145,6 +147,7 @@ export default function Page() {
             }}
             onChangeRole={(user) => setRoleUser(user)}
             onToggleStatus={(user) => void toggleStatus(user)}
+            onResetPassword={(user) => setResetUser(user)}
           />
         )}
 
@@ -171,6 +174,11 @@ export default function Page() {
         user={roleUser}
         roles={roles.data}
         onClose={() => setRoleUser(null)}
+      />
+      <UserPasswordResetModal
+        open={resetUser !== null}
+        user={resetUser}
+        onClose={() => setResetUser(null)}
       />
       <ConfirmationDialog
         open={statusTarget !== null}

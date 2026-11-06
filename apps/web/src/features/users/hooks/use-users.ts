@@ -71,5 +71,14 @@ export function useUserMutations() {
       onSettled: (_data, _error, _variables, context) =>
         finishActionToast(context?.toastId),
     }),
+    resetPassword: useMutation({
+      mutationFn: (id: string) => usersService.resetPassword(id),
+      onMutate: () => ({
+        toastId: startActionToast('Generando clave temporal…'),
+      }),
+      onSuccess: refreshUsers,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
+    }),
   }
 }

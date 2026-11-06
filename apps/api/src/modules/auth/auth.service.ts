@@ -149,6 +149,7 @@ function toAuthUser(
     username: user.username,
     permissions: [...permissions].sort(),
     isPlatformAdmin: user.isPlatformAdmin ?? false,
+    mustChangePassword: user.mustChangePassword ?? false,
     role: resolvedRole,
     organization: membership
       ? {

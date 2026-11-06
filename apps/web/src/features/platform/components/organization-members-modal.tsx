@@ -1,5 +1,13 @@
 import { useState, type ChangeEvent } from 'react'
-import { Plus, UserRound, UserRoundCheck, UserRoundX } from 'lucide-react'
+import {
+  Check,
+  Copy,
+  KeyRound,
+  Plus,
+  UserRound,
+  UserRoundCheck,
+  UserRoundX,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -35,6 +43,7 @@ export function OrganizationMembersModal({
   onClose,
   onCreate,
   onUpdate,
+  onResetPassword,
 }: {
   organization: PlatformOrganization | null
   roles: PlatformRole[]
@@ -47,9 +56,15 @@ export function OrganizationMembersModal({
     userId: string,
     input: { active?: boolean; roleId?: string },
   ) => Promise<void>
+  onResetPassword?: (userId: string) => Promise<{ temporaryPassword: string }>
 }) {
   const [formVisible, setFormVisible] = useState(false)
   const [values, setValues] = useState(initialMember)
+  const [resetResult, setResetResult] = useState<{
+    memberName: string
+    temporaryPassword: string
+  } | null>(null)
+  const [copied, setCopied] = useState(false)
   if (!organization) return null
 
   const setValue =
@@ -90,6 +105,32 @@ export function OrganizationMembersModal({
     }
   }
 
+  const resetPassword = async (member: PlatformOrganizationMember) => {
+    if (!onResetPassword) return
+    try {
+      const response = await onResetPassword(member.id)
+      setResetResult({
+        memberName: member.displayName,
+        temporaryPassword: response.temporaryPassword,
+      })
+      toast.success('Contraseña temporal generada con éxito.')
+    } catch (error) {
+      toast.error(errorMessage(error))
+    }
+  }
+
+  const copyResetPassword = async () => {
+    if (!resetResult) return
+    try {
+      await navigator.clipboard.writeText(resetResult.temporaryPassword)
+      setCopied(true)
+      toast.success('Contraseña copiada al portapapeles.')
+      setTimeout(() => setCopied(false), 2500)
+    } catch {
+      toast.error('Copia la contraseña manualmente.')
+    }
+  }
+
   return (
     <Modal
       open
@@ -122,6 +163,37 @@ export function OrganizationMembersModal({
             Añadir miembro
           </Button>
         </div>
+
+        {resetResult && (
+          <div className="rounded-xl border border-emerald-300 bg-emerald-50/70 p-3.5 text-xs text-emerald-950">
+            <p className="font-semibold text-emerald-800">
+              Clave temporal emitida para {resetResult.memberName}:
+            </p>
+            <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-emerald-300 bg-white p-2">
+              <code className="select-all font-mono text-sm font-bold tracking-wide text-brand-forest">
+                {resetResult.temporaryPassword}
+              </code>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => void copyResetPassword()}
+                className="h-8 gap-1 text-xs"
+              >
+                {copied ? (
+                  <Check size={13} className="text-emerald-600" />
+                ) : (
+                  <Copy size={13} />
+                )}
+                {copied ? 'Copiada' : 'Copiar'}
+              </Button>
+            </div>
+            <p className="mt-2 text-[11px] text-emerald-800">
+              Entrega esta clave al usuario. Al ingresar, se le exigirá
+              cambiarla de inmediato.
+            </p>
+          </div>
+        )}
 
         {formVisible && (
           <form
@@ -226,20 +298,35 @@ export function OrganizationMembersModal({
                     {member.email} · {member.role.name}
                   </p>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={busy}
-                  onClick={() => void toggle(member)}
-                >
-                  {member.active ? (
-                    <UserRoundX aria-hidden className="size-4" />
-                  ) : (
-                    <UserRoundCheck aria-hidden className="size-4" />
+                <div className="flex items-center gap-1.5">
+                  {onResetPassword && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      title="Restablecer contraseña"
+                      disabled={busy}
+                      onClick={() => void resetPassword(member)}
+                    >
+                      <KeyRound aria-hidden className="size-4" />
+                      <span className="hidden sm:inline">Clave</span>
+                    </Button>
                   )}
-                  {member.active ? 'Desactivar' : 'Activar'}
-                </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={busy}
+                    onClick={() => void toggle(member)}
+                  >
+                    {member.active ? (
+                      <UserRoundX aria-hidden className="size-4" />
+                    ) : (
+                      <UserRoundCheck aria-hidden className="size-4" />
+                    )}
+                    {member.active ? 'Desactivar' : 'Activar'}
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
