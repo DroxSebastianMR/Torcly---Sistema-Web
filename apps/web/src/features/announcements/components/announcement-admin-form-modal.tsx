@@ -1,9 +1,21 @@
 import { useEffect, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Megaphone } from 'lucide-react'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
 import { SmartSelect } from '@/components/ui/smart-select'
+import { cn } from '@/lib/utils'
+import {
+  announcementFormSchema,
+  emptyAnnouncement,
+  mapAnnouncementToFormValues,
+  mapFormValuesToCreatePayload,
+  mapFormValuesToUpdatePayload,
+  type AnnouncementFormValues,
+} from '../forms/announcement.schema'
 import type {
   AnnouncementItem,
   AnnouncementStatus,
@@ -31,84 +43,45 @@ export function AnnouncementAdminFormModal({
   onSubmitUpdate,
 }: AnnouncementAdminFormModalProps) {
   const isEditing = Boolean(initialData)
-
-  const [title, setTitle] = useState('')
-  const [summary, setSummary] = useState('')
-  const [content, setContent] = useState('')
-  const [type, setType] = useState<AnnouncementType>('UPDATE')
-  const [status, setStatus] = useState<AnnouncementStatus>('PUBLISHED')
-  const [versionTag, setVersionTag] = useState('')
-  const [videoUrl, setVideoUrl] = useState('')
-  const [startsAt, setStartsAt] = useState('')
-  const [endsAt, setEndsAt] = useState('')
-  const [notifyUsers, setNotifyUsers] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const form = useForm<AnnouncementFormValues>({
+    resolver: zodResolver(announcementFormSchema),
+    defaultValues: emptyAnnouncement,
+    mode: 'onTouched',
+  })
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = form
+
+  const type = useWatch({ control, name: 'type' })
+  const status = useWatch({ control, name: 'status' })
+  const notifyUsers = useWatch({ control, name: 'notifyUsers' })
+
   useEffect(() => {
-    if (initialData) {
-      setTitle(initialData.title)
-      setSummary(initialData.summary)
-      setContent(initialData.content)
-      setType(initialData.type)
-      setStatus(initialData.status)
-      setVersionTag(initialData.versionTag ?? '')
-      setVideoUrl(initialData.videoUrl ?? '')
-      setStartsAt(initialData.startsAt ? initialData.startsAt.slice(0, 16) : '')
-      setEndsAt(initialData.endsAt ? initialData.endsAt.slice(0, 16) : '')
-      setNotifyUsers(false)
-    } else {
-      setTitle('')
-      setSummary('')
-      setContent('')
-      setType('UPDATE')
-      setStatus('PUBLISHED')
-      setVersionTag('v1.1.2')
-      setVideoUrl('')
-      setStartsAt('')
-      setEndsAt('')
-      setNotifyUsers(true)
-    }
-  }, [initialData, open])
+    if (!open) return
+    reset(
+      initialData
+        ? mapAnnouncementToFormValues(initialData)
+        : emptyAnnouncement,
+    )
+  }, [open, reset, initialData])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!title.trim() || !summary.trim() || !content.trim()) {
-      toast.error(
-        'Completa los campos obligatorios (título, resumen y contenido).',
-      )
-      return
-    }
-
+  const submit = handleSubmit(async (values) => {
     setIsSubmitting(true)
     try {
       if (isEditing && initialData) {
-        const payload: UpdateAnnouncementPayload = {
-          title: title.trim(),
-          summary: summary.trim(),
-          content: content.trim(),
-          type,
-          status,
-          versionTag: versionTag.trim() || null,
-          videoUrl: videoUrl.trim() || null,
-          startsAt: startsAt ? new Date(startsAt).toISOString() : null,
-          endsAt: endsAt ? new Date(endsAt).toISOString() : null,
-          notifyUsers,
-        }
+        const payload = mapFormValuesToUpdatePayload(values)
         await onSubmitUpdate(initialData.id, payload)
         toast.success('Anuncio actualizado correctamente.')
       } else {
-        const payload: CreateAnnouncementPayload = {
-          title: title.trim(),
-          summary: summary.trim(),
-          content: content.trim(),
-          type,
-          status,
-          versionTag: versionTag.trim() || null,
-          videoUrl: videoUrl.trim() || null,
-          startsAt: startsAt ? new Date(startsAt).toISOString() : null,
-          endsAt: endsAt ? new Date(endsAt).toISOString() : null,
-          notifyUsers,
-        }
+        const payload = mapFormValuesToCreatePayload(values)
         await onSubmitCreate(payload)
         toast.success('Anuncio publicado con éxito.')
       }
@@ -118,43 +91,89 @@ export function AnnouncementAdminFormModal({
     } finally {
       setIsSubmitting(false)
     }
+  })
+
+  const error = (name: keyof AnnouncementFormValues) => {
+    const message = errors[name]?.message
+    return message ? String(message) : undefined
   }
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={isEditing ? 'Editar Anuncio SaaS' : 'Publicar Nuevo Anuncio SaaS'}
+      title={isEditing ? 'Editar anuncio SaaS' : 'Publicar nuevo anuncio SaaS'}
+      description={
+        isEditing
+          ? 'Actualiza el contenido, tipo o estado del anuncio para los talleres.'
+          : 'Publica actualizaciones de versiones, mantenimientos preventivos o comunicados en la plataforma.'
+      }
+      visual={
+        <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
+          <Megaphone aria-hidden className="size-6" />
+        </span>
+      }
       className="max-w-2xl"
-    >
-      <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-        {/* Title */}
-        <div className="space-y-1">
-          <label className="font-semibold text-foreground">
-            Título del Anuncio <span className="text-destructive">*</span>
-          </label>
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="ej. Torcly v1.1.2 — Notificaciones Operativas"
-            required
-            className="text-xs"
-          />
+      footer={
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            form="announcement-form"
+            disabled={isSubmitting}
+          >
+            {isSubmitting
+              ? 'Guardando…'
+              : isEditing
+                ? 'Guardar cambios'
+                : 'Publicar anuncio'}
+          </Button>
         </div>
+      }
+    >
+      <form
+        id="announcement-form"
+        onSubmit={submit}
+        noValidate
+        className="space-y-5 min-w-0 overflow-x-hidden"
+      >
+        {/* Title */}
+        <Field
+          label="Título del Anuncio"
+          error={error('title')}
+          required
+          hint="Ej. Torcly v1.1.2 — Notificaciones Operativas"
+        >
+          <Input
+            {...register('title')}
+            invalid={Boolean(error('title'))}
+            placeholder="Ej. Torcly v1.1.2 — Notificaciones Operativas"
+          />
+        </Field>
 
         {/* Row Type & Status */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="space-y-1">
-            <label
-              htmlFor="announcement-form-type"
-              className="font-semibold text-foreground"
-            >
-              Tipo de Anuncio
-            </label>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field
+            label="Tipo de Anuncio"
+            error={error('type')}
+            required
+            hint="Define el propósito y etiqueta visual"
+          >
             <SmartSelect
               id="announcement-form-type"
               value={type}
-              onChange={(val) => setType(val as AnnouncementType)}
+              onChange={(val) =>
+                setValue('type', val as AnnouncementType, {
+                  shouldValidate: true,
+                })
+              }
               options={[
                 { value: 'UPDATE', label: 'Actualización (Release / Versión)' },
                 { value: 'MAINTENANCE', label: 'Mantenimiento Preventivo' },
@@ -163,19 +182,22 @@ export function AnnouncementAdminFormModal({
               placeholder="Seleccionar tipo"
               aria-label="Tipo de anuncio"
             />
-          </div>
+          </Field>
 
-          <div className="space-y-1">
-            <label
-              htmlFor="announcement-form-status"
-              className="font-semibold text-foreground"
-            >
-              Estado
-            </label>
+          <Field
+            label="Estado"
+            error={error('status')}
+            required
+            hint="Controla si se muestra en el feed"
+          >
             <SmartSelect
               id="announcement-form-status"
               value={status}
-              onChange={(val) => setStatus(val as AnnouncementStatus)}
+              onChange={(val) =>
+                setValue('status', val as AnnouncementStatus, {
+                  shouldValidate: true,
+                })
+              }
               options={[
                 { value: 'PUBLISHED', label: 'Publicado (Visible en feed)' },
                 { value: 'DRAFT', label: 'Borrador (Solo administradores)' },
@@ -184,140 +206,154 @@ export function AnnouncementAdminFormModal({
               placeholder="Seleccionar estado"
               aria-label="Estado del anuncio"
             />
-          </div>
+          </Field>
         </div>
 
         {/* Version tag and Video URL */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="space-y-1">
-            <label className="font-semibold text-foreground">
-              Etiqueta de Versión{' '}
-              <span className="text-muted-foreground font-normal">
-                (opcional)
-              </span>
-            </label>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field
+            label="Etiqueta de Versión"
+            error={error('versionTag')}
+            hint="Opcional. Ej. v1.1.2"
+          >
             <Input
-              value={versionTag}
-              onChange={(e) => setVersionTag(e.target.value)}
-              placeholder="ej. v1.1.2"
-              className="text-xs"
+              {...register('versionTag')}
+              invalid={Boolean(error('versionTag'))}
+              placeholder="Ej. v1.1.2"
             />
-          </div>
+          </Field>
 
-          <div className="space-y-1">
-            <label className="font-semibold text-foreground">
-              URL Video Tutorial / Demo{' '}
-              <span className="text-muted-foreground font-normal">
-                (YouTube, Loom)
-              </span>
-            </label>
+          <Field
+            label="URL Video Tutorial / Demo"
+            error={error('videoUrl')}
+            hint="Opcional (YouTube o Loom)"
+          >
             <Input
               type="url"
-              value={videoUrl}
-              onChange={(e) => setVideoUrl(e.target.value)}
+              {...register('videoUrl')}
+              invalid={Boolean(error('videoUrl'))}
               placeholder="https://www.youtube.com/watch?v=..."
-              className="text-xs"
             />
-          </div>
+          </Field>
         </div>
 
         {/* Maintenance Date Window (only if type is MAINTENANCE) */}
         {type === 'MAINTENANCE' && (
-          <div className="grid grid-cols-1 gap-3 rounded-lg border bg-muted/20 p-3 sm:grid-cols-2">
-            <div className="space-y-1">
-              <label className="font-semibold text-foreground">
-                Inicio de Mantenimiento
-              </label>
+          <div className="grid grid-cols-1 gap-4 rounded-xl border border-border bg-muted/20 p-4 sm:grid-cols-2">
+            <Field
+              label="Inicio de Mantenimiento"
+              error={error('startsAt')}
+              hint="Fecha y hora de inicio"
+            >
               <Input
                 type="datetime-local"
-                value={startsAt}
-                onChange={(e) => setStartsAt(e.target.value)}
-                className="text-xs"
+                {...register('startsAt')}
+                invalid={Boolean(error('startsAt'))}
               />
-            </div>
-            <div className="space-y-1">
-              <label className="font-semibold text-foreground">
-                Fin de Mantenimiento
-              </label>
+            </Field>
+
+            <Field
+              label="Fin de Mantenimiento"
+              error={error('endsAt')}
+              hint="Fecha y hora de culminación estimada"
+            >
               <Input
                 type="datetime-local"
-                value={endsAt}
-                onChange={(e) => setEndsAt(e.target.value)}
-                className="text-xs"
+                {...register('endsAt')}
+                invalid={Boolean(error('endsAt'))}
               />
-            </div>
+            </Field>
           </div>
         )}
 
         {/* Summary */}
-        <div className="space-y-1">
-          <label className="font-semibold text-foreground">
-            Resumen Breve <span className="text-destructive">*</span>
-          </label>
+        <Field
+          label="Resumen Breve"
+          error={error('summary')}
+          required
+          hint="Descripción corta visible en la tarjeta del feed (máx. 500 caracteres)."
+        >
           <Input
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-            placeholder="Breve descripción que aparecerá en la tarjeta del feed."
-            required
-            className="text-xs"
+            {...register('summary')}
+            invalid={Boolean(error('summary'))}
+            placeholder="Breve resumen de la novedad que aparecerá en el feed principal."
           />
-        </div>
+        </Field>
 
         {/* Content */}
-        <div className="space-y-1">
-          <label className="font-semibold text-foreground">
-            Contenido Completo <span className="text-destructive">*</span>
-          </label>
+        <Field
+          label="Contenido Completo"
+          error={error('content')}
+          required
+          hint="Detalle de cambios, changelog, guías de usuario o instrucciones operativas."
+        >
           <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            id="announcement-content"
+            {...register('content')}
             rows={6}
+            aria-invalid={Boolean(error('content'))}
             placeholder="Detalle de cambios, changelog, guías de usuario o instrucciones operativas."
-            required
-            className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-xs shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className={cn(
+              'w-full min-w-0 resize-y rounded-[10px] border border-input bg-card px-3 py-2.5 text-sm leading-relaxed transition-[border-color,background-color] duration-150 ease-out hover:bg-background focus:border-primary/70 focus:outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 overflow-x-hidden break-words whitespace-pre-wrap',
+              error('content') && 'border-red-500 focus:border-red-600',
+            )}
           />
-        </div>
+        </Field>
 
         {/* Broadcast Checkbox */}
-        <div className="flex items-center gap-2 rounded-lg border bg-muted/10 p-3">
+        <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-3.5 shadow-xs">
           <input
             type="checkbox"
             id="notifyUsers"
             checked={notifyUsers}
-            onChange={(e) => setNotifyUsers(e.target.checked)}
-            className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+            onChange={(e) => setValue('notifyUsers', e.target.checked)}
+            className="mt-0.5 size-4 rounded border-input accent-primary cursor-pointer"
           />
-          <label htmlFor="notifyUsers" className="cursor-pointer select-none">
-            <span className="font-medium text-foreground">
+          <label
+            htmlFor="notifyUsers"
+            className="cursor-pointer select-none space-y-0.5"
+          >
+            <span className="text-sm font-medium text-foreground">
               Difundir a la campana de notificaciones de todos los talleres
             </span>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Enviará una alerta a los usuarios de talleres activos para que
               revisen este anuncio.
             </p>
           </label>
         </div>
-
-        {/* Form Actions */}
-        <div className="flex justify-end gap-2 pt-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={onClose}
-            disabled={isSubmitting}
-          >
-            Cancelar
-          </Button>
-          <Button type="submit" size="sm" disabled={isSubmitting}>
-            {isSubmitting
-              ? 'Guardando…'
-              : isEditing
-                ? 'Actualizar Anuncio'
-                : 'Publicar Anuncio'}
-          </Button>
-        </div>
       </form>
     </Modal>
+  )
+}
+
+function Field({
+  label,
+  error,
+  hint,
+  required,
+  children,
+}: {
+  label: string
+  error?: string
+  hint?: string
+  required?: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <label className="block space-y-2 text-sm font-medium">
+      <span className="text-foreground">
+        {label}
+        {required && <span className="ml-1 text-emerald-700">*</span>}
+      </span>
+      {children}
+      {error ? (
+        <span className="block text-xs font-normal text-red-600">{error}</span>
+      ) : hint ? (
+        <span className="block text-xs font-normal text-muted-foreground">
+          {hint}
+        </span>
+      ) : null}
+    </label>
   )
 }
