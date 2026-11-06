@@ -193,7 +193,10 @@ export function PurchaseFormModal({
               aria-invalid={Boolean(formState.errors.supplierId)}
             />
             {formState.errors.supplierId && (
-              <p className="text-xs text-destructive" role="alert">
+              <p
+                className="text-xs font-medium text-red-600 dark:text-red-400"
+                role="alert"
+              >
                 {formState.errors.supplierId.message}
               </p>
             )}
@@ -201,7 +204,8 @@ export function PurchaseFormModal({
 
           <div className="space-y-1.5">
             <label htmlFor="purchaseDate" className="text-sm font-medium">
-              Fecha de compra <span className="text-destructive">*</span>
+              Fecha de compra{' '}
+              <span className="text-red-600 dark:text-red-400">*</span>
             </label>
             <DatePicker
               id="purchaseDate"
@@ -212,7 +216,10 @@ export function PurchaseFormModal({
               aria-invalid={Boolean(formState.errors.purchaseDate)}
             />
             {formState.errors.purchaseDate && (
-              <p className="text-xs text-destructive" role="alert">
+              <p
+                className="text-xs font-medium text-red-600 dark:text-red-400"
+                role="alert"
+              >
                 {formState.errors.purchaseDate.message}
               </p>
             )}
@@ -230,7 +237,10 @@ export function PurchaseFormModal({
             aria-invalid={Boolean(formState.errors.externalRef)}
           />
           {formState.errors.externalRef && (
-            <p className="text-xs text-destructive" role="alert">
+            <p
+              className="text-xs font-medium text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {formState.errors.externalRef.message}
             </p>
           )}
@@ -257,7 +267,10 @@ export function PurchaseFormModal({
           </div>
 
           {formState.errors.lines?.message && (
-            <p className="mb-2 text-xs text-destructive" role="alert">
+            <p
+              className="mb-2 text-xs font-medium text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {formState.errors.lines.message}
             </p>
           )}
@@ -318,7 +331,10 @@ export function PurchaseFormModal({
                           aria-label={`Producto para línea ${index + 1}`}
                         />
                         {formState.errors.lines?.[index]?.productId && (
-                          <p className="text-xs text-destructive" role="alert">
+                          <p
+                            className="text-xs font-medium text-red-600 dark:text-red-400"
+                            role="alert"
+                          >
                             {formState.errors.lines[index]?.productId?.message}
                           </p>
                         )}
@@ -356,7 +372,10 @@ export function PurchaseFormModal({
                           className="text-right text-xs"
                         />
                         {formState.errors.lines?.[index]?.quantity && (
-                          <p className="text-xs text-destructive" role="alert">
+                          <p
+                            className="text-xs font-medium text-red-600 dark:text-red-400"
+                            role="alert"
+                          >
                             {formState.errors.lines[index]?.quantity?.message}
                           </p>
                         )}
@@ -382,7 +401,10 @@ export function PurchaseFormModal({
                           className="text-right text-xs"
                         />
                         {formState.errors.lines?.[index]?.unitCost && (
-                          <p className="text-xs text-destructive" role="alert">
+                          <p
+                            className="text-xs font-medium text-red-600 dark:text-red-400"
+                            role="alert"
+                          >
                             {formState.errors.lines[index]?.unitCost?.message}
                           </p>
                         )}
@@ -416,7 +438,10 @@ export function PurchaseFormModal({
             {...register('notes')}
           />
           {formState.errors.notes && (
-            <p className="text-xs text-destructive" role="alert">
+            <p
+              className="text-xs font-medium text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {formState.errors.notes.message}
             </p>
           )}

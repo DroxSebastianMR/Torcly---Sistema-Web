@@ -186,8 +186,20 @@ export default function AnnouncementsAdminPage() {
 
       {/* Admin Announcements List */}
       {isLoading ? (
-        <div className="rounded-xl border bg-card p-8 text-center text-xs text-muted-foreground">
-          Cargando anuncios…
+        <div className="space-y-4" aria-label="Cargando anuncios">
+          {Array.from({ length: 3 }, (_, index) => (
+            <div
+              key={index}
+              className="animate-pulse rounded-xl border bg-card p-5 space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="h-5 w-48 rounded bg-muted" />
+                <div className="h-5 w-20 rounded-full bg-muted" />
+              </div>
+              <div className="h-3 w-3/4 rounded bg-muted/70" />
+              <div className="h-3 w-1/2 rounded bg-muted/50" />
+            </div>
+          ))}
         </div>
       ) : isError ? (
         <ErrorState

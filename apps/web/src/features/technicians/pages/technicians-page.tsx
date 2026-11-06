@@ -139,13 +139,33 @@ export default function TechniciansPage() {
                 {canWrite && <th className="px-4 py-3" />}
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y" aria-label="Cargando técnicos">
               {query.isFetching ? (
-                <tr>
-                  <td className="px-5 py-8 text-muted-foreground" colSpan={5}>
-                    Cargando técnicos…
-                  </td>
-                </tr>
+                Array.from({ length: 5 }, (_, index) => (
+                  <tr key={index} className="animate-pulse">
+                    <td className="px-5 py-4">
+                      <div className="h-4 w-40 rounded bg-muted" />
+                      <div className="mt-1.5 h-3 w-24 rounded bg-muted/70" />
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="h-3.5 w-28 rounded bg-muted" />
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="h-3.5 w-32 rounded bg-muted" />
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="h-5 w-16 rounded-full bg-muted" />
+                    </td>
+                    {canWrite && (
+                      <td className="px-4 py-4">
+                        <div className="flex justify-end gap-1">
+                          <div className="size-8 rounded-lg bg-muted" />
+                          <div className="size-8 rounded-lg bg-muted" />
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))
               ) : rows.length ? (
                 rows.map((item) => (
                   <tr key={item.id}>

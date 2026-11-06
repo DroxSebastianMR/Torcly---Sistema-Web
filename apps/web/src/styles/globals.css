@@ -12,6 +12,8 @@
   --color-border: var(--border);
   --color-input: var(--border);
   --color-ring: var(--primary);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --font-sans: var(--font-body);
   --font-heading: var(--font-display);
 
@@ -48,6 +50,8 @@
   --muted: #eaf0ec;
   --muted-foreground: #61706a;
   --border: #dce4df;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
   --control-radius: 10px;
   --card-radius: 16px;
   --hover-duration: 150ms;

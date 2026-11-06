@@ -412,8 +412,25 @@ export default function PlatformSubscriptionsPage() {
           {/* Tabla de Suscripciones */}
           <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             {subscriptionsLoading ? (
-              <div className="p-8 text-center text-xs text-muted-foreground">
-                Cargando suscripciones de plataforma...
+              <div
+                className="divide-y divide-border/60"
+                aria-label="Cargando suscripciones de plataforma"
+              >
+                {Array.from({ length: 5 }, (_, index) => (
+                  <div
+                    key={index}
+                    className="flex animate-pulse items-center justify-between gap-4 px-4 py-4"
+                  >
+                    <div className="space-y-1.5">
+                      <div className="h-4 w-44 rounded bg-muted" />
+                      <div className="h-3 w-28 rounded bg-muted/60" />
+                    </div>
+                    <div className="h-4 w-28 rounded bg-muted" />
+                    <div className="h-5 w-20 rounded-full bg-muted" />
+                    <div className="h-4 w-24 rounded bg-muted" />
+                    <div className="size-8 rounded-lg bg-muted" />
+                  </div>
+                ))}
               </div>
             ) : subscriptions.length === 0 ? (
               <div className="p-12 text-center text-xs text-muted-foreground">
@@ -547,8 +564,30 @@ export default function PlatformSubscriptionsPage() {
           </div>
 
           {plansLoading ? (
-            <div className="rounded-xl border border-border bg-card p-12 text-center text-xs text-muted-foreground">
-              Cargando planes comerciales...
+            <div
+              className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
+              aria-label="Cargando planes comerciales"
+            >
+              {Array.from({ length: 3 }, (_, index) => (
+                <div
+                  key={index}
+                  className="flex animate-pulse flex-col justify-between rounded-2xl border border-border bg-card p-5 space-y-4"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="h-5 w-24 rounded bg-muted" />
+                      <div className="h-5 w-16 rounded-full bg-muted" />
+                    </div>
+                    <div className="h-6 w-36 rounded bg-muted" />
+                    <div className="h-4 w-full rounded bg-muted/60" />
+                    <div className="h-8 w-28 rounded bg-muted" />
+                  </div>
+                  <div className="space-y-2 border-t pt-4">
+                    <div className="h-4 w-32 rounded bg-muted/70" />
+                    <div className="h-4 w-28 rounded bg-muted/60" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : plans.length === 0 ? (
             <div className="rounded-xl border border-border bg-card p-12 text-center text-xs text-muted-foreground">

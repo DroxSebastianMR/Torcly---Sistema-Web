@@ -189,7 +189,10 @@ export function DirectWorkOrderModal({
             aria-invalid={Boolean(errors.customerId)}
           />
           {errors.customerId && (
-            <p className="text-xs text-destructive" role="alert">
+            <p
+              className="text-xs font-medium text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {errors.customerId.message}
             </p>
           )}
@@ -197,7 +200,7 @@ export function DirectWorkOrderModal({
 
         <div className="space-y-1.5">
           <label htmlFor="directVehicleId" className="text-sm font-medium">
-            Vehículo <span className="text-destructive">*</span>
+            Vehículo <span className="text-red-600 dark:text-red-400">*</span>
           </label>
           <SmartSelect
             id="directVehicleId"
@@ -223,7 +226,10 @@ export function DirectWorkOrderModal({
             aria-invalid={Boolean(errors.vehicleId)}
           />
           {errors.vehicleId && (
-            <p className="text-xs text-destructive" role="alert">
+            <p
+              className="text-xs font-medium text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {errors.vehicleId.message}
             </p>
           )}
@@ -255,7 +261,10 @@ export function DirectWorkOrderModal({
               aria-invalid={Boolean(errors.currentMileage)}
             />
             {errors.currentMileage && (
-              <p className="text-xs text-destructive" role="alert">
+              <p
+                className="text-xs font-medium text-red-600 dark:text-red-400"
+                role="alert"
+              >
                 {errors.currentMileage.message}
               </p>
             )}
@@ -300,7 +309,10 @@ export function DirectWorkOrderModal({
             {...register('receptionNotes')}
           />
           {errors.receptionNotes && (
-            <p className="text-xs text-destructive" role="alert">
+            <p
+              className="text-xs font-medium text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {errors.receptionNotes.message}
             </p>
           )}

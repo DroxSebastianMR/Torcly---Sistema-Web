@@ -101,7 +101,10 @@ export function SupplierFormModal({
             aria-invalid={Boolean(formState.errors.legalName)}
           />
           {formState.errors.legalName && (
-            <p className="text-xs text-destructive" role="alert">
+            <p
+              className="text-xs font-medium text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {formState.errors.legalName.message}
             </p>
           )}
@@ -119,7 +122,10 @@ export function SupplierFormModal({
             aria-invalid={Boolean(formState.errors.documentNumber)}
           />
           {formState.errors.documentNumber && (
-            <p className="text-xs text-destructive" role="alert">
+            <p
+              className="text-xs font-medium text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {formState.errors.documentNumber.message}
             </p>
           )}
@@ -162,7 +168,10 @@ export function SupplierFormModal({
             aria-invalid={Boolean(formState.errors.email)}
           />
           {formState.errors.email && (
-            <p className="text-xs text-destructive" role="alert">
+            <p
+              className="text-xs font-medium text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {formState.errors.email.message}
             </p>
           )}
