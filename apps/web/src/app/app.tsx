@@ -6,16 +6,19 @@ import {
 import { QueryProvider } from './providers/query-provider'
 import { AuthProvider } from './providers/auth-provider'
 import { AppRouter } from './router/app-router'
+import { ThemeProvider } from '@/features/theme/context/theme-provider'
 export function App() {
   return (
-    <ToastProvider>
-      <QueryProvider>
-        <AuthProvider>
-          <AppRouter />
-          <NavigationToaster />
-          <Toaster richColors position="top-right" />
-        </AuthProvider>
-      </QueryProvider>
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <AppRouter />
+            <NavigationToaster />
+            <Toaster richColors position="top-right" />
+          </AuthProvider>
+        </QueryProvider>
+      </ToastProvider>
+    </ThemeProvider>
   )
 }

@@ -9,7 +9,7 @@ export function LoginPage() {
         </p>
         <h1
           id="login-title"
-          className="font-heading text-[clamp(2rem,2.8vw,2.7rem)] leading-none font-semibold tracking-[-0.045em] text-brand-forest"
+          className="font-heading text-[clamp(2rem,2.8vw,2.7rem)] leading-none font-semibold tracking-[-0.045em] text-foreground"
         >
           Bienvenido a Torcly
         </h1>

@@ -18,7 +18,7 @@ export function RecoveryForm() {
           className="mb-4 size-7 text-primary"
           strokeWidth={1.5}
         />
-        <h2 className="text-base font-semibold text-brand-forest">
+        <h2 className="text-base font-semibold text-foreground">
           Revisa tu correo
         </h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -64,7 +64,7 @@ export function RecoveryForm() {
       {errors.root?.server && (
         <p
           role="alert"
-          className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm leading-5 text-red-700"
+          className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm leading-5 text-destructive"
         >
           {errors.root.server.message}
         </p>

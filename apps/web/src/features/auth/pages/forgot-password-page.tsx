@@ -12,7 +12,7 @@ export function ForgotPasswordPage() {
         </p>
         <h1
           id="recovery-title"
-          className="text-[clamp(1.75rem,2.2vw,2.25rem)] leading-tight font-semibold tracking-[-0.035em] text-brand-forest"
+          className="text-[clamp(1.75rem,2.2vw,2.25rem)] leading-tight font-semibold tracking-[-0.035em] text-foreground"
         >
           Recuperación de acceso
         </h1>

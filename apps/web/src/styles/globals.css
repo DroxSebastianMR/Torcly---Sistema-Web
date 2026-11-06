@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
 @theme inline {
   --color-brand-forest: #102c25;
   --color-brand-accent: oklch(76.5% 0.177 163.223);
@@ -12,6 +13,9 @@
   --color-border: var(--border);
   --color-input: var(--border);
   --color-ring: var(--primary);
+  --color-destructive: var(--destructive);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
   --font-sans: var(--font-body);
   --font-heading: var(--font-display);
 
@@ -43,15 +47,33 @@
   --background: #f7f8fa;
   --foreground: #1b2925;
   --card: #ffffff;
+  --surface: #f8faf9;
+  --surface-elevated: #ffffff;
   --primary: #17634c;
   --primary-foreground: #ffffff;
   --muted: #eaf0ec;
   --muted-foreground: #61706a;
   --border: #dce4df;
+  --destructive: #dc2626;
   --control-radius: 10px;
   --card-radius: 16px;
   --hover-duration: 150ms;
   --table-row-height: 56px;
+}
+
+.dark {
+  --background: #0e1412;
+  --foreground: #ecf2ef;
+  --card: #16201d;
+  --surface: #16201d;
+  --surface-elevated: #1d2a26;
+  --primary: #19a368;
+  --primary-foreground: #f7fcf9;
+  --muted: #202d29;
+  --muted-foreground: #8ea49b;
+  --border: #243630;
+  --destructive: #ef4444;
+  color-scheme: dark;
 }
 
 @utility font-brand {
@@ -84,6 +106,16 @@
     min-width: 320px;
     font-family: var(--font-body);
     font-weight: 500;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--foreground);
+    box-shadow: 0 0 0 1000px var(--surface-elevated) inset;
+    caret-color: var(--foreground);
   }
   h1,
   h2,

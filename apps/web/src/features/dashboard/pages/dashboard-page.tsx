@@ -67,20 +67,24 @@ const activeOrders = (section: Record<string, unknown> | undefined) => {
 type Tone = 'blue' | 'violet' | 'amber' | 'red'
 const tones: Record<Tone, { card: string; icon: string }> = {
   blue: {
-    card: 'border-sky-100 bg-gradient-to-br from-white to-sky-50',
-    icon: 'text-sky-500',
+    card:
+      'border-sky-100 bg-gradient-to-br from-white to-sky-50 dark:border-sky-900/70 dark:from-[#16201d] dark:to-[#132b36]',
+    icon: 'text-sky-500 dark:text-sky-300',
   },
   violet: {
-    card: 'border-violet-100 bg-gradient-to-br from-white to-violet-50',
-    icon: 'text-violet-500',
+    card:
+      'border-violet-100 bg-gradient-to-br from-white to-violet-50 dark:border-violet-900/65 dark:from-[#16201d] dark:to-[#29203a]',
+    icon: 'text-violet-500 dark:text-violet-300',
   },
   amber: {
-    card: 'border-amber-100 bg-gradient-to-br from-white to-amber-50',
-    icon: 'text-amber-500',
+    card:
+      'border-amber-100 bg-gradient-to-br from-white to-amber-50 dark:border-amber-900/65 dark:from-[#16201d] dark:to-[#352b16]',
+    icon: 'text-amber-500 dark:text-amber-300',
   },
   red: {
-    card: 'border-rose-100 bg-gradient-to-br from-white to-rose-50',
-    icon: 'text-rose-500',
+    card:
+      'border-rose-100 bg-gradient-to-br from-white to-rose-50 dark:border-rose-900/65 dark:from-[#16201d] dark:to-[#351d27]',
+    icon: 'text-rose-500 dark:text-rose-300',
   },
 }
 
@@ -112,13 +116,13 @@ function OperationalCard({
           colors.icon,
         )}
       />
-      <p className="text-xs font-bold uppercase tracking-[0.1em] text-ink-muted">
+      <p className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">
         {label}
       </p>
-      <p className={cn('mt-2 text-2xl font-bold tracking-tight text-ink')}>
+      <p className={cn('mt-2 text-2xl font-bold tracking-tight text-foreground')}>
         {value}
       </p>
-      <p className="mt-2 text-sm text-ink-muted">{detail}</p>
+      <p className="mt-2 text-sm text-muted-foreground">{detail}</p>
     </article>
   )
 }
@@ -138,8 +142,8 @@ function Panel({
     <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-ink">{title}</h2>
-          <p className="mt-1 text-sm text-ink-muted">{description}</p>
+          <h2 className="text-lg font-bold text-foreground">{title}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         </div>
         <Link
           className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary hover:underline"
@@ -170,7 +174,7 @@ function Agenda({ attention }: { attention: Attention | undefined }) {
           className="flex items-center gap-3 py-3"
           key={String(appointment.code)}
         >
-          <div className="flex w-20 shrink-0 flex-col rounded-lg bg-sky-50 px-2 py-1.5 text-center text-xs font-bold text-sky-700">
+          <div className="flex w-20 shrink-0 flex-col rounded-lg bg-sky-50 px-2 py-1.5 text-center text-xs font-bold text-sky-700 dark:bg-sky-950/50 dark:text-sky-200">
             <span className="whitespace-nowrap">
               {formatDate(appointment.date)}
             </span>
@@ -179,10 +183,10 @@ function Agenda({ attention }: { attention: Attention | undefined }) {
             </span>
           </div>
           <div className="min-w-0">
-            <p className="truncate font-semibold text-ink">
+            <p className="truncate font-semibold text-foreground">
               {String(appointment.customerName ?? 'Cliente sin nombre')}
             </p>
-            <p className="truncate text-sm text-ink-muted">
+            <p className="truncate text-sm text-muted-foreground">
               {String(appointment.vehiclePlate ?? 'Vehículo por confirmar')} ·{' '}
               {String(appointment.code ?? '')}
             </p>
@@ -217,27 +221,27 @@ function AttentionList({ inventory }: { inventory: Attention | undefined }) {
       {rows.map((row) => (
         <li
           className={cn(
-            'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-surface-muted',
-            'bg-rose-50/50',
+            'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-muted/60',
+            'bg-rose-50/50 dark:bg-rose-950/25',
           )}
           key={row.key}
         >
           <span
             className={cn(
               'grid size-9 shrink-0 place-items-center rounded-lg',
-              'bg-rose-100 text-rose-600',
+              'bg-rose-100 text-rose-600 dark:bg-rose-950/65 dark:text-rose-300',
             )}
           >
             <PackageX aria-hidden className="size-4" />
           </span>
           <div className="min-w-0">
-            <p className="truncate font-semibold text-ink">{row.label}</p>
-            <p className="truncate text-sm text-ink-muted">{row.detail}</p>
+            <p className="truncate font-semibold text-foreground">{row.label}</p>
+            <p className="truncate text-sm text-muted-foreground">{row.detail}</p>
           </div>
           <p
             className={cn(
               'ml-auto shrink-0 text-right text-xs font-semibold',
-              'text-rose-700',
+              'text-rose-700 dark:text-rose-300',
             )}
           >
             {row.meta}
@@ -262,17 +266,17 @@ function RecentActivity({ sales }: { sales: Attention | undefined }) {
     <ul className="h-[340px] divide-y divide-border overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {sales.data.map((sale) => (
         <li className="flex items-center gap-3 py-3" key={String(sale.code)}>
-          <ReceiptText aria-hidden className="size-5 shrink-0 text-sky-500" />
+          <ReceiptText aria-hidden className="size-5 shrink-0 text-sky-500 dark:text-sky-300" />
           <div className="min-w-0 flex-1">
-            <p className="truncate font-semibold text-ink">
+            <p className="truncate font-semibold text-foreground">
               {String(sale.code ?? 'Venta confirmada')}
             </p>
-            <p className="truncate text-sm text-ink-muted">
+            <p className="truncate text-sm text-muted-foreground">
               {String(sale.customerName ?? 'Venta sin cliente')} ·{' '}
               {formatDate(sale.confirmedAt)}
             </p>
           </div>
-          <p className="shrink-0 text-sm font-semibold text-emerald-700">
+          <p className="shrink-0 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
             +{currency(Number(sale.total ?? 0))}
           </p>
         </li>
@@ -295,19 +299,19 @@ function WorkshopOverview({
       label: 'En diagnóstico',
       value: numberOf(statuses, 'EN_DIAGNOSTICO'),
       dot: 'bg-sky-500',
-      valueClass: 'text-sky-700',
+      valueClass: 'text-sky-700 dark:text-sky-300',
     },
     {
       label: 'En ejecución',
       value: numberOf(statuses, 'EN_EJECUCION'),
       dot: 'bg-violet-500',
-      valueClass: 'text-violet-700',
+      valueClass: 'text-violet-700 dark:text-violet-300',
     },
     {
       label: 'Entregadas',
       value: numberOf(statuses, 'ENTREGADA'),
       dot: 'bg-emerald-500',
-      valueClass: 'text-emerald-700',
+      valueClass: 'text-emerald-700 dark:text-emerald-300',
     },
   ]
   return (
@@ -318,7 +322,7 @@ function WorkshopOverview({
             aria-hidden
             className={cn('size-2 shrink-0 rounded-full', item.dot)}
           />
-          <p className="flex-1 text-sm font-medium text-ink">{item.label}</p>
+          <p className="flex-1 text-sm font-medium text-foreground">{item.label}</p>
           <p className={cn('text-lg font-bold', item.valueClass)}>
             {item.value}
           </p>
@@ -371,7 +375,7 @@ export default function Page() {
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             Operación de hoy
           </p>
-          <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-[2rem]">
             Bienvenido de vuelta
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -471,18 +475,18 @@ export default function Page() {
 function DashboardSkeleton() {
   return (
     <div className="space-y-6" aria-label="Cargando panel operativo">
-      <div className="h-32 animate-pulse rounded-2xl bg-surface-muted" />
+      <div className="h-32 animate-pulse rounded-2xl bg-muted" />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
           <div
-            className="h-36 animate-pulse rounded-2xl bg-surface-muted"
+            className="h-36 animate-pulse rounded-2xl bg-muted"
             key={index}
           />
         ))}
       </div>
       <div className="grid gap-6 xl:grid-cols-2">
-        <div className="h-80 animate-pulse rounded-2xl bg-surface-muted" />
-        <div className="h-80 animate-pulse rounded-2xl bg-surface-muted" />
+        <div className="h-80 animate-pulse rounded-2xl bg-muted" />
+        <div className="h-80 animate-pulse rounded-2xl bg-muted" />
       </div>
     </div>
   )

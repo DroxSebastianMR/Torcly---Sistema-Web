@@ -61,7 +61,7 @@ export function AuthInput({
         <p
           id={errorId}
           role="alert"
-          className="mt-2 text-xs leading-5 text-red-700"
+          className="mt-2 text-xs leading-5 text-destructive"
         >
           {error}
         </p>
