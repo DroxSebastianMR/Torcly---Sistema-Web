@@ -29,7 +29,7 @@ Los sprints son secuenciales y cada uno tiene una rama, alcance cerrado, criteri
 | 23     | `sprint-23-multitenencia`          | `feature/multitenancy-organizations`       | Aprobado (v1.1.1 en main)     |
 | 24     | `sprint-24-roles-identidad-taller` | `feature/workshop-manager-role`            | Aprobado (v1.1.2 en develop)  |
 | 25     | `sprint-25-admin-password-reset`   | `feature/admin-password-reset`             | Aprobado (en develop)         |
-| 26     | `sprint-26-notificaciones-taller`  | `feature/workshop-notifications`           | En ejecución                  |
+| 26     | `sprint-26-notificaciones-taller`  | `feature/workshop-notifications`           | Aprobado (en develop)         |
 
 El porcentaje solo cambia después de completar [Definition of Done](../04-calidad/definition-of-done.md) y registrar la aprobación.
 
