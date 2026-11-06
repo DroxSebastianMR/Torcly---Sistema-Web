@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Crown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
 import { SmartSelect } from '@/components/ui/smart-select'
@@ -112,11 +113,6 @@ function SubscriptionEditForm({
       open
       onClose={onClose}
       busy={busy}
-      visual={
-        <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
-          <Crown aria-hidden className="size-6" />
-        </span>
-      }
       title="Gestionar suscripción SaaS"
       description={`Configuración de plan y vigencia para ${subscription.organizationName} (${subscription.organizationCode}).`}
       className="max-w-2xl"
@@ -187,10 +183,10 @@ function SubscriptionEditForm({
           label="Fecha de renovación o vencimiento"
           hint="Dejar vacío si la suscripción no tiene fecha de corte definida."
         >
-          <Input
-            type="date"
+          <DatePicker
             value={renewalDate}
-            onChange={(e) => setRenewalDate(e.target.value)}
+            onChange={setRenewalDate}
+            placeholder="Seleccionar fecha de renovación"
           />
         </Field>
 
@@ -211,11 +207,22 @@ function SubscriptionEditForm({
             <span className="block font-semibold text-xs text-foreground uppercase tracking-wider">
               Beneficios incluidos en este plan:
             </span>
-            <ul className="mt-2 grid grid-cols-1 gap-1 text-xs text-muted-foreground sm:grid-cols-2">
+            <ul className="mt-2.5 grid grid-cols-1 gap-2 text-xs text-muted-foreground sm:grid-cols-2">
               {selectedPlan.features.map((feat, idx) => (
-                <li key={idx} className="flex items-center gap-1.5">
-                  <span className="size-1.5 rounded-full bg-primary" />
-                  {feat}
+                <li key={idx} className="flex items-center gap-2">
+                  <span
+                    aria-hidden
+                    className="inline-block size-1.5 shrink-0 rounded-full bg-emerald-700"
+                    style={{
+                      width: '6px',
+                      height: '6px',
+                      minWidth: '6px',
+                      minHeight: '6px',
+                    }}
+                  />
+                  <span className="leading-snug text-foreground/80">
+                    {feat}
+                  </span>
                 </li>
               ))}
             </ul>

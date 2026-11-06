@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Crown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
 import { SmartSelect } from '@/components/ui/smart-select'
@@ -160,11 +161,6 @@ function SubscriptionAssignForm({
       open
       onClose={onClose}
       busy={busy}
-      visual={
-        <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
-          <Crown aria-hidden className="size-6" />
-        </span>
-      }
       title="Asignar nueva membresía SaaS"
       description="Vincula o actualiza el plan comercial y la vigencia para un taller existente en la plataforma."
       className="max-w-3xl sm:max-w-3xl"
@@ -279,10 +275,10 @@ function SubscriptionAssignForm({
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Fecha de inicio" required>
-            <Input
-              type="date"
+            <DatePicker
               value={startDate}
-              onChange={(e) => handleStartDateChange(e.target.value)}
+              onChange={handleStartDateChange}
+              placeholder="Seleccionar fecha de inicio"
             />
           </Field>
 
@@ -294,10 +290,11 @@ function SubscriptionAssignForm({
                 : '+30 días automático'
             }
           >
-            <Input
-              type="date"
+            <DatePicker
               value={renewalDate}
-              onChange={(e) => setRenewalDate(e.target.value)}
+              onChange={setRenewalDate}
+              align="right"
+              placeholder="Seleccionar fecha de corte"
             />
           </Field>
         </div>

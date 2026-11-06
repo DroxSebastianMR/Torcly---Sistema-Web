@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Layers } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
@@ -155,11 +154,6 @@ function PlanForm({
       open
       onClose={onClose}
       busy={busy}
-      visual={
-        <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
-          <Layers aria-hidden className="size-6" />
-        </span>
-      }
       title={
         isEditing ? `Editar plan: ${plan?.name}` : 'Crear nuevo plan comercial'
       }

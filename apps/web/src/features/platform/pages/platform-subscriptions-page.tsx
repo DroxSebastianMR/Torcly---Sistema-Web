@@ -755,11 +755,6 @@ export default function PlatformSubscriptionsPage() {
       <Modal
         open={Boolean(deactivateBlockedPlan)}
         onClose={() => setDeactivateBlockedPlan(null)}
-        visual={
-          <span className="flex size-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 ring-8 ring-amber-50/50">
-            <AlertTriangle className="size-6" />
-          </span>
-        }
         title="No se puede desactivar este plan"
         description={
           deactivateBlockedPlan

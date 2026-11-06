@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Megaphone } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -199,11 +198,6 @@ export function AnnouncementAdminFormModal({
         isEditing
           ? 'Actualiza el contenido, tipo o estado del anuncio para los talleres.'
           : 'Publica actualizaciones de versiones, mantenimientos preventivos o comunicados en la plataforma.'
-      }
-      visual={
-        <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
-          <Megaphone aria-hidden className="size-6" />
-        </span>
       }
       className="max-w-2xl"
       footer={
