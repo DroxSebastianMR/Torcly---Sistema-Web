@@ -69,11 +69,14 @@ export default function NotificationsPage() {
 
   return (
     <div className="w-full space-y-6">
-      {/* Top Header with title and quick time pills */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      {/* Header matching Torcly standard (like reports-page) */}
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            <span>Centro de notificaciones</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
               Notificaciones
             </h1>
             {unreadCount > 0 && (
@@ -82,9 +85,9 @@ export default function NotificationsPage() {
               </span>
             )}
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             Bandeja centralizada de eventos del taller: órdenes de trabajo,
-            citas, stock, cobros y sistema.
+            citas, compras, inventario, cobros y sistema.
           </p>
         </div>
 
@@ -92,7 +95,7 @@ export default function NotificationsPage() {
         <div
           role="group"
           aria-label="Filtrar por antigüedad"
-          className="inline-flex rounded-full border bg-muted/30 p-1 text-xs"
+          className="inline-flex rounded-full border bg-muted/40 p-1 text-xs"
         >
           {TIME_FILTERS.map((tf) => {
             const isSelected = filters.days === tf.days
@@ -106,9 +109,9 @@ export default function NotificationsPage() {
                     page: 1,
                   })
                 }
-                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                className={`rounded-full px-3.5 py-1 text-xs font-semibold transition-all ${
                   isSelected
-                    ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
+                    ? 'bg-primary text-primary-foreground shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -117,7 +120,7 @@ export default function NotificationsPage() {
             )
           })}
         </div>
-      </div>
+      </header>
 
       {/* Categories and Filters Bar */}
       <section

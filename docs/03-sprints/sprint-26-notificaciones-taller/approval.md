@@ -13,14 +13,18 @@
 - [x] **Popover desplegable con scroll y categorías (según referencias adjuntas):**
   - Despliegue con selector por pestañas (`Todas`, `Taller`, `Citas`, `Inventario`, `Caja`).
   - Capacidad de scroll fluido (`max-h-[380px] overflow-y-auto`) con barra de desplazamiento gris oculta (`[scrollbar-width:none] [&::-webkit-scrollbar]:hidden`) para un diseño limpio e interactivo.
-  - Colores e íconos originales de Torcly restaurados fielmente (sin tintes morados): verde esmeralda para caja y puntos de no leído (`bg-emerald-500`), ámbar para stock/cobros pendientes, cielo para citas e índigo para taller.
+  - Colores encendidos en pasteles luminosos según referencia gráfica: mint/verde (`#E6F7ED` / `#059669`) para órdenes de taller e inventario, fuchsia/magenta (`#FDF2F8` / `#C026D3`) para cobros de caja, electric blue (`#EFF6FF` / `#2563EB`) para citas, warm amber (`#FEFCE8` / `#D97706`) para stock y rose (`#FEF2F2` / `#E11D48`) para vencimientos.
   - Acción rápida "Marcar todas como leídas" tanto en la cabecera como en el pie del desplegable.
   - Enlace al módulo completo "Ver todas".
-- [x] **Rediseño completo de la página de Notificaciones (`/notificaciones`):**
-  - Expansión a ancho completo (`w-full`), eliminando la restricción de ancho angosto (`max-w-4xl`).
-  - Eliminación del patrón de "tarjetas dentro de tarjetas": sustituido por un contenedor unificado de bordes redondeados y filas con divisores suaves (`divide-y divide-border/60`).
+- [x] **Rediseño y estructura completa de la página de Notificaciones (`/notificaciones`):**
+  - Encabezado formal siguiendo la estructura institucional de Torcly (como en el módulo de Reportes):
+    - Indicador superior (`kicker`): `Centro de notificaciones` en `text-xs font-semibold uppercase tracking-[0.18em] text-primary`.
+    - Título principal: `text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]` con badge de avisos nuevos.
+    - Descripción: `text-sm leading-6 text-muted-foreground max-w-2xl`.
+  - Expansión a ancho completo (`w-full`) y alturas armonizadas con el dashboard y módulos operativos.
+  - Eliminación de tarjetas anidadas: sustituido por un contenedor unificado de bordes redondeados y filas con divisores suaves (`divide-y divide-border/60`).
   - Selector rápido de período temporal en pills en la cabecera (`Todo`, `7d`, `30d`, `90d`).
-  - Pestañas/pills de filtrado por categoría (`Todas las áreas`, `Taller`, `Citas`, `Inventario`, `Caja`, `Sistema`) con badges de colores distintivos (índigo para taller, cielo para citas, esmeralda para compras/inventario, ámbar para stock/cobro vencido, púrpura para caja).
+  - Badges de categoría encendidos y sin bordes toscos, junto con timestamps relativos legibles.
   - Paginación estándar de 10 elementos por página (`pageSize: 10`) sincronizada entre el backend y frontend.
 - [x] **Backend enriquecido:**
   - `notificationQuerySchema` ampliado con `category`, `days` y `pageSize: 10` por defecto.

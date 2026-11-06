@@ -247,7 +247,9 @@ export function NotificationSummaryPopover({
                             )}
                           </span>
                           <span>•</span>
-                          <span className="font-medium text-foreground/70">
+                          <span
+                            className={`rounded-full px-1.5 py-0.2 text-[10px] font-semibold ${category.badgeClass}`}
+                          >
                             {category.label}
                           </span>
                         </div>

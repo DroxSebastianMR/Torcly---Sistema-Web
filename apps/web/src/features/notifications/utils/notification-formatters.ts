@@ -66,9 +66,9 @@ export function getNotificationCategory(type: string) {
         label: 'Taller',
         icon: ClipboardList,
         badgeClass:
-          'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800',
+          'bg-[#E6F7ED] text-[#059669] dark:bg-emerald-950/70 dark:text-emerald-300',
         bgIconClass:
-          'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300',
+          'bg-[#E6F7ED] text-[#059669] dark:bg-emerald-950/70 dark:text-emerald-300',
       }
     case 'APPOINTMENT_SCHEDULED':
     case 'APPOINTMENT_RESCHEDULED':
@@ -77,9 +77,9 @@ export function getNotificationCategory(type: string) {
         label: 'Citas',
         icon: CalendarDays,
         badgeClass:
-          'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/50 dark:text-sky-300 dark:border-sky-800',
+          'bg-[#EFF6FF] text-[#2563EB] dark:bg-blue-950/70 dark:text-blue-300',
         bgIconClass:
-          'bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300',
+          'bg-[#EFF6FF] text-[#2563EB] dark:bg-blue-950/70 dark:text-blue-300',
       }
     case 'APPOINTMENT_OVERDUE':
       return {
@@ -87,9 +87,9 @@ export function getNotificationCategory(type: string) {
         label: 'Cita Vencida',
         icon: CalendarDays,
         badgeClass:
-          'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800',
+          'bg-[#FEF2F2] text-[#E11D48] dark:bg-rose-950/70 dark:text-rose-300',
         bgIconClass:
-          'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300',
+          'bg-[#FEF2F2] text-[#E11D48] dark:bg-rose-950/70 dark:text-rose-300',
       }
     case 'STOCK_LOW':
       return {
@@ -97,9 +97,9 @@ export function getNotificationCategory(type: string) {
         label: 'Stock Bajo',
         icon: Warehouse,
         badgeClass:
-          'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800',
+          'bg-[#FEFCE8] text-[#D97706] dark:bg-amber-950/70 dark:text-amber-300',
         bgIconClass:
-          'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
+          'bg-[#FEFCE8] text-[#D97706] dark:bg-amber-950/70 dark:text-amber-300',
       }
     case 'PURCHASE_RECEIVED':
       return {
@@ -107,9 +107,9 @@ export function getNotificationCategory(type: string) {
         label: 'Inventario',
         icon: Truck,
         badgeClass:
-          'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800',
+          'bg-[#E6F7ED] text-[#059669] dark:bg-emerald-950/70 dark:text-emerald-300',
         bgIconClass:
-          'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
+          'bg-[#E6F7ED] text-[#059669] dark:bg-emerald-950/70 dark:text-emerald-300',
       }
     case 'PAYMENT_COMPENSATED':
       return {
@@ -117,9 +117,9 @@ export function getNotificationCategory(type: string) {
         label: 'Caja',
         icon: Wallet,
         badgeClass:
-          'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800',
+          'bg-[#FDF2F8] text-[#C026D3] dark:bg-fuchsia-950/70 dark:text-fuchsia-300',
         bgIconClass:
-          'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
+          'bg-[#FDF2F8] text-[#C026D3] dark:bg-fuchsia-950/70 dark:text-fuchsia-300',
       }
     case 'PAYMENT_DUE':
       return {
@@ -127,9 +127,9 @@ export function getNotificationCategory(type: string) {
         label: 'Cobro Vencido',
         icon: Wallet,
         badgeClass:
-          'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800',
+          'bg-[#FEFCE8] text-[#D97706] dark:bg-amber-950/70 dark:text-amber-300',
         bgIconClass:
-          'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
+          'bg-[#FEFCE8] text-[#D97706] dark:bg-amber-950/70 dark:text-amber-300',
       }
     case 'SYSTEM':
     default:
@@ -138,8 +138,9 @@ export function getNotificationCategory(type: string) {
         label: 'Sistema',
         icon: Bell,
         badgeClass:
-          'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
-        bgIconClass: 'bg-primary/10 text-primary',
+          'bg-[#F5F3FF] text-[#7C3AED] dark:bg-violet-950/70 dark:text-violet-300',
+        bgIconClass:
+          'bg-[#F5F3FF] text-[#7C3AED] dark:bg-violet-950/70 dark:text-violet-300',
       }
   }
 }
