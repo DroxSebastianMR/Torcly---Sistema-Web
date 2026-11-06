@@ -14,7 +14,7 @@ import {
   HardHat,
   CalendarDays,
   ClipboardList,
-  FileText,
+  Megaphone,
 } from 'lucide-react'
 import { paths } from '@/app/router/constants/paths'
 import type { NavigationGroup } from '../types/navigation.types'
@@ -51,7 +51,7 @@ export const appNavigation: readonly NavigationGroup[] = [
       {
         id: 'announcements',
         label: 'Novedades',
-        icon: FileText,
+        icon: Megaphone,
         path: paths.announcements,
         visible: true,
       },
