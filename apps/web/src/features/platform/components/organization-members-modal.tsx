@@ -36,7 +36,28 @@ function errorMessage(error: unknown) {
     : 'No se pudo completar la operación. Inténtalo nuevamente.'
 }
 
-export function OrganizationMembersModal({
+export function OrganizationMembersModal(props: {
+  organization: PlatformOrganization | null
+  roles: PlatformRole[]
+  members: PlatformOrganizationMember[]
+  loading: boolean
+  busy: boolean
+  onClose: () => void
+  onCreate: (input: CreatePlatformOrganizationMemberInput) => Promise<void>
+  onUpdate: (
+    userId: string,
+    input: { active?: boolean; roleId?: string },
+  ) => Promise<void>
+  onResetPassword?: (userId: string) => Promise<{ temporaryPassword: string }>
+}) {
+  if (!props.organization) return null
+
+  return (
+    <OrganizationMembersDialog {...props} organization={props.organization} />
+  )
+}
+
+function OrganizationMembersDialog({
   organization,
   roles,
   members,
@@ -47,7 +68,7 @@ export function OrganizationMembersModal({
   onUpdate,
   onResetPassword,
 }: {
-  organization: PlatformOrganization | null
+  organization: PlatformOrganization
   roles: PlatformRole[]
   members: PlatformOrganizationMember[]
   loading: boolean
@@ -70,7 +91,6 @@ export function OrganizationMembersModal({
     generatedAt: number
   } | null>(null)
   const [copied, setCopied] = useState(false)
-  if (!organization) return null
 
   useEffect(() => {
     if (!resetResult) return

@@ -1,3 +1,4 @@
+import { useContext } from 'react'
 import {
   createBrowserRouter,
   RouterProvider,
@@ -10,7 +11,7 @@ import { publicRoutes } from './routes/public.routes'
 import { protectedRoutes } from './routes/protected.routes'
 import { paths } from './constants/paths'
 import { SystemFeedbackScreen } from '@/components/ui/system-feedback-screen'
-import { useAuth } from '@/features/auth/hooks/auth-context'
+import { AuthContext, useAuth } from '@/features/auth/hooks/auth-context'
 import { LoadingScreen } from '@/components/ui/loading-screen'
 
 function HomeRedirect() {
@@ -27,7 +28,12 @@ function HomeRedirect() {
 export function RouteError() {
   const error = useRouteError()
   const navigate = useNavigate()
+  const auth = useContext(AuthContext)
   const notFound = isRouteErrorResponse(error) && error.status === 404
+  const homePath = auth?.user?.isPlatformAdmin
+    ? paths.platform
+    : paths.dashboard
+
   return (
     <SystemFeedbackScreen
       kind={notFound ? 'not-found' : 'unexpected'}
@@ -35,7 +41,7 @@ export function RouteError() {
         notFound
           ? {
               label: 'Volver al inicio',
-              onClick: () => navigate(paths.dashboard),
+              onClick: () => navigate(homePath),
             }
           : { label: 'Reintentar', onClick: () => window.location.reload() }
       }
@@ -44,7 +50,7 @@ export function RouteError() {
           ? undefined
           : {
               label: 'Volver al inicio',
-              onClick: () => navigate(paths.dashboard),
+              onClick: () => navigate(homePath),
             }
       }
     />

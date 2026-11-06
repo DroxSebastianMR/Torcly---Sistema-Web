@@ -21,18 +21,16 @@ const mockOrganization: PlatformOrganization = {
   id: 'org-1',
   code: 'ORG001',
   name: 'Taller Central',
-  tradeName: 'Taller Central S.A.C.',
-  documentType: 'RUC',
-  documentNumber: '20123456789',
-  phone: '999888777',
-  email: 'contacto@tallercentral.com',
-  address: 'Av. Las Palmas 123',
-  plan: 'ENTERPRISE',
-  status: 'ACTIVE',
   active: true,
+  owner: {
+    id: 'user-1',
+    displayName: 'Arian Bautista',
+    email: 'arian@example.com',
+    role: { id: 'role-1', code: 'OWNER', name: 'Dueño del taller' },
+  },
+  memberCount: 2,
   createdAt: '2026-11-01T00:00:00.000Z',
   updatedAt: '2026-11-01T00:00:00.000Z',
-  memberCount: 2,
 }
 
 const mockRoles: PlatformRole[] = [
@@ -42,18 +40,20 @@ const mockRoles: PlatformRole[] = [
 const mockMembers: PlatformOrganizationMember[] = [
   {
     id: 'user-1',
+    username: 'arian',
     displayName: 'Arian Bautista',
     email: 'arian@example.com',
     active: true,
-    createdAt: '2026-11-01T00:00:00.000Z',
+    joinedAt: '2026-11-01T00:00:00.000Z',
     role: { id: 'role-1', code: 'OWNER', name: 'Dueño del taller' },
   },
   {
     id: 'user-2',
+    username: 'juanito',
     displayName: 'Juanito Perez',
     email: 'juanito@example.com',
     active: true,
-    createdAt: '2026-11-02T00:00:00.000Z',
+    joinedAt: '2026-11-02T00:00:00.000Z',
     role: { id: 'role-1', code: 'OWNER', name: 'Dueño del taller' },
   },
 ]
@@ -164,5 +164,39 @@ describe('OrganizationMembersModal', () => {
     await waitFor(() => {
       expect(screen.queryByText('Torcly-TEST-9999!')).toBeNull()
     })
+  })
+
+  it('no renderiza nada cuando organization es null y no rompe las reglas de hooks al abrirse', () => {
+    const { rerender } = render(
+      <OrganizationMembersModal
+        organization={null}
+        roles={mockRoles}
+        members={[]}
+        loading={false}
+        busy={false}
+        onClose={vi.fn()}
+        onCreate={vi.fn()}
+        onUpdate={vi.fn()}
+      />,
+    )
+
+    expect(screen.queryByText('Miembros de Taller Central')).toBeNull()
+
+    // Ahora se abre con la organización seleccionada
+    rerender(
+      <OrganizationMembersModal
+        organization={mockOrganization}
+        roles={mockRoles}
+        members={mockMembers}
+        loading={false}
+        busy={false}
+        onClose={vi.fn()}
+        onCreate={vi.fn()}
+        onUpdate={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Miembros de Taller Central')).toBeTruthy()
+    expect(screen.getByText('Arian Bautista')).toBeTruthy()
   })
 })
