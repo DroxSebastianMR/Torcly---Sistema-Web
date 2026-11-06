@@ -156,12 +156,12 @@ export function AnnouncementDetailModal({
         )}
 
         {/* Summary */}
-        <div className="rounded-lg bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
+        <div className="rounded-lg bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground break-words min-w-0">
           <p className="font-medium text-foreground">{announcement.summary}</p>
         </div>
 
         {/* Content body */}
-        <div className="prose prose-sm max-w-none text-xs leading-relaxed text-foreground whitespace-pre-wrap">
+        <div className="prose prose-sm max-w-none text-xs leading-relaxed text-foreground whitespace-pre-wrap break-words min-w-0 overflow-x-hidden">
           {announcement.content}
         </div>
       </div>

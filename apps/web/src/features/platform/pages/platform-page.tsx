@@ -123,25 +123,25 @@ export default function PlatformPage() {
   const totalPages = organizations.data?.pagination.totalPages ?? 1
 
   return (
-    <section className="space-y-7" aria-labelledby="platform-title">
-      <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-3xl">
-          <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">
+    <div className="space-y-6">
+      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             Administración de plataforma
-          </p>
+          </div>
           <h1
             id="platform-title"
-            className="mt-2 text-3xl font-semibold tracking-[-0.035em] text-brand-forest sm:text-4xl"
+            className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]"
           >
             Organizaciones Torcly
           </h1>
-          <p className="mt-3 text-base leading-7 text-muted-foreground">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             Gestiona talleres y sus responsables. Esta consola nunca muestra ni
             concede acceso a sus datos operativos.
           </p>
         </div>
         <Button onClick={() => setFormOpen(true)}>
-          <Plus aria-hidden className="size-4" />
+          <Plus size={17} />
           Nueva organización
         </Button>
       </header>
@@ -416,6 +416,6 @@ export default function PlatformPage() {
           return res.data
         }}
       />
-    </section>
+    </div>
   )
 }

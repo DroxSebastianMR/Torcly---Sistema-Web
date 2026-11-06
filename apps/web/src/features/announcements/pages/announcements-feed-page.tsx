@@ -110,14 +110,14 @@ export default function AnnouncementsFeedPage() {
   }
 
   return (
-    <div className="w-full space-y-6">
+    <div className="space-y-6">
       {/* Header conforming to Torcly standard */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <span>Plataforma SaaS</span>
+            Plataforma SaaS
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
               Novedades del Sistema
             </h1>
@@ -136,12 +136,10 @@ export default function AnnouncementsFeedPage() {
         {unreadCount > 0 && (
           <Button
             variant="outline"
-            size="sm"
             onClick={handleMarkAllAsRead}
             disabled={mutations.markAllAsRead.isPending}
-            className="self-start gap-1.5"
           >
-            <CheckCheck size={14} />
+            <CheckCheck size={17} />
             <span>Marcar todas como leídas</span>
           </Button>
         )}

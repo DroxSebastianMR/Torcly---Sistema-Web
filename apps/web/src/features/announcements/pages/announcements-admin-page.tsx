@@ -89,14 +89,14 @@ export default function AnnouncementsAdminPage() {
   }
 
   return (
-    <div className="w-full space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <span>Consola de Administración SaaS</span>
+            Consola de Administración SaaS
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
               Gestión de Anuncios y Novedades
             </h1>
@@ -119,20 +119,18 @@ export default function AnnouncementsAdminPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 self-start">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
-            size="sm"
             onClick={handleGenerateRelease}
             disabled={mutations.generateVersionRelease.isPending}
-            className="gap-1.5"
           >
-            <TrendingUp size={14} className="text-primary" />
+            <TrendingUp size={17} className="text-primary" />
             <span>Generar Release v{activeVersion?.version ?? '1.1.2'}</span>
           </Button>
 
-          <Button size="sm" onClick={handleOpenCreate} className="gap-1.5">
-            <Plus size={14} />
+          <Button onClick={handleOpenCreate}>
+            <Plus size={17} />
             <span>Nuevo Anuncio</span>
           </Button>
         </div>
