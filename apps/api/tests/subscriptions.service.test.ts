@@ -2,6 +2,18 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { subscriptionsRepository } from '../src/modules/subscriptions/subscriptions.repository.js'
 import { subscriptionsService } from '../src/modules/subscriptions/subscriptions.service.js'
 
+type PlanRecord = NonNullable<
+  Awaited<ReturnType<typeof subscriptionsRepository.findPlanById>>
+>
+type SubscriptionRecord = NonNullable<
+  Awaited<
+    ReturnType<typeof subscriptionsRepository.findSubscriptionByOrganizationId>
+  >
+>
+
+const asPlanRecord = (value: unknown) => value as PlanRecord
+const asSubscriptionRecord = (value: unknown) => value as SubscriptionRecord
+
 describe('subscriptionsService', () => {
   afterEach(() => {
     vi.restoreAllMocks()
@@ -50,7 +62,7 @@ describe('subscriptionsService', () => {
     vi.spyOn(
       subscriptionsRepository,
       'findSubscriptionByOrganizationId',
-    ).mockResolvedValue(mockSubscription as any)
+    ).mockResolvedValue(asSubscriptionRecord(mockSubscription))
 
     vi.spyOn(
       subscriptionsRepository,
@@ -87,7 +99,7 @@ describe('subscriptionsService', () => {
     vi.spyOn(
       subscriptionsRepository,
       'findSubscriptionByOrganizationId',
-    ).mockResolvedValue(mockSubscription as any)
+    ).mockResolvedValue(asSubscriptionRecord(mockSubscription))
 
     vi.spyOn(
       subscriptionsRepository,
@@ -107,7 +119,7 @@ describe('subscriptionsService', () => {
     vi.spyOn(
       subscriptionsRepository,
       'findSubscriptionByOrganizationId',
-    ).mockResolvedValue(mockSubscription as any)
+    ).mockResolvedValue(asSubscriptionRecord(mockSubscription))
 
     vi.spyOn(
       subscriptionsRepository,
@@ -130,7 +142,7 @@ describe('subscriptionsService', () => {
     ).mockResolvedValue({
       ...mockSubscription,
       status: 'SUSPENDED',
-    } as any)
+    } as unknown as SubscriptionRecord)
 
     await expect(
       subscriptionsService.checkMemberQuota('org-1'),
@@ -145,7 +157,7 @@ describe('subscriptionsService', () => {
     vi.spyOn(
       subscriptionsRepository,
       'findSubscriptionByOrganizationId',
-    ).mockResolvedValue(mockSubscription as any)
+    ).mockResolvedValue(asSubscriptionRecord(mockSubscription))
 
     vi.spyOn(
       subscriptionsRepository,
@@ -163,12 +175,12 @@ describe('subscriptionsService', () => {
 
   it('actualiza el plan y la vigencia desde la consola de plataforma', async () => {
     vi.spyOn(subscriptionsRepository, 'findPlanById').mockResolvedValue(
-      mockPlan as any,
+      asPlanRecord(mockPlan),
     )
     vi.spyOn(
       subscriptionsRepository,
       'findSubscriptionByOrganizationId',
-    ).mockResolvedValue(mockSubscription as any)
+    ).mockResolvedValue(asSubscriptionRecord(mockSubscription))
 
     const updatedSub = {
       ...mockSubscription,
@@ -184,7 +196,7 @@ describe('subscriptionsService', () => {
     }
 
     vi.spyOn(subscriptionsRepository, 'updateSubscription').mockResolvedValue(
-      updatedSub as any,
+      asSubscriptionRecord(updatedSub),
     )
 
     const result = await subscriptionsService.updatePlatformSubscription(
@@ -201,7 +213,7 @@ describe('subscriptionsService', () => {
 
   it('asigna una membresía anual a una organización', async () => {
     vi.spyOn(subscriptionsRepository, 'findPlanById').mockResolvedValue(
-      mockPlan as any,
+      asPlanRecord(mockPlan),
     )
 
     const assignedSub = {
@@ -210,7 +222,7 @@ describe('subscriptionsService', () => {
       notes: 'Membresía anual asignada',
     }
     vi.spyOn(subscriptionsRepository, 'upsertSubscription').mockResolvedValue(
-      assignedSub as any,
+      asSubscriptionRecord(assignedSub),
     )
 
     const result = await subscriptionsService.assignOrganizationSubscription({
@@ -230,7 +242,7 @@ describe('subscriptionsService', () => {
       ...mockPlan,
       code: 'VIP',
       name: 'Plan VIP',
-    } as any)
+    } as unknown as PlanRecord)
 
     const result = await subscriptionsService.createPlan({
       code: 'VIP',
@@ -248,13 +260,13 @@ describe('subscriptionsService', () => {
 
   it('actualiza los límites y precios de un plan existente', async () => {
     vi.spyOn(subscriptionsRepository, 'findPlanById').mockResolvedValue(
-      mockPlan as any,
+      asPlanRecord(mockPlan),
     )
     vi.spyOn(subscriptionsRepository, 'updatePlan').mockResolvedValue({
       ...mockPlan,
       name: 'Plan Inicial Mejorado',
       maxMembers: 4,
-    } as any)
+    } as unknown as PlanRecord)
 
     const result = await subscriptionsService.updatePlan('plan-1', {
       name: 'Plan Inicial Mejorado',
@@ -267,7 +279,7 @@ describe('subscriptionsService', () => {
 
   it('rechaza la desactivación de un plan cuando tiene suscripciones activas asociadas', async () => {
     vi.spyOn(subscriptionsRepository, 'findPlanById').mockResolvedValue(
-      mockPlan as any,
+      asPlanRecord(mockPlan),
     )
     vi.spyOn(
       subscriptionsRepository,
@@ -283,7 +295,7 @@ describe('subscriptionsService', () => {
 
   it('permite la desactivación de un plan cuando no tiene suscripciones activas', async () => {
     vi.spyOn(subscriptionsRepository, 'findPlanById').mockResolvedValue(
-      mockPlan as any,
+      asPlanRecord(mockPlan),
     )
     vi.spyOn(
       subscriptionsRepository,
@@ -292,7 +304,7 @@ describe('subscriptionsService', () => {
     vi.spyOn(subscriptionsRepository, 'updatePlan').mockResolvedValue({
       ...mockPlan,
       active: false,
-    } as any)
+    } as unknown as PlanRecord)
 
     const result = await subscriptionsService.updatePlan('plan-1', {
       active: false,

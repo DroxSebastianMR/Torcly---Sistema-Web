@@ -70,6 +70,8 @@ export function DirectWorkOrderModal({
   } = form
 
   const customerId = useWatch({ control, name: 'customerId' })
+  const vehicleId = useWatch({ control, name: 'vehicleId' })
+  const fuelLevel = useWatch({ control, name: 'fuelLevel' })
 
   const vehiclesQuery = useQuery({
     queryKey: vehicleKeys.list({
@@ -214,13 +216,9 @@ export function DirectWorkOrderModal({
                 : 'Primero selecciona un cliente'
             }
             options={vehicleOptions}
-            value={form.watch('vehicleId')}
+            value={vehicleId}
             onChange={(val) => {
               setValue('vehicleId', val, { shouldValidate: true })
-              const veh = vehiclesQuery.data?.data?.find((v) => v.id === val)
-              if (veh && (veh as any).mileage) {
-                setValue('currentMileage', (veh as any).mileage)
-              }
             }}
             disabled={!customerId || vehiclesQuery.isLoading}
             aria-invalid={Boolean(errors.vehicleId)}
@@ -285,7 +283,7 @@ export function DirectWorkOrderModal({
                 value: opt.value,
                 label: opt.label,
               }))}
-              value={form.watch('fuelLevel') ?? ''}
+              value={fuelLevel ?? ''}
               onChange={(val) =>
                 setValue(
                   'fuelLevel',

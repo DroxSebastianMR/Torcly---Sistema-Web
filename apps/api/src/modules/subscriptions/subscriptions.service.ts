@@ -341,13 +341,19 @@ export const subscriptionsService = {
     }
 
     const startsAt = input.startsAt ? new Date(input.startsAt) : new Date()
-    let renewsAt: Date | null = null
-    if (input.renewsAt !== undefined) {
-      renewsAt = input.renewsAt ? new Date(input.renewsAt) : null
-    } else {
-      const days = input.billingCycle === 'ANNUAL' ? 365 : 30
-      renewsAt = new Date(startsAt.getTime() + days * 24 * 60 * 60 * 1000)
-    }
+    const renewsAt =
+      input.renewsAt !== undefined
+        ? input.renewsAt
+          ? new Date(input.renewsAt)
+          : null
+        : new Date(
+            startsAt.getTime() +
+              (input.billingCycle === 'ANNUAL' ? 365 : 30) *
+                24 *
+                60 *
+                60 *
+                1000,
+          )
 
     const subscription = await subscriptionsRepository.upsertSubscription({
       organizationId: input.organizationId,
