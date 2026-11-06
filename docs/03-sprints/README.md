@@ -32,6 +32,7 @@ Los sprints son secuenciales y cada uno tiene una rama, alcance cerrado, criteri
 | 26     | `sprint-26-notificaciones-taller`    | `feature/workshop-notifications`           | Aprobado (en develop)         |
 | 27     | `sprint-27-anuncios-novedades-saas`  | `feature/announcements-news`               | Aprobado (v2.1.2 en develop)  |
 | 28     | `sprint-28-suscripciones-membresias` | `feature/subscriptions-memberships`        | Aprobado (v2.1.2 en develop)  |
+| 29     | `sprint-29-proveedores-compras`      | `feature/sprint-29-suppliers-purchases`    | En desarrollo                 |
 
 El porcentaje solo cambia después de completar [Definition of Done](../04-calidad/definition-of-done.md) y registrar la aprobación.
 
