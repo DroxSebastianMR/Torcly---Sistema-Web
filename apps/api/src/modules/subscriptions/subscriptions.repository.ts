@@ -4,7 +4,9 @@ import {
 } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import type {
+  CreatePlanDto,
   PlatformSubscriptionFilters,
+  UpdatePlanDto,
   UpdatePlatformSubscriptionDto,
 } from './subscriptions.types.js'
 
@@ -47,6 +49,13 @@ export const subscriptionsRepository = {
     })
   },
 
+  listAllPlans() {
+    return databaseService.client.plan.findMany({
+      select: planSelect,
+      orderBy: [{ active: 'desc' }, { priceMonthly: 'asc' }],
+    })
+  },
+
   findPlanById(id: string) {
     return databaseService.client.plan.findUnique({
       where: { id },
@@ -57,6 +66,58 @@ export const subscriptionsRepository = {
   findPlanByCode(code: string) {
     return databaseService.client.plan.findUnique({
       where: { code },
+      select: planSelect,
+    })
+  },
+
+  createPlan(data: CreatePlanDto) {
+    return databaseService.client.plan.create({
+      data: {
+        code: data.code,
+        name: data.name,
+        description: data.description ?? null,
+        priceMonthly: data.priceMonthly,
+        priceYearly: data.priceYearly,
+        currency: data.currency ?? 'PEN',
+        maxMembers: data.maxMembers,
+        maxTechnicians: data.maxTechnicians,
+        maxProducts: data.maxProducts,
+        features: data.features ?? [],
+        active: data.active ?? true,
+        isPublic: data.isPublic ?? true,
+      },
+      select: planSelect,
+    })
+  },
+
+  updatePlan(planId: string, data: UpdatePlanDto) {
+    return databaseService.client.plan.update({
+      where: { id: planId },
+      data: {
+        ...(data.name !== undefined ? { name: data.name } : {}),
+        ...(data.description !== undefined
+          ? { description: data.description }
+          : {}),
+        ...(data.priceMonthly !== undefined
+          ? { priceMonthly: data.priceMonthly }
+          : {}),
+        ...(data.priceYearly !== undefined
+          ? { priceYearly: data.priceYearly }
+          : {}),
+        ...(data.currency !== undefined ? { currency: data.currency } : {}),
+        ...(data.maxMembers !== undefined
+          ? { maxMembers: data.maxMembers }
+          : {}),
+        ...(data.maxTechnicians !== undefined
+          ? { maxTechnicians: data.maxTechnicians }
+          : {}),
+        ...(data.maxProducts !== undefined
+          ? { maxProducts: data.maxProducts }
+          : {}),
+        ...(data.features !== undefined ? { features: data.features } : {}),
+        ...(data.active !== undefined ? { active: data.active } : {}),
+        ...(data.isPublic !== undefined ? { isPublic: data.isPublic } : {}),
+      },
       select: planSelect,
     })
   },
@@ -152,6 +213,31 @@ export const subscriptionsRepository = {
   }) {
     return databaseService.client.organizationSubscription.create({
       data,
+      include: subscriptionInclude,
+    })
+  },
+
+  upsertSubscription(data: {
+    organizationId: string
+    planId: string
+    status?: SubscriptionStatus
+    billingCycle?: 'MONTHLY' | 'ANNUAL'
+    startsAt?: Date
+    renewsAt?: Date | null
+    notes?: string | null
+  }) {
+    return databaseService.client.organizationSubscription.upsert({
+      where: { organizationId: data.organizationId },
+      update: {
+        planId: data.planId,
+        ...(data.status ? { status: data.status } : {}),
+        ...(data.billingCycle ? { billingCycle: data.billingCycle } : {}),
+        ...(data.startsAt ? { startsAt: data.startsAt } : {}),
+        renewsAt: data.renewsAt,
+        notes: data.notes,
+        updatedAt: new Date(),
+      },
+      create: data,
       include: subscriptionInclude,
     })
   },

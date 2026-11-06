@@ -69,6 +69,7 @@ model OrganizationSubscription {
 ## 2. Endpoints y Arquitectura Backend (API)
 
 ### A. Rutas de Taller (`/api/v1/subscriptions`)
+
 - `GET /api/v1/subscriptions/current`:
   - Requiere sesión activa en una organización.
   - Retorna información de la suscripción activa del taller, el plan asociado y los consumos actuales en tiempo real:
@@ -88,7 +89,11 @@ model OrganizationSubscription {
         "maxMembers": 10,
         "maxTechnicians": 15,
         "maxProducts": 2500,
-        "features": ["Asistente IA", "Múltiples sesiones de caja", "Analítica avanzada"]
+        "features": [
+          "Asistente IA",
+          "Múltiples sesiones de caja",
+          "Analítica avanzada"
+        ]
       },
       "usage": {
         "members": { "current": 3, "max": 10, "percent": 30 },
@@ -98,14 +103,19 @@ model OrganizationSubscription {
     }
     ```
 
-### B. Rutas de Plataforma (`/api/v1/platform/subscriptions`)
+### B. Rutas de Plataforma (`/api/v1/platform/subscriptions` y `/api/v1/platform/plans`)
+
 - Requieren `isPlatformAdmin`.
-- `GET /api/v1/platform/plans`: Listado de planes comerciales disponibles.
+- `GET /api/v1/platform/plans`: Listado de todos los planes comerciales disponibles.
+- `POST /api/v1/platform/plans`: Creación de un nuevo plan comercial (código, nombre, cuotas, precios mensual y anual, beneficios).
+- `PATCH /api/v1/platform/plans/:planId`: Modificación de un plan comercial existente (precios, cuotas de miembros/técnicos/productos, estado activo/público).
 - `GET /api/v1/platform/subscriptions`: Listado paginado de suscripciones de todas las organizaciones, con búsqueda y filtro por estado y plan.
 - `GET /api/v1/platform/subscriptions/metrics`: Métricas agregadas de plataforma (activas, trial, suspendidas, vencidas).
+- `POST /api/v1/platform/subscriptions`: Asignación directa o migración de membresía (anual o mensual) a cualquier organización existente en la plataforma (`upsertSubscription`).
 - `PATCH /api/v1/platform/subscriptions/:organizationId`: Actualización administrativa de la suscripción (cambiar de plan, modificar vigencia `renewsAt`, cambiar estado `status`, notas).
 
 ### C. Validación de Límites (Quota Enforcement)
+
 - En el servicio de creación de miembros:
   - Se consulta la suscripción de la organización.
   - Si `currentMembers >= plan.maxMembers`, se lanza un error descriptivo:
@@ -119,17 +129,23 @@ model OrganizationSubscription {
 ## 3. Frontend Web
 
 ### A. Navegación
+
 - **Plataforma Torcly** (`apps/web/src/features/navigation/config/platform-navigation.ts`):
   - Nuevo ítem: `Suscripciones` (`/plataforma/suscripciones`), icono `CreditCard` o `Crown`.
 - **Navegación de Taller** (`apps/web/src/features/navigation/config/app-navigation.ts`):
   - Nuevo ítem en grupo de Configuración/Administración: `Suscripción` (`/suscripcion`), visible para dueños o administradores del taller.
 
 ### B. Módulo de Suscripciones en Plataforma (`src/features/platform/pages/platform-subscriptions-page.tsx`)
+
+- Pestaña dual: **Membresías de Talleres** y **Planes Comerciales**.
 - Métricas principales en tarjetas tipo resumen.
-- Tabla con filtros por estado y búsqueda por taller.
-- Modal de edición rápida para cambio de plan y ajuste de fechas.
+- Tabla con filtros por estado, plan y búsqueda por taller.
+- Modal de asignación de membresía (`SubscriptionAssignModal`) con cálculo automático de corte para ciclos anuales o mensuales.
+- Modal de creación y edición de planes (`PlanFormModal`) con validación de cuotas operativas y tarifas.
+- Modal de edición rápida para cambio de plan y ajuste de fechas (`SubscriptionEditModal`).
 
 ### C. Módulo de Suscripción en Taller (`src/features/subscriptions/pages/subscription-page.tsx`)
+
 - Indicadores visuales de estado y próximo cobro/renovación.
 - Barras de progreso de uso por cada recurso del taller.
 - Desglose de beneficios incluidos en el plan activo.

@@ -5,10 +5,13 @@ import type {
 import { AppError } from '../../shared/errors/app-error.js'
 import { subscriptionsRepository } from './subscriptions.repository.js'
 import type {
+  AssignSubscriptionDto,
+  CreatePlanDto,
   OrganizationSubscriptionDto,
   PlanDto,
   PlatformSubscriptionFilters,
   PlatformSubscriptionMetricsDto,
+  UpdatePlanDto,
   UpdatePlatformSubscriptionDto,
   WorkshopSubscriptionDetailsDto,
 } from './subscriptions.types.js'
@@ -279,8 +282,67 @@ export const subscriptionsService = {
   },
 
   async listPlatformPlans(): Promise<{ data: PlanDto[] }> {
-    const plans = await subscriptionsRepository.listActivePlans()
+    const plans = await subscriptionsRepository.listAllPlans()
     return { data: plans.map(toPlanDto) }
+  },
+
+  async createPlan(input: CreatePlanDto): Promise<{ data: PlanDto }> {
+    const existing = await subscriptionsRepository.findPlanByCode(input.code)
+    if (existing) {
+      throw new AppError(
+        409,
+        'PLAN_DUPLICATE',
+        `Ya existe un plan con el código ${input.code}.`,
+      )
+    }
+
+    const plan = await subscriptionsRepository.createPlan(input)
+    return { data: toPlanDto(plan) }
+  },
+
+  async updatePlan(
+    planId: string,
+    input: UpdatePlanDto,
+  ): Promise<{ data: PlanDto }> {
+    const existing = await subscriptionsRepository.findPlanById(planId)
+    if (!existing) {
+      throw new AppError(404, 'PLAN_NOT_FOUND', 'Plan no encontrado.')
+    }
+
+    const plan = await subscriptionsRepository.updatePlan(planId, input)
+    return { data: toPlanDto(plan) }
+  },
+
+  async assignOrganizationSubscription(input: AssignSubscriptionDto) {
+    const plan = await subscriptionsRepository.findPlanById(input.planId)
+    if (!plan || !plan.active) {
+      throw new AppError(
+        400,
+        'PLAN_NOT_FOUND',
+        'El plan seleccionado no existe o no está activo.',
+      )
+    }
+
+    const startsAt = input.startsAt ? new Date(input.startsAt) : new Date()
+    let renewsAt: Date | null = null
+    if (input.renewsAt !== undefined) {
+      renewsAt = input.renewsAt ? new Date(input.renewsAt) : null
+    } else {
+      const days = input.billingCycle === 'ANNUAL' ? 365 : 30
+      renewsAt = new Date(startsAt.getTime() + days * 24 * 60 * 60 * 1000)
+    }
+
+    const subscription = await subscriptionsRepository.upsertSubscription({
+      organizationId: input.organizationId,
+      planId: input.planId,
+      status: input.status ?? 'ACTIVE',
+      billingCycle: input.billingCycle ?? 'ANNUAL',
+      startsAt,
+      renewsAt,
+      notes: input.notes ?? null,
+    })
+
+    return { data: toSubscriptionDto(subscription) }
   },
 
   async updatePlatformSubscription(

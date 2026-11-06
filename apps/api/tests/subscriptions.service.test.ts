@@ -198,4 +198,70 @@ describe('subscriptionsService', () => {
     expect(result.data.plan.name).toBe('Plan Profesional')
     expect(result.data.renewsAt).toBe('2027-01-01T00:00:00.000Z')
   })
+
+  it('asigna una membresía anual a una organización', async () => {
+    vi.spyOn(subscriptionsRepository, 'findPlanById').mockResolvedValue(
+      mockPlan as any,
+    )
+
+    const assignedSub = {
+      ...mockSubscription,
+      billingCycle: 'ANNUAL' as const,
+      notes: 'Membresía anual asignada',
+    }
+    vi.spyOn(subscriptionsRepository, 'upsertSubscription').mockResolvedValue(
+      assignedSub as any,
+    )
+
+    const result = await subscriptionsService.assignOrganizationSubscription({
+      organizationId: 'org-1',
+      planId: 'plan-1',
+      billingCycle: 'ANNUAL',
+      notes: 'Membresía anual asignada',
+    })
+
+    expect(result.data.billingCycle).toBe('ANNUAL')
+    expect(result.data.notes).toBe('Membresía anual asignada')
+  })
+
+  it('crea un nuevo plan comercial con éxito', async () => {
+    vi.spyOn(subscriptionsRepository, 'findPlanByCode').mockResolvedValue(null)
+    vi.spyOn(subscriptionsRepository, 'createPlan').mockResolvedValue({
+      ...mockPlan,
+      code: 'VIP',
+      name: 'Plan VIP',
+    } as any)
+
+    const result = await subscriptionsService.createPlan({
+      code: 'VIP',
+      name: 'Plan VIP',
+      priceMonthly: 199,
+      priceYearly: 1990,
+      maxMembers: 20,
+      maxTechnicians: 30,
+      maxProducts: 5000,
+    })
+
+    expect(result.data.code).toBe('VIP')
+    expect(result.data.name).toBe('Plan VIP')
+  })
+
+  it('actualiza los límites y precios de un plan existente', async () => {
+    vi.spyOn(subscriptionsRepository, 'findPlanById').mockResolvedValue(
+      mockPlan as any,
+    )
+    vi.spyOn(subscriptionsRepository, 'updatePlan').mockResolvedValue({
+      ...mockPlan,
+      name: 'Plan Inicial Mejorado',
+      maxMembers: 4,
+    } as any)
+
+    const result = await subscriptionsService.updatePlan('plan-1', {
+      name: 'Plan Inicial Mejorado',
+      maxMembers: 4,
+    })
+
+    expect(result.data.name).toBe('Plan Inicial Mejorado')
+    expect(result.data.maxMembers).toBe(4)
+  })
 })

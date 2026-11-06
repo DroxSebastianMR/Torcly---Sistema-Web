@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Crown, Sparkles } from 'lucide-react'
+import { Crown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
@@ -218,8 +218,7 @@ function SubscriptionEditForm({
 
         {selectedPlan.features.length > 0 && (
           <div className="rounded-lg border border-border bg-muted/20 p-3">
-            <span className="flex items-center gap-1.5 font-medium text-foreground">
-              <Sparkles className="size-3.5 text-brand-forest" />
+            <span className="flex items-center gap-1.5 font-bold text-foreground">
               Beneficios incluidos en este plan:
             </span>
             <ul className="mt-2 grid grid-cols-1 gap-1 text-[11px] text-muted-foreground sm:grid-cols-2">

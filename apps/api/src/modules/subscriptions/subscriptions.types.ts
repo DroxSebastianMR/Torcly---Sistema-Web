@@ -85,3 +85,42 @@ export interface UpdatePlatformSubscriptionDto {
   renewsAt?: string | null
   notes?: string | null
 }
+
+export interface CreatePlanDto {
+  code: string
+  name: string
+  description?: string | null
+  priceMonthly: number
+  priceYearly: number
+  currency?: string
+  maxMembers: number
+  maxTechnicians: number
+  maxProducts: number
+  features?: string[]
+  active?: boolean
+  isPublic?: boolean
+}
+
+export interface UpdatePlanDto {
+  name?: string
+  description?: string | null
+  priceMonthly?: number
+  priceYearly?: number
+  currency?: string
+  maxMembers?: number
+  maxTechnicians?: number
+  maxProducts?: number
+  features?: string[]
+  active?: boolean
+  isPublic?: boolean
+}
+
+export interface AssignSubscriptionDto {
+  organizationId: string
+  planId: string
+  status?: SubscriptionStatus
+  billingCycle?: BillingCycle
+  startsAt?: string
+  renewsAt?: string | null
+  notes?: string | null
+}

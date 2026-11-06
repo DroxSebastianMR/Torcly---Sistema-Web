@@ -3,6 +3,7 @@
 ## 1. Contexto y Objetivos
 
 Torcly opera como una plataforma SaaS multitenant para la gestión integral de talleres automotrices. De acuerdo con la arquitectura base descrita en `docs/02-arquitectura/administracion-plataforma.md`:
+
 - La **suscripción pertenece a la Organización (el taller)**, no a usuarios individuales.
 - El modelo comercial contempla planes diferenciados según el tamaño operativo del taller, con cuotas máximas de usuarios (miembros), catálogo de técnicos y volumen de inventario.
 - Los límites deben ser **validados en el servidor** para proteger los recursos y garantizar el cumplimiento del contrato SaaS, no únicamente en la interfaz visual.
@@ -16,6 +17,7 @@ El objetivo del **Sprint 28** es implementar el modelo completo de **Suscripcion
 ## 2. Alcance Funcional
 
 ### A. Catálogo de Planes SaaS (`Plan`)
+
 - Modelo relacional para definir planes comerciales:
   - **STARTER (Plan Inicial)**: Orientado a talleres emergentes o mecánicos independientes.
     - Cuotas: hasta 3 miembros, hasta 5 técnicos, hasta 250 productos.
@@ -28,6 +30,7 @@ El objetivo del **Sprint 28** es implementar el modelo completo de **Suscripcion
     - Soporte prioritario y acceso a todas las capacidades de la plataforma.
 
 ### B. Suscripción por Organización (`OrganizationSubscription`)
+
 - Cada taller tiene una suscripción asociada que registra:
   - `planId`: Plan asignado.
   - `status`: Estado de la suscripción (`ACTIVE`, `TRIAL`, `PAST_DUE`, `CANCELED`, `SUSPENDED`).
@@ -38,17 +41,26 @@ El objetivo del **Sprint 28** es implementar el modelo completo de **Suscripcion
   - `notes`: Observaciones administrativas del equipo de plataforma.
 
 ### C. Control de Cuotas en Servidor (Enforcement)
+
 - Al crear o invitar nuevos miembros a la organización (`POST /api/v1/platform/organizations/:id/members`), el servidor verifica el conteo de miembros activos versus `maxMembers` del plan. Si se excede, rechaza la operación con código `409 Conflict` y mensaje claro.
 - Al registrar nuevos técnicos en el taller (`POST /api/v1/technicians`), el servidor verifica el conteo de técnicos versus `maxTechnicians` del plan.
 - Si la suscripción de la organización está en estado `SUSPENDED` o `CANCELED`, se restringe el alta de nuevos recursos.
 
-### D. Consola de Plataforma (`/plataforma/suscripciones`)
+### D. Consola de Plataforma (`/suscripciones-saas`)
+
 - Vista exclusiva para Superadministradores de Plataforma (`isPlatformAdmin`).
-- Tabla de suscripciones con filtros por estado (`Todos`, `Activa`, `Prueba`, `Vencida`, `Suspendida`, `Cancelada`) y búsqueda por nombre o código de taller.
-- Métricas rápidas: Total de talleres suscritos, suscripciones activas, talleres en período de prueba y suscripciones por vencer.
-- Diálogo modal de cambio de plan y vigencia: permite al administrador de plataforma asignar un nuevo plan a una organización, modificar la fecha de renovación o suspender la suscripción con justificación en auditoría.
+- **Pestaña Membresías de Talleres**:
+  - Tabla de suscripciones con filtros por estado (`Todos`, `Activa`, `Prueba`, `Vencida`, `Suspendida`, `Cancelada`), búsqueda y filtro por plan.
+  - Métricas rápidas: Total de talleres suscritos, suscripciones activas, talleres en período de prueba y suscripciones por vencer o suspendidas.
+  - Botón **`[+ Asignar Membresía]`**: permite vincular o migrar directamente una membresía anual o mensual a cualquier organización existente en producción, calculando automáticamente la vigencia (ej. +365 días para ciclos anuales).
+  - Diálogo modal de gestión de suscripción (`SubscriptionEditModal`): permite al administrador de plataforma modificar plan, estado, fecha de corte y notas administrativas.
+- **Pestaña Planes Comerciales**:
+  - Catálogo interactivo de planes con límites de miembros, técnicos y productos, tarifas mensual/anual y checklist de beneficios.
+  - Botón **`[+ Nuevo Plan]`**: modal para dar de alta nuevos planes comerciales (`PlanFormModal`).
+  - Botón **`[Editar Plan]`**: modal para ajustar precios, cuotas máximas, descripción y funcionalidades incluidas.
 
 ### E. Vista de Suscripción en el Taller (`/suscripcion`)
+
 - Acceso para usuarios con rol `Dueño del taller` o `Administrador`.
 - Tarjeta informativa del plan contratado con distintivo de estado (`Activo`, `Prueba`, `Suspendido`).
 - Barras de progreso de uso en tiempo real:

@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
+  assignSubscriptionSchema,
   billingCycleEnum,
+  createPlanSchema,
   platformSubscriptionQuerySchema,
   subscriptionStatusEnum,
+  updatePlanSchema,
   updatePlatformSubscriptionSchema,
 } from '../src/modules/subscriptions/subscriptions.schemas.js'
 
@@ -88,5 +91,75 @@ describe('updatePlatformSubscriptionSchema', () => {
         planId: 'plan-no-uuid',
       }),
     ).toThrow()
+  })
+})
+
+describe('assignSubscriptionSchema', () => {
+  it('valida asignación de membresía anual', () => {
+    const parsed = assignSubscriptionSchema.parse({
+      organizationId: '123e4567-e89b-12d3-a456-426614174000',
+      planId: '123e4567-e89b-12d3-a456-426614174001',
+      billingCycle: 'ANNUAL',
+      status: 'ACTIVE',
+      notes: 'Membresía anual activada para taller en producción.',
+    })
+    expect(parsed.billingCycle).toBe('ANNUAL')
+    expect(parsed.status).toBe('ACTIVE')
+    expect(parsed.notes).toBe(
+      'Membresía anual activada para taller en producción.',
+    )
+  })
+
+  it('rechaza organización inválida', () => {
+    expect(() =>
+      assignSubscriptionSchema.parse({
+        organizationId: 'no-uuid',
+        planId: '123e4567-e89b-12d3-a456-426614174001',
+      }),
+    ).toThrow()
+  })
+})
+
+describe('createPlanSchema y updatePlanSchema', () => {
+  it('valida creación de plan comercial con cuotas', () => {
+    const parsed = createPlanSchema.parse({
+      code: 'VIP_TURBO',
+      name: 'Plan VIP Turbo',
+      description: 'Para talleres de alto rendimiento.',
+      priceMonthly: 199.9,
+      priceYearly: 1999.0,
+      maxMembers: 15,
+      maxTechnicians: 25,
+      maxProducts: 5000,
+      features: ['Atención 24/7', 'IA avanzada'],
+    })
+    expect(parsed.code).toBe('VIP_TURBO')
+    expect(parsed.priceMonthly).toBe(199.9)
+    expect(parsed.maxMembers).toBe(15)
+  })
+
+  it('rechaza código con caracteres no permitidos', () => {
+    expect(() =>
+      createPlanSchema.parse({
+        code: 'plan con espacios!',
+        name: 'Plan Invalido',
+        priceMonthly: 50,
+        priceYearly: 500,
+        maxMembers: 5,
+        maxTechnicians: 5,
+        maxProducts: 500,
+      }),
+    ).toThrow()
+  })
+
+  it('permite actualizar campos parciales de un plan sin código', () => {
+    const parsed = updatePlanSchema.parse({
+      name: 'Plan Profesional Plus',
+      priceMonthly: 179.0,
+      maxMembers: 12,
+    })
+    expect(parsed.name).toBe('Plan Profesional Plus')
+    expect(parsed.priceMonthly).toBe(179.0)
+    expect(parsed.maxMembers).toBe(12)
   })
 })

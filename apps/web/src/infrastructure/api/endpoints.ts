@@ -21,6 +21,7 @@ export const endpoints = {
     organizationMemberResetPassword: (organizationId: string, userId: string) =>
       `/platform/organizations/${organizationId}/members/${userId}/reset-password`,
     plans: '/platform/plans',
+    plan: (planId: string) => `/platform/plans/${planId}`,
     subscriptions: '/platform/subscriptions',
     subscriptionMetrics: '/platform/subscriptions/metrics',
     subscription: (organizationId: string) =>

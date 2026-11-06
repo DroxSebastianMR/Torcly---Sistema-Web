@@ -1,7 +1,10 @@
 import type { NextFunction, Request, Response } from 'express'
 import { AppError } from '../../shared/errors/app-error.js'
 import {
+  assignSubscriptionSchema,
+  createPlanSchema,
   platformSubscriptionQuerySchema,
+  updatePlanSchema,
   updatePlatformSubscriptionSchema,
 } from './subscriptions.schemas.js'
 import { subscriptionsService } from './subscriptions.service.js'
@@ -89,6 +92,57 @@ export async function updatePlatformSubscription(
       organizationId,
       payload,
     )
+    response.json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function assignOrganizationSubscription(
+  request: Request,
+  response: Response,
+  next: NextFunction,
+) {
+  try {
+    const payload = assignSubscriptionSchema.parse(request.body)
+    const result =
+      await subscriptionsService.assignOrganizationSubscription(payload)
+    response.status(201).json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function createPlatformPlan(
+  request: Request,
+  response: Response,
+  next: NextFunction,
+) {
+  try {
+    const payload = createPlanSchema.parse(request.body)
+    const result = await subscriptionsService.createPlan(payload)
+    response.status(201).json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function updatePlatformPlan(
+  request: Request,
+  response: Response,
+  next: NextFunction,
+) {
+  try {
+    const planId = request.params.planId as string
+    if (!planId) {
+      throw new AppError(
+        400,
+        'PLAN_ID_REQUIRED',
+        'Identificador de plan requerido.',
+      )
+    }
+    const payload = updatePlanSchema.parse(request.body)
+    const result = await subscriptionsService.updatePlan(planId, payload)
     response.json(result)
   } catch (error) {
     next(error)

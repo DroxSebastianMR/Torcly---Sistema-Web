@@ -1,7 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { subscriptionsService } from '../services/subscriptions.service'
 import type {
+  AssignSubscriptionInput,
+  CreatePlanInput,
   PlatformSubscriptionFilters,
+  UpdatePlanInput,
   UpdatePlatformSubscriptionInput,
 } from '../types/subscriptions.types'
 
@@ -62,6 +65,59 @@ export function useUpdatePlatformSubscription() {
     }) =>
       subscriptionsService.updatePlatformSubscription(organizationId, input),
     onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: subscriptionKeys.platform,
+      })
+      void queryClient.invalidateQueries({
+        queryKey: subscriptionKeys.workshop,
+      })
+    },
+  })
+}
+
+export function useAssignSubscription() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: AssignSubscriptionInput) =>
+      subscriptionsService.assignSubscription(input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: subscriptionKeys.platform,
+      })
+      void queryClient.invalidateQueries({
+        queryKey: subscriptionKeys.workshop,
+      })
+    },
+  })
+}
+
+export function useCreatePlan() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: CreatePlanInput) =>
+      subscriptionsService.createPlan(input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: subscriptionKeys.platformPlans,
+      })
+    },
+  })
+}
+
+export function useUpdatePlan() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      planId,
+      input,
+    }: {
+      planId: string
+      input: UpdatePlanInput
+    }) => subscriptionsService.updatePlan(planId, input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: subscriptionKeys.platformPlans,
+      })
       void queryClient.invalidateQueries({
         queryKey: subscriptionKeys.platform,
       })
