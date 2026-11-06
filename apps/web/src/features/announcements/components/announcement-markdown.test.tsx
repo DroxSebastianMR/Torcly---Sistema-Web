@@ -49,6 +49,31 @@ describe('AnnouncementMarkdown', () => {
     expect(screen.queryByText(/-\s+\*\*/)).toBeNull()
   })
 
+  it('renderiza encabezados de nivel 1 (#) con tamaño grande', () => {
+    render(<AnnouncementMarkdown content="# Guía Operativa Principal" />)
+    const heading = screen.getByRole('heading', { level: 1 })
+    expect(heading).toBeTruthy()
+    expect(heading.textContent).toBe('Guía Operativa Principal')
+    expect(heading.className).toContain('text-xl')
+  })
+
+  it('renderiza encabezados de nivel 2 (##) con tamaño mediano', () => {
+    render(<AnnouncementMarkdown content="## Subsección Importante" />)
+    const heading = screen.getByRole('heading', { level: 2 })
+    expect(heading).toBeTruthy()
+    expect(heading.textContent).toBe('Subsección Importante')
+    expect(heading.className).toContain('text-lg')
+  })
+
+  it('permite texto con tamaño grande personalizado usando [grande]texto[/grande]', () => {
+    render(
+      <AnnouncementMarkdown content="Texto normal y [grande]Texto Destacado Grande[/grande]." />,
+    )
+    const largeSpan = screen.getByText('Texto Destacado Grande')
+    expect(largeSpan).toBeTruthy()
+    expect(largeSpan.className).toContain('font-bold')
+  })
+
   it('renderiza listas numeradas explícitas 1. y 2.', () => {
     const markdown = `
 1. **Primera mejora:** Base de datos

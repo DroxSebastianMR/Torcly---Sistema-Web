@@ -66,7 +66,7 @@ export const emptyAnnouncement: AnnouncementFormValues = {
   content: '',
   type: 'UPDATE',
   status: 'PUBLISHED',
-  versionTag: 'v1.1.2',
+  versionTag: '',
   videoUrl: '',
   startsAt: '',
   endsAt: '',
@@ -99,7 +99,10 @@ export function mapFormValuesToCreatePayload(
     content: values.content.trim(),
     type: values.type,
     status: values.status,
-    versionTag: values.versionTag?.trim() || null,
+    versionTag:
+      values.type === 'UPDATE' && values.versionTag?.trim()
+        ? values.versionTag.trim()
+        : null,
     videoUrl: values.videoUrl?.trim() || null,
     startsAt: values.startsAt ? new Date(values.startsAt).toISOString() : null,
     endsAt: values.endsAt ? new Date(values.endsAt).toISOString() : null,
@@ -116,7 +119,10 @@ export function mapFormValuesToUpdatePayload(
     content: values.content.trim(),
     type: values.type,
     status: values.status,
-    versionTag: values.versionTag?.trim() || null,
+    versionTag:
+      values.type === 'UPDATE' && values.versionTag?.trim()
+        ? values.versionTag.trim()
+        : null,
     videoUrl: values.videoUrl?.trim() || null,
     startsAt: values.startsAt ? new Date(values.startsAt).toISOString() : null,
     endsAt: values.endsAt ? new Date(values.endsAt).toISOString() : null,
