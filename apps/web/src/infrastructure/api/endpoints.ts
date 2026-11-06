@@ -148,6 +148,15 @@ export const endpoints = {
     markRead: (id: string) => `/notifications/${id}/read`,
     markAllRead: '/notifications/mark-all-read',
   },
+  announcements: {
+    root: '/announcements',
+    unreadCount: '/announcements/unread-count',
+    activeVersion: '/announcements/active-version',
+    detail: (id: string) => `/announcements/${id}`,
+    markRead: (id: string) => `/announcements/${id}/read`,
+    markAllRead: '/announcements/mark-all-read',
+    generateVersionRelease: '/announcements/generate-version-release',
+  },
   assistant: {
     chat: '/assistant/chat',
     conversations: '/assistant/conversations',

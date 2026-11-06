@@ -22,6 +22,16 @@ export const protectedRoutes: RouteObject[] = [
                   ).default,
                 }),
               },
+              {
+                path: paths.platformAnnouncements,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/announcements/pages/announcements-admin-page'
+                    )
+                  ).default,
+                }),
+              },
             ],
           },
           {
@@ -238,6 +248,16 @@ export const protectedRoutes: RouteObject[] = [
                 }),
               },
             ],
+          },
+          {
+            path: paths.announcements,
+            lazy: async () => ({
+              Component: (
+                await import(
+                  '@/features/announcements/pages/announcements-feed-page'
+                )
+              ).default,
+            }),
           },
         ],
       },
