@@ -112,20 +112,26 @@ function SubscriptionEditForm({
       open
       onClose={onClose}
       busy={busy}
-      title="Gestionar Suscripción SaaS"
+      visual={
+        <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
+          <Crown aria-hidden className="size-6" />
+        </span>
+      }
+      title="Gestionar suscripción SaaS"
       description={`Configuración de plan y vigencia para ${subscription.organizationName} (${subscription.organizationCode}).`}
+      className="max-w-2xl"
       footer={
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" disabled={busy} onClick={onClose}>
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={onClose}
+          >
             Cancelar
           </Button>
-          <Button
-            type="submit"
-            form="subscription-edit-form"
-            disabled={busy}
-            className="bg-brand-forest hover:bg-brand-forest/90"
-          >
-            Guardar cambios
+          <Button type="submit" form="subscription-edit-form" disabled={busy}>
+            {busy ? 'Guardando…' : 'Guardar cambios'}
           </Button>
         </div>
       }
@@ -133,98 +139,82 @@ function SubscriptionEditForm({
       <form
         id="subscription-edit-form"
         onSubmit={(e) => void handleSubmit(e)}
-        className="space-y-4 text-xs"
+        noValidate
+        className="space-y-5"
       >
-        <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-3.5 text-xs text-emerald-950">
-          <div className="flex items-center gap-2 font-semibold text-emerald-900">
-            <Crown className="size-4 text-brand-forest" />
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 text-xs text-emerald-950">
+          <div className="flex items-center gap-2 font-semibold text-emerald-900 text-sm">
+            <Crown className="size-4 text-primary" />
             <span>Plan asignado actualmente: {selectedPlan.name}</span>
           </div>
-          <p className="mt-1 text-[11px] text-emerald-800">
+          <p className="mt-1.5 text-xs text-emerald-800">
             Límites del plan: hasta {selectedPlan.maxMembers} miembros,{' '}
             {selectedPlan.maxTechnicians} técnicos y {selectedPlan.maxProducts}{' '}
             productos en inventario.
           </p>
         </div>
 
-        <div>
-          <label className="block font-medium text-foreground">
-            Plan comercial *
-          </label>
+        <Field label="Plan comercial" required>
           <SmartSelect
             value={planId}
             onChange={setPlanId}
             options={planSelectOptions}
-            className="mt-1.5"
             aria-label="Seleccionar plan comercial"
           />
-        </div>
+        </Field>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div>
-            <label className="block font-medium text-foreground">
-              Estado de la suscripción *
-            </label>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Estado de la suscripción" required>
             <SmartSelect
               value={status}
               onChange={(val) => setStatus(val as SubscriptionStatus)}
               options={statusOptions}
-              className="mt-1.5"
               aria-label="Estado de suscripción"
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block font-medium text-foreground">
-              Ciclo de facturación *
-            </label>
+          <Field label="Ciclo de facturación" required>
             <SmartSelect
               value={billingCycle}
               onChange={(val) => setBillingCycle(val as BillingCycle)}
               options={billingCycleOptions}
-              className="mt-1.5"
               aria-label="Ciclo de facturación"
             />
-          </div>
+          </Field>
         </div>
 
-        <div>
-          <label className="block font-medium text-foreground">
-            Fecha de renovación o vencimiento
-          </label>
+        <Field
+          label="Fecha de renovación o vencimiento"
+          hint="Dejar vacío si la suscripción no tiene fecha de corte definida."
+        >
           <Input
             type="date"
             value={renewalDate}
             onChange={(e) => setRenewalDate(e.target.value)}
-            className="mt-1.5"
           />
-          <span className="mt-1 block text-[11px] text-muted-foreground">
-            Dejar vacío si la suscripción no tiene fecha de corte definida.
-          </span>
-        </div>
+        </Field>
 
-        <div>
-          <label className="block font-medium text-foreground">
-            Observaciones o notas administrativas
-          </label>
+        <Field
+          label="Observaciones o notas administrativas"
+          hint="Quedan registradas para el equipo de soporte y facturación."
+        >
           <Input
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Ej. Promoción 3 meses de descuento / Upgrade autorizado por soporte"
             maxLength={500}
-            className="mt-1.5"
           />
-        </div>
+        </Field>
 
         {selectedPlan.features.length > 0 && (
-          <div className="rounded-lg border border-border bg-muted/20 p-3">
-            <span className="flex items-center gap-1.5 font-bold text-foreground">
+          <div className="rounded-xl border border-border bg-muted/40 p-3.5">
+            <span className="block font-semibold text-xs text-foreground uppercase tracking-wider">
               Beneficios incluidos en este plan:
             </span>
-            <ul className="mt-2 grid grid-cols-1 gap-1 text-[11px] text-muted-foreground sm:grid-cols-2">
+            <ul className="mt-2 grid grid-cols-1 gap-1 text-xs text-muted-foreground sm:grid-cols-2">
               {selectedPlan.features.map((feat, idx) => (
                 <li key={idx} className="flex items-center gap-1.5">
-                  <span className="size-1 rounded-full bg-brand-forest" />
+                  <span className="size-1.5 rounded-full bg-primary" />
                   {feat}
                 </li>
               ))}
@@ -233,5 +223,36 @@ function SubscriptionEditForm({
         )}
       </form>
     </Modal>
+  )
+}
+
+function Field({
+  label,
+  error,
+  hint,
+  required,
+  children,
+}: {
+  label: string
+  error?: string
+  hint?: string
+  required?: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <label className="block space-y-2 text-sm font-medium">
+      <span>
+        {label}
+        {required && <span className="ml-1 text-emerald-700">*</span>}
+      </span>
+      {children}
+      {error ? (
+        <span className="block text-xs font-normal text-red-600">{error}</span>
+      ) : hint ? (
+        <span className="block text-xs font-normal text-muted-foreground">
+          {hint}
+        </span>
+      ) : null}
+    </label>
   )
 }

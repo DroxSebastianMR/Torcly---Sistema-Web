@@ -164,7 +164,7 @@ describe('PlatformSubscriptionsPage', () => {
     const manageBtn = screen.getByRole('button', { name: /gestionar/i })
     await userEvent.click(manageBtn)
 
-    expect(screen.getByText('Gestionar Suscripción SaaS')).toBeTruthy()
+    expect(screen.getByText(/gestionar suscripción saas/i)).toBeTruthy()
     expect(
       screen.getByText(
         /Configuración de plan y vigencia para Taller Central San Isidro/,
@@ -178,7 +178,7 @@ describe('PlatformSubscriptionsPage', () => {
     const assignBtn = screen.getByRole('button', { name: /asignar membresía/i })
     await userEvent.click(assignBtn)
 
-    expect(screen.getByText('Asignar Nueva Membresía SaaS')).toBeTruthy()
+    expect(screen.getByText(/asignar nueva membresía saas/i)).toBeTruthy()
     expect(
       screen.getByText(
         /Vincula o actualiza el plan comercial y la vigencia para un taller existente/,
@@ -219,7 +219,7 @@ describe('PlatformSubscriptionsPage', () => {
     const editPlanBtn = screen.getByRole('button', { name: /editar plan/i })
     await userEvent.click(editPlanBtn)
 
-    expect(screen.getByText('Editar Plan: Plan Profesional')).toBeTruthy()
+    expect(screen.getByText(/editar plan: plan profesional/i)).toBeTruthy()
     expect(screen.getByDisplayValue('Plan Profesional')).toBeTruthy()
   })
 
@@ -234,6 +234,6 @@ describe('PlatformSubscriptionsPage', () => {
     const newPlanBtn = screen.getByRole('button', { name: /nuevo plan/i })
     await userEvent.click(newPlanBtn)
 
-    expect(screen.getByText('Crear Nuevo Plan Comercial')).toBeTruthy()
+    expect(screen.getByText(/crear nuevo plan comercial/i)).toBeTruthy()
   })
 })

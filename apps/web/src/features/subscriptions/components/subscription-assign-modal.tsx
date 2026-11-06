@@ -87,7 +87,7 @@ function SubscriptionAssignForm({
   const [startDate, setStartDate] = useState(today)
   const [renewalDate, setRenewalDate] = useState(oneYearLater)
   const [notes, setNotes] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const handleCycleChange = (nextCycle: BillingCycle) => {
     setBillingCycle(nextCycle)
@@ -115,12 +115,15 @@ function SubscriptionAssignForm({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
+    const errs: Record<string, string> = {}
     if (!organizationId) {
-      setError('Selecciona la organización o taller.')
-      return
+      errs.organizationId = 'Selecciona la organización o taller.'
     }
     if (!planId) {
-      setError('Selecciona el plan comercial a asignar.')
+      errs.planId = 'Selecciona el plan comercial a asignar.'
+    }
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs)
       return
     }
 
@@ -157,20 +160,30 @@ function SubscriptionAssignForm({
       open
       onClose={onClose}
       busy={busy}
-      title="Asignar Nueva Membresía SaaS"
+      visual={
+        <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
+          <Crown aria-hidden className="size-6" />
+        </span>
+      }
+      title="Asignar nueva membresía SaaS"
       description="Vincula o actualiza el plan comercial y la vigencia para un taller existente en la plataforma."
+      className="max-w-2xl"
       footer={
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" disabled={busy} onClick={onClose}>
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={onClose}
+          >
             Cancelar
           </Button>
           <Button
             type="submit"
             form="subscription-assign-form"
             disabled={busy || !organizationId || !planId}
-            className="bg-brand-forest hover:bg-brand-forest/90"
           >
-            Asignar Membresía
+            {busy ? 'Asignando…' : 'Asignar membresía'}
           </Button>
         </div>
       }
@@ -178,61 +191,54 @@ function SubscriptionAssignForm({
       <form
         id="subscription-assign-form"
         onSubmit={(e) => void handleSubmit(e)}
-        className="space-y-4 text-xs"
+        noValidate
+        className="space-y-5"
       >
-        {error && (
-          <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-2.5 text-xs text-destructive">
-            {error}
-          </div>
-        )}
-
-        <div>
-          <label className="block font-medium text-foreground">
-            Organización / Taller Destino *
-          </label>
+        <Field
+          label="Organización o taller destino"
+          error={errors.organizationId}
+          required
+        >
           <SmartSelect
             value={organizationId}
-            onChange={setOrganizationId}
+            onChange={(val) => {
+              setOrganizationId(val)
+              setErrors((prev) => ({ ...prev, organizationId: '' }))
+            }}
             options={organizationOptions}
             placeholder="Selecciona el taller..."
-            className="mt-1.5"
             aria-label="Seleccionar taller"
           />
-        </div>
+        </Field>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div>
-            <label className="block font-medium text-foreground">
-              Plan comercial *
-            </label>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Plan comercial" error={errors.planId} required>
             <SmartSelect
               value={planId}
-              onChange={setPlanId}
+              onChange={(val) => {
+                setPlanId(val)
+                setErrors((prev) => ({ ...prev, planId: '' }))
+              }}
               options={planOptions}
               placeholder="Selecciona un plan..."
-              className="mt-1.5"
               aria-label="Seleccionar plan comercial"
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block font-medium text-foreground">
-              Ciclo de facturación *
-            </label>
+          <Field label="Ciclo de facturación" required>
             <SmartSelect
               value={billingCycle}
               onChange={(val) => handleCycleChange(val as BillingCycle)}
               options={billingCycleOptions}
-              className="mt-1.5"
               aria-label="Ciclo de facturación"
             />
-          </div>
+          </Field>
         </div>
 
         {selectedPlan && (
-          <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-3 text-xs text-emerald-950">
-            <div className="flex items-center gap-1.5 font-semibold text-emerald-900">
-              <Crown className="size-4 text-brand-forest" />
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 text-xs text-emerald-950">
+            <div className="flex items-center gap-2 font-semibold text-emerald-900 text-sm">
+              <Crown className="size-4 text-primary" />
               <span>
                 {selectedPlan.name} · Tarifa:{' '}
                 {billingCycle === 'ANNUAL'
@@ -240,66 +246,91 @@ function SubscriptionAssignForm({
                   : `S/ ${selectedPlan.priceMonthly} al mes`}
               </span>
             </div>
-            <p className="mt-1 text-[11px] text-emerald-800">
-              Límites: hasta {selectedPlan.maxMembers} miembros,{' '}
+            <p className="mt-1.5 text-xs text-emerald-800">
+              Límites técnicos: hasta {selectedPlan.maxMembers} miembros,{' '}
               {selectedPlan.maxTechnicians} técnicos y{' '}
-              {selectedPlan.maxProducts} productos.
+              {selectedPlan.maxProducts} productos en catálogo.
             </p>
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div>
-            <label className="block font-medium text-foreground">
-              Estado de la membresía *
-            </label>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <Field label="Estado inicial" required>
             <SmartSelect
               value={status}
               onChange={(val) => setStatus(val as SubscriptionStatus)}
               options={statusOptions}
-              className="mt-1.5"
               aria-label="Estado de membresía"
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block font-medium text-foreground">
-              Fecha de inicio *
-            </label>
+          <Field label="Fecha de inicio" required>
             <Input
               type="date"
               value={startDate}
               onChange={(e) => handleStartDateChange(e.target.value)}
-              className="mt-1.5"
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block font-medium text-foreground">
-              Fecha de renovación / corte
-            </label>
+          <Field
+            label="Fecha de corte / renovación"
+            hint={
+              billingCycle === 'ANNUAL'
+                ? '+1 año automático'
+                : '+30 días automático'
+            }
+          >
             <Input
               type="date"
               value={renewalDate}
               onChange={(e) => setRenewalDate(e.target.value)}
-              className="mt-1.5"
             />
-          </div>
+          </Field>
         </div>
 
-        <div>
-          <label className="block font-medium text-foreground">
-            Notas de emisión o acuerdo comercial
-          </label>
+        <Field
+          label="Observaciones o notas comerciales"
+          hint="Opcional. Queda registrado en el historial de la organización."
+        >
           <Input
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Ej. Membresía anual pagada por transferencia. Válida hasta 2027."
             maxLength={500}
-            className="mt-1.5"
           />
-        </div>
+        </Field>
       </form>
     </Modal>
+  )
+}
+
+function Field({
+  label,
+  error,
+  hint,
+  required,
+  children,
+}: {
+  label: string
+  error?: string
+  hint?: string
+  required?: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <label className="block space-y-2 text-sm font-medium">
+      <span>
+        {label}
+        {required && <span className="ml-1 text-emerald-700">*</span>}
+      </span>
+      {children}
+      {error ? (
+        <span className="block text-xs font-normal text-red-600">{error}</span>
+      ) : hint ? (
+        <span className="block text-xs font-normal text-muted-foreground">
+          {hint}
+        </span>
+      ) : null}
+    </label>
   )
 }

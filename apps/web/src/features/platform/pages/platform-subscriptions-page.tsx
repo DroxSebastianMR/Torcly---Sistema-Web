@@ -218,16 +218,16 @@ export default function PlatformSubscriptionsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Encabezado */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* Encabezado estándar Torcly */}
+      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-brand-forest">
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             Consola de Administración SaaS
-          </p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground">
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
             Suscripciones y Membresías
           </h1>
-          <p className="text-xs text-muted-foreground">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             Supervisión de planes comerciales contratados, vigencias de
             facturación y control de recursos para cada taller.
           </p>
@@ -235,33 +235,29 @@ export default function PlatformSubscriptionsPage() {
 
         <div className="flex flex-wrap items-center gap-2">
           {activeTab === 'subscriptions' ? (
-            <Button
-              onClick={() => setAssignModalOpen(true)}
-              className="gap-1.5 bg-brand-forest text-xs text-white hover:bg-brand-forest/90"
-            >
-              <Plus className="size-4" />
-              Asignar Membresía
+            <Button onClick={() => setAssignModalOpen(true)}>
+              <Plus size={17} />
+              <span>Asignar Membresía</span>
             </Button>
           ) : (
             <Button
               onClick={() => setPlanModalState({ open: true, plan: null })}
-              className="gap-1.5 bg-brand-forest text-xs text-white hover:bg-brand-forest/90"
             >
-              <Plus className="size-4" />
-              Nuevo Plan
+              <Plus size={17} />
+              <span>Nuevo Plan</span>
             </Button>
           )}
         </div>
-      </div>
+      </header>
 
-      {/* Pestañas de Navegación */}
+      {/* Pestañas de Navegación estándar Torcly */}
       <div className="flex items-center gap-2 border-b border-border">
         <button
           type="button"
           onClick={() => setActiveTab('subscriptions')}
-          className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-medium transition-colors ${
+          className={`inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors ${
             activeTab === 'subscriptions'
-              ? 'border-brand-forest font-semibold text-brand-forest'
+              ? 'border-primary text-primary'
               : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
@@ -271,9 +267,9 @@ export default function PlatformSubscriptionsPage() {
         <button
           type="button"
           onClick={() => setActiveTab('plans')}
-          className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-medium transition-colors ${
+          className={`inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors ${
             activeTab === 'plans'
-              ? 'border-brand-forest font-semibold text-brand-forest'
+              ? 'border-primary text-primary'
               : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
@@ -385,20 +381,19 @@ export default function PlatformSubscriptionsPage() {
             ) : subscriptions.length === 0 ? (
               <div className="p-12 text-center text-xs text-muted-foreground">
                 <CreditCard className="mx-auto mb-2 size-8 text-muted-foreground/50" />
-                <p className="font-medium text-foreground">
+                <p className="text-sm font-semibold text-foreground">
                   No se encontraron suscripciones registradas
                 </p>
                 <p className="mt-1 text-muted-foreground">
                   Asigna una membresía inicial a los talleres existentes para
                   comenzar a supervisarlos.
                 </p>
-                <Button
-                  onClick={() => setAssignModalOpen(true)}
-                  className="mt-4 gap-1.5 bg-brand-forest text-xs text-white hover:bg-brand-forest/90"
-                >
-                  <Plus className="size-3.5" />
-                  Asignar Primera Membresía
-                </Button>
+                <div className="mt-4 flex justify-center">
+                  <Button onClick={() => setAssignModalOpen(true)}>
+                    <Plus size={17} />
+                    <span>Asignar Primera Membresía</span>
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -445,7 +440,7 @@ export default function PlatformSubscriptionsPage() {
 
                           <td className="px-4 py-3">
                             <span className="inline-flex items-center gap-1 font-medium text-foreground">
-                              <Crown className="size-3.5 text-brand-forest" />
+                              <Crown className="size-3.5 text-primary" />
                               {sub.plan.name}
                             </span>
                           </td>
@@ -478,9 +473,9 @@ export default function PlatformSubscriptionsPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => setEditingSubscription(sub)}
-                              className="h-7 gap-1 text-xs"
+                              className="h-8 gap-1.5 text-xs"
                             >
-                              <Pencil className="size-3" />
+                              <Pencil className="size-3.5" />
                               Gestionar
                             </Button>
                           </td>
@@ -508,7 +503,7 @@ export default function PlatformSubscriptionsPage() {
         /* Vista de Planes Comerciales */
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Configura las cuotas operativas de miembros, técnicos, catálogo y
               las tarifas de suscripción vigentes.
             </p>
@@ -521,45 +516,46 @@ export default function PlatformSubscriptionsPage() {
           ) : plans.length === 0 ? (
             <div className="rounded-xl border border-border bg-card p-12 text-center text-xs text-muted-foreground">
               <Layers className="mx-auto mb-2 size-8 text-muted-foreground/50" />
-              <p className="font-medium text-foreground">
+              <p className="text-sm font-semibold text-foreground">
                 No existen planes comerciales configurados
               </p>
-              <Button
-                onClick={() => setPlanModalState({ open: true, plan: null })}
-                className="mt-4 gap-1.5 bg-brand-forest text-xs text-white hover:bg-brand-forest/90"
-              >
-                <Plus className="size-3.5" />
-                Crear Primer Plan
-              </Button>
+              <div className="mt-4 flex justify-center">
+                <Button
+                  onClick={() => setPlanModalState({ open: true, plan: null })}
+                >
+                  <Plus size={17} />
+                  <span>Crear Primer Plan</span>
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
               {plans.map((plan) => (
                 <div
                   key={plan.id}
-                  className="flex flex-col justify-between rounded-xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md"
+                  className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md"
                 >
                   <div className="space-y-4">
                     {/* Header del Plan */}
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-[11px] font-semibold text-brand-forest">
+                          <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-xs font-bold text-emerald-800">
                             {plan.code}
                           </span>
                           {!plan.active && (
-                            <span className="rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-medium text-rose-700 border border-rose-200">
+                            <span className="rounded border border-rose-200 bg-rose-50 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">
                               Inactivo
                             </span>
                           )}
                           {!plan.isPublic && (
-                            <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 border border-amber-200">
+                            <span className="rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
                               Oculto
                             </span>
                           )}
                         </div>
-                        <h3 className="mt-1 flex items-center gap-1.5 text-base font-bold text-foreground">
-                          <Crown className="size-4 text-brand-forest shrink-0" />
+                        <h3 className="mt-2 flex items-center gap-1.5 text-lg font-bold text-brand-forest">
+                          <Crown className="size-4 shrink-0 text-primary" />
                           {plan.name}
                         </h3>
                       </div>
@@ -572,7 +568,7 @@ export default function PlatformSubscriptionsPage() {
                     )}
 
                     {/* Precios */}
-                    <div className="rounded-lg bg-muted/40 p-3">
+                    <div className="rounded-xl bg-muted/60 p-4">
                       <div className="flex items-baseline gap-1">
                         <span className="text-2xl font-extrabold text-foreground">
                           S/ {plan.priceMonthly}
@@ -581,7 +577,7 @@ export default function PlatformSubscriptionsPage() {
                           / mes
                         </span>
                       </div>
-                      <div className="mt-1 text-[11px] text-muted-foreground">
+                      <div className="mt-1 text-xs text-muted-foreground">
                         o{' '}
                         <strong className="text-foreground">
                           S/ {plan.priceYearly}
@@ -591,14 +587,14 @@ export default function PlatformSubscriptionsPage() {
                     </div>
 
                     {/* Cuotas Máximas */}
-                    <div className="space-y-1.5 rounded-lg border border-border bg-card p-3 text-xs">
+                    <div className="space-y-2 rounded-xl border border-border bg-card p-4 text-xs">
                       <span className="block font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                         Cuotas máximas del sistema
                       </span>
-                      <div className="grid grid-cols-1 gap-1.5 pt-1 text-muted-foreground">
+                      <div className="grid grid-cols-1 gap-2 pt-1 text-muted-foreground">
                         <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-1.5">
-                            <Users className="size-3.5 text-brand-forest" />
+                          <span className="flex items-center gap-2">
+                            <Users className="size-4 text-primary" />
                             Miembros de taller:
                           </span>
                           <span className="font-semibold text-foreground">
@@ -606,8 +602,8 @@ export default function PlatformSubscriptionsPage() {
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-1.5">
-                            <Wrench className="size-3.5 text-brand-forest" />
+                          <span className="flex items-center gap-2">
+                            <Wrench className="size-4 text-primary" />
                             Mecánicos / Técnicos:
                           </span>
                           <span className="font-semibold text-foreground">
@@ -615,8 +611,8 @@ export default function PlatformSubscriptionsPage() {
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-1.5">
-                            <Package className="size-3.5 text-brand-forest" />
+                          <span className="flex items-center gap-2">
+                            <Package className="size-4 text-primary" />
                             Productos en catálogo:
                           </span>
                           <span className="font-semibold text-foreground">
@@ -628,14 +624,14 @@ export default function PlatformSubscriptionsPage() {
 
                     {/* Beneficios */}
                     {plan.features.length > 0 && (
-                      <div className="space-y-1.5 pt-1">
+                      <div className="space-y-2 pt-1">
                         <span className="block font-semibold text-[11px] uppercase tracking-wider text-muted-foreground">
                           Funcionalidades incluidas
                         </span>
-                        <ul className="space-y-1 text-xs text-foreground/80">
+                        <ul className="space-y-1.5 text-xs text-foreground/80">
                           {plan.features.map((feat, i) => (
                             <li key={i} className="flex items-start gap-2">
-                              <Check className="size-3.5 text-brand-forest shrink-0 mt-0.5" />
+                              <Check className="mt-0.5 size-3.5 shrink-0 text-primary" />
                               <span>{feat}</span>
                             </li>
                           ))}

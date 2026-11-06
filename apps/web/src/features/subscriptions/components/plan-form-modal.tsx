@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Layers } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
@@ -82,27 +83,28 @@ function PlanForm({
   const validate = () => {
     const errs: Record<string, string> = {}
     if (!name.trim() || name.trim().length < 3) {
-      errs.name = 'El nombre debe tener al menos 3 caracteres.'
+      errs.name = 'El nombre del plan debe tener al menos 3 caracteres.'
     }
     if (!isEditing) {
       if (!code.trim() || !/^[A-Z0-9_-]+$/.test(code.trim().toUpperCase())) {
-        errs.code = 'Usa mayúsculas, números o guiones (ej. STARTER, PRO_PLUS).'
+        errs.code =
+          'Usa solo mayúsculas, números o guiones (ej. STARTER, PRO, ENTERPRISE).'
       }
     }
-    if (Number(priceMonthly) < 0) {
+    if (Number(priceMonthly) < 0 || isNaN(Number(priceMonthly))) {
       errs.priceMonthly = 'El precio mensual no puede ser negativo.'
     }
-    if (Number(priceYearly) < 0) {
+    if (Number(priceYearly) < 0 || isNaN(Number(priceYearly))) {
       errs.priceYearly = 'El precio anual no puede ser negativo.'
     }
-    if (Number(maxMembers) < 1) {
+    if (Number(maxMembers) < 1 || isNaN(Number(maxMembers))) {
       errs.maxMembers = 'Debe permitir al menos 1 miembro.'
     }
-    if (Number(maxTechnicians) < 1) {
-      errs.maxTechnicians = 'Debe permitir al menos 1 técnico.'
+    if (Number(maxTechnicians) < 1 || isNaN(Number(maxTechnicians))) {
+      errs.maxTechnicians = 'Debe permitir al menos 1 mecánico o técnico.'
     }
-    if (Number(maxProducts) < 1) {
-      errs.maxProducts = 'Debe permitir al menos 1 producto.'
+    if (Number(maxProducts) < 1 || isNaN(Number(maxProducts))) {
+      errs.maxProducts = 'Debe permitir al menos 1 producto en catálogo.'
     }
     setErrors(errs)
     return Object.keys(errs).length === 0
@@ -153,22 +155,28 @@ function PlanForm({
       open
       onClose={onClose}
       busy={busy}
-      title={
-        isEditing ? `Editar Plan: ${plan?.name}` : 'Crear Nuevo Plan Comercial'
+      visual={
+        <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
+          <Layers aria-hidden className="size-6" />
+        </span>
       }
-      description="Define las cuotas de miembros, mecánicos, inventario y tarifas comerciales para este plan."
+      title={
+        isEditing ? `Editar plan: ${plan?.name}` : 'Crear nuevo plan comercial'
+      }
+      description="Define las cuotas operativas de miembros, técnicos, catálogo y tarifas comerciales para este plan."
+      className="max-w-2xl"
       footer={
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" disabled={busy} onClick={onClose}>
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={onClose}
+          >
             Cancelar
           </Button>
-          <Button
-            type="submit"
-            form="plan-form"
-            disabled={busy}
-            className="bg-brand-forest hover:bg-brand-forest/90"
-          >
-            {isEditing ? 'Guardar Cambios' : 'Crear Plan'}
+          <Button type="submit" form="plan-form" disabled={busy}>
+            {busy ? 'Guardando…' : isEditing ? 'Guardar cambios' : 'Crear plan'}
           </Button>
         </div>
       }
@@ -176,194 +184,232 @@ function PlanForm({
       <form
         id="plan-form"
         onSubmit={(e) => void handleSubmit(e)}
-        className="space-y-4 text-xs"
+        noValidate
+        className="space-y-5"
       >
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div>
-            <label className="block font-medium text-foreground">
-              Código comercial (ID) *
-            </label>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field
+            label="Código comercial (ID)"
+            error={errors.code}
+            hint={
+              isEditing
+                ? 'No editable una vez creado'
+                : 'Ej. STARTER, PRO, ENTERPRISE'
+            }
+            required
+          >
             <Input
               value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              onChange={(e) => {
+                setCode(e.target.value.toUpperCase())
+                setErrors((prev) => ({ ...prev, code: '' }))
+              }}
               disabled={isEditing}
+              invalid={Boolean(errors.code)}
               placeholder="Ej. STARTER, PRO, ENTERPRISE"
-              className="mt-1.5 font-mono"
+              className="font-mono"
             />
-            {errors.code && (
-              <span className="mt-1 block text-[11px] text-destructive">
-                {errors.code}
-              </span>
-            )}
-          </div>
+          </Field>
 
-          <div>
-            <label className="block font-medium text-foreground">
-              Nombre visible del plan *
-            </label>
+          <Field
+            label="Nombre visible del plan"
+            error={errors.name}
+            required
+            hint="Nombre con el que se mostrará en los talleres"
+          >
             <Input
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value)
+                setErrors((prev) => ({ ...prev, name: '' }))
+              }}
+              invalid={Boolean(errors.name)}
               placeholder="Ej. Plan Profesional"
-              className="mt-1.5"
             />
-            {errors.name && (
-              <span className="mt-1 block text-[11px] text-destructive">
-                {errors.name}
-              </span>
-            )}
-          </div>
+          </Field>
         </div>
 
-        <div>
-          <label className="block font-medium text-foreground">
-            Descripción comercial
-          </label>
+        <Field
+          label="Descripción comercial"
+          hint="Breve resumen del tipo de taller al que va dirigido"
+        >
           <Input
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Breve resumen del tipo de taller al que va dirigido este plan"
-            className="mt-1.5"
+            placeholder="Orientado a talleres medianos con recepción y equipo técnico"
           />
-        </div>
+        </Field>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block font-medium text-foreground">
-              Precio Mensual (S/) *
-            </label>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field
+            label="Precio mensual (S/)"
+            error={errors.priceMonthly}
+            required
+            hint="Tarifa por mes de servicio"
+          >
             <Input
               type="number"
               step="0.01"
               min="0"
               value={priceMonthly}
-              onChange={(e) => setPriceMonthly(e.target.value)}
-              className="mt-1.5"
+              onChange={(e) => {
+                setPriceMonthly(e.target.value)
+                setErrors((prev) => ({ ...prev, priceMonthly: '' }))
+              }}
+              invalid={Boolean(errors.priceMonthly)}
             />
-            {errors.priceMonthly && (
-              <span className="mt-1 block text-[11px] text-destructive">
-                {errors.priceMonthly}
-              </span>
-            )}
-          </div>
+          </Field>
 
-          <div>
-            <label className="block font-medium text-foreground">
-              Precio Anual (S/) *
-            </label>
+          <Field
+            label="Precio anual (S/)"
+            error={errors.priceYearly}
+            required
+            hint="Tarifa con descuento anual"
+          >
             <Input
               type="number"
               step="0.01"
               min="0"
               value={priceYearly}
-              onChange={(e) => setPriceYearly(e.target.value)}
-              className="mt-1.5"
+              onChange={(e) => {
+                setPriceYearly(e.target.value)
+                setErrors((prev) => ({ ...prev, priceYearly: '' }))
+              }}
+              invalid={Boolean(errors.priceYearly)}
             />
-            {errors.priceYearly && (
-              <span className="mt-1 block text-[11px] text-destructive">
-                {errors.priceYearly}
-              </span>
-            )}
-          </div>
+          </Field>
         </div>
 
-        <div className="rounded-xl border border-border bg-muted/20 p-3.5 space-y-3">
-          <span className="block font-semibold text-foreground">
-            Cuotas Máximas del Servidor (Límites)
-          </span>
+        <div className="rounded-2xl border border-border bg-muted/40 p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
+              Cuotas máximas del servidor
+            </span>
+          </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <label className="block text-[11px] font-medium text-muted-foreground">
-                Max Miembros *
-              </label>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <Field
+              label="Max miembros"
+              error={errors.maxMembers}
+              required
+              hint="Usuarios en taller"
+            >
               <Input
                 type="number"
                 min="1"
                 value={maxMembers}
-                onChange={(e) => setMaxMembers(e.target.value)}
-                className="mt-1"
+                onChange={(e) => {
+                  setMaxMembers(e.target.value)
+                  setErrors((prev) => ({ ...prev, maxMembers: '' }))
+                }}
+                invalid={Boolean(errors.maxMembers)}
               />
-              {errors.maxMembers && (
-                <span className="mt-1 block text-[10px] text-destructive">
-                  {errors.maxMembers}
-                </span>
-              )}
-            </div>
+            </Field>
 
-            <div>
-              <label className="block text-[11px] font-medium text-muted-foreground">
-                Max Técnicos *
-              </label>
+            <Field
+              label="Max mecánicos / técnicos"
+              error={errors.maxTechnicians}
+              required
+              hint="Mecánicos activos"
+            >
               <Input
                 type="number"
                 min="1"
                 value={maxTechnicians}
-                onChange={(e) => setMaxTechnicians(e.target.value)}
-                className="mt-1"
+                onChange={(e) => {
+                  setMaxTechnicians(e.target.value)
+                  setErrors((prev) => ({ ...prev, maxTechnicians: '' }))
+                }}
+                invalid={Boolean(errors.maxTechnicians)}
               />
-              {errors.maxTechnicians && (
-                <span className="mt-1 block text-[10px] text-destructive">
-                  {errors.maxTechnicians}
-                </span>
-              )}
-            </div>
+            </Field>
 
-            <div>
-              <label className="block text-[11px] font-medium text-muted-foreground">
-                Max Productos *
-              </label>
+            <Field
+              label="Max productos"
+              error={errors.maxProducts}
+              required
+              hint="Artículos catálogo"
+            >
               <Input
                 type="number"
                 min="1"
                 value={maxProducts}
-                onChange={(e) => setMaxProducts(e.target.value)}
-                className="mt-1"
+                onChange={(e) => {
+                  setMaxProducts(e.target.value)
+                  setErrors((prev) => ({ ...prev, maxProducts: '' }))
+                }}
+                invalid={Boolean(errors.maxProducts)}
               />
-              {errors.maxProducts && (
-                <span className="mt-1 block text-[10px] text-destructive">
-                  {errors.maxProducts}
-                </span>
-              )}
-            </div>
+            </Field>
           </div>
         </div>
 
-        <div>
-          <label className="block font-medium text-foreground">
-            Beneficios y funcionalidades incluidas (un beneficio por línea)
-          </label>
+        <Field
+          label="Beneficios y funcionalidades incluidas"
+          hint="Ingresa un beneficio por cada línea"
+        >
           <textarea
             value={featuresText}
             onChange={(e) => setFeaturesText(e.target.value)}
             rows={3}
             placeholder="Hasta 10 miembros en taller&#10;Asistente IA conversacional&#10;Múltiples sesiones de caja"
-            className="mt-1.5 w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="flex w-full rounded-[10px] border border-input bg-card px-3 py-2.5 text-sm transition-[border-color,background-color] duration-150 ease-out hover:bg-background focus:border-primary/70 focus:outline-none"
           />
-        </div>
+        </Field>
 
-        <div className="flex items-center gap-6 pt-1">
-          <label className="flex items-center gap-2 cursor-pointer font-medium text-foreground">
+        <div className="flex flex-wrap items-center gap-6 pt-1">
+          <label className="flex items-center gap-2.5 cursor-pointer text-sm font-medium text-foreground">
             <input
               type="checkbox"
               checked={active}
               onChange={(e) => setActive(e.target.checked)}
-              className="size-4 rounded border-gray-300 text-brand-forest focus:ring-brand-forest"
+              className="size-4 rounded border-border text-primary accent-primary focus:ring-primary"
             />
-            Plan activo para asignación
+            <span>Plan activo para asignación</span>
           </label>
 
-          <label className="flex items-center gap-2 cursor-pointer font-medium text-foreground">
+          <label className="flex items-center gap-2.5 cursor-pointer text-sm font-medium text-foreground">
             <input
               type="checkbox"
               checked={isPublic}
               onChange={(e) => setIsPublic(e.target.checked)}
-              className="size-4 rounded border-gray-300 text-brand-forest focus:ring-brand-forest"
+              className="size-4 rounded border-border text-primary accent-primary focus:ring-primary"
             />
-            Visible públicamente
+            <span>Visible públicamente</span>
           </label>
         </div>
       </form>
     </Modal>
+  )
+}
+
+function Field({
+  label,
+  error,
+  hint,
+  required,
+  children,
+}: {
+  label: string
+  error?: string
+  hint?: string
+  required?: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <label className="block space-y-2 text-sm font-medium">
+      <span>
+        {label}
+        {required && <span className="ml-1 text-emerald-700">*</span>}
+      </span>
+      {children}
+      {error ? (
+        <span className="block text-xs font-normal text-red-600">{error}</span>
+      ) : hint ? (
+        <span className="block text-xs font-normal text-muted-foreground">
+          {hint}
+        </span>
+      ) : null}
+    </label>
   )
 }
