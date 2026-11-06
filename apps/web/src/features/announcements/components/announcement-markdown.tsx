@@ -7,9 +7,9 @@ interface AnnouncementMarkdownProps {
 
 function renderInline(text: string): ReactNode[] {
   const elements: ReactNode[] = []
-  // Matches **bold**, *italic*, `code`, [grande]text[/grande], [xl]text[/xl], [sm]text[/sm], [label](url)
+  // Matches **bold**, *italic*, `code`, [size:18]text[/size], [grande]text[/grande], [xl]text[/xl], [sm]text[/sm], [label](url)
   const regex =
-    /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[(grande|xl|lg|sm)\][\s\S]+?\[\/\2\]|\[[^\]]+\]\([^)]+\))/g
+    /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[size:\d+\][\s\S]+?\[\/size\]|\[(grande|xl|lg|sm)\][\s\S]+?\[\/\2\]|\[[^\]]+\]\([^)]+\))/g
 
   let lastIndex = 0
   let match: RegExpExecArray | null
@@ -41,6 +41,24 @@ function renderInline(text: string): ReactNode[] {
           {token.slice(1, -1)}
         </code>,
       )
+    } else if (/^\[size:(\d+)\]([\s\S]+)\[\/size\]$/.test(token)) {
+      const sizeMatch = /^\[size:(\d+)\]([\s\S]+)\[\/size\]$/.exec(token)
+      if (sizeMatch) {
+        const sizePx = Number(sizeMatch[1])
+        const inner = sizeMatch[2]
+        elements.push(
+          <span
+            key={match.index}
+            style={{
+              fontSize: `${sizePx}px`,
+              lineHeight: 1.35,
+            }}
+            className={`inline ${sizePx >= 18 ? 'font-bold text-brand-forest' : sizePx <= 11 ? 'text-muted-foreground' : ''}`}
+          >
+            {renderInline(inner)}
+          </span>,
+        )
+      }
     } else if (/^\[(grande|lg)\]([\s\S]+)\[\/\1\]$/.test(token)) {
       const inner = token.replace(/^\[(grande|lg)\]([\s\S]+)\[\/\1\]$/, '$2')
       elements.push(

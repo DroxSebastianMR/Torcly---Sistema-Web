@@ -91,6 +91,64 @@ export function AnnouncementAdminFormModal({
     }, 10)
   }
 
+  const applyFontSize = (size: number) => {
+    const textarea = contentTextareaRef.current
+    if (!textarea) return
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const current = textarea.value
+    const selected = current.slice(start, end)
+
+    let replacement = ''
+    let newCursorStart = start
+    let newCursorEnd = end
+
+    if (!selected) {
+      replacement = `[size:${size}]Texto[/size]`
+      newCursorStart = start + `[size:${size}]`.length
+      newCursorEnd = newCursorStart + 5
+    } else {
+      const match = /^\[size:\d+\]([\s\S]+)\[\/size\]$/.exec(selected)
+      const innerText = match ? match[1] : selected
+      replacement = `[size:${size}]${innerText}[/size]`
+      newCursorStart = start
+      newCursorEnd = start + replacement.length
+    }
+
+    const nextValue = current.slice(0, start) + replacement + current.slice(end)
+    setValue('content', nextValue, {
+      shouldValidate: true,
+      shouldDirty: true,
+    })
+    setTimeout(() => {
+      textarea.focus()
+      textarea.setSelectionRange(newCursorStart, newCursorEnd)
+    }, 10)
+  }
+
+  const changeFontSize = (delta: 1 | -1) => {
+    const textarea = contentTextareaRef.current
+    if (!textarea) return
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const current = textarea.value
+    const selected = current.slice(start, end)
+
+    let currentSize = 14
+    const match = /\[size:(\d+)\]/.exec(selected)
+    if (match) {
+      currentSize = parseInt(match[1], 10)
+    }
+
+    const FONT_SIZES = [10, 12, 14, 16, 18, 20, 24, 28, 32]
+    const currentIndex = FONT_SIZES.indexOf(currentSize)
+    let nextIndex =
+      currentIndex !== -1 ? currentIndex + delta : delta > 0 ? 3 : 1
+    if (nextIndex < 0) nextIndex = 0
+    if (nextIndex >= FONT_SIZES.length) nextIndex = FONT_SIZES.length - 1
+    applyFontSize(FONT_SIZES[nextIndex])
+  }
+
   useEffect(() => {
     if (contentTextareaRef.current) {
       contentTextareaRef.current.style.height = 'auto'
@@ -406,16 +464,56 @@ export function AnnouncementAdminFormModal({
                 <div className="mx-1 h-3.5 w-px bg-border/70" />
 
                 <span className="mr-1 text-[11px] font-semibold text-muted-foreground">
+                  Tamaño:
+                </span>
+                <div className="inline-flex items-center rounded-md border border-border/60 bg-card">
+                  <button
+                    type="button"
+                    onClick={() => changeFontSize(-1)}
+                    className="cursor-pointer px-1.5 py-0.5 text-[11px] font-bold text-foreground hover:bg-muted transition-colors border-r border-border/50"
+                    title="Disminuir tamaño (A-)"
+                  >
+                    A-
+                  </button>
+                  <select
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        applyFontSize(Number(e.target.value))
+                        e.target.value = ''
+                      }
+                    }}
+                    defaultValue=""
+                    className="cursor-pointer bg-transparent px-1.5 py-0.5 text-[11px] font-semibold text-foreground outline-none"
+                    title="Seleccionar tamaño de fuente en píxeles (tipo Word)"
+                  >
+                    <option value="" disabled>
+                      Tamaño
+                    </option>
+                    <option value="10">10 px</option>
+                    <option value="12">12 px</option>
+                    <option value="14">14 px (normal)</option>
+                    <option value="16">16 px</option>
+                    <option value="18">18 px</option>
+                    <option value="20">20 px</option>
+                    <option value="24">24 px</option>
+                    <option value="28">28 px</option>
+                    <option value="32">32 px</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => changeFontSize(1)}
+                    className="cursor-pointer px-1.5 py-0.5 text-[11px] font-bold text-foreground hover:bg-muted transition-colors border-l border-border/50"
+                    title="Aumentar tamaño (A+)"
+                  >
+                    A+
+                  </button>
+                </div>
+
+                <div className="mx-1 h-3.5 w-px bg-border/70" />
+
+                <span className="mr-1 text-[11px] font-semibold text-muted-foreground">
                   Estilo:
                 </span>
-                <button
-                  type="button"
-                  onClick={() => insertFormatting('[grande]', '[/grande]')}
-                  className="cursor-pointer rounded border border-border/60 bg-card px-2 py-0.5 text-[11px] font-semibold text-emerald-800 transition-colors hover:bg-muted"
-                  title="Aumentar tamaño de texto seleccionado"
-                >
-                  T+ Texto Grande
-                </button>
                 <button
                   type="button"
                   onClick={() => insertFormatting('**', '**')}
@@ -476,8 +574,8 @@ export function AnnouncementAdminFormModal({
             </span>
           ) : (
             <span className="block text-xs font-normal text-muted-foreground">
-              Usa # para Título Grande, ## para Mediano, ### para Normal, o
-              resalta texto y pulsa "T+ Texto Grande".
+              Selecciona cualquier texto y ajusta su tamaño con el selector o
+              A+/A- (tipo Word), o usa # para títulos.
             </span>
           )}
         </div>
