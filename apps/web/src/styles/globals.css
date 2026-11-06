@@ -14,6 +14,20 @@
   --color-ring: var(--primary);
   --font-sans: var(--font-body);
   --font-heading: var(--font-display);
+
+  /* Paleta de etiquetas y notificaciones */
+  --color-mint-bg: #e7f6ef;
+  --color-mint-accent: #329b78;
+  --color-lavender-bg: #fcebfa;
+  --color-lavender-accent: #c34ab7;
+  --color-sky-tag-bg: #eaf4fd;
+  --color-sky-tag-accent: #4385c7;
+  --color-rose-tag-bg: #fff0f4;
+  --color-rose-tag-accent: #ce4779;
+  --color-cream-bg: #fffbe8;
+  --color-cream-accent: #c58a24;
+  --color-violet-tag-bg: #f3effd;
+  --color-violet-tag-accent: #7852c9;
 }
 :root {
   --font-body:
