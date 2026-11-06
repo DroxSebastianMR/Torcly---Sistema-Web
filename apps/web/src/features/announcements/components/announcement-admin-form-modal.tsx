@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
 import { SmartSelect } from '@/components/ui/smart-select'
 import { cn } from '@/lib/utils'
+import { AnnouncementMarkdown } from './announcement-markdown'
 import {
   announcementFormSchema,
   emptyAnnouncement,
@@ -66,6 +67,29 @@ export function AnnouncementAdminFormModal({
   const contentValue = useWatch({ control, name: 'content' })
   const contentRegister = register('content')
   const contentTextareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const [previewMode, setPreviewMode] = useState(false)
+
+  const insertFormatting = (prefix: string, suffix = '') => {
+    const textarea = contentTextareaRef.current
+    if (!textarea) return
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const current = textarea.value
+    const selected = current.slice(start, end)
+    const replacement = selected
+      ? `${prefix}${selected}${suffix}`
+      : `${prefix}${suffix}`
+    const nextValue = current.slice(0, start) + replacement + current.slice(end)
+    setValue('content', nextValue, {
+      shouldValidate: true,
+      shouldDirty: true,
+    })
+    setTimeout(() => {
+      textarea.focus()
+      const cursorPos = start + prefix.length + (selected ? selected.length : 0)
+      textarea.setSelectionRange(cursorPos, cursorPos)
+    }, 10)
+  }
 
   useEffect(() => {
     if (contentTextareaRef.current) {
@@ -291,29 +315,123 @@ export function AnnouncementAdminFormModal({
         </Field>
 
         {/* Content */}
-        <Field
-          label="Contenido Completo"
-          error={error('content')}
-          required
-          hint="Detalle de cambios, changelog, guías de usuario o instrucciones operativas."
-        >
-          <textarea
-            id="announcement-content"
-            {...contentRegister}
-            ref={(element) => {
-              contentRegister.ref(element)
-              contentTextareaRef.current = element
-            }}
-            rows={6}
-            aria-invalid={Boolean(error('content'))}
-            placeholder="Detalle de cambios, changelog, guías de usuario o instrucciones operativas."
-            className={cn(
-              'no-scrollbar w-full min-w-0 resize-y rounded-[10px] border border-input bg-card px-3 py-2.5 text-sm leading-relaxed transition-[border-color,background-color] duration-150 ease-out hover:bg-background focus:border-primary/70 focus:outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 overflow-x-hidden break-words whitespace-pre-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
-              error('content') && 'border-red-500 focus:border-red-600',
-            )}
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          />
-        </Field>
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <label
+              htmlFor="announcement-content"
+              className="text-sm font-medium text-foreground cursor-pointer"
+            >
+              Contenido Completo{' '}
+              <span className="ml-1 text-emerald-700">*</span>
+            </label>
+            <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-0.5 text-xs">
+              <button
+                type="button"
+                onClick={() => setPreviewMode(false)}
+                className={cn(
+                  'rounded-md px-2.5 py-1 font-medium transition-colors cursor-pointer',
+                  !previewMode
+                    ? 'bg-card text-foreground shadow-2xs font-semibold'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                Editor
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewMode(true)}
+                className={cn(
+                  'rounded-md px-2.5 py-1 font-medium transition-colors cursor-pointer',
+                  previewMode
+                    ? 'bg-card text-foreground shadow-2xs font-semibold'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                Vista Previa
+              </button>
+            </div>
+          </div>
+
+          {!previewMode ? (
+            <>
+              {/* Quick formatting toolbar */}
+              <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-border/70 bg-muted/20 px-2 py-1.5 text-xs">
+                <span className="mr-1 text-[11px] font-semibold text-muted-foreground">
+                  Insertar formato:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => insertFormatting('### ')}
+                  className="cursor-pointer rounded border border-border/60 bg-card px-2 py-0.5 text-[11px] font-medium text-foreground transition-colors hover:bg-muted"
+                  title="Encabezado de sección"
+                >
+                  ### Título
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertFormatting('**', '**')}
+                  className="cursor-pointer rounded border border-border/60 bg-card px-2 py-0.5 text-[11px] font-bold text-foreground transition-colors hover:bg-muted"
+                  title="Texto en negrita"
+                >
+                  **B** Negrita
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertFormatting('1. ')}
+                  className="cursor-pointer rounded border border-border/60 bg-card px-2 py-0.5 text-[11px] font-medium text-foreground transition-colors hover:bg-muted"
+                  title="Lista numerada con badge"
+                >
+                  1. Numeración
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertFormatting('- ')}
+                  className="cursor-pointer rounded border border-border/60 bg-card px-2 py-0.5 text-[11px] font-medium text-foreground transition-colors hover:bg-muted"
+                  title="Viñeta de lista"
+                >
+                  • Viñeta
+                </button>
+              </div>
+
+              <textarea
+                id="announcement-content"
+                {...contentRegister}
+                ref={(element) => {
+                  contentRegister.ref(element)
+                  contentTextareaRef.current = element
+                }}
+                rows={6}
+                aria-invalid={Boolean(error('content'))}
+                placeholder="Detalle de cambios, changelog, guías de usuario o instrucciones operativas."
+                className={cn(
+                  'no-scrollbar w-full min-w-0 resize-y rounded-[10px] border border-input bg-card px-3 py-2.5 text-sm leading-relaxed transition-[border-color,background-color] duration-150 ease-out hover:bg-background focus:border-primary/70 focus:outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 overflow-x-hidden break-words whitespace-pre-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+                  error('content') && 'border-red-500 focus:border-red-600',
+                )}
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              />
+            </>
+          ) : (
+            <div className="min-h-[160px] rounded-[10px] border border-border bg-card p-4 shadow-2xs">
+              <AnnouncementMarkdown
+                content={
+                  contentValue?.trim() ||
+                  '*(Escribe contenido en el editor para visualizarlo aquí)*'
+                }
+              />
+            </div>
+          )}
+
+          {error('content') ? (
+            <span className="block text-xs font-normal text-red-600">
+              {error('content')}
+            </span>
+          ) : (
+            <span className="block text-xs font-normal text-muted-foreground">
+              Puedes usar títulos (###), texto en negrita (**negrita**) o listas
+              numeradas (1. 2. 3.) para destacar cambios visuales.
+            </span>
+          )}
+        </div>
 
         {/* Broadcast Checkbox */}
         <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-3.5 shadow-xs">

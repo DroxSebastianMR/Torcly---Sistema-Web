@@ -220,10 +220,10 @@ export const announcementsService = {
       content:
         `### Resumen de la Versión v${CURRENT_SAAS_VERSION}\n\n` +
         `Nos complace anunciar el despliegue oficial de **Torcly v${CURRENT_SAAS_VERSION}** con importantes mejoras en la productividad de los talleres y la comunicación de plataforma:\n\n` +
-        `- **Centro de Notificaciones Unificado:** Nueva campana interactiva con categorías operativas (Órdenes de trabajo, Inventario, Clientes y Facturación).\n` +
-        `- **Bandeja Completa y Filtros Rápidos:** Visualización por rangos de tiempo (Hoy, 7 días, 30 días, 90 días) con colores visuales suaves identificativos.\n` +
-        `- **Módulo de Novedades y Anuncios SaaS:** Espacio centralizado para consultar releases, cambios en el sistema y ventanas de mantenimiento programadas.\n` +
-        `- **Mejoras de Rendimiento:** Optimización de consultas en base de datos y reducción de latencia en carga de vistas operativas.\n\n` +
+        `1. **Centro de Notificaciones Unificado:** Nueva campana interactiva con categorías operativas (Órdenes de trabajo, Inventario, Clientes y Facturación).\n` +
+        `2. **Bandeja Completa y Filtros Rápidos:** Visualización por rangos de tiempo (Hoy, 7 días, 30 días, 90 días) con colores visuales suaves identificativos.\n` +
+        `3. **Módulo de Novedades y Anuncios SaaS:** Espacio centralizado para consultar releases, cambios en el sistema y ventanas de mantenimiento programadas.\n` +
+        `4. **Mejoras de Rendimiento:** Optimización de consultas en base de datos y reducción de latencia en carga de vistas operativas.\n\n` +
         `Si tienes dudas o consultas sobre el uso de las nuevas herramientas, revisa nuestro video tutorial explicativo o contacta al equipo de soporte de Torcly.`,
       type: 'UPDATE',
       status: 'PUBLISHED',
