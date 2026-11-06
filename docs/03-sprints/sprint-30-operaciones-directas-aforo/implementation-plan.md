@@ -3,6 +3,7 @@
 ## 1. Arquitectura de Datos y Modelado Prisma
 
 ### A. Modificaciones en el Modelo `WorkOrder`
+
 - `appointmentId`: Pasa de `String @unique` a `String? @unique @map("appointment_id") @db.Uuid`.
 - `appointment`: Pasa de `Appointment` a `Appointment?`.
 - `source`: Nuevo campo `WorkOrderSource @default(APPOINTMENT)` con valores `APPOINTMENT` | `WALK_IN`.
@@ -11,6 +12,7 @@
 - `receptionNotes`: `String? @map("reception_notes") @db.VarChar(500)`.
 
 ### B. Modificaciones en el Modelo `Vehicle`
+
 - `mileage`: `Int? @map("mileage")` (Odómetro actualizado con el último registro en taller).
 
 ---

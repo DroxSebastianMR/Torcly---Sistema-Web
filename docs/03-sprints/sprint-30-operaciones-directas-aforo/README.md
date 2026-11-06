@@ -5,6 +5,7 @@
 En la operación real de un taller mecánico automotriz, no todos los clientes programan una cita con anticipación. Gran parte de la afluencia ocurre por **ingresos directos ("walk-ins")**: vehículos que llegan de improviso por emergencias mecánicas (ruidos extraños, pinchazos, sobrecalentamiento, fallas de arranque o mantenimientos inmediatos).
 
 Actualmente:
+
 - Para generar una Orden de Trabajo (`WorkOrder`), el flujo exigía obligatoriamente partir de una cita previa (`Appointment`).
 - En la recepción física del vehículo faltaba registrar variables críticas de control automotriz: **kilometraje actual (`currentMileage`)** y **nivel de combustible (`fuelLevel`)**, datos que protegen al taller ante reclamos y sustentan futuras alertas preventivas (ej. cambios de aceite cada 5,000 km).
 - Los talleres físicos operan con una infraestructura limitada: en este caso, una capacidad física de **8 vehículos concurrentes** en patio/bahías de trabajo. El control de cuántos vehículos ingresan al día y el aforo actual de patio se venía gestionando a mano o en pizarras.
@@ -16,12 +17,14 @@ El objetivo del **Sprint 30** es implementar la recepción directa de vehículos
 ## 2. Alcance Funcional
 
 ### A. Recepción Directa y Creación de Orden de Trabajo sin Cita Previa ("Walk-ins")
+
 - **Generación directa de OTs:** Permite a los recepcionistas y asesores crear una Orden de Trabajo directamente desde `/ordenes-taller` o recepción rápida sin requerir una cita previa.
 - **Selección o Registro Rápido:** Selección ágil de cliente y vehículo existentes (con búsqueda por placa o DNI/RUC), o alta rápida en caso de cliente nuevo.
 - **Trazabilidad de Origen:** La orden queda etiquetada con su origen (`source: 'WALK_IN'` vs `source: 'APPOINTMENT'`).
 - **Estado Inicial y Asignación:** Ingresa en estado `RECEPCIONADA` con correlativo secuencial `OT-XXXXXX`.
 
 ### B. Captura de Odómetro y Nivel de Combustible en Recepción
+
 - **Campos de Control Obligatorios en Recepción:**
   - **Kilometraje actual (`currentMileage`):** Número entero en kilómetros. Se actualiza automáticamente como el último kilometraje registrado en la ficha del vehículo (`Vehicle.mileage`).
   - **Nivel de Combustible (`fuelLevel`):** Selección gráfica o segmentada (`EMPTY`, `1/4`, `1/2`, `3/4`, `FULL`).
@@ -29,6 +32,7 @@ El objetivo del **Sprint 30** es implementar la recepción directa de vehículos
 - **Aplicación Universal:** Disponible tanto en la **creación directa** como al **atender y recepcionar una cita programada**.
 
 ### C. Aforo Diario y Capacidad de Patio (Límite 8 Bahías)
+
 - **Monitoreo de Capacidad Concurrente:**
   - El aforo mide los vehículos físicamente en taller (estados activos: `RECEPCIONADA`, `EN_DIAGNOSTICO`, `PENDIENTE_APROBACION`, `APROBADA`, `EN_EJECUCION`, `LISTA_PARA_ENTREGA`).
   - Cuando la orden pasa a `ENTREGADA` o `RECHAZADA`, el vehículo libera su bahía en patio.
