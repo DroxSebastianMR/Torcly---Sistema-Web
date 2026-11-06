@@ -1,6 +1,7 @@
 import { Calendar, Clock, ExternalLink, Tag, Video } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
+import { AnnouncementMarkdown } from './announcement-markdown'
 import type { AnnouncementItem } from '../types/announcements.types'
 import {
   formatAnnouncementDate,
@@ -161,8 +162,8 @@ export function AnnouncementDetailModal({
         </div>
 
         {/* Content body */}
-        <div className="prose prose-sm max-w-none text-xs leading-relaxed text-foreground whitespace-pre-wrap break-words min-w-0 overflow-x-hidden">
-          {announcement.content}
+        <div className="min-w-0 overflow-x-hidden pt-1">
+          <AnnouncementMarkdown content={announcement.content} />
         </div>
       </div>
     </Modal>
