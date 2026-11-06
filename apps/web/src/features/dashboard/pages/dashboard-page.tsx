@@ -34,8 +34,13 @@ const allTime: Period = { from: null, to: null }
 const todayPeriod: Period = { from: today, to: today }
 const weekPeriod: Period = { from: today, to: dateKey(weekEnd) }
 
-const numberOf = (section: Record<string, unknown> | undefined, key: string) =>
-  typeof section?.[key] === 'number' ? section[key] : 0
+const numberOf = (
+  section: Record<string, unknown> | undefined,
+  key: string,
+): number => {
+  const value = section?.[key]
+  return typeof value === 'number' ? value : 0
+}
 
 const currency = (value: number) =>
   new Intl.NumberFormat('es-PE', {
@@ -54,7 +59,7 @@ const formatDate = (value: unknown) => {
   }).format(new Date(year, month - 1, day))
 }
 
-const activeOrders = (section: Record<string, unknown> | undefined) => {
+const activeOrders = (section: Record<string, unknown> | undefined): number => {
   const statuses = section?.byStatus
   if (!statuses || typeof statuses !== 'object') return 0
   return Object.entries(statuses as Record<string, unknown>)

@@ -132,7 +132,7 @@ export function YardCapacityWidget({
                 className={
                   isFilteringToday
                     ? 'text-white'
-                    : 'text-foreground underline decoration-dotted underline-offset-2'
+                    : 'text-foreground decoration-dotted'
                 }
               >
                 {todayEntries}
