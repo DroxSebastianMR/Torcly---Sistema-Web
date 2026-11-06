@@ -1,4 +1,4 @@
-import { Megaphone, Sparkles, Wrench, type LucideIcon } from 'lucide-react'
+import { FileText, TrendingUp, Wrench, type LucideIcon } from 'lucide-react'
 import type { AnnouncementType } from '../types/announcements.types'
 
 export const announcementDateFormatter = new Intl.DateTimeFormat('es-PE', {
@@ -61,7 +61,7 @@ export function getAnnouncementAppearance(
       return {
         key: 'UPDATE',
         label: 'Actualización',
-        icon: Sparkles,
+        icon: TrendingUp,
         bg: '#E7F6EF', // Verde menta
         accent: '#329B78',
         description: 'Nueva versión o características del SaaS',
@@ -80,7 +80,7 @@ export function getAnnouncementAppearance(
       return {
         key: 'COMMUNICATION',
         label: 'Comunicado',
-        icon: Megaphone,
+        icon: FileText,
         bg: '#EAF4FD', // Azul cielo
         accent: '#4385C7',
         description: 'Noticia, anuncio o comunicado oficial',

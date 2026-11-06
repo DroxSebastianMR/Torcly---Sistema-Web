@@ -1,5 +1,12 @@
 import { useState } from 'react'
-import { CheckCheck, Megaphone, Sparkles, Wrench } from 'lucide-react'
+import {
+  CheckCheck,
+  FileText,
+  Layers,
+  TrendingUp,
+  Wrench,
+  type LucideIcon,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -22,10 +29,10 @@ const CATEGORY_TABS: Array<{
   id: string
   label: string
   type?: AnnouncementType
-  icon: typeof Sparkles
+  icon: LucideIcon
 }> = [
-  { id: 'all', label: 'Todas', icon: Megaphone },
-  { id: 'UPDATE', label: 'Actualizaciones', type: 'UPDATE', icon: Sparkles },
+  { id: 'all', label: 'Todas', icon: Layers },
+  { id: 'UPDATE', label: 'Actualizaciones', type: 'UPDATE', icon: TrendingUp },
   {
     id: 'MAINTENANCE',
     label: 'Mantenimientos',
@@ -36,7 +43,7 @@ const CATEGORY_TABS: Array<{
     id: 'COMMUNICATION',
     label: 'Comunicados',
     type: 'COMMUNICATION',
-    icon: Megaphone,
+    icon: FileText,
   },
 ]
 

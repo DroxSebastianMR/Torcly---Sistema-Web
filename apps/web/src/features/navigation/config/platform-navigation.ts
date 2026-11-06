@@ -1,4 +1,4 @@
-import { Building2, Megaphone } from 'lucide-react'
+import { Building2, FileText } from 'lucide-react'
 import { paths } from '@/app/router/constants/paths'
 import type { NavigationGroup } from '../types/navigation.types'
 
@@ -18,7 +18,7 @@ export const platformNavigation: readonly NavigationGroup[] = [
       {
         id: 'platform-announcements',
         label: 'Anuncios SaaS',
-        icon: Megaphone,
+        icon: FileText,
         path: paths.platformAnnouncements,
         visible: true,
       },

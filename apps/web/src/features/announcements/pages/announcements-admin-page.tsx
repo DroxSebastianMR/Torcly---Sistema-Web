@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Edit3, Plus, Sparkles, Trash2, Video } from 'lucide-react'
+import { Edit3, Plus, Trash2, TrendingUp, Video } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -126,7 +126,7 @@ export default function AnnouncementsAdminPage() {
             disabled={mutations.generateVersionRelease.isPending}
             className="gap-1.5"
           >
-            <Sparkles size={14} className="text-primary" />
+            <TrendingUp size={14} className="text-primary" />
             <span>Generar Release v{activeVersion?.version ?? '1.1.2'}</span>
           </Button>
 
