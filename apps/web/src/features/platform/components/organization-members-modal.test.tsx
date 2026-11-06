@@ -165,4 +165,38 @@ describe('OrganizationMembersModal', () => {
       expect(screen.queryByText('Torcly-TEST-9999!')).toBeNull()
     })
   })
+
+  it('no renderiza nada cuando organization es null y no rompe las reglas de hooks al abrirse', () => {
+    const { rerender } = render(
+      <OrganizationMembersModal
+        organization={null}
+        roles={mockRoles}
+        members={[]}
+        loading={false}
+        busy={false}
+        onClose={vi.fn()}
+        onCreate={vi.fn()}
+        onUpdate={vi.fn()}
+      />,
+    )
+
+    expect(screen.queryByText('Miembros de Taller Central')).toBeNull()
+
+    // Ahora se abre con la organización seleccionada
+    rerender(
+      <OrganizationMembersModal
+        organization={mockOrganization}
+        roles={mockRoles}
+        members={mockMembers}
+        loading={false}
+        busy={false}
+        onClose={vi.fn()}
+        onCreate={vi.fn()}
+        onUpdate={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Miembros de Taller Central')).toBeTruthy()
+    expect(screen.getByText('Arian Bautista')).toBeTruthy()
+  })
 })

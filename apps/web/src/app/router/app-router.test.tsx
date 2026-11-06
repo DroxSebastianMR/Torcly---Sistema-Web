@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom'
 import { afterEach, describe, expect, it } from 'vitest'
 import { RouteError } from './app-router'
+import { AuthContext } from '@/features/auth/hooks/auth-context'
 
 function renderError(initialPath: string) {
   const routes: RouteObject[] = [
@@ -61,5 +62,43 @@ describe('RouteError', () => {
     expect(
       screen.getByRole('button', { name: 'Volver al inicio' }),
     ).toBeTruthy()
+  })
+
+  it('redirige a /organizaciones al hacer clic en Volver al inicio si el usuario es platform admin', async () => {
+    const routes: RouteObject[] = [
+      {
+        errorElement: <RouteError />,
+        children: [
+          { path: '/organizaciones', element: <p>Consola de Plataforma</p> },
+          {
+            path: '/falla-admin',
+            loader: () => {
+              throw new Response('Error', { status: 500 })
+            },
+          },
+        ],
+      },
+    ]
+    const router = createMemoryRouter(routes, {
+      initialEntries: ['/falla-admin'],
+    })
+    const mockAuthValue: any = {
+      user: { id: 'admin-1', isPlatformAdmin: true, name: 'Admin Torcly' },
+      loading: false,
+      error: false,
+    }
+    render(
+      <AuthContext.Provider value={mockAuthValue}>
+        <RouterProvider router={router} />
+      </AuthContext.Provider>,
+    )
+
+    const alert = await screen.findByRole('alert')
+    expect(alert).toBeTruthy()
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Volver al inicio' }),
+    )
+    expect(await screen.findByText('Consola de Plataforma')).toBeTruthy()
   })
 })

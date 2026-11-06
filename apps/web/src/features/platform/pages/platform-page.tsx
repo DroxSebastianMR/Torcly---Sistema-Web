@@ -379,43 +379,45 @@ export default function PlatformPage() {
         onClose={() => setEditingOrganization(null)}
         onSubmit={editOrganization}
       />
-      <OrganizationMembersModal
-        organization={selectedOrganization}
-        roles={roles.data?.data ?? []}
-        members={members.data?.data ?? []}
-        loading={members.isLoading}
-        busy={
-          createMember.isPending ||
-          updateMember.isPending ||
-          resetMember.isPending
-        }
-        onClose={() => setSelectedOrganization(null)}
-        onCreate={async (input) => {
-          if (selectedOrganization) {
-            await createMember.mutateAsync({
-              organizationId: selectedOrganization.id,
-              input,
-            })
+      {selectedOrganization && (
+        <OrganizationMembersModal
+          organization={selectedOrganization}
+          roles={roles.data?.data ?? []}
+          members={members.data?.data ?? []}
+          loading={members.isLoading}
+          busy={
+            createMember.isPending ||
+            updateMember.isPending ||
+            resetMember.isPending
           }
-        }}
-        onUpdate={async (userId, input) => {
-          if (selectedOrganization) {
-            await updateMember.mutateAsync({
+          onClose={() => setSelectedOrganization(null)}
+          onCreate={async (input) => {
+            if (selectedOrganization) {
+              await createMember.mutateAsync({
+                organizationId: selectedOrganization.id,
+                input,
+              })
+            }
+          }}
+          onUpdate={async (userId, input) => {
+            if (selectedOrganization) {
+              await updateMember.mutateAsync({
+                organizationId: selectedOrganization.id,
+                userId,
+                input,
+              })
+            }
+          }}
+          onResetPassword={async (userId) => {
+            if (!selectedOrganization) throw new Error('Taller no seleccionado')
+            const res = await resetMember.mutateAsync({
               organizationId: selectedOrganization.id,
               userId,
-              input,
             })
-          }
-        }}
-        onResetPassword={async (userId) => {
-          if (!selectedOrganization) throw new Error('Taller no seleccionado')
-          const res = await resetMember.mutateAsync({
-            organizationId: selectedOrganization.id,
-            userId,
-          })
-          return res.data
-        }}
-      />
+            return res.data
+          }}
+        />
+      )}
     </div>
   )
 }
