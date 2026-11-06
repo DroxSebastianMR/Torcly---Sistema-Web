@@ -191,16 +191,4 @@ describe('PurchasesPage', () => {
     expect(screen.getByRole('dialog')).toBeTruthy()
     expect(screen.getByRole('heading', { name: /nueva compra/i })).toBeTruthy()
   })
-
-  it('abre el modal de proveedores al hacer clic en Proveedores', async () => {
-    renderWithClient(<PurchasesPage />)
-
-    const suppliersBtn = screen.getByRole('button', { name: /proveedores/i })
-    await userEvent.click(suppliersBtn)
-
-    expect(screen.getByRole('dialog')).toBeTruthy()
-    expect(
-      screen.getByRole('heading', { name: /gestión de proveedores/i }),
-    ).toBeTruthy()
-  })
 })

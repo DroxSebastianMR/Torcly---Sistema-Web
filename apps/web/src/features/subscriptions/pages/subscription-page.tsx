@@ -1,11 +1,8 @@
 import {
-  Crown,
   Users,
   Wrench,
   Package,
-  Calendar,
   CheckCircle2,
-  Sparkles,
   HelpCircle,
   AlertTriangle,
 } from 'lucide-react'
@@ -56,10 +53,13 @@ export default function SubscriptionPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Suscripción y Membresía
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            Configuración y Facturación
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
+            Suscripción y Membresía del Taller
           </h1>
-          <p className="text-xs text-muted-foreground">
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
             Cargando información del plan de tu taller...
           </p>
         </div>
@@ -86,77 +86,44 @@ export default function SubscriptionPage() {
 
   const { subscription, plan, usage } = data.data
   const statusBadge = statusBadgeStyles[subscription.status]
-
-  const renewalFormatted = subscription.renewsAt
-    ? new Date(subscription.renewsAt).toLocaleDateString('es-PE', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : 'Sin fecha de corte'
+  const isCorporateOrMaxPlan =
+    plan.code === 'ENTERPRISE' ||
+    plan.code === 'CORPORATE' ||
+    plan.name.toLowerCase().includes('corporativo') ||
+    plan.name.toLowerCase().includes('enterprise')
 
   return (
     <div className="space-y-6">
       {/* Encabezado */}
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-brand-forest">
-          Configuración y Facturación
-        </p>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground">
-          Suscripción y Membresía del Taller
-        </h1>
-        <p className="text-xs text-muted-foreground">
-          Consulta los detalles de tu plan contratado, la fecha de renovación y
-          el consumo en tiempo real de los límites asignados a tu equipo.
-        </p>
-      </div>
+      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            Configuración y Facturación
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
+            Suscripción y Membresía del Taller
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+            Consulta los detalles de tu plan contratado, la fecha de renovación
+            y el consumo en tiempo real de los límites asignados a tu equipo.
+          </p>
+        </div>
+      </header>
 
       {/* Tarjeta Principal del Plan Activo */}
       <div className="rounded-xl border border-border bg-gradient-to-br from-card to-emerald-50/20 p-6 shadow-sm">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-4">
-            <div className="flex size-12 items-center justify-center rounded-xl bg-emerald-100 text-brand-forest">
-              <Crown className="size-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h2 className="text-xl font-bold text-foreground">
-                  {plan.name}
-                </h2>
-                <span
-                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusBadge.bg} ${statusBadge.text} ${statusBadge.border}`}
-                >
-                  {statusBadge.label}
-                </span>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {plan.description ||
-                  'Plan empresarial diseñado para la gestión integral de tu taller.'}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-start rounded-xl border border-border bg-card p-3 sm:items-end">
-            <span className="text-[11px] font-medium text-muted-foreground">
-              Tarifa contratada
-            </span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-xl font-bold text-foreground">
-                S/{' '}
-                {subscription.billingCycle === 'ANNUAL'
-                  ? plan.priceYearly.toFixed(2)
-                  : plan.priceMonthly.toFixed(2)}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                / {subscription.billingCycle === 'ANNUAL' ? 'año' : 'mes'}
-              </span>
-            </div>
-            <div className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
-              <Calendar className="size-3 text-muted-foreground" />
-              <span>Próxima renovación: {renewalFormatted}</span>
-            </div>
-          </div>
+        <div className="flex items-center gap-2.5">
+          <h2 className="text-xl font-bold text-foreground">{plan.name}</h2>
+          <span
+            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusBadge.bg} ${statusBadge.text} ${statusBadge.border}`}
+          >
+            {statusBadge.label}
+          </span>
         </div>
+        <p className="mt-1.5 text-xs text-muted-foreground">
+          {plan.description ||
+            'Plan empresarial diseñado para la gestión integral de tu taller.'}
+        </p>
       </div>
 
       {/* Cuotas de Uso en Tiempo Real */}
@@ -289,12 +256,9 @@ export default function SubscriptionPage() {
       {/* Funcionalidades Incluidas */}
       {plan.features.length > 0 && (
         <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-          <div className="flex items-center gap-2">
-            <Sparkles className="size-4 text-brand-forest" />
-            <h3 className="text-sm font-semibold text-foreground">
-              Funcionalidades Incluidas en tu Membresía
-            </h3>
-          </div>
+          <h3 className="text-sm font-semibold text-foreground">
+            Funcionalidades Incluidas en tu Membresía
+          </h3>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Beneficios activos para la gestión diaria de tu taller bajo el{' '}
             {plan.name}.
@@ -314,34 +278,36 @@ export default function SubscriptionPage() {
         </div>
       )}
 
-      {/* Tarjeta de Soporte y Upgrade */}
-      <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50/50 p-5 sm:flex-row">
-        <div className="flex items-start gap-3">
-          <HelpCircle className="size-5 text-brand-forest shrink-0 mt-0.5" />
-          <div>
-            <h4 className="text-xs font-semibold text-emerald-950">
-              ¿Tu taller está creciendo y necesitas ampliar tus cuotas?
-            </h4>
-            <p className="mt-0.5 text-[11px] text-emerald-800">
-              Comunícate con el equipo de soporte de Torcly para solicitar una
-              ampliación de usuarios, técnicos o migración hacia un Plan
-              Corporativo sin interrupción de tus servicios.
-            </p>
+      {/* Tarjeta de Soporte y Upgrade (Oculta si ya se encuentra en el plan corporativo / máximo) */}
+      {!isCorporateOrMaxPlan && (
+        <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50/50 p-5 sm:flex-row">
+          <div className="flex items-start gap-3">
+            <HelpCircle className="size-5 text-brand-forest shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-xs font-semibold text-emerald-950">
+                ¿Tu taller está creciendo y necesitas ampliar tus cuotas?
+              </h4>
+              <p className="mt-0.5 text-[11px] text-emerald-800">
+                Comunícate con el equipo de soporte de Torcly para solicitar una
+                ampliación de usuarios, técnicos o migración hacia un Plan
+                Corporativo sin interrupción de tus servicios.
+              </p>
+            </div>
           </div>
-        </div>
 
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => {
-            window.location.href =
-              'mailto:soporte@torcly.com?subject=Solicitud%20de%20Upgrade%20de%20Plan%20Torcly'
-          }}
-          className="border-emerald-300 bg-white text-xs text-brand-forest hover:bg-emerald-50 shrink-0"
-        >
-          Contactar soporte
-        </Button>
-      </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              window.location.href =
+                'mailto:soporte@torcly.com?subject=Solicitud%20de%20Upgrade%20de%20Plan%20Torcly'
+            }}
+            className="border-emerald-300 bg-white text-xs text-brand-forest hover:bg-emerald-50 shrink-0"
+          >
+            Contactar soporte
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

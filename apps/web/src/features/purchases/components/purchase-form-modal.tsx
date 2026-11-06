@@ -167,6 +167,7 @@ export function PurchaseFormModal({
       open={open}
       onClose={onClose}
       title={isEditing ? 'Editar borrador de compra' : 'Nueva compra'}
+      className="max-w-xl"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -262,15 +263,18 @@ export function PurchaseFormModal({
           )}
 
           {fields.length === 0 ? (
-            <div className="flex min-h-24 flex-col items-center justify-center rounded-xl border border-dashed text-sm text-muted-foreground">
-              <PackagePlus size={24} className="mb-1 opacity-50" aria-hidden />
-              <span>No hay productos agregados a la compra.</span>
-              <span className="text-xs">
-                Haz clic en &quot;Agregar ítem&quot; para comenzar.
+            <div className="flex min-h-24 flex-col items-center justify-center rounded-xl border border-dashed py-6 px-4 text-center text-muted-foreground">
+              <PackagePlus
+                size={24}
+                className="mb-1.5 opacity-50"
+                aria-hidden
+              />
+              <span className="text-xs font-medium">
+                No hay productos agregados a la compra.
               </span>
             </div>
           ) : (
-            <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+            <div className="max-h-80 space-y-3 overflow-y-auto pr-1 no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {fields.map((field, index) => {
                 const currentProductId = lines[index]?.productId ?? ''
                 const currentQty = Number(lines[index]?.quantity) || 0
@@ -280,111 +284,119 @@ export function PurchaseFormModal({
                 return (
                   <div
                     key={field.id}
-                    className="flex flex-col gap-2 rounded-xl border bg-card p-3 sm:flex-row sm:items-center"
+                    className="space-y-3 rounded-xl border border-border bg-card p-3.5 shadow-sm"
                   >
-                    <div className="flex-1 space-y-1">
-                      <label
-                        htmlFor={`line-product-${index}`}
-                        className="text-xs font-medium text-muted-foreground"
+                    {/* Fila 1: Selector de producto a ancho completo con botón eliminar */}
+                    <div className="flex items-start gap-2">
+                      <div className="flex-1 space-y-1">
+                        <label
+                          htmlFor={`line-product-${index}`}
+                          className="text-xs font-medium text-muted-foreground"
+                        >
+                          Producto
+                        </label>
+                        <SmartSelect
+                          id={`line-product-${index}`}
+                          value={currentProductId}
+                          placeholder="Selecciona un producto…"
+                          options={[
+                            { value: '', label: 'Selecciona un producto…' },
+                            ...products.map((product) => ({
+                              value: product.id,
+                              label: `${product.code} · ${product.name}`,
+                              meta: product.unit?.symbol ?? undefined,
+                              disabled: lines.some(
+                                (line, lineIndex) =>
+                                  lineIndex !== index &&
+                                  line.productId === product.id,
+                              ),
+                            })),
+                          ]}
+                          onChange={(value) =>
+                            handleProductSelect(index, value)
+                          }
+                          aria-label={`Producto para línea ${index + 1}`}
+                        />
+                        {formState.errors.lines?.[index]?.productId && (
+                          <p className="text-xs text-destructive" role="alert">
+                            {formState.errors.lines[index]?.productId?.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => remove(index)}
+                        className="mt-6 flex size-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        aria-label={`Eliminar producto ${index + 1}`}
                       >
-                        Producto
-                      </label>
-                      <SmartSelect
-                        id={`line-product-${index}`}
-                        value={currentProductId}
-                        placeholder="Selecciona un producto…"
-                        options={[
-                          { value: '', label: 'Selecciona un producto…' },
-                          ...products.map((product) => ({
-                            value: product.id,
-                            label: `${product.code} · ${product.name}`,
-                            meta: product.unit?.symbol ?? undefined,
-                            disabled: lines.some(
-                              (line, lineIndex) =>
-                                lineIndex !== index &&
-                                line.productId === product.id,
-                            ),
-                          })),
-                        ]}
-                        onChange={(value) => handleProductSelect(index, value)}
-                        aria-label={`Producto para línea ${index + 1}`}
-                      />
-                      {formState.errors.lines?.[index]?.productId && (
-                        <p className="text-xs text-destructive" role="alert">
-                          {formState.errors.lines[index]?.productId?.message}
-                        </p>
-                      )}
+                        <Trash2 size={16} />
+                      </button>
                     </div>
 
-                    <div className="w-28 space-y-1">
-                      <label
-                        htmlFor={`line-qty-${index}`}
-                        className="text-xs font-medium text-muted-foreground"
-                      >
-                        Cantidad
-                      </label>
-                      <Input
-                        id={`line-qty-${index}`}
-                        type="number"
-                        step="0.001"
-                        min="0.001"
-                        placeholder="1"
-                        {...register(`lines.${index}.quantity`, {
-                          valueAsNumber: true,
-                        })}
-                        aria-label={`Cantidad línea ${index + 1}`}
-                        className="text-right text-xs"
-                      />
-                      {formState.errors.lines?.[index]?.quantity && (
-                        <p className="text-xs text-destructive" role="alert">
-                          {formState.errors.lines[index]?.quantity?.message}
-                        </p>
-                      )}
-                    </div>
+                    {/* Fila 2: Cantidad, Costo Unitario y Subtotal */}
+                    <div className="grid grid-cols-3 items-end gap-3 rounded-lg border border-border/50 bg-muted/20 p-2.5">
+                      <div className="space-y-1">
+                        <label
+                          htmlFor={`line-qty-${index}`}
+                          className="text-xs font-medium text-muted-foreground"
+                        >
+                          Cantidad
+                        </label>
+                        <Input
+                          id={`line-qty-${index}`}
+                          type="number"
+                          step="0.001"
+                          min="0.001"
+                          placeholder="1"
+                          {...register(`lines.${index}.quantity`, {
+                            valueAsNumber: true,
+                          })}
+                          aria-label={`Cantidad línea ${index + 1}`}
+                          className="text-right text-xs"
+                        />
+                        {formState.errors.lines?.[index]?.quantity && (
+                          <p className="text-xs text-destructive" role="alert">
+                            {formState.errors.lines[index]?.quantity?.message}
+                          </p>
+                        )}
+                      </div>
 
-                    <div className="w-28 space-y-1">
-                      <label
-                        htmlFor={`line-cost-${index}`}
-                        className="text-xs font-medium text-muted-foreground"
-                      >
-                        Costo Unit.
-                      </label>
-                      <Input
-                        id={`line-cost-${index}`}
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        placeholder="0.00"
-                        {...register(`lines.${index}.unitCost`, {
-                          valueAsNumber: true,
-                        })}
-                        aria-label={`Costo unitario línea ${index + 1}`}
-                        className="text-right text-xs"
-                      />
-                      {formState.errors.lines?.[index]?.unitCost && (
-                        <p className="text-xs text-destructive" role="alert">
-                          {formState.errors.lines[index]?.unitCost?.message}
-                        </p>
-                      )}
-                    </div>
+                      <div className="space-y-1">
+                        <label
+                          htmlFor={`line-cost-${index}`}
+                          className="text-xs font-medium text-muted-foreground"
+                        >
+                          Costo Unit.
+                        </label>
+                        <Input
+                          id={`line-cost-${index}`}
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          placeholder="0.00"
+                          {...register(`lines.${index}.unitCost`, {
+                            valueAsNumber: true,
+                          })}
+                          aria-label={`Costo unitario línea ${index + 1}`}
+                          className="text-right text-xs"
+                        />
+                        {formState.errors.lines?.[index]?.unitCost && (
+                          <p className="text-xs text-destructive" role="alert">
+                            {formState.errors.lines[index]?.unitCost?.message}
+                          </p>
+                        )}
+                      </div>
 
-                    <div className="w-28 text-right">
-                      <span className="text-xs text-muted-foreground block">
-                        Subtotal
-                      </span>
-                      <span className="font-mono text-sm font-semibold">
-                        {currencyFormatter.format(lineSubtotal)}
-                      </span>
+                      <div className="space-y-1 text-right">
+                        <span className="block text-xs font-medium text-muted-foreground">
+                          Subtotal
+                        </span>
+                        <div className="flex h-9 items-center justify-end font-mono text-sm font-semibold text-foreground">
+                          {currencyFormatter.format(lineSubtotal)}
+                        </div>
+                      </div>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => remove(index)}
-                      className="mt-4 flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                      aria-label={`Eliminar producto ${index + 1}`}
-                    >
-                      <Trash2 size={15} />
-                    </button>
                   </div>
                 )
               })}
@@ -399,7 +411,7 @@ export function PurchaseFormModal({
           <textarea
             id="notes"
             rows={2}
-            className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+            className="no-scrollbar flex w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition-[border-color,background-color] focus:border-primary/70 focus:ring-1 focus:ring-primary/70 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden resize-none"
             placeholder="Notas u observaciones de la compra…"
             {...register('notes')}
           />

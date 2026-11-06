@@ -76,7 +76,6 @@ describe('SubscriptionPage', () => {
 
     expect(screen.getByText('Plan Profesional')).toBeTruthy()
     expect(screen.getByText('Suscripción Activa')).toBeTruthy()
-    expect(screen.getByText('S/ 149.00')).toBeTruthy()
 
     // Usage cards
     expect(screen.getByText('3 / 10')).toBeTruthy()
@@ -87,5 +86,61 @@ describe('SubscriptionPage', () => {
     // Features
     expect(screen.getByText('Asistente IA conversacional')).toBeTruthy()
     expect(screen.getByText('Analítica y reportes avanzados')).toBeTruthy()
+  })
+
+  it('oculta la tarjeta de upgrade/soporte si el taller se encuentra en Plan Corporativo', () => {
+    vi.spyOn(useSubscriptionsModule, 'useWorkshopSubscription').mockReturnValue(
+      {
+        data: {
+          data: {
+            subscription: {
+              id: 'sub-2',
+              status: 'ACTIVE',
+              billingCycle: 'ANNUAL',
+              startsAt: '2026-11-01T00:00:00.000Z',
+              renewsAt: '2027-11-01T00:00:00.000Z',
+              canceledAt: null,
+              notes: null,
+            },
+            plan: {
+              id: 'plan-corp',
+              code: 'ENTERPRISE',
+              name: 'Plan Corporativo',
+              description: 'Máxima escala y capacidad.',
+              priceMonthly: 299,
+              priceYearly: 2990,
+              currency: 'PEN',
+              maxMembers: 50,
+              maxTechnicians: 50,
+              maxProducts: 20000,
+              features: ['Soporte 24/7', 'Auditoría completa'],
+              active: true,
+              isPublic: true,
+              createdAt: '2026-11-01T00:00:00.000Z',
+              updatedAt: '2026-11-01T00:00:00.000Z',
+            },
+            usage: {
+              members: { current: 5, max: 50, percent: 10 },
+              technicians: { current: 4, max: 50, percent: 8 },
+              products: { current: 20, max: 20000, percent: 0 },
+            },
+          },
+        },
+        isLoading: false,
+        error: null,
+      } as any,
+    )
+
+    render(<SubscriptionPage />)
+
+    expect(screen.getByText('Plan Corporativo')).toBeTruthy()
+    expect(
+      screen.queryByText(
+        /¿Tu taller está creciendo y necesitas ampliar tus cuotas\?/i,
+      ),
+    ).toBeNull()
+    expect(
+      screen.queryByRole('button', { name: /contactar soporte/i }),
+    ).toBeNull()
   })
 })

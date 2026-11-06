@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Building2, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ErrorState } from '@/components/ui/error-state'
 import { ModuleMetrics } from '@/components/ui/module-metrics'
@@ -10,7 +10,6 @@ import { PurchaseDetailModal } from '../components/purchase-detail-modal'
 import { PurchaseFormModal } from '../components/purchase-form-modal'
 import { PurchasesTable } from '../components/purchases-table'
 import { PurchasesToolbar } from '../components/purchases-toolbar'
-import { SuppliersModal } from '../components/suppliers-modal'
 import { usePurchases } from '../hooks/use-purchases'
 import type {
   PurchaseDetail,
@@ -33,7 +32,6 @@ export default function Page() {
   const [editingPurchase, setEditingPurchase] = useState<PurchaseDetail | null>(
     null,
   )
-  const [suppliersModalOpen, setSuppliersModalOpen] = useState(false)
 
   const purchases = usePurchases(filters)
   const total = purchases.data?.pagination.total ?? 0
@@ -74,22 +72,14 @@ export default function Page() {
             consulta el historial trazable e inmutable.
           </p>
         </div>
-        <div className="flex shrink-0 gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setSuppliersModalOpen(true)}
-            className="gap-1.5"
-          >
-            <Building2 size={16} />
-            Proveedores
-          </Button>
-          {canWrite && (
+        {canWrite && (
+          <div className="flex shrink-0">
             <Button onClick={openCreate} className="gap-1.5">
               <Plus size={17} />
               Nueva compra
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </header>
 
       <ModuleMetrics
@@ -164,11 +154,6 @@ export default function Page() {
           setFormOpen(false)
           setEditingPurchase(null)
         }}
-      />
-
-      <SuppliersModal
-        open={suppliersModalOpen}
-        onClose={() => setSuppliersModalOpen(false)}
       />
     </div>
   )
