@@ -48,7 +48,7 @@ export function CashSessionHistory({
     <section className="overflow-hidden rounded-2xl border bg-card">
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f] dark:border-[#365047] dark:bg-[#1d2a26] dark:text-[#aac4b8]">
             <tr>
               <th className="px-5 py-3">Caja</th>
               <th className="px-4 py-3">Período</th>
@@ -65,7 +65,7 @@ export function CashSessionHistory({
             {response.data.map((session) => (
               <tr
                 key={session.id}
-                className="cursor-pointer hover:bg-[#f9fbfa]"
+                className="cursor-pointer hover:bg-[#f9fbfa] dark:hover:bg-[#1b2924]"
                 onClick={() => onOpen(session)}
               >
                 <td className="px-5 py-4 font-semibold">{session.code}</td>

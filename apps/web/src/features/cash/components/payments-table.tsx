@@ -39,7 +39,7 @@ export function PaymentsTable({
     <>
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full border-collapse text-left text-sm">
-          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f] dark:border-[#365047] dark:bg-[#1d2a26] dark:text-[#aac4b8]">
             <tr>
               <th className="px-5 py-3">Venta</th>
               <th className="px-4 py-3">Cliente</th>
@@ -57,7 +57,7 @@ export function PaymentsTable({
             {obligations.map((obligation) => (
               <tr
                 key={obligation.id}
-                className="group cursor-pointer hover:bg-[#f9fbfa]"
+                className="group cursor-pointer hover:bg-[#f9fbfa] dark:hover:bg-[#1b2924]"
                 onClick={() => onOpen(obligation)}
               >
                 <td className="px-5 py-4">
@@ -91,7 +91,7 @@ export function PaymentsTable({
                 <td className="px-4 py-4 text-right tabular-nums text-muted-foreground">
                   {currencyFormatter.format(obligation.paid)}
                 </td>
-                <td className="px-4 py-4 text-right font-semibold tabular-nums text-emerald-700">
+                <td className="px-4 py-4 text-right font-semibold tabular-nums text-emerald-700 dark:text-emerald-300">
                   {currencyFormatter.format(obligation.balance)}
                 </td>
                 <td className="px-4 py-4">
@@ -185,7 +185,7 @@ export function PaymentsTable({
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Saldo</p>
-                <p className="mt-1 font-semibold tabular-nums text-emerald-700">
+                <p className="mt-1 font-semibold tabular-nums text-emerald-700 dark:text-emerald-300">
                   {currencyFormatter.format(obligation.balance)}
                 </p>
               </div>
@@ -203,9 +203,9 @@ function CollectionBadge({
   status: PaymentObligationSummary['collectionStatus']
 }) {
   const tones: Record<PaymentObligationSummary['collectionStatus'], string> = {
-    PENDING: 'bg-amber-50 text-amber-700',
-    PARTIALLY_PAID: 'bg-sky-50 text-sky-700',
-    PAID: 'bg-emerald-50 text-emerald-700',
+    PENDING: 'bg-amber-50 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300',
+    PARTIALLY_PAID: 'bg-sky-50 text-sky-700 dark:bg-sky-400/15 dark:text-sky-300',
+    PAID: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300',
   }
   return (
     <span

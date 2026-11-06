@@ -64,7 +64,7 @@ export default function TechniciansPage() {
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             Operación de taller
           </p>
-          <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-[2rem]">
             Técnicos
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -130,7 +130,7 @@ export default function TechniciansPage() {
       <section className="overflow-hidden rounded-2xl border bg-card">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+            <thead className="bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f] dark:bg-[#1d2a26] dark:text-[#aac4b8]">
               <tr>
                 <th className="px-5 py-3">Técnico</th>
                 <th className="px-4 py-3">Contacto</th>

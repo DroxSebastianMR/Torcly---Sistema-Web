@@ -256,7 +256,7 @@ export function WorkOrderDetailModal({
           <div className="overflow-hidden rounded-xl border">
             <div className="hidden divide-y md:block">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+                <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f] dark:border-[#365047] dark:bg-[#1d2a26] dark:text-[#aac4b8]">
                   <tr>
                     <th className="px-4 py-3">Descripción</th>
                     <th className="px-4 py-3 text-right">Precio</th>
@@ -276,7 +276,7 @@ export function WorkOrderDetailModal({
                 <LineCard key={line.id} line={line} />
               ))}
             </div>
-            <div className="flex items-center justify-between border-t bg-[#f8faf9] px-4 py-3 text-sm">
+            <div className="flex items-center justify-between border-t bg-[#f8faf9] px-4 py-3 text-sm dark:bg-[#1a2c25]">
               <span className="font-medium text-muted-foreground">
                 {order.lineCount} {order.lineCount === 1 ? 'línea' : 'líneas'}
               </span>

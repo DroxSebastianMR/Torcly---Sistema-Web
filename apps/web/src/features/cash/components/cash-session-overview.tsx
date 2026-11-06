@@ -77,14 +77,14 @@ export function CashSessionOverview({
   ]
 
   return (
-    <section className="rounded-2xl border bg-card p-5 shadow-[0_10px_28px_rgb(16_44_37_/_5%)]">
+    <section className="rounded-2xl border bg-card p-5 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] dark:border-[#2b4a3d] dark:shadow-[0_8px_20px_rgb(0_0_0_/_16%)]">
       <div className="flex flex-col gap-4 border-b pb-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <p className="font-semibold text-brand-forest">
+            <p className="font-semibold text-foreground">
               Caja actual · {session.code}
             </p>
-            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-200 dark:ring-1 dark:ring-emerald-400/30">
               Abierta
             </span>
           </div>
@@ -106,12 +106,12 @@ export function CashSessionOverview({
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {methods.map(({ label, value, icon: Icon }) => (
-          <div key={label} className="rounded-xl bg-muted/55 p-3.5">
+          <div key={label} className="rounded-xl bg-muted/55 p-3.5 dark:bg-[#13261e]">
             <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
               <Icon aria-hidden className="size-4 text-primary" />
               {label}
             </div>
-            <p className="mt-2 text-lg font-semibold tabular-nums text-brand-forest">
+            <p className="mt-2 text-xl font-bold tabular-nums text-foreground dark:text-emerald-200">
               {currencyFormatter.format(value)}
             </p>
           </div>

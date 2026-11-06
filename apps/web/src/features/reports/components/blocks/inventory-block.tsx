@@ -68,25 +68,25 @@ export function InventoryBlockContent({ data }: { data: InventoryBlockData }) {
           {
             key: 'entry',
             label: 'Entradas',
-            color: '#147357',
+            color: 'var(--chart-green)',
             formatter: formatQuantity,
           },
           {
             key: 'exit',
             label: 'Salidas',
-            color: '#c85d00',
+            color: 'var(--chart-amber)',
             formatter: formatQuantity,
           },
           {
             key: 'adjustmentIn',
             label: 'Ajuste ingreso',
-            color: '#2a79a5',
+            color: 'var(--chart-blue)',
             formatter: formatQuantity,
           },
           {
             key: 'adjustmentOut',
             label: 'Ajuste egreso',
-            color: '#b23a48',
+            color: 'var(--chart-rose)',
             formatter: formatQuantity,
           },
         ]}

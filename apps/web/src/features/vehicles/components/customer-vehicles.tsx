@@ -67,7 +67,7 @@ export function CustomerVehicles({ customerId }: CustomerVehiclesProps) {
           <button
             type="button"
             onClick={() => navigate(`${paths.vehicles}/${vehicle.id}`)}
-            className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition-colors hover:bg-[#f9fbfa]"
+            className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition-colors hover:bg-[#f9fbfa] dark:hover:bg-[#1b2924]"
             aria-label={`Ver ficha de ${vehicle.plate}`}
           >
             <div className="min-w-0">

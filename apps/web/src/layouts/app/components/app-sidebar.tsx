@@ -7,5 +7,11 @@ interface AppSidebarProps {
 
 export function AppSidebar({ onNavigate }: AppSidebarProps) {
   const sidebar = useAppSidebar()
-  return <AppSidebarView {...sidebar} onNavigate={onNavigate} />
+  return (
+    <AppSidebarView
+      {...sidebar}
+      onNavigate={onNavigate}
+      showThemeToggle={!sidebar.user?.isPlatformAdmin}
+    />
+  )
 }

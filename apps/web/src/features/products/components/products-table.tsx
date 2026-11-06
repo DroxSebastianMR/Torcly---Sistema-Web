@@ -43,7 +43,7 @@ export function ProductsTable({
     <>
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full border-collapse text-left text-sm">
-          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f] dark:border-[#365047] dark:bg-[#1d2a26] dark:text-[#aac4b8]">
             <tr>
               <th className="px-5 py-3">Producto</th>
               <th className="px-4 py-3">Categoría / Marca</th>
@@ -59,7 +59,7 @@ export function ProductsTable({
           </thead>
           <tbody className="divide-y">
             {products.map((product) => (
-              <tr key={product.id} className="group hover:bg-[#f9fbfa]">
+              <tr key={product.id} className="group hover:bg-[#f9fbfa] dark:hover:bg-[#1b2924]">
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-3">
                     <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/8 text-xs font-bold text-primary">
@@ -199,8 +199,8 @@ function StatusBadge({ active }: { active: boolean }) {
     <span
       className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
         active
-          ? 'bg-emerald-50 text-emerald-700'
-          : 'bg-slate-100 text-slate-600'
+          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300'
+          : 'bg-slate-100 text-slate-600 dark:bg-slate-400/15 dark:text-slate-300'
       }`}
     >
       {active ? 'Activo' : 'Inactivo'}
@@ -220,11 +220,13 @@ function Info({
   return (
     <div>
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={`mt-1 font-medium ${warning ? 'text-amber-700' : ''}`}>
+      <p
+        className={`mt-1 font-medium ${warning ? 'text-amber-700 dark:text-amber-300' : ''}`}
+      >
         {value}
       </p>
       {warning && (
-        <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-amber-700">
+        <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-300">
           <AlertTriangle aria-hidden size={12} /> Stock bajo
         </p>
       )}

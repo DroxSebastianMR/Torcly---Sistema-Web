@@ -45,7 +45,7 @@ export function PurchasesTable({
     <>
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full border-collapse text-left text-sm">
-          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f] dark:border-[#365047] dark:bg-[#1d2a26] dark:text-[#aac4b8]">
             <tr>
               <th className="px-5 py-3">Código</th>
               <th className="px-4 py-3">Proveedor</th>
@@ -62,7 +62,7 @@ export function PurchasesTable({
             {purchases.map((purchase) => (
               <tr
                 key={purchase.id}
-                className="group cursor-pointer hover:bg-[#f9fbfa]"
+                className="group cursor-pointer hover:bg-[#f9fbfa] dark:hover:bg-[#1b2924]"
                 onClick={() => onOpen(purchase)}
               >
                 <td className="px-5 py-3 font-mono text-xs font-semibold text-primary">

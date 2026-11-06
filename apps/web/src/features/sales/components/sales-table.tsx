@@ -31,7 +31,7 @@ export function SalesTable({ sales, loading, onOpen }: SalesTableProps) {
     <>
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full border-collapse text-left text-sm">
-          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f] dark:border-[#365047] dark:bg-[#1d2a26] dark:text-[#aac4b8]">
             <tr>
               <th className="px-5 py-3">Venta</th>
               <th className="px-4 py-3">Cliente</th>
@@ -48,7 +48,7 @@ export function SalesTable({ sales, loading, onOpen }: SalesTableProps) {
             {sales.map((sale) => (
               <tr
                 key={sale.id}
-                className="group cursor-pointer hover:bg-[#f9fbfa]"
+                className="group cursor-pointer hover:bg-[#f9fbfa] dark:hover:bg-[#1b2924]"
                 onClick={() => onOpen(sale)}
               >
                 <td className="px-5 py-4">
@@ -158,10 +158,10 @@ export function SalesTable({ sales, loading, onOpen }: SalesTableProps) {
 function StatusBadge({ status }: { status: SaleSummary['status'] }) {
   const tone =
     status === 'CONFIRMED'
-      ? 'bg-emerald-50 text-emerald-700'
+      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300'
       : status === 'CANCELLED'
-        ? 'bg-rose-50 text-rose-700'
-        : 'bg-amber-50 text-amber-700'
+        ? 'bg-rose-50 text-rose-700 dark:bg-rose-400/15 dark:text-rose-300'
+        : 'bg-amber-50 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300'
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${tone}`}

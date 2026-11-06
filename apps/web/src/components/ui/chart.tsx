@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from 'react'
+import type { CSSProperties, ReactElement, ReactNode } from 'react'
 import { CartesianGrid, Legend, ResponsiveContainer, Tooltip } from 'recharts'
 import { cn } from '@/lib/utils'
 
@@ -37,13 +37,35 @@ export function ChartContainer({
 }
 
 export function ChartGrid() {
-  return <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
+  return (
+    <CartesianGrid
+      vertical={false}
+      stroke="var(--border)"
+      strokeDasharray="3 3"
+    />
+  )
+}
+
+const tooltipStyle: CSSProperties = {
+  backgroundColor: 'var(--surface-elevated)',
+  border: '1px solid var(--border)',
+  borderRadius: '0.75rem',
+  boxShadow: '0 12px 28px rgb(0 0 0 / 24%)',
+  color: 'var(--foreground)',
 }
 
 export function ChartTooltip() {
-  return <Tooltip cursor={false} />
+  return <Tooltip cursor={false} contentStyle={tooltipStyle} />
 }
 
 export function ChartLegend() {
-  return <Legend wrapperStyle={{ fontSize: '0.75rem', paddingTop: '0.5rem' }} />
+  return (
+    <Legend
+      wrapperStyle={{
+        color: 'var(--muted-foreground)',
+        fontSize: '0.75rem',
+        paddingTop: '0.5rem',
+      }}
+    />
+  )
 }

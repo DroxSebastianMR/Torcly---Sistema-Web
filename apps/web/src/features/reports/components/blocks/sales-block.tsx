@@ -58,7 +58,7 @@ export function SalesBlockContent({ data }: { data: SalesBlockData }) {
           {
             key: 'amount',
             label: 'Importe confirmado',
-            color: '#147357',
+            color: 'var(--chart-green)',
             formatter: formatAmount,
           },
         ]}

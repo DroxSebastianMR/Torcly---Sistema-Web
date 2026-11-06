@@ -65,25 +65,29 @@ const activeOrders = (section: Record<string, unknown> | undefined) => {
 }
 
 type Tone = 'blue' | 'violet' | 'amber' | 'red'
-const tones: Record<Tone, { card: string; icon: string }> = {
+const tones: Record<Tone, { accent: string; card: string; icon: string }> = {
   blue: {
+    accent: 'bg-sky-300/70',
     card:
-      'border-sky-100 bg-gradient-to-br from-white to-sky-50 dark:border-sky-900/70 dark:from-[#16201d] dark:to-[#132b36]',
+      'border-sky-100 bg-gradient-to-br from-card to-sky-50 dark:border-sky-700/75 dark:bg-[#10282d] dark:bg-none',
     icon: 'text-sky-500 dark:text-sky-300',
   },
   violet: {
+    accent: 'bg-violet-300/70',
     card:
-      'border-violet-100 bg-gradient-to-br from-white to-violet-50 dark:border-violet-900/65 dark:from-[#16201d] dark:to-[#29203a]',
+      'border-violet-100 bg-gradient-to-br from-card to-violet-50 dark:border-violet-700/75 dark:bg-[#211c31] dark:bg-none',
     icon: 'text-violet-500 dark:text-violet-300',
   },
   amber: {
+    accent: 'bg-amber-300/70',
     card:
-      'border-amber-100 bg-gradient-to-br from-white to-amber-50 dark:border-amber-900/65 dark:from-[#16201d] dark:to-[#352b16]',
+      'border-amber-100 bg-gradient-to-br from-card to-amber-50 dark:border-amber-700/75 dark:bg-[#292615] dark:bg-none',
     icon: 'text-amber-500 dark:text-amber-300',
   },
   red: {
+    accent: 'bg-rose-300/70',
     card:
-      'border-rose-100 bg-gradient-to-br from-white to-rose-50 dark:border-rose-900/65 dark:from-[#16201d] dark:to-[#351d27]',
+      'border-rose-100 bg-gradient-to-br from-card to-rose-50 dark:border-rose-700/75 dark:bg-[#2a1b21] dark:bg-none',
     icon: 'text-rose-500 dark:text-rose-300',
   },
 }
@@ -105,10 +109,17 @@ function OperationalCard({
   return (
     <article
       className={cn(
-        'relative min-h-36 overflow-hidden rounded-2xl border p-4 shadow-sm',
+        'group relative min-h-36 overflow-hidden rounded-2xl border p-4 shadow-[0_8px_20px_rgb(16_44_37_/_7%)] transition-colors duration-200 dark:shadow-[0_6px_18px_rgb(0_0_0_/_16%)]',
         colors.card,
       )}
     >
+      <span
+        aria-hidden
+        className={cn(
+          'absolute inset-x-5 top-0 h-px opacity-0 transition-opacity duration-200 group-hover:opacity-100 dark:opacity-80',
+          colors.accent,
+        )}
+      />
       <Icon
         aria-hidden
         className={cn(
@@ -139,7 +150,7 @@ function Panel({
   children: ReactNode
 }) {
   return (
-    <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+    <section className="rounded-2xl border border-border bg-surface p-5 shadow-[0_10px_28px_rgb(16_44_37_/_6%)] dark:border-[#2b4a3d] dark:bg-[#102019] dark:shadow-[0_8px_20px_rgb(0_0_0_/_16%)]">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold text-foreground">{title}</h2>

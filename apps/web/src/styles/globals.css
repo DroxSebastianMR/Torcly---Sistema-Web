@@ -59,20 +59,30 @@
   --card-radius: 16px;
   --hover-duration: 150ms;
   --table-row-height: 56px;
+  --chart-green: #147357;
+  --chart-amber: #c85d00;
+  --chart-blue: #2a79a5;
+  --chart-rose: #b23a48;
+  --chart-violet: #7758b5;
 }
 
 .dark {
-  --background: #0e1412;
+  --background: #08110e;
   --foreground: #ecf2ef;
-  --card: #16201d;
-  --surface: #16201d;
-  --surface-elevated: #1d2a26;
-  --primary: #19a368;
+  --card: #102019;
+  --surface: #102019;
+  --surface-elevated: #172a22;
+  --primary: #38d996;
   --primary-foreground: #f7fcf9;
-  --muted: #202d29;
-  --muted-foreground: #8ea49b;
-  --border: #243630;
+  --muted: #17271f;
+  --muted-foreground: #a1b8ae;
+  --border: #2b4a3d;
   --destructive: #ef4444;
+  --chart-green: #5cdda5;
+  --chart-amber: #f4bd5e;
+  --chart-blue: #6bbcff;
+  --chart-rose: #fa7c9f;
+  --chart-violet: #b99bff;
   color-scheme: dark;
 }
 
@@ -173,6 +183,9 @@
   }
   table tbody tr {
     transition: background-color var(--hover-duration) ease-out;
+  }
+  .dark table tbody tr:hover {
+    background: rgb(56 217 150 / 6%);
   }
 }
 

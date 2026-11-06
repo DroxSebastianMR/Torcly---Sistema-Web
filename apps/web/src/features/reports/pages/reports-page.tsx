@@ -107,7 +107,7 @@ export default function Page() {
         <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
           Inteligencia de negocio
         </p>
-        <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-[2rem]">
           Reportes
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -164,10 +164,10 @@ function ReportCarouselNavigation({
   return (
     <nav
       aria-label="Navegación entre áreas de reportes"
-      className="flex flex-col gap-3 rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:flex-row sm:items-center sm:justify-between"
+      className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] dark:border-[#2b4a3d] dark:bg-[#102019] dark:shadow-[0_8px_20px_rgb(0_0_0_/_16%)] sm:flex-row sm:items-center sm:justify-between"
     >
       <p className="text-sm text-muted-foreground">
-        <span className="font-semibold text-brand-forest">
+        <span className="font-semibold text-foreground">
           {activeIndex + 1} de {reports.length}
         </span>{' '}
         áreas de análisis

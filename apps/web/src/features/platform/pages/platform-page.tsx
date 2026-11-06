@@ -249,7 +249,7 @@ export default function PlatformPage() {
         ) : organizations.data?.data.length ? (
           <div className="overflow-x-auto">
             <table className="min-w-[860px] w-full text-left text-sm">
-              <thead className="bg-[#e9f2ed] text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              <thead className="bg-[#e9f2ed] text-xs font-semibold tracking-wide text-muted-foreground uppercase dark:bg-[#1d2a26] dark:text-[#aac4b8]">
                 <tr>
                   <th className="px-5 py-4">Organización</th>
                   <th className="px-5 py-4">Responsable</th>

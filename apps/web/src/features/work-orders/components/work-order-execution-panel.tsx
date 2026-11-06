@@ -73,7 +73,7 @@ export function WorkOrderExecutionPanel({
 
       {execution.productLines.length > 0 && (
         <div className="overflow-hidden rounded-xl border">
-          <div className="flex items-center gap-2 border-b bg-[#f8faf9] px-4 py-3">
+          <div className="flex items-center gap-2 border-b bg-[#f8faf9] px-4 py-3 dark:bg-[#1a2c25]">
             <PackageOpen size={15} className="text-primary" />
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Consumo de repuestos
@@ -82,7 +82,7 @@ export function WorkOrderExecutionPanel({
           <div className="hidden divide-y md:block" />
           <div className="hidden md:block">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+              <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f] dark:border-[#365047] dark:bg-[#1d2a26] dark:text-[#aac4b8]">
                 <tr>
                   <th className="px-4 py-2">Repuesto</th>
                   <th className="px-4 py-2 text-right">Ppto.</th>
@@ -140,7 +140,7 @@ export function WorkOrderExecutionPanel({
       )}
 
       <div className="overflow-hidden rounded-xl border">
-        <div className="flex items-center gap-2 border-b bg-[#f8faf9] px-4 py-3">
+        <div className="flex items-center gap-2 border-b bg-[#f8faf9] px-4 py-3 dark:bg-[#1a2c25]">
           <Hammer size={15} className="text-primary" />
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Actividades registradas

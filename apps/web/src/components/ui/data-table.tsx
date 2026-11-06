@@ -19,7 +19,7 @@ export function DataTable({
   return (
     <div
       className={cn(
-        'overflow-x-auto rounded-2xl border border-border bg-card shadow-[0_8px_24px_rgb(16_44_37_/_6%)]',
+        'overflow-x-auto rounded-2xl border border-border bg-card shadow-[0_8px_24px_rgb(16_44_37_/_6%)] dark:border-[#2b4a3d] dark:bg-surface dark:shadow-[0_8px_20px_rgb(0_0_0_/_18%)]',
         wrapperClassName,
       )}
     >

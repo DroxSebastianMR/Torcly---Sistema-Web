@@ -38,12 +38,12 @@ export function BlockCard({
   const forbidden = isError && isForbidden(error)
 
   return (
-    <section className="overflow-hidden rounded-[22px] border border-border/80 bg-card shadow-[0_14px_30px_rgb(16_44_37_/_5%)]">
-      <header className="flex items-start justify-between gap-3 border-b border-border/70 bg-[linear-gradient(135deg,rgba(234,242,238,.72),rgba(255,255,255,.9))] px-5 py-4 sm:px-6">
+    <section className="overflow-hidden rounded-[22px] border border-border/80 bg-card shadow-[0_14px_30px_rgb(16_44_37_/_5%)] dark:border-[#2b4a3d] dark:bg-[#102019] dark:shadow-[0_8px_20px_rgb(0_0_0_/_16%)]">
+      <header className="flex items-start justify-between gap-3 border-b border-border/70 bg-muted/60 px-5 py-4 sm:px-6 dark:bg-[#172a22]">
         <div>
           <div className="flex items-center gap-2">
             {icon && <span aria-hidden>{icon}</span>}
-            <h2 className="text-lg font-bold tracking-tight text-brand-forest">
+            <h2 className="text-lg font-bold tracking-tight text-foreground">
               {title}
             </h2>
             {isFetching && !isError && (

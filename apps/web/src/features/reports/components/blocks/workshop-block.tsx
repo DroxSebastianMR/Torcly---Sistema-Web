@@ -80,13 +80,13 @@ export function WorkshopBlockContent({ data }: { data: WorkshopBlockData }) {
           {
             key: 'ordersCreated',
             label: 'Órdenes creadas',
-            color: '#147357',
+            color: 'var(--chart-green)',
             formatter: formatCount,
           },
           {
             key: 'delivered',
             label: 'Entregadas',
-            color: '#2a79a5',
+            color: 'var(--chart-blue)',
             formatter: formatCount,
           },
         ]}
@@ -99,7 +99,12 @@ export function WorkshopBlockContent({ data }: { data: WorkshopBlockData }) {
           key: row.status,
           label: workOrderStatusLabel[row.status],
           value: row.count,
-          color: ['#147357', '#2a79a5', '#c85d00', '#7758b5'][index % 4]!,
+          color: [
+            'var(--chart-green)',
+            'var(--chart-blue)',
+            'var(--chart-amber)',
+            'var(--chart-violet)',
+          ][index % 4]!,
         }))}
       />
       <ReportTable

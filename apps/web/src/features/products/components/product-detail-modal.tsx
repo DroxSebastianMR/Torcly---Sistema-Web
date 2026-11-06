@@ -54,7 +54,7 @@ export function ProductDetailModal({
     >
       {product && (
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#dce9e2] bg-[#f5f9f7] px-4 py-3.5 sm:px-5">
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#dce9e2] bg-[#f5f9f7] px-4 py-3.5 dark:border-[#2e463c] dark:bg-[#1a2c25] sm:px-5">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                 Existencia disponible

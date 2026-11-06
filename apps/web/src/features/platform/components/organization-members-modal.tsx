@@ -169,7 +169,7 @@ export function OrganizationMembersModal({
             <p className="font-semibold text-emerald-800">
               Clave temporal emitida para {resetResult.memberName}:
             </p>
-            <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-emerald-300 bg-white p-2">
+            <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-emerald-300 bg-white p-2 dark:border-emerald-700 dark:bg-[#1a2c25]">
               <code className="select-all font-mono text-sm font-bold tracking-wide text-brand-forest">
                 {resetResult.temporaryPassword}
               </code>

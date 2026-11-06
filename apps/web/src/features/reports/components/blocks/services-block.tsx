@@ -54,7 +54,7 @@ export function ServicesBlockContent({ data }: { data: ServicesBlockData }) {
           {
             key: 'amount',
             label: 'Importe facturado',
-            color: '#147357',
+            color: 'var(--chart-green)',
             formatter: formatAmount,
           },
         ]}

@@ -118,7 +118,7 @@ export default function AnnouncementsFeedPage() {
             <span>Plataforma SaaS</span>
           </div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-[2rem]">
               Novedades del Sistema
             </h1>
             {unreadCount > 0 && (

@@ -96,7 +96,7 @@ export default function AnnouncementsAdminPage() {
             <span>Consola de Administración SaaS</span>
           </div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-[2rem]">
               Gestión de Anuncios y Novedades
             </h1>
             {activeVersion && (

@@ -119,7 +119,7 @@ export function UserPasswordResetModal({
             <p className="text-xs font-semibold uppercase tracking-wider text-emerald-800">
               Contraseña temporal generada
             </p>
-            <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-emerald-300 bg-white p-2.5">
+            <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-emerald-300 bg-white p-2.5 dark:border-emerald-700 dark:bg-[#1a2c25]">
               <code className="select-all font-mono text-base font-bold tracking-wider text-brand-forest">
                 {temporaryPassword}
               </code>

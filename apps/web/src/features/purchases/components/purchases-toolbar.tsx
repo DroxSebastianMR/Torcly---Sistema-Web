@@ -73,7 +73,7 @@ export function PurchasesToolbar({
             onClick={() => onFilterChange({ status: value, page: 1 })}
             className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
               filters.status === value
-                ? 'bg-white text-foreground shadow-sm'
+                ? 'bg-white text-foreground shadow-sm dark:bg-surface-elevated dark:shadow-[0_6px_16px_rgb(0_0_0_/_24%)]'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
             aria-pressed={filters.status === value}

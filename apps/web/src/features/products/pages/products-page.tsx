@@ -93,7 +93,7 @@ export default function Page() {
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             Catálogo comercial
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-[2rem]">
             Productos
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">

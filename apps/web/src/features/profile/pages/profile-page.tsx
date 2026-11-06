@@ -47,10 +47,13 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+          Configuración de cuenta
+        </p>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-[2rem]">
           Mi perfil
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
           Gestiona tu información de cuenta, preferencias de avisos y
           credenciales de acceso seguro.
         </p>

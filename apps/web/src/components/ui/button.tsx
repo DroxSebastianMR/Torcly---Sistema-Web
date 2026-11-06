@@ -9,7 +9,7 @@ const variants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground shadow-[0_6px_16px_rgb(23_99_76_/_18%)] hover:bg-primary/90',
+          'bg-primary text-primary-foreground shadow-[0_6px_16px_rgb(23_99_76_/_18%)] hover:bg-primary/90 dark:shadow-[0_6px_16px_rgb(0_0_0_/_22%)] dark:hover:shadow-[0_8px_20px_rgb(0_0_0_/_30%)]',
         outline:
           'border-primary/70 bg-card text-primary hover:border-primary hover:bg-muted',
         ghost: 'text-primary hover:bg-muted',

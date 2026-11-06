@@ -1,9 +1,14 @@
 import { X } from 'lucide-react'
 import { TorclyLogo } from '@/components/brand/torcly-logo'
+import { ThemeToggle } from '@/features/theme/components/theme-toggle'
 import { SidebarNavigationItem } from './sidebar-navigation-item'
 import type { SidebarViewProps } from '../types/navigation.types'
 
-export function AppSidebarView({ groups, onNavigate }: SidebarViewProps) {
+export function AppSidebarView({
+  groups,
+  onNavigate,
+  showThemeToggle = false,
+}: SidebarViewProps) {
   return (
     <>
       <header className="flex h-20 shrink-0 items-center justify-between px-6 [@media(max-height:700px)]:h-16">
@@ -38,6 +43,11 @@ export function AppSidebarView({ groups, onNavigate }: SidebarViewProps) {
           </section>
         ))}
       </nav>
+      {showThemeToggle && (
+        <div className="shrink-0 px-3 pb-2">
+          <ThemeToggle variant="sidebar" />
+        </div>
+      )}
       <footer className="shrink-0 px-6 py-4 text-[10px] font-medium tracking-[0.12em] text-white/35">
         v1.1.2
       </footer>

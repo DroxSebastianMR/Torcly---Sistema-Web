@@ -18,7 +18,7 @@ export function PeriodToolbar({
   isExporting = false,
 }: PeriodToolbarProps) {
   return (
-    <section className="flex flex-wrap items-center gap-3 rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5">
+    <section className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] dark:border-[#2b4a3d] dark:bg-[#102019] dark:shadow-[0_8px_20px_rgb(0_0_0_/_16%)] sm:p-5">
       <DateRangePicker
         aria-label="Filtrar reportes por período"
         value={{ from: value.from ?? '', to: value.to ?? '' }}

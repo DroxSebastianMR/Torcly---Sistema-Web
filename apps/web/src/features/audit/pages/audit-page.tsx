@@ -110,7 +110,7 @@ export default function Page() {
               wrapperClassName="hidden md:block"
               className="min-w-[820px]"
             >
-              <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+              <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f] dark:border-[#365047] dark:bg-[#1d2a26] dark:text-[#aac4b8]">
                 <tr>
                   <th className="px-5 py-3">Fecha y hora</th>
                   <th className="px-4 py-3">Evento</th>
@@ -122,7 +122,7 @@ export default function Page() {
               </thead>
               <tbody className="divide-y">
                 {items.map((item) => (
-                  <tr key={item.id} className="hover:bg-[#f9fbfa]">
+                  <tr key={item.id} className="hover:bg-[#f9fbfa] dark:hover:bg-[#1b2924]">
                     <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">
                       {formatAuditDate(item.createdAt)}
                     </td>

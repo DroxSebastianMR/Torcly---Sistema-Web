@@ -33,4 +33,5 @@ export interface AccountSummary {
 export interface SidebarViewProps {
   groups: readonly NavigationGroup[]
   onNavigate: () => void
+  showThemeToggle?: boolean
 }

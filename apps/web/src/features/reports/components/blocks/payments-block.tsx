@@ -60,19 +60,19 @@ export function PaymentsBlockContent({ data }: { data: PaymentsBlockData }) {
           {
             key: 'grossCollected',
             label: 'Pagos',
-            color: '#147357',
+            color: 'var(--chart-green)',
             formatter: formatAmount,
           },
           {
             key: 'compensated',
             label: 'Compensaciones',
-            color: '#c85d00',
+            color: 'var(--chart-amber)',
             formatter: formatAmount,
           },
           {
             key: 'netCollected',
             label: 'Neto',
-            color: '#083b2d',
+            color: 'var(--chart-green)',
             formatter: formatAmount,
           },
         ]}
@@ -87,10 +87,10 @@ export function PaymentsBlockContent({ data }: { data: PaymentsBlockData }) {
           value: row.count,
           color:
             row.status === 'PAID'
-              ? '#147357'
+              ? 'var(--chart-green)'
               : row.status === 'PARTIALLY_PAID'
-                ? '#c85d00'
-                : '#b23a48',
+                ? 'var(--chart-amber)'
+                : 'var(--chart-rose)',
         }))}
       />
       <ReportTable

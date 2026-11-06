@@ -458,7 +458,7 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
               {String(linesError)}
             </p>
           )}
-          <div className="flex items-center justify-between border-t bg-[#f8faf9] px-4 py-3 text-sm">
+          <div className="flex items-center justify-between border-t bg-[#f8faf9] px-4 py-3 text-sm dark:bg-[#1a2c25]">
             <span className="text-muted-foreground">
               {fields.length} {fields.length === 1 ? 'línea' : 'líneas'}
             </span>

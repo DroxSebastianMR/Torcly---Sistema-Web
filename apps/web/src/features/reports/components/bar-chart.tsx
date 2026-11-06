@@ -45,7 +45,7 @@ export function BarChart({
 
   return (
     <div className={cn('space-y-1.5', className)}>
-      <h3 className="text-sm font-semibold text-brand-forest">{label}</h3>
+      <h3 className="text-sm font-semibold text-foreground">{label}</h3>
       <div
         role="img"
         aria-label={`${ariaLabel} ${hasData ? '' : emptyMessage}`}
@@ -90,7 +90,7 @@ export function BarChart({
       </div>
       <table className="w-full text-sm">
         <caption className="sr-only">{caption}</caption>
-        <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+        <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f] dark:border-[#365047] dark:bg-[#1d2a26] dark:text-[#aac4b8]">
           <tr className="text-left">
             <th scope="col" className="px-3 py-2.5 font-bold first:pl-4">
               Período

@@ -30,7 +30,7 @@ export function ExistenceTable({
     <>
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full border-collapse text-left text-sm">
-          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f]">
+          <thead className="border-b border-[#d6e3dd] bg-[#eaf2ee] text-[11px] font-bold uppercase tracking-wider text-[#53685f] dark:border-[#365047] dark:bg-[#1d2a26] dark:text-[#aac4b8]">
             <tr>
               <th className="px-5 py-3">Producto</th>
               <th className="px-4 py-3 text-right">Existencia</th>
@@ -41,7 +41,7 @@ export function ExistenceTable({
           </thead>
           <tbody className="divide-y">
             {items.map((item) => (
-              <tr key={item.productId} className="group hover:bg-[#f9fbfa]">
+              <tr key={item.productId} className="group hover:bg-[#f9fbfa] dark:hover:bg-[#1b2924]">
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-3">
                     <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/8 text-xs font-bold text-primary">
@@ -77,7 +77,7 @@ export function ExistenceTable({
                     </span>
                   </p>
                   {item.lowStock && (
-                    <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-amber-700">
+                    <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-300">
                       <AlertTriangle size={12} /> Stock bajo
                     </p>
                   )}
@@ -100,15 +100,15 @@ export function ExistenceTable({
                 </td>
                 <td className="px-4 py-4">
                   {!item.active ? (
-                    <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                    <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:bg-slate-400/15 dark:text-slate-300">
                       Producto inactivo
                     </span>
                   ) : item.lowStock ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-400/15 dark:text-amber-300">
                       <AlertTriangle size={12} /> Por debajo del mínimo
                     </span>
                   ) : (
-                    <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                    <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300">
                       En orden
                     </span>
                   )}
@@ -132,10 +132,10 @@ export function ExistenceTable({
               <span
                 className={`inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
                   !item.active
-                    ? 'bg-slate-100 text-slate-600'
+                    ? 'bg-slate-100 text-slate-600 dark:bg-slate-400/15 dark:text-slate-300'
                     : item.lowStock
-                      ? 'bg-amber-50 text-amber-700'
-                      : 'bg-emerald-50 text-emerald-700'
+                      ? 'bg-amber-50 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300'
+                      : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300'
                 }`}
               >
                 {!item.active
@@ -150,7 +150,7 @@ export function ExistenceTable({
                 <p className="text-xs text-muted-foreground">Existencia</p>
                 <p
                   className={`mt-1 font-semibold tabular-nums ${
-                    item.lowStock ? 'text-amber-700' : ''
+                    item.lowStock ? 'text-amber-700 dark:text-amber-300' : ''
                   }`}
                 >
                   {numberFormatter.format(item.stock)} {item.unit.symbol}
