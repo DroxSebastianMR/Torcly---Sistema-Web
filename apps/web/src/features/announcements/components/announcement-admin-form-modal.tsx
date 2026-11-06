@@ -203,11 +203,15 @@ export function AnnouncementAdminFormModal({
             <SmartSelect
               id="announcement-form-type"
               value={type}
-              onChange={(val) =>
-                setValue('type', val as AnnouncementType, {
+              onChange={(val) => {
+                const nextType = val as AnnouncementType
+                setValue('type', nextType, {
                   shouldValidate: true,
                 })
-              }
+                if (nextType !== 'UPDATE') {
+                  setValue('versionTag', '')
+                }
+              }}
               options={[
                 { value: 'UPDATE', label: 'Actualización (Release / Versión)' },
                 { value: 'MAINTENANCE', label: 'Mantenimiento Preventivo' },
@@ -243,20 +247,35 @@ export function AnnouncementAdminFormModal({
           </Field>
         </div>
 
-        {/* Version tag and Video URL */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field
-            label="Etiqueta de Versión"
-            error={error('versionTag')}
-            hint="Opcional. Ej. v1.1.2"
-          >
-            <Input
-              {...register('versionTag')}
-              invalid={Boolean(error('versionTag'))}
-              placeholder="Ej. v1.1.2"
-            />
-          </Field>
+        {/* Version tag (only for UPDATE) and Video URL */}
+        {type === 'UPDATE' ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field
+              label="Etiqueta de Versión"
+              error={error('versionTag')}
+              hint="Opcional. Ej. v1.2.0"
+            >
+              <Input
+                {...register('versionTag')}
+                invalid={Boolean(error('versionTag'))}
+                placeholder="Ej. v1.2.0"
+              />
+            </Field>
 
+            <Field
+              label="URL Video Tutorial / Demo"
+              error={error('videoUrl')}
+              hint="Opcional (YouTube o Loom)"
+            >
+              <Input
+                type="url"
+                {...register('videoUrl')}
+                invalid={Boolean(error('videoUrl'))}
+                placeholder="https://www.youtube.com/watch?v=..."
+              />
+            </Field>
+          </div>
+        ) : (
           <Field
             label="URL Video Tutorial / Demo"
             error={error('videoUrl')}
@@ -269,7 +288,7 @@ export function AnnouncementAdminFormModal({
               placeholder="https://www.youtube.com/watch?v=..."
             />
           </Field>
-        </div>
+        )}
 
         {/* Maintenance Date Window (only if type is MAINTENANCE) */}
         {type === 'MAINTENANCE' && (
@@ -357,15 +376,45 @@ export function AnnouncementAdminFormModal({
               {/* Quick formatting toolbar */}
               <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-border/70 bg-muted/20 px-2 py-1.5 text-xs">
                 <span className="mr-1 text-[11px] font-semibold text-muted-foreground">
-                  Insertar formato:
+                  Encabezados:
                 </span>
+                <button
+                  type="button"
+                  onClick={() => insertFormatting('# ')}
+                  className="cursor-pointer rounded border border-border/60 bg-card px-2 py-0.5 text-[11px] font-bold text-foreground transition-colors hover:bg-muted"
+                  title="Título Principal Grande (H1)"
+                >
+                  # Grande
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertFormatting('## ')}
+                  className="cursor-pointer rounded border border-border/60 bg-card px-2 py-0.5 text-[11px] font-semibold text-foreground transition-colors hover:bg-muted"
+                  title="Título Mediano (H2)"
+                >
+                  ## Mediano
+                </button>
                 <button
                   type="button"
                   onClick={() => insertFormatting('### ')}
                   className="cursor-pointer rounded border border-border/60 bg-card px-2 py-0.5 text-[11px] font-medium text-foreground transition-colors hover:bg-muted"
-                  title="Encabezado de sección"
+                  title="Subtítulo Estándar (H3)"
                 >
-                  ### Título
+                  ### Normal
+                </button>
+
+                <div className="mx-1 h-3.5 w-px bg-border/70" />
+
+                <span className="mr-1 text-[11px] font-semibold text-muted-foreground">
+                  Estilo:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => insertFormatting('[grande]', '[/grande]')}
+                  className="cursor-pointer rounded border border-border/60 bg-card px-2 py-0.5 text-[11px] font-semibold text-emerald-800 transition-colors hover:bg-muted"
+                  title="Aumentar tamaño de texto seleccionado"
+                >
+                  T+ Texto Grande
                 </button>
                 <button
                   type="button"
@@ -427,8 +476,8 @@ export function AnnouncementAdminFormModal({
             </span>
           ) : (
             <span className="block text-xs font-normal text-muted-foreground">
-              Puedes usar títulos (###), texto en negrita (**negrita**) o listas
-              numeradas (1. 2. 3.) para destacar cambios visuales.
+              Usa # para Título Grande, ## para Mediano, ### para Normal, o
+              resalta texto y pulsa "T+ Texto Grande".
             </span>
           )}
         </div>

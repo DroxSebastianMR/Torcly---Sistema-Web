@@ -7,8 +7,9 @@ interface AnnouncementMarkdownProps {
 
 function renderInline(text: string): ReactNode[] {
   const elements: ReactNode[] = []
-  // Matches **bold**, *italic*, `code`, [label](url)
-  const regex = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g
+  // Matches **bold**, *italic*, `code`, [grande]text[/grande], [xl]text[/xl], [sm]text[/sm], [label](url)
+  const regex =
+    /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[(grande|xl|lg|sm)\][\s\S]+?\[\/\2\]|\[[^\]]+\]\([^)]+\))/g
 
   let lastIndex = 0
   let match: RegExpExecArray | null
@@ -39,6 +40,33 @@ function renderInline(text: string): ReactNode[] {
         >
           {token.slice(1, -1)}
         </code>,
+      )
+    } else if (/^\[(grande|lg)\]([\s\S]+)\[\/\1\]$/.test(token)) {
+      const inner = token.replace(/^\[(grande|lg)\]([\s\S]+)\[\/\1\]$/, '$2')
+      elements.push(
+        <span
+          key={match.index}
+          className="text-base sm:text-lg font-bold text-brand-forest"
+        >
+          {renderInline(inner)}
+        </span>,
+      )
+    } else if (/^\[xl\]([\s\S]+)\[\/xl\]$/.test(token)) {
+      const inner = token.replace(/^\[xl\]([\s\S]+)\[\/xl\]$/, '$1')
+      elements.push(
+        <span
+          key={match.index}
+          className="text-lg sm:text-xl font-extrabold text-brand-forest"
+        >
+          {renderInline(inner)}
+        </span>,
+      )
+    } else if (/^\[sm\]([\s\S]+)\[\/sm\]$/.test(token)) {
+      const inner = token.replace(/^\[sm\]([\s\S]+)\[\/sm\]$/, '$1')
+      elements.push(
+        <span key={match.index} className="text-xs text-muted-foreground">
+          {renderInline(inner)}
+        </span>,
       )
     } else if (token.startsWith('[')) {
       const linkMatch = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(token)
@@ -144,10 +172,46 @@ export function AnnouncementMarkdown({
     <div className={`space-y-3.5 text-sm leading-relaxed ${className}`}>
       {blocks.map((block, index) => {
         if (block.type === 'heading') {
+          const level = block.headingLevel ?? 3
+
+          if (level === 1) {
+            return (
+              <div
+                key={index}
+                className="mt-5 mb-2.5 flex items-center gap-3 border-b-2 border-emerald-600/30 pb-2.5"
+              >
+                <span
+                  aria-hidden="true"
+                  className="h-6 w-1.5 shrink-0 rounded-full bg-emerald-600"
+                />
+                <h1 className="text-xl font-extrabold tracking-tight text-brand-forest sm:text-2xl">
+                  {renderInline(block.headingText ?? '')}
+                </h1>
+              </div>
+            )
+          }
+
+          if (level === 2) {
+            return (
+              <div
+                key={index}
+                className="mt-4 mb-2 flex items-center gap-2.5 border-b border-border/70 pb-2"
+              >
+                <span
+                  aria-hidden="true"
+                  className="h-5 w-1.5 shrink-0 rounded-full bg-emerald-600"
+                />
+                <h2 className="text-lg font-bold tracking-tight text-brand-forest sm:text-xl">
+                  {renderInline(block.headingText ?? '')}
+                </h2>
+              </div>
+            )
+          }
+
           return (
             <div
               key={index}
-              className="mt-4 mb-2 flex items-center gap-2.5 border-b border-border/50 pb-2"
+              className="mt-3.5 mb-1.5 flex items-center gap-2 border-b border-border/50 pb-1.5"
             >
               <span
                 aria-hidden="true"

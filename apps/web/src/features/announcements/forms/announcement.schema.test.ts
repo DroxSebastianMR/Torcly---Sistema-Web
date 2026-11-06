@@ -152,4 +152,30 @@ describe('Validación de formulario de anuncios SaaS', () => {
     expect(payload.startsAt).toBeNull()
     expect(payload.endsAt).toBeNull()
   })
+
+  it('omite la etiqueta de versión cuando el tipo es comunicado o mantenimiento', () => {
+    const commValues = {
+      ...emptyAnnouncement,
+      title: 'Políticas de Respaldo',
+      summary: 'Recomendaciones clave para talleres',
+      content: 'Contenido completo para el comunicado general del sistema.',
+      type: 'COMMUNICATION' as const,
+      versionTag: 'v1.1.2',
+    }
+
+    const payload = mapFormValuesToCreatePayload(commValues)
+    expect(payload.versionTag).toBeNull()
+
+    const maintValues = {
+      ...emptyAnnouncement,
+      title: 'Mantenimiento de Servidores',
+      summary: 'Ventana técnica de base de datos',
+      content: 'Contenido completo para mantenimiento preventivo.',
+      type: 'MAINTENANCE' as const,
+      versionTag: 'v1.1.2',
+    }
+
+    const maintPayload = mapFormValuesToCreatePayload(maintValues)
+    expect(maintPayload.versionTag).toBeNull()
+  })
 })
