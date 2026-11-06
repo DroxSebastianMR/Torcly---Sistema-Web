@@ -91,12 +91,12 @@ export function NotificationCard({
       {/* Right column: Vivid Category badge + timestamp */}
       <div className="flex shrink-0 flex-col items-end justify-start self-stretch pl-2 text-right">
         <span
-          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${category.badgeClass}`}
+          className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-semibold shadow-2xs ${category.badgeClass}`}
         >
           {category.label}
         </span>
         <span
-          className="mt-1.5 text-xs text-muted-foreground"
+          className="mt-1.5 text-xs font-medium text-muted-foreground"
           title={formatNotificationDate(notification.createdAt)}
         >
           {formatRelativeNotificationDate(notification.createdAt)}
