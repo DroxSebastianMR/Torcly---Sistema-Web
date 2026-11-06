@@ -22,6 +22,7 @@ import type {
 } from '../types/announcements.types'
 import {
   formatAnnouncementDate,
+  formatAnnouncementStatus,
   getAnnouncementAppearance,
 } from '../utils/announcement-formatters'
 
@@ -267,7 +268,7 @@ export default function AnnouncementsAdminPage() {
                                 : 'bg-muted text-muted-foreground'
                           }`}
                         >
-                          {announcement.status}
+                          {formatAnnouncementStatus(announcement.status)}
                         </span>
 
                         {announcement.videoUrl && (

@@ -1,5 +1,8 @@
 import { FileText, TrendingUp, Wrench, type LucideIcon } from 'lucide-react'
-import type { AnnouncementType } from '../types/announcements.types'
+import type {
+  AnnouncementStatus,
+  AnnouncementType,
+} from '../types/announcements.types'
 
 export const announcementDateFormatter = new Intl.DateTimeFormat('es-PE', {
   day: '2-digit',
@@ -85,6 +88,19 @@ export function getAnnouncementAppearance(
         accent: '#4385C7',
         description: 'Noticia, anuncio o comunicado oficial',
       }
+  }
+}
+
+export function formatAnnouncementStatus(status: AnnouncementStatus): string {
+  switch (status) {
+    case 'PUBLISHED':
+      return 'Publicado'
+    case 'DRAFT':
+      return 'Borrador'
+    case 'ARCHIVED':
+      return 'Archivado'
+    default:
+      return status
   }
 }
 

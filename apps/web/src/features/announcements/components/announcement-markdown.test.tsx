@@ -74,6 +74,15 @@ describe('AnnouncementMarkdown', () => {
     expect(largeSpan.className).toContain('font-bold')
   })
 
+  it('renderiza tamaños de fuente numéricos exactos tipo Word usando [size:20]texto[/size]', () => {
+    render(
+      <AnnouncementMarkdown content="Texto base y [size:20]Texto en tamaño 20[/size]." />,
+    )
+    const sizedSpan = screen.getByText('Texto en tamaño 20')
+    expect(sizedSpan).toBeTruthy()
+    expect(sizedSpan.style.fontSize).toBe('20px')
+  })
+
   it('renderiza listas numeradas explícitas 1. y 2.', () => {
     const markdown = `
 1. **Primera mejora:** Base de datos

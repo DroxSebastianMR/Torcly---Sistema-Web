@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  formatAnnouncementStatus,
   getAnnouncementAppearance,
   getEmbeddableVideoUrl,
 } from './announcement-formatters'
@@ -53,5 +54,13 @@ describe('getEmbeddableVideoUrl', () => {
     expect(getEmbeddableVideoUrl(null)).toBeNull()
     expect(getEmbeddableVideoUrl(undefined)).toBeNull()
     expect(getEmbeddableVideoUrl('')).toBeNull()
+  })
+})
+
+describe('formatAnnouncementStatus', () => {
+  it('traduce los estados correctamente al español', () => {
+    expect(formatAnnouncementStatus('PUBLISHED')).toBe('Publicado')
+    expect(formatAnnouncementStatus('DRAFT')).toBe('Borrador')
+    expect(formatAnnouncementStatus('ARCHIVED')).toBe('Archivado')
   })
 })
