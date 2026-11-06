@@ -22,33 +22,33 @@ const toneClasses: Record<
   { value: string; glow: string; ring: string; label: string }
 > = {
   default: {
-    value: 'text-brand-forest',
-    glow: 'bg-emerald-100/50',
-    ring: 'border-emerald-100/70',
+    value: 'text-foreground',
+    glow: 'bg-emerald-100/50 dark:bg-emerald-400/10',
+    ring: 'border-emerald-100/70 dark:border-emerald-400/20',
     label: 'text-muted-foreground',
   },
   success: {
-    value: 'text-emerald-700',
-    glow: 'bg-emerald-100/50',
-    ring: 'border-emerald-100/70',
+    value: 'text-emerald-700 dark:text-emerald-300',
+    glow: 'bg-emerald-100/50 dark:bg-emerald-400/10',
+    ring: 'border-emerald-100/70 dark:border-emerald-400/20',
     label: 'text-muted-foreground',
   },
   warning: {
-    value: 'text-amber-700',
-    glow: 'bg-amber-100/55',
-    ring: 'border-amber-100/70',
+    value: 'text-amber-700 dark:text-amber-300',
+    glow: 'bg-amber-100/55 dark:bg-amber-400/10',
+    ring: 'border-amber-100/70 dark:border-amber-400/20',
     label: 'text-muted-foreground',
   },
   danger: {
-    value: 'text-rose-600',
-    glow: 'bg-rose-100/50',
-    ring: 'border-rose-100/70',
+    value: 'text-rose-600 dark:text-rose-300',
+    glow: 'bg-rose-100/50 dark:bg-rose-400/10',
+    ring: 'border-rose-100/70 dark:border-rose-400/20',
     label: 'text-muted-foreground',
   },
   info: {
     value: 'text-primary',
-    glow: 'bg-teal-100/55',
-    ring: 'border-teal-100/70',
+    glow: 'bg-teal-100/55 dark:bg-teal-400/10',
+    ring: 'border-teal-100/70 dark:border-teal-400/20',
     label: 'text-muted-foreground',
   },
 }
@@ -76,7 +76,7 @@ function MetricCard({ item }: { item: ModuleMetric }) {
   const valueLabel = item.valueLabel
 
   return (
-    <article className="relative isolate min-h-[132px] overflow-hidden rounded-[22px] border border-[#e2ebe6] bg-card p-5 shadow-[0_8px_22px_rgb(16_44_37_/_7%),inset_0_1px_0_rgb(255_255_255_/_90%)] transition-[box-shadow,transform] duration-150 hover:-translate-y-px hover:shadow-[0_12px_28px_rgb(16_44_37_/_11%),inset_0_1px_0_rgb(255_255_255_/_90%)]">
+    <article className="relative isolate min-h-[132px] overflow-hidden rounded-[22px] border border-border bg-card p-5 shadow-[0_8px_22px_rgb(16_44_37_/_7%),inset_0_1px_0_rgb(255_255_255_/_90%)] transition-[box-shadow,transform] duration-150 hover:-translate-y-px hover:shadow-[0_12px_28px_rgb(16_44_37_/_11%),inset_0_1px_0_rgb(255_255_255_/_90%)] dark:shadow-[0_8px_22px_rgb(0_0_0_/_20%)] dark:hover:shadow-[0_12px_28px_rgb(0_0_0_/_28%)]">
       <span
         aria-hidden
         className={cn(
@@ -106,7 +106,7 @@ function MetricCard({ item }: { item: ModuleMetric }) {
         )}
       />
       <div className="min-w-0">
-        <p className="text-[13px] font-semibold uppercase tracking-[0.01em] text-[#52645d]">
+        <p className="text-[13px] font-semibold uppercase tracking-[0.01em] text-muted-foreground">
           {item.label}
         </p>
       </div>

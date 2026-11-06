@@ -20,9 +20,9 @@ export function ResetPasswordPage() {
   })
   return (
     <>
-      <h1 className="mb-6 text-3xl font-semibold">Nueva contraseña</h1>
+      <h1 className="mb-6 text-3xl font-semibold text-foreground">Nueva contraseña</h1>
       {!token ? (
-        <p role="alert">
+        <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
           El enlace no contiene un token válido. Solicita una nueva
           recuperación.
         </p>
@@ -50,7 +50,11 @@ export function ResetPasswordPage() {
             autoComplete="new-password"
             {...register('password')}
           />
-          {errors.password && <p role="alert">{errors.password.message}</p>}
+          {errors.password && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.password.message}
+            </p>
+          )}
           <label htmlFor="confirmPassword" className="block text-sm">
             Confirmar contraseña
           </label>
@@ -61,7 +65,9 @@ export function ResetPasswordPage() {
             {...register('confirmPassword')}
           />
           {errors.confirmPassword && (
-            <p role="alert">{errors.confirmPassword.message}</p>
+            <p role="alert" className="text-sm text-destructive">
+              {errors.confirmPassword.message}
+            </p>
           )}
           <Button type="submit" disabled={isSubmitting}>
             Guardar contraseña

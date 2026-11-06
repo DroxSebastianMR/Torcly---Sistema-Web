@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#043129" />
+    <script>
+      ;(function () {
+        try {
+          var preference = localStorage.getItem('torcly-theme-preference')
+          var isDark =
+            preference === 'dark' ||
+            (preference !== 'light' &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches)
+          if (isDark) document.documentElement.classList.add('dark')
+        } catch (_) {}
+      })()
+    </script>
     <link rel="icon" type="image/png" href="/torcly-icon.png" />
     <link rel="apple-touch-icon" href="/torcly-icon.png" />
     <title>Torcly | Gestión comercial</title>

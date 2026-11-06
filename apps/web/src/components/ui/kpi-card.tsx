@@ -14,9 +14,9 @@ interface KpiCardProps {
 
 const iconTone: Record<KpiTone, string> = {
   primary: 'bg-primary/10 text-primary',
-  success: 'bg-emerald-50 text-emerald-700',
-  warning: 'bg-amber-50 text-amber-700',
-  danger: 'bg-red-50 text-red-700',
+  success: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/55 dark:text-emerald-300',
+  warning: 'bg-amber-50 text-amber-700 dark:bg-amber-950/55 dark:text-amber-300',
+  danger: 'bg-red-50 text-red-700 dark:bg-red-950/55 dark:text-red-300',
 }
 
 export function KpiCard({
@@ -30,7 +30,7 @@ export function KpiCard({
   return (
     <article
       className={cn(
-        'flex min-h-[138px] items-center gap-[18px] rounded-2xl border bg-card p-6 shadow-[0_8px_24px_rgb(16_44_37_/_6%)]',
+        'flex min-h-[138px] items-center gap-[18px] rounded-2xl border border-border bg-card p-6 shadow-[0_8px_24px_rgb(16_44_37_/_6%)] dark:shadow-[0_8px_24px_rgb(0_0_0_/_18%)]',
         className,
       )}
     >
