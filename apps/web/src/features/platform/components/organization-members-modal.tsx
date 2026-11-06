@@ -1,12 +1,14 @@
-import { useState, type ChangeEvent } from 'react'
+import { useState, useEffect, type ChangeEvent } from 'react'
 import {
   Check,
+  Clock,
   Copy,
   KeyRound,
   Plus,
   UserRound,
   UserRoundCheck,
   UserRoundX,
+  X,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -61,11 +63,31 @@ export function OrganizationMembersModal({
   const [formVisible, setFormVisible] = useState(false)
   const [values, setValues] = useState(initialMember)
   const [resetResult, setResetResult] = useState<{
+    memberId: string
     memberName: string
     temporaryPassword: string
+    secondsLeft: number
+    generatedAt: number
   } | null>(null)
   const [copied, setCopied] = useState(false)
   if (!organization) return null
+
+  useEffect(() => {
+    if (!resetResult) return
+
+    const interval = setInterval(() => {
+      setResetResult((prev) => {
+        if (!prev) return null
+        if (prev.secondsLeft <= 1) {
+          toast.info('La clave temporal ha expirado por seguridad.')
+          return null
+        }
+        return { ...prev, secondsLeft: prev.secondsLeft - 1 }
+      })
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [resetResult?.generatedAt])
 
   const setValue =
     (key: keyof CreatePlatformOrganizationMemberInput) =>
@@ -110,9 +132,13 @@ export function OrganizationMembersModal({
     try {
       const response = await onResetPassword(member.id)
       setResetResult({
+        memberId: member.id,
         memberName: member.displayName,
         temporaryPassword: response.temporaryPassword,
+        secondsLeft: 60,
+        generatedAt: Date.now(),
       })
+      setCopied(false)
       toast.success('Contraseña temporal generada con éxito.')
     } catch (error) {
       toast.error(errorMessage(error))
@@ -163,37 +189,6 @@ export function OrganizationMembersModal({
             Añadir miembro
           </Button>
         </div>
-
-        {resetResult && (
-          <div className="rounded-xl border border-emerald-300 bg-emerald-50/70 p-3.5 text-xs text-emerald-950">
-            <p className="font-semibold text-emerald-800">
-              Clave temporal emitida para {resetResult.memberName}:
-            </p>
-            <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-emerald-300 bg-white p-2">
-              <code className="select-all font-mono text-sm font-bold tracking-wide text-brand-forest">
-                {resetResult.temporaryPassword}
-              </code>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => void copyResetPassword()}
-                className="h-8 gap-1 text-xs"
-              >
-                {copied ? (
-                  <Check size={13} className="text-emerald-600" />
-                ) : (
-                  <Copy size={13} />
-                )}
-                {copied ? 'Copiada' : 'Copiar'}
-              </Button>
-            </div>
-            <p className="mt-2 text-[11px] text-emerald-800">
-              Entrega esta clave al usuario. Al ingresar, se le exigirá
-              cambiarla de inmediato.
-            </p>
-          </div>
-        )}
 
         {formVisible && (
           <form
@@ -286,47 +281,98 @@ export function OrganizationMembersModal({
         ) : members.length ? (
           <div className="divide-y overflow-hidden rounded-xl border border-border">
             {members.map((member) => (
-              <div
-                key={member.id}
-                className="flex items-center justify-between gap-4 p-3.5"
-              >
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-brand-forest">
-                    {member.displayName}
-                  </p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {member.email} · {member.role.name}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  {onResetPassword && (
+              <div key={member.id} className="transition-colors">
+                <div className="flex items-center justify-between gap-4 p-3.5">
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-brand-forest">
+                      {member.displayName}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {member.email} · {member.role.name}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {onResetPassword && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        title="Restablecer contraseña"
+                        disabled={busy}
+                        onClick={() => void resetPassword(member)}
+                      >
+                        <KeyRound aria-hidden className="size-4" />
+                        <span className="hidden sm:inline">Clave</span>
+                      </Button>
+                    )}
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      title="Restablecer contraseña"
                       disabled={busy}
-                      onClick={() => void resetPassword(member)}
+                      onClick={() => void toggle(member)}
                     >
-                      <KeyRound aria-hidden className="size-4" />
-                      <span className="hidden sm:inline">Clave</span>
+                      {member.active ? (
+                        <UserRoundX aria-hidden className="size-4" />
+                      ) : (
+                        <UserRoundCheck aria-hidden className="size-4" />
+                      )}
+                      {member.active ? 'Desactivar' : 'Activar'}
                     </Button>
-                  )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled={busy}
-                    onClick={() => void toggle(member)}
-                  >
-                    {member.active ? (
-                      <UserRoundX aria-hidden className="size-4" />
-                    ) : (
-                      <UserRoundCheck aria-hidden className="size-4" />
-                    )}
-                    {member.active ? 'Desactivar' : 'Activar'}
-                  </Button>
+                  </div>
                 </div>
+
+                {resetResult?.memberId === member.id && (
+                  <div className="border-t border-emerald-200 bg-emerald-50/80 p-3.5 text-xs text-emerald-950 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-semibold text-emerald-900">
+                        Clave temporal emitida para {resetResult.memberName}:
+                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 font-mono text-[11px] font-medium text-emerald-800">
+                          <Clock
+                            aria-hidden
+                            className="size-3 text-emerald-700"
+                          />
+                          Expira en {resetResult.secondsLeft}s
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setResetResult(null)}
+                          className="rounded p-0.5 text-emerald-700 hover:bg-emerald-200/60 hover:text-emerald-950 transition-colors"
+                          title="Cerrar aviso de clave"
+                          aria-label="Cerrar clave temporal"
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-emerald-300 bg-white p-2">
+                      <code className="select-all font-mono text-sm font-bold tracking-wide text-brand-forest">
+                        {resetResult.temporaryPassword}
+                      </code>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => void copyResetPassword()}
+                        className="h-8 gap-1 text-xs"
+                      >
+                        {copied ? (
+                          <Check size={13} className="text-emerald-600" />
+                        ) : (
+                          <Copy size={13} />
+                        )}
+                        {copied ? 'Copiada' : 'Copiar'}
+                      </Button>
+                    </div>
+                    <p className="mt-2 text-[11px] text-emerald-800">
+                      Entrega esta clave al usuario. Al ingresar, se le exigirá
+                      cambiarla de inmediato. Se ocultará automáticamente al
+                      expirar.
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
