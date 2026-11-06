@@ -74,10 +74,15 @@ function SubscriptionAssignForm({
   onClose: () => void
   onSubmit: (input: AssignSubscriptionInput) => Promise<void>
 }) {
-  const today = new Date().toISOString().substring(0, 10)
-  const oneYearLater = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .substring(0, 10)
+  const [initialDates] = useState(() => {
+    const today = new Date()
+    const oneYearLater = new Date(today)
+    oneYearLater.setUTCDate(oneYearLater.getUTCDate() + 365)
+    return {
+      today: today.toISOString().substring(0, 10),
+      oneYearLater: oneYearLater.toISOString().substring(0, 10),
+    }
+  })
 
   const [organizationId, setOrganizationId] = useState(
     initialOrganizationId ?? (organizations[0]?.id || ''),
@@ -85,8 +90,8 @@ function SubscriptionAssignForm({
   const [planId, setPlanId] = useState(plans[0]?.id || '')
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('ANNUAL')
   const [status, setStatus] = useState<SubscriptionStatus>('ACTIVE')
-  const [startDate, setStartDate] = useState(today)
-  const [renewalDate, setRenewalDate] = useState(oneYearLater)
+  const [startDate, setStartDate] = useState(initialDates.today)
+  const [renewalDate, setRenewalDate] = useState(initialDates.oneYearLater)
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
 

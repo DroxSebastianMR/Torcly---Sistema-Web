@@ -74,6 +74,7 @@ export function Modal({
   const panelRef = useRef<HTMLDivElement>(null)
   const onCloseRef = useRef(onClose)
   const busyRef = useRef(busy)
+  const preventCloseRef = useRef(preventClose)
 
   // Mantiene el listener estable mientras el diálogo está abierto. Varios
   // formularios recrean sus callbacks al escribir; reiniciar el efecto de foco
@@ -81,7 +82,8 @@ export function Modal({
   useEffect(() => {
     onCloseRef.current = onClose
     busyRef.current = busy
-  }, [busy, onClose])
+    preventCloseRef.current = preventClose
+  }, [busy, onClose, preventClose])
 
   useEffect(() => {
     if (!open) return
@@ -90,7 +92,7 @@ export function Modal({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (!busyRef.current && !preventClose) onCloseRef.current()
+        if (!busyRef.current && !preventCloseRef.current) onCloseRef.current()
         return
       }
       if (event.key !== 'Tab') return

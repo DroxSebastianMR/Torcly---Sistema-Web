@@ -98,21 +98,17 @@ export function AnnouncementAdminFormModal({
     const current = textarea.value
     const selected = current.slice(start, end)
 
-    let replacement = ''
-    let newCursorStart = start
-    let newCursorEnd = end
-
-    if (!selected) {
-      replacement = `[size:${size}]Texto[/size]`
-      newCursorStart = start + `[size:${size}]`.length
-      newCursorEnd = newCursorStart + 5
-    } else {
-      const match = /^\[size:\d+\]([\s\S]+)\[\/size\]$/.exec(selected)
-      const innerText = match ? match[1] : selected
-      replacement = `[size:${size}]${innerText}[/size]`
-      newCursorStart = start
-      newCursorEnd = start + replacement.length
-    }
+    const match = /^\[size:\d+\]([\s\S]+)\[\/size\]$/.exec(selected)
+    const innerText = match ? match[1] : selected
+    const replacement = selected
+      ? `[size:${size}]${innerText}[/size]`
+      : `[size:${size}]Texto[/size]`
+    const newCursorStart = selected
+      ? start
+      : start + `[size:${size}]`.length
+    const newCursorEnd = selected
+      ? start + replacement.length
+      : newCursorStart + 5
 
     const nextValue = current.slice(0, start) + replacement + current.slice(end)
     setValue('content', nextValue, {

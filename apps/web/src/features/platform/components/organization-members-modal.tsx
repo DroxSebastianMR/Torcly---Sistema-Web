@@ -88,12 +88,12 @@ function OrganizationMembersDialog({
     memberName: string
     temporaryPassword: string
     secondsLeft: number
-    generatedAt: number
   } | null>(null)
   const [copied, setCopied] = useState(false)
+  const temporaryPassword = resetResult?.temporaryPassword
 
   useEffect(() => {
-    if (!resetResult) return
+    if (!temporaryPassword) return
 
     const interval = setInterval(() => {
       setResetResult((prev) => {
@@ -107,7 +107,7 @@ function OrganizationMembersDialog({
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [resetResult?.generatedAt])
+  }, [temporaryPassword])
 
   const setValue =
     (key: keyof CreatePlatformOrganizationMemberInput) =>
@@ -156,7 +156,6 @@ function OrganizationMembersDialog({
         memberName: member.displayName,
         temporaryPassword: response.temporaryPassword,
         secondsLeft: 60,
-        generatedAt: Date.now(),
       })
       setCopied(false)
       toast.success('Contraseña temporal generada con éxito.')
