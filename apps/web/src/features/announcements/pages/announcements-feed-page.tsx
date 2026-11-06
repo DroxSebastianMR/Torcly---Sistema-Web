@@ -159,7 +159,7 @@ export default function AnnouncementsFeedPage() {
               onClick={() => handleTabChange(tab.type)}
               className={`flex items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-semibold transition-colors shrink-0 ${
                 isActive
-                  ? 'border-primary text-primary'
+                  ? 'border-primary text-primary dark:border-[#1b7e58] dark:text-[#70bf9b]'
                   : 'border-transparent text-muted-foreground hover:border-muted hover:text-foreground'
               }`}
             >

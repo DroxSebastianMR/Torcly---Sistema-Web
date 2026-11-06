@@ -111,7 +111,7 @@ export default function NotificationsPage() {
                 }
                 className={`rounded-full px-3.5 py-1 text-xs font-semibold transition-all ${
                   isSelected
-                    ? 'bg-primary text-primary-foreground shadow-xs'
+                    ? 'bg-primary text-primary-foreground shadow-xs dark:bg-[#1b7e58]'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
