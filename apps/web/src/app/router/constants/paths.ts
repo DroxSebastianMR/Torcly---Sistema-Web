@@ -10,6 +10,8 @@ export const paths = {
   assistantHistory: '/historial-ia',
   products: '/productos',
   inventory: '/inventario',
+  purchases: '/compras',
+  suppliers: '/proveedores',
   services: '/servicios',
   sales: '/ventas',
   appointments: '/citas',

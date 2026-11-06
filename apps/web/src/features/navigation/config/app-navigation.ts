@@ -16,6 +16,8 @@ import {
   CalendarDays,
   ClipboardList,
   Megaphone,
+  ShoppingBag,
+  Building2,
 } from 'lucide-react'
 import { paths } from '@/app/router/constants/paths'
 import type { NavigationGroup } from '../types/navigation.types'
@@ -145,6 +147,22 @@ export const appNavigation: readonly NavigationGroup[] = [
         path: paths.inventory,
         visible: true,
         permission: 'inventory:read',
+      },
+      {
+        id: 'purchases',
+        label: 'Compras',
+        icon: ShoppingBag,
+        path: paths.purchases,
+        visible: true,
+        permission: 'purchases:read',
+      },
+      {
+        id: 'suppliers',
+        label: 'Proveedores',
+        icon: Building2,
+        path: paths.suppliers,
+        visible: true,
+        permission: 'purchases:read',
       },
       {
         id: 'services',
