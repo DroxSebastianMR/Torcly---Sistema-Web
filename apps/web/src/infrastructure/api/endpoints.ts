@@ -95,6 +95,8 @@ export const endpoints = {
   },
   workOrders: {
     root: '/work-orders',
+    direct: '/work-orders/direct',
+    yardCapacity: '/work-orders/yard-capacity',
     detail: (id: string) => `/work-orders/${id}`,
     catalog: '/work-orders/catalog',
     technicians: '/work-orders/technicians',

@@ -3,6 +3,7 @@ import { requireAuth, requirePermission } from '../auth/auth.middleware.js'
 import {
   completeWorkOrderActivity,
   consumeWorkOrderProduct,
+  createDirectWorkOrder,
   createWorkOrder,
   createWorkOrderActivity,
   decideWorkOrder,
@@ -13,6 +14,7 @@ import {
   getWorkOrderExecution,
   getWorkOrderTechnicians,
   getWorkOrderVehicleHistory,
+  getYardCapacity,
   listWorkOrders,
   returnWorkOrderProduct,
   saveWorkOrderBudget,
@@ -37,6 +39,11 @@ workOrdersRouter.get(
   getWorkOrderTechnicians,
 )
 workOrdersRouter.get(
+  '/yard-capacity',
+  requirePermission('workshop:read'),
+  getYardCapacity,
+)
+workOrdersRouter.get(
   '/vehicles/:vehicleId/history',
   requirePermission('workshop:read'),
   getWorkOrderVehicleHistory,
@@ -48,6 +55,11 @@ workOrdersRouter.get(
   getWorkOrderExecution,
 )
 workOrdersRouter.post('/', requirePermission('workshop:write'), createWorkOrder)
+workOrdersRouter.post(
+  '/direct',
+  requirePermission('workshop:write'),
+  createDirectWorkOrder,
+)
 workOrdersRouter.put(
   '/:id/diagnosis',
   requirePermission('workshop:write'),

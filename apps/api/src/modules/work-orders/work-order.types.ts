@@ -76,10 +76,42 @@ export interface WorkOrderBillingSummary {
   status: 'PENDING' | 'PARTIALLY_PAID' | 'PAID'
 }
 
+export type WorkOrderSource = 'APPOINTMENT' | 'WALK_IN'
+export type FuelLevel = 'EMPTY' | 'QUARTER' | 'HALF' | 'THREE_QUARTERS' | 'FULL'
+
+export interface CreateDirectWorkOrderInput {
+  customerId: string
+  vehicleId: string
+  currentMileage?: number | null
+  fuelLevel?: string | null
+  receptionNotes?: string | null
+}
+
+export interface AttendAppointmentInput {
+  currentMileage?: number | null
+  fuelLevel?: string | null
+  receptionNotes?: string | null
+}
+
+export interface YardCapacitySummary {
+  maxCapacity: number
+  occupiedBays: number
+  availableBays: number
+  occupancyRate: number
+  isAtCapacity: boolean
+  todayEntriesCount: number
+  todayWalkInsCount: number
+  todayAppointmentsCount: number
+}
+
 export interface WorkOrderSummary {
   id: string
   code: string
-  appointment: { id: string; code: string }
+  appointment: { id: string; code: string } | null
+  source: WorkOrderSource
+  currentMileage: number | null
+  fuelLevel: string | null
+  receptionNotes: string | null
   customer: WorkOrderCustomerRef
   vehicle: WorkOrderVehicleRef
   status: WorkOrderStatus

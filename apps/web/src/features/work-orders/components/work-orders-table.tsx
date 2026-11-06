@@ -67,7 +67,9 @@ export function WorkOrdersTable({
                         {order.code}
                       </p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        Cita {order.appointment.code}
+                        {order.appointment
+                          ? `Cita ${order.appointment.code}`
+                          : 'Ingreso directo'}
                       </p>
                     </div>
                   </div>

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  createDirectWorkOrderSchema,
   createWorkOrderSchema,
   workOrderActivitySchema,
   workOrderBudgetSchema,
@@ -18,10 +19,58 @@ describe('Schemas de órdenes de taller', () => {
     expect(
       createWorkOrderSchema.parse({
         appointmentId: 'a0000000-0000-4000-8000-000000000001',
+        currentMileage: 45000,
+        fuelLevel: 'HALF',
+        receptionNotes: 'Revisión preventiva',
       }),
-    ).toEqual({ appointmentId: 'a0000000-0000-4000-8000-000000000001' })
+    ).toEqual({
+      appointmentId: 'a0000000-0000-4000-8000-000000000001',
+      currentMileage: 45000,
+      fuelLevel: 'HALF',
+      receptionNotes: 'Revisión preventiva',
+    })
     expect(() =>
       createWorkOrderSchema.parse({ appointmentId: 'no-uuid' }),
+    ).toThrow()
+    expect(() =>
+      createWorkOrderSchema.parse({
+        appointmentId: 'a0000000-0000-4000-8000-000000000001',
+        currentMileage: -50,
+      }),
+    ).toThrow()
+  })
+
+  it('valida la creación de orden directa (walk-in)', () => {
+    const valid = {
+      customerId: 'a0000000-0000-4000-8000-000000000001',
+      vehicleId: 'b0000000-0000-4000-8000-000000000002',
+      currentMileage: 120500,
+      fuelLevel: 'FULL',
+      receptionNotes: 'Ingreso directo sin cita previa',
+    }
+    expect(createDirectWorkOrderSchema.parse(valid)).toEqual(valid)
+
+    // Rechaza si falta customerId o vehicleId
+    expect(() =>
+      createDirectWorkOrderSchema.parse({
+        vehicleId: 'b0000000-0000-4000-8000-000000000002',
+      }),
+    ).toThrow()
+
+    // Rechaza nivel de combustible inválido
+    expect(() =>
+      createDirectWorkOrderSchema.parse({
+        ...valid,
+        fuelLevel: 'INVALID_FUEL',
+      }),
+    ).toThrow()
+
+    // Rechaza kilometraje excesivo o negativo
+    expect(() =>
+      createDirectWorkOrderSchema.parse({
+        ...valid,
+        currentMileage: 3_000_000,
+      }),
     ).toThrow()
   })
 

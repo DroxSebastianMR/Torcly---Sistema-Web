@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
+  WORKSHOP_MAX_BAY_CAPACITY,
+  computeYardOccupancy,
   assertAppointmentAttendable,
   assertBudgetEditable,
   assertCanCompleteActivity,
@@ -236,5 +238,31 @@ describe('Reglas de órdenes de taller', () => {
       workOrderOperationKey('wo-consume', orderId, 'other-line', requestId),
     )
     expect(key.length).toBeLessThanOrEqual(100)
+  })
+
+  it('calcula la ocupación y aforo del patio (máximo 8 bahías)', () => {
+    expect(WORKSHOP_MAX_BAY_CAPACITY).toBe(8)
+
+    const normal = computeYardOccupancy(5)
+    expect(normal).toEqual({
+      maxCapacity: 8,
+      occupiedBays: 5,
+      availableBays: 3,
+      occupancyRate: 62.5,
+      isAtCapacity: false,
+    })
+
+    const full = computeYardOccupancy(8)
+    expect(full).toEqual({
+      maxCapacity: 8,
+      occupiedBays: 8,
+      availableBays: 0,
+      occupancyRate: 100,
+      isAtCapacity: true,
+    })
+
+    const overflow = computeYardOccupancy(9)
+    expect(overflow.isAtCapacity).toBe(true)
+    expect(overflow.availableBays).toBe(0)
   })
 })

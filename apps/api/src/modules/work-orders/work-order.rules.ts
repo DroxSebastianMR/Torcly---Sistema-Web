@@ -5,6 +5,38 @@ import type {
   WorkOrderStatus,
 } from './work-order.types.js'
 
+export const WORKSHOP_MAX_BAY_CAPACITY = 8
+
+export const ACTIVE_YARD_STATUSES: readonly WorkOrderStatus[] = [
+  'RECEPCIONADA',
+  'EN_DIAGNOSTICO',
+  'PENDIENTE_APROBACION',
+  'APROBADA',
+  'EN_EJECUCION',
+  'LISTA_PARA_ENTREGA',
+]
+
+export function computeYardOccupancy(
+  activeOrdersCount: number,
+  maxCapacity = WORKSHOP_MAX_BAY_CAPACITY,
+) {
+  const occupiedBays = activeOrdersCount
+  const availableBays = Math.max(0, maxCapacity - occupiedBays)
+  const occupancyRate =
+    maxCapacity > 0
+      ? Math.min(100, Math.round((occupiedBays / maxCapacity) * 1000) / 10)
+      : 0
+  const isAtCapacity = occupiedBays >= maxCapacity
+
+  return {
+    maxCapacity,
+    occupiedBays,
+    availableBays,
+    occupancyRate,
+    isAtCapacity,
+  }
+}
+
 export const BUDGET_EDITABLE_STATUSES: readonly WorkOrderStatus[] = [
   'RECEPCIONADA',
   'EN_DIAGNOSTICO',

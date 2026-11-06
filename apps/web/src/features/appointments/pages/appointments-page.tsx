@@ -15,8 +15,10 @@ import { hasPermission } from '@/lib/permissions'
 import { useQueryClient } from '@tanstack/react-query'
 import { AppointmentDetailModal } from '../components/appointment-detail-modal'
 import { AppointmentFormModal } from '../components/appointment-form-modal'
+import { AppointmentReceptionModal } from '../components/appointment-reception-modal'
 import { AppointmentsTable } from '../components/appointments-table'
 import { AppointmentsToolbar } from '../components/appointments-toolbar'
+import type { FuelLevel } from '@/features/work-orders/types/work-orders.types'
 import {
   appointmentKeys,
   useAppointment,
@@ -130,11 +132,19 @@ export default function Page() {
     }
   }
 
-  const attendAppointment = async () => {
+  const [attending, setAttending] = useState(false)
+
+  const attendAppointment = async (receptionData: {
+    currentMileage?: number | null
+    fuelLevel?: FuelLevel | null
+    receptionNotes?: string | null
+  }) => {
     if (!attendTarget) return
+    setAttending(true)
     try {
       const result = await workOrdersService.createFromAppointment(
         attendTarget.id,
+        receptionData,
       )
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: appointmentKeys.all }),
@@ -147,6 +157,8 @@ export default function Page() {
       setSelectedId(null)
     } catch (error) {
       toast.error(getAppointmentErrorMessage(error))
+    } finally {
+      setAttending(false)
     }
   }
 
@@ -274,18 +286,12 @@ export default function Page() {
         onConfirm={cancelAppointment}
         onCancel={() => setCancelTarget(null)}
       />
-      <ConfirmationDialog
+      <AppointmentReceptionModal
         open={Boolean(attendTarget)}
-        variant="info"
-        title="Atender cita y crear orden"
-        description={
-          attendTarget
-            ? 'La cita se marcará como atendida y se creará su orden de taller.'
-            : undefined
-        }
-        confirmLabel="Crear orden"
+        appointment={attendTarget}
+        isBusy={attending}
+        onClose={() => setAttendTarget(null)}
         onConfirm={attendAppointment}
-        onCancel={() => setAttendTarget(null)}
       />
     </div>
   )

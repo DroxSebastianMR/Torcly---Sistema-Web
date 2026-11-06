@@ -1,12 +1,15 @@
 import { useDeferredValue, useMemo, useState } from 'react'
-import { BadgeCheck, Wrench } from 'lucide-react'
+import { BadgeCheck, Plus, Wrench } from 'lucide-react'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { ErrorState } from '@/components/ui/error-state'
 import { ModuleMetrics } from '@/components/ui/module-metrics'
 import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
+import { DirectWorkOrderModal } from '../components/direct-work-order-modal'
+import { YardCapacityWidget } from '../components/yard-capacity-widget'
 import { WorkOrderActivityModal } from '../components/work-order-activity-modal'
 import { WorkOrderBudgetModal } from '../components/work-order-budget-modal'
 import { WorkOrderConsumptionModal } from '../components/work-order-consumption-modal'
@@ -72,6 +75,7 @@ export default function Page() {
   const [finalizeOrder, setFinalizeOrder] = useState<WorkOrderDetail | null>(
     null,
   )
+  const [directOrderOpen, setDirectOrderOpen] = useState(false)
 
   const deferredSearch = useDeferredValue(filters.search)
   const queryFilters = { ...filters, search: deferredSearch }
@@ -111,7 +115,7 @@ export default function Page() {
         label: `${order.code} · ${order.customer.name} · ${order.vehicle.plate}`,
         searchTerms: [
           order.code,
-          order.appointment.code,
+          order.appointment?.code ?? 'Ingreso directo',
           order.customer.name,
           order.customer.documentNumber,
           order.vehicle.plate,
@@ -206,12 +210,24 @@ export default function Page() {
             Órdenes de taller
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Cada cita atendida genera una única orden; registra el diagnóstico,
-            el presupuesto con precios congelados y el seguimiento de la
-            decisión del cliente.
+            Control de ingresos de vehículos (citas y walk-ins), registro de
+            odómetro, presupuesto, ejecución técnica y entrega al cliente.
           </p>
         </div>
+        {canWrite && (
+          <div className="flex shrink-0">
+            <Button
+              onClick={() => setDirectOrderOpen(true)}
+              className="gap-1.5"
+            >
+              <Plus size={17} />
+              Nueva orden directa
+            </Button>
+          </div>
+        )}
       </header>
+
+      <YardCapacityWidget />
 
       <ModuleMetrics
         items={[
@@ -415,6 +431,11 @@ export default function Page() {
         pending={mutations.finalize.isPending}
         onConfirm={() => void confirmFinalize()}
         onCancel={() => setFinalizeOrder(null)}
+      />
+      <DirectWorkOrderModal
+        open={directOrderOpen}
+        onClose={() => setDirectOrderOpen(false)}
+        onSuccess={(newId) => setSelectedId(newId)}
       />
     </div>
   )

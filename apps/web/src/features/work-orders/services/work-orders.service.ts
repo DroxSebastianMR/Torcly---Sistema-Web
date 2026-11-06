@@ -1,7 +1,9 @@
 import { api } from '@/infrastructure/api/client'
 import { endpoints } from '@/infrastructure/api/endpoints'
 import type {
+  CreateDirectWorkOrderInput,
   DataResponse,
+  ReceptionInput,
   WorkOrderActivity,
   WorkOrderActivityInput,
   WorkOrderBudgetInput,
@@ -19,6 +21,7 @@ import type {
   WorkOrderTechnician,
   WorkOrderVehicleHistoryResponse,
   WorkOrdersResponse,
+  YardCapacitySummary,
 } from '../types/work-orders.types'
 
 function buildQuery(filters: WorkOrderFilters) {
@@ -58,10 +61,23 @@ export const workOrdersService = {
       signal,
     )
   },
-  createFromAppointment(appointmentId: string) {
+  createFromAppointment(appointmentId: string, reception?: ReceptionInput) {
     return api.post<DataResponse<WorkOrderCreated>>(endpoints.workOrders.root, {
       appointmentId,
+      ...reception,
     })
+  },
+  createDirect(input: CreateDirectWorkOrderInput) {
+    return api.post<DataResponse<WorkOrderCreated>>(
+      endpoints.workOrders.direct,
+      input,
+    )
+  },
+  getYardCapacity(signal?: AbortSignal) {
+    return api.get<DataResponse<YardCapacitySummary>>(
+      endpoints.workOrders.yardCapacity,
+      signal,
+    )
   },
   updateDiagnosis(id: string, diagnosis: string) {
     return api.put<DataResponse<WorkOrderDetail>>(

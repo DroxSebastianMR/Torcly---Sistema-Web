@@ -188,8 +188,12 @@ export function WorkOrderDetailModal({
           <div className="grid gap-3 sm:grid-cols-2">
             <InfoItem
               icon={<ClipboardList aria-hidden size={15} />}
-              label="Cita de origen"
-              value={order.appointment.code}
+              label="Origen del ingreso"
+              value={
+                order.appointment
+                  ? `Cita ${order.appointment.code}`
+                  : 'Ingreso directo (Walk-in)'
+              }
             />
             <InfoItem
               label="Estado"
@@ -207,11 +211,41 @@ export function WorkOrderDetailModal({
                   : `${order.vehicle.brand} ${order.vehicle.model} (${order.vehicle.year})`
               }
             />
+            {order.currentMileage != null && (
+              <InfoItem
+                label="Kilometraje de ingreso"
+                value={`${order.currentMileage.toLocaleString('es-PE')} km`}
+              />
+            )}
+            {order.fuelLevel && (
+              <InfoItem
+                label="Nivel de combustible"
+                value={
+                  order.fuelLevel === 'EMPTY'
+                    ? 'Vacío (Reserva)'
+                    : order.fuelLevel === 'QUARTER'
+                      ? '1/4 de tanque'
+                      : order.fuelLevel === 'HALF'
+                        ? '1/2 tanque'
+                        : order.fuelLevel === 'THREE_QUARTERS'
+                          ? '3/4 de tanque'
+                          : 'Tanque lleno'
+                }
+              />
+            )}
             <InfoItem label="Registrada por" value={order.performedBy} />
             <InfoItem
               label="Técnico"
               value={order.technician ?? 'Sin asignar'}
             />
+            {order.receptionNotes && (
+              <div className="sm:col-span-2 rounded-xl border border-border/80 bg-muted/30 px-3.5 py-2.5 text-xs">
+                <span className="font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
+                  Observaciones de recepción:
+                </span>
+                <span className="text-foreground">{order.receptionNotes}</span>
+              </div>
+            )}
           </div>
 
           {order.billing && (

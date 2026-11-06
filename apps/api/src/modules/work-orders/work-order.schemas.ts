@@ -30,6 +30,47 @@ export const workOrderQuerySchema = z.object({
 export const createWorkOrderSchema = z
   .object({
     appointmentId: z.uuid('Cita inválida.'),
+    currentMileage: z.coerce
+      .number()
+      .int('El kilometraje debe ser un número entero.')
+      .min(0, 'El kilometraje no puede ser negativo.')
+      .max(2_000_000, 'Kilometraje fuera de rango.')
+      .optional()
+      .nullable(),
+    fuelLevel: z
+      .enum(['EMPTY', 'QUARTER', 'HALF', 'THREE_QUARTERS', 'FULL'])
+      .optional()
+      .nullable(),
+    receptionNotes: z
+      .string()
+      .trim()
+      .max(500, 'Las observaciones no pueden exceder los 500 caracteres.')
+      .optional()
+      .nullable(),
+  })
+  .strict()
+
+export const createDirectWorkOrderSchema = z
+  .object({
+    customerId: z.uuid('Cliente inválido.'),
+    vehicleId: z.uuid('Vehículo inválido.'),
+    currentMileage: z.coerce
+      .number()
+      .int('El kilometraje debe ser un número entero.')
+      .min(0, 'El kilometraje no puede ser negativo.')
+      .max(2_000_000, 'Kilometraje fuera de rango.')
+      .optional()
+      .nullable(),
+    fuelLevel: z
+      .enum(['EMPTY', 'QUARTER', 'HALF', 'THREE_QUARTERS', 'FULL'])
+      .optional()
+      .nullable(),
+    receptionNotes: z
+      .string()
+      .trim()
+      .max(500, 'Las observaciones no pueden exceder los 500 caracteres.')
+      .optional()
+      .nullable(),
   })
   .strict()
 

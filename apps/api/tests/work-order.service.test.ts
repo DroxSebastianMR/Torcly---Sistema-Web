@@ -25,6 +25,8 @@ const repository = vi.hoisted(() => ({
   finalize: vi.fn(),
   deliver: vi.fn(),
   listVehicleHistory: vi.fn(),
+  createDirectWorkOrder: vi.fn(),
+  getYardCapacity: vi.fn(),
 }))
 
 vi.mock('../src/modules/work-orders/work-order.repository.js', () => ({
@@ -167,6 +169,10 @@ describe('Servicio de órdenes de taller', () => {
           id: 'work-order-1',
           code: 'OT-000001',
           appointment: { id: appointmentId, code: 'CITA-000001' },
+          source: 'APPOINTMENT',
+          currentMileage: null,
+          fuelLevel: null,
+          receptionNotes: null,
           customer: {
             id: customerId,
             documentNumber: '12345678',
@@ -1086,5 +1092,60 @@ describe('Servicio de órdenes de taller', () => {
       total: 1,
       totalPages: 1,
     })
+  })
+
+  it('crea una orden directa sin cita previa (walk-in)', async () => {
+    const directInput = {
+      customerId: 'a0000000-0000-4000-8000-000000000001',
+      vehicleId: 'b0000000-0000-4000-8000-000000000002',
+      currentMileage: 85000,
+      fuelLevel: 'QUARTER',
+      receptionNotes: 'Llega de emergencia con ruido en motor',
+    }
+
+    repository.createDirectWorkOrder.mockResolvedValue({
+      id: 'work-order-direct',
+      code: 'OT-000099',
+    })
+
+    const result = await workOrdersService.createDirect(
+      directInput,
+      actor,
+      context,
+      organizationId,
+    )
+
+    expect(repository.createDirectWorkOrder).toHaveBeenCalledWith(
+      directInput,
+      actor,
+      context,
+      organizationId,
+    )
+    expect(result).toEqual({
+      data: {
+        id: 'work-order-direct',
+        code: 'OT-000099',
+      },
+    })
+  })
+
+  it('obtiene el aforo diario y capacidad de patio', async () => {
+    const mockCapacity = {
+      maxCapacity: 8,
+      occupiedBays: 6,
+      availableBays: 2,
+      occupancyRate: 75,
+      isAtCapacity: false,
+      todayEntriesCount: 5,
+      todayWalkInsCount: 3,
+      todayAppointmentsCount: 2,
+    }
+
+    repository.getYardCapacity.mockResolvedValue(mockCapacity)
+
+    const result = await workOrdersService.getYardCapacity(organizationId)
+
+    expect(repository.getYardCapacity).toHaveBeenCalledWith(organizationId)
+    expect(result).toEqual({ data: mockCapacity })
   })
 })

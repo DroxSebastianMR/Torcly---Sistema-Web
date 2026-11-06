@@ -2,6 +2,7 @@ import type { Request, RequestHandler } from 'express'
 import { getRequestContext } from '../auth/auth.middleware.js'
 import { requireOrganizationContext } from '../auth/organization-context.js'
 import {
+  createDirectWorkOrderSchema,
   createWorkOrderSchema,
   workOrderActivityIdSchema,
   workOrderActivitySchema,
@@ -59,7 +60,8 @@ export const getWorkOrderTechnicians: RequestHandler = async (
 }
 
 export const createWorkOrder: RequestHandler = async (request, response) => {
-  const { appointmentId } = createWorkOrderSchema.parse(request.body)
+  const { appointmentId, currentMileage, fuelLevel, receptionNotes } =
+    createWorkOrderSchema.parse(request.body)
   response
     .status(201)
     .json(
@@ -68,8 +70,32 @@ export const createWorkOrder: RequestHandler = async (request, response) => {
         actor(request),
         getRequestContext(request, response),
         organizationId(request),
+        { currentMileage, fuelLevel, receptionNotes },
       ),
     )
+}
+
+export const createDirectWorkOrder: RequestHandler = async (
+  request,
+  response,
+) => {
+  const input = createDirectWorkOrderSchema.parse(request.body)
+  response
+    .status(201)
+    .json(
+      await workOrdersService.createDirect(
+        input,
+        actor(request),
+        getRequestContext(request, response),
+        organizationId(request),
+      ),
+    )
+}
+
+export const getYardCapacity: RequestHandler = async (request, response) => {
+  response.json(
+    await workOrdersService.getYardCapacity(organizationId(request)),
+  )
 }
 
 export const updateWorkOrderDiagnosis: RequestHandler = async (

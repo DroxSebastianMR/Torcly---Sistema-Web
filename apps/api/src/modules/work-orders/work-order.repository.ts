@@ -7,6 +7,7 @@ import {
 } from '../inventory/inventory.rules.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import {
+  ACTIVE_YARD_STATUSES,
   assertAppointmentAttendable,
   assertBudgetEditable,
   assertCanCompleteActivity,
@@ -20,6 +21,7 @@ import {
   assertHasLines,
   assertTechnicianEditable,
   computeNetConsumed,
+  computeYardOccupancy,
   roundQuantity,
   shouldMoveToDiagnosis,
   workOrderOperationKey,
@@ -33,6 +35,10 @@ const workOrderSummarySelect = {
   id: true,
   code: true,
   appointmentId: true,
+  source: true,
+  currentMileage: true,
+  fuelLevel: true,
+  receptionNotes: true,
   status: true,
   technicianId: true,
   subtotal: true,
@@ -424,6 +430,11 @@ export const workOrdersRepository = {
     actor: { id: string; name: string },
     context: RequestContext,
     organizationId: string,
+    reception?: {
+      currentMileage?: number | null
+      fuelLevel?: string | null
+      receptionNotes?: string | null
+    },
   ): Promise<CreatedWorkOrderRecord> {
     return databaseService.transaction(async (transaction) => {
       await lockAppointment(transaction, appointmentId)
@@ -483,11 +494,22 @@ export const workOrdersRepository = {
           appointmentId: appointment.id,
           customerId: appointment.customerId,
           vehicleId: appointment.vehicleId,
+          source: 'APPOINTMENT',
+          currentMileage: reception?.currentMileage ?? null,
+          fuelLevel: reception?.fuelLevel ?? null,
+          receptionNotes: reception?.receptionNotes ?? null,
           status: 'RECEPCIONADA',
           performedBy: actor.name,
         },
         select: { id: true, code: true },
       })
+
+      if (reception?.currentMileage != null && reception.currentMileage > 0) {
+        await transaction.vehicle.update({
+          where: { id: appointment.vehicleId },
+          data: { mileage: reception.currentMileage },
+        })
+      }
 
       await transaction.appointment.update({
         where: { id: appointment.id },
@@ -519,12 +541,143 @@ export const workOrdersRepository = {
             appointmentCode: appointment.code,
             customerId: appointment.customerId,
             vehicleId: appointment.vehicleId,
+            currentMileage: reception?.currentMileage,
+            fuelLevel: reception?.fuelLevel,
           }),
         ],
       })
 
       return workOrder
     })
+  },
+
+  async createDirectWorkOrder(
+    input: {
+      customerId: string
+      vehicleId: string
+      currentMileage?: number | null
+      fuelLevel?: string | null
+      receptionNotes?: string | null
+    },
+    actor: { id: string; name: string },
+    context: RequestContext,
+    organizationId: string,
+  ): Promise<CreatedWorkOrderRecord> {
+    return databaseService.transaction(async (transaction) => {
+      const customer = await transaction.customer.findFirst({
+        where: { id: input.customerId, organizationId },
+        select: { id: true },
+      })
+      if (!customer) {
+        throw new AppError(404, 'CUSTOMER_NOT_FOUND', 'Cliente no encontrado.')
+      }
+
+      const vehicle = await transaction.vehicle.findFirst({
+        where: {
+          id: input.vehicleId,
+          organizationId,
+          customerId: input.customerId,
+        },
+        select: { id: true },
+      })
+      if (!vehicle) {
+        throw new AppError(
+          404,
+          'VEHICLE_NOT_FOUND',
+          'El vehículo no existe o no pertenece al cliente seleccionado.',
+        )
+      }
+
+      const rows = await transaction.$queryRaw<
+        Array<{ seq: number | string }>
+      >`SELECT nextval('"work_orders_code_seq"') AS seq`
+      const code = `OT-${String(Number(rows[0].seq)).padStart(6, '0')}`
+
+      const workOrder = await transaction.workOrder.create({
+        data: {
+          code,
+          organizationId,
+          appointmentId: null,
+          customerId: input.customerId,
+          vehicleId: input.vehicleId,
+          source: 'WALK_IN',
+          currentMileage: input.currentMileage ?? null,
+          fuelLevel: input.fuelLevel ?? null,
+          receptionNotes: input.receptionNotes ?? null,
+          status: 'RECEPCIONADA',
+          performedBy: actor.name,
+        },
+        select: { id: true, code: true },
+      })
+
+      if (input.currentMileage != null && input.currentMileage > 0) {
+        await transaction.vehicle.update({
+          where: { id: vehicle.id },
+          data: { mileage: input.currentMileage },
+        })
+      }
+
+      await transaction.auditLog.create({
+        data: auditData(
+          'WORK_ORDER_CREATED',
+          actor.id,
+          workOrder.code,
+          context,
+          {
+            workOrderId: workOrder.id,
+            code: workOrder.code,
+            source: 'WALK_IN',
+            customerId: input.customerId,
+            vehicleId: input.vehicleId,
+            currentMileage: input.currentMileage,
+            fuelLevel: input.fuelLevel,
+          },
+        ),
+      })
+
+      return workOrder
+    })
+  },
+
+  async getYardCapacity(organizationId: string) {
+    const todayStart = new Date()
+    todayStart.setHours(0, 0, 0, 0)
+
+    const [activeOrdersCount, todayEntries] = await Promise.all([
+      databaseService.client.workOrder.count({
+        where: {
+          organizationId,
+          status: { in: [...ACTIVE_YARD_STATUSES] },
+        },
+      }),
+      databaseService.client.workOrder.findMany({
+        where: {
+          organizationId,
+          createdAt: { gte: todayStart },
+        },
+        select: {
+          id: true,
+          source: true,
+        },
+      }),
+    ])
+
+    const occupancy = computeYardOccupancy(activeOrdersCount)
+
+    const todayEntriesCount = todayEntries.length
+    const todayWalkInsCount = todayEntries.filter(
+      (o: { source: string }) => o.source === 'WALK_IN',
+    ).length
+    const todayAppointmentsCount = todayEntries.filter(
+      (o: { source: string }) => o.source === 'APPOINTMENT',
+    ).length
+
+    return {
+      ...occupancy,
+      todayEntriesCount,
+      todayWalkInsCount,
+      todayAppointmentsCount,
+    }
   },
 
   async updateDiagnosis(

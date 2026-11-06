@@ -41,6 +41,7 @@ import type {
   WorkOrderVehicleHistoryFilters,
   WorkOrderVehicleHistoryItem,
   WorkOrderVehicleRef,
+  CreateDirectWorkOrderInput,
 } from './work-order.types.js'
 
 type WorkOrderActor = { id: string; name: string }
@@ -112,7 +113,11 @@ function toSummary(
   order: {
     id: string
     code: string
-    appointment: { id: string; code: string }
+    appointment?: { id: string; code: string } | null
+    source?: 'APPOINTMENT' | 'WALK_IN'
+    currentMileage?: number | null
+    fuelLevel?: string | null
+    receptionNotes?: string | null
     customer: WorkOrderRecord['customer']
     vehicle: WorkOrderRecord['vehicle']
     status: WorkOrderSummary['status']
@@ -165,7 +170,13 @@ function toSummary(
   return {
     id: order.id,
     code: order.code,
-    appointment: order.appointment,
+    appointment: order.appointment
+      ? { id: order.appointment.id, code: order.appointment.code }
+      : null,
+    source: order.source ?? 'APPOINTMENT',
+    currentMileage: order.currentMileage ?? null,
+    fuelLevel: order.fuelLevel ?? null,
+    receptionNotes: order.receptionNotes ?? null,
     customer: toCustomerRef(order.customer),
     vehicle: toVehicleRef(order.vehicle),
     status: order.status,
@@ -634,10 +645,44 @@ export const workOrdersService = {
     actor: WorkOrderActor | string,
     context: RequestContext,
     organizationId: string,
+    reception?: {
+      currentMileage?: number | null
+      fuelLevel?: string | null
+      receptionNotes?: string | null
+    },
   ) {
     try {
-      const order = await workOrdersRepository.createFromAppointment(
-        appointmentId,
+      const normalizedActor = normalizeActor(actor)
+      const order =
+        reception !== undefined
+          ? await workOrdersRepository.createFromAppointment(
+              appointmentId,
+              normalizedActor,
+              context,
+              organizationId,
+              reception,
+            )
+          : await workOrdersRepository.createFromAppointment(
+              appointmentId,
+              normalizedActor,
+              context,
+              organizationId,
+            )
+      return { data: order }
+    } catch (error) {
+      return mapPersistenceError(error)
+    }
+  },
+
+  async createDirect(
+    input: CreateDirectWorkOrderInput,
+    actor: WorkOrderActor | string,
+    context: RequestContext,
+    organizationId: string,
+  ) {
+    try {
+      const order = await workOrdersRepository.createDirectWorkOrder(
+        input,
         normalizeActor(actor),
         context,
         organizationId,
@@ -646,6 +691,11 @@ export const workOrdersService = {
     } catch (error) {
       return mapPersistenceError(error)
     }
+  },
+
+  async getYardCapacity(organizationId: string) {
+    const data = await workOrdersRepository.getYardCapacity(organizationId)
+    return { data }
   },
 
   async updateDiagnosis(

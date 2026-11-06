@@ -4,6 +4,8 @@ import { paymentKeys } from '@/features/cash/hooks/use-payments'
 import { saleKeys } from '@/features/sales/hooks/use-sales'
 import { workOrdersService } from '../services/work-orders.service'
 import type {
+  CreateDirectWorkOrderInput,
+  ReceptionInput,
   WorkOrderActivityInput,
   WorkOrderBudgetInput,
   WorkOrderConsumptionInput,
@@ -22,6 +24,16 @@ export const workOrderKeys = {
   detail: (id: string) => [...baseKey, 'detail', id] as const,
   catalog: [...baseKey, 'catalog'] as const,
   execution: (id: string) => [...baseKey, 'execution', id] as const,
+  yardCapacity: [...baseKey, 'yard-capacity'] as const,
+}
+
+export function useYardCapacity() {
+  return useQuery({
+    queryKey: workOrderKeys.yardCapacity,
+    queryFn: ({ signal }) => workOrdersService.getYardCapacity(signal),
+    select: (response) => response.data,
+    refetchInterval: 30000,
+  })
 }
 
 export function useWorkOrders(filters: WorkOrderFilters) {
@@ -69,10 +81,29 @@ export function useWorkOrdersMutations() {
 
   return {
     createFromAppointment: useMutation({
-      mutationFn: (appointmentId: string) =>
-        workOrdersService.createFromAppointment(appointmentId),
+      mutationFn: (
+        params: string | { appointmentId: string; reception?: ReceptionInput },
+      ) => {
+        if (typeof params === 'string') {
+          return workOrdersService.createFromAppointment(params)
+        }
+        return workOrdersService.createFromAppointment(
+          params.appointmentId,
+          params.reception,
+        )
+      },
       onMutate: () => ({
         toastId: startActionToast('Creando orden de taller…'),
+      }),
+      onSuccess: refresh,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
+    }),
+    createDirect: useMutation({
+      mutationFn: (input: CreateDirectWorkOrderInput) =>
+        workOrdersService.createDirect(input),
+      onMutate: () => ({
+        toastId: startActionToast('Creando orden directa…'),
       }),
       onSuccess: refresh,
       onSettled: (_data, _error, _variables, context) =>

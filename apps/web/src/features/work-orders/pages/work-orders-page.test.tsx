@@ -14,6 +14,19 @@ const orders = vi.hoisted(() => ({
   useWorkOrder: vi.fn(),
   useWorkOrderExecution: vi.fn(),
   useWorkOrdersMutations: vi.fn(),
+  useYardCapacity: vi.fn(() => ({
+    data: {
+      maxCapacity: 8,
+      occupiedBays: 3,
+      availableBays: 5,
+      occupancyRate: 37.5,
+      isAtCapacity: false,
+      todayEntriesCount: 2,
+      todayWalkInsCount: 1,
+      todayAppointmentsCount: 1,
+    },
+    isLoading: false,
+  })),
 }))
 vi.mock('../hooks/use-work-orders', () => ({
   workOrderKeys: { all: ['work-orders'] },
@@ -21,6 +34,7 @@ vi.mock('../hooks/use-work-orders', () => ({
   useWorkOrder: orders.useWorkOrder,
   useWorkOrderExecution: orders.useWorkOrderExecution,
   useWorkOrdersMutations: orders.useWorkOrdersMutations,
+  useYardCapacity: orders.useYardCapacity,
 }))
 
 const reactQuery = vi.hoisted(() => ({ useQuery: vi.fn() }))
@@ -33,6 +47,9 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
   }
 })
 
+vi.mock('../components/direct-work-order-modal', () => ({
+  DirectWorkOrderModal: () => null,
+}))
 vi.mock('../components/work-order-detail-modal', () => ({
   WorkOrderDetailModal: () => null,
 }))

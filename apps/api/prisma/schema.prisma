@@ -47,6 +47,11 @@ enum AppointmentStatus {
   ATENDIDA
 }
 
+enum WorkOrderSource {
+  APPOINTMENT
+  WALK_IN
+}
+
 enum WorkOrderStatus {
   RECEPCIONADA
   EN_DIAGNOSTICO
@@ -407,6 +412,7 @@ model Vehicle {
   brand        String        @db.VarChar(80)
   model        String        @db.VarChar(120)
   year         Int           @map("year")
+  mileage      Int?          @map("mileage")
   customerId   String        @map("customer_id") @db.Uuid
   customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
   organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Restrict)
@@ -670,12 +676,16 @@ model WorkOrder {
   code               String                 @unique @db.VarChar(20)
   organizationId     String                 @map("organization_id") @db.Uuid
   organization       Organization           @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  appointmentId      String                 @unique @map("appointment_id") @db.Uuid
-  appointment        Appointment            @relation(fields: [appointmentId], references: [id], onDelete: Restrict)
+  appointmentId      String?                @unique @map("appointment_id") @db.Uuid
+  appointment        Appointment?           @relation(fields: [appointmentId], references: [id], onDelete: Restrict)
   customerId         String                 @map("customer_id") @db.Uuid
   customer           Customer               @relation(fields: [customerId], references: [id], onDelete: Restrict)
   vehicleId          String                 @map("vehicle_id") @db.Uuid
   vehicle            Vehicle                @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  source             WorkOrderSource        @default(APPOINTMENT) @map("source")
+  currentMileage     Int?                   @map("current_mileage")
+  fuelLevel          String?                @map("fuel_level") @db.VarChar(20)
+  receptionNotes     String?                @map("reception_notes") @db.VarChar(500)
   status             WorkOrderStatus        @default(RECEPCIONADA)
   legacyTechnicianId String?                @map("technician_id") @db.Uuid
   legacyTechnician   User?                  @relation(fields: [legacyTechnicianId], references: [id], onDelete: SetNull, name: "WorkOrderTechnician")
