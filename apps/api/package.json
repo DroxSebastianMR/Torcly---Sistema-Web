@@ -1,6 +1,6 @@
 {
   "name": "@torcly/api",
-  "version": "2.1.2",
+  "version": "2.2.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -21,6 +21,7 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
+    "seed:demo": "tsx scripts/seed-production-demo.ts",
     "db:studio": "prisma studio"
   },
   "dependencies": {
