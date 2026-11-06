@@ -58,7 +58,7 @@ function paginate(total: number, page: number, pageSize: number) {
   }
 }
 
-export const CURRENT_SAAS_VERSION = '1.1.2'
+export const CURRENT_SAAS_VERSION = '2.1.2'
 
 export const announcementsService = {
   async listAnnouncements(authUser: AuthUser, filters: AnnouncementFilters) {

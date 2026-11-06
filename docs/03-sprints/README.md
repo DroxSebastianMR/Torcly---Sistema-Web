@@ -30,8 +30,8 @@ Los sprints son secuenciales y cada uno tiene una rama, alcance cerrado, criteri
 | 24     | `sprint-24-roles-identidad-taller`   | `feature/workshop-manager-role`            | Aprobado (v1.1.2 en develop)  |
 | 25     | `sprint-25-admin-password-reset`     | `feature/admin-password-reset`             | Aprobado (en develop)         |
 | 26     | `sprint-26-notificaciones-taller`    | `feature/workshop-notifications`           | Aprobado (en develop)         |
-| 27     | `sprint-27-anuncios-novedades-saas`  | `feature/announcements-news`               | Aprobado                      |
-| 28     | `sprint-28-suscripciones-membresias` | `feature/subscriptions-memberships`        | En desarrollo                 |
+| 27     | `sprint-27-anuncios-novedades-saas`  | `feature/announcements-news`               | Aprobado (v2.1.2 en develop)  |
+| 28     | `sprint-28-suscripciones-membresias` | `feature/subscriptions-memberships`        | Aprobado (v2.1.2 en develop)  |
 
 El porcentaje solo cambia después de completar [Definition of Done](../04-calidad/definition-of-done.md) y registrar la aprobación.
 
