@@ -224,6 +224,21 @@ export const protectedRoutes: RouteObject[] = [
               },
             ],
           },
+          {
+            element: <PermissionRoute permission="notifications:read" />,
+            children: [
+              {
+                path: paths.notifications,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/notifications/pages/notifications-page'
+                    )
+                  ).default,
+                }),
+              },
+            ],
+          },
         ],
       },
     ],

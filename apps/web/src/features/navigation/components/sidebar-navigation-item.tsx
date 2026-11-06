@@ -94,7 +94,12 @@ export function SidebarNavigationItem({
                   : 'text-white/45 group-hover:text-white/80',
               )}
             />
-            <span>{item.label}</span>
+            <span className="truncate">{item.label}</span>
+            {Boolean(item.badge && Number(item.badge) > 0) && (
+              <span className="ml-auto inline-flex min-w-5 h-4.5 items-center justify-center rounded-full bg-emerald-500/25 px-1.5 text-[10px] font-bold text-emerald-300">
+                {Number(item.badge) > 99 ? '99+' : item.badge}
+              </span>
+            )}
           </>
         )}
       </NavLink>

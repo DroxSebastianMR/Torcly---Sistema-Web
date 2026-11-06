@@ -14,6 +14,9 @@ function buildQuery(filters: NotificationFilters): string {
     pageSize: String(filters.pageSize),
   })
   if (filters.type) query.set('type', filters.type)
+  if (filters.category && filters.category !== 'all')
+    query.set('category', filters.category)
+  if (filters.days && filters.days > 0) query.set('days', String(filters.days))
   return query.toString()
 }
 

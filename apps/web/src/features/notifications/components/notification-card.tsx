@@ -1,17 +1,12 @@
 import { Link } from 'react-router-dom'
-import {
-  Bell,
-  CalendarDays,
-  Check,
-  ClipboardList,
-  ExternalLink,
-  Truck,
-  Wallet,
-  Warehouse,
-} from 'lucide-react'
+import { Check, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { NotificationItem } from '../types/notifications.types'
-import { formatNotificationDate } from '../utils/notification-formatters'
+import {
+  formatNotificationDate,
+  formatRelativeNotificationDate,
+  getNotificationCategory,
+} from '../utils/notification-formatters'
 
 interface NotificationCardProps {
   notification: NotificationItem
@@ -24,106 +19,88 @@ export function NotificationCard({
   onMarkAsRead,
   isMarking,
 }: NotificationCardProps) {
-  const getIconConfig = () => {
-    switch (notification.type) {
-      case 'STOCK_LOW':
-        return {
-          icon: Warehouse,
-          bg: 'bg-amber-100 text-amber-700',
-        }
-      case 'PURCHASE_RECEIVED':
-        return {
-          icon: Truck,
-          bg: 'bg-emerald-100 text-emerald-700',
-        }
-      case 'APPOINTMENT_RESCHEDULED':
-      case 'APPOINTMENT_SCHEDULED':
-        return {
-          icon: CalendarDays,
-          bg: 'bg-sky-100 text-sky-700',
-        }
-      case 'WORK_ORDER_READY':
-        return {
-          icon: ClipboardList,
-          bg: 'bg-indigo-100 text-indigo-700',
-        }
-      case 'PAYMENT_COMPENSATED':
-        return {
-          icon: Wallet,
-          bg: 'bg-purple-100 text-purple-700',
-        }
-      default:
-        return {
-          icon: Bell,
-          bg: 'bg-primary/10 text-primary',
-        }
-    }
-  }
-
-  const { icon: Icon, bg } = getIconConfig()
+  const category = getNotificationCategory(notification.type)
+  const Icon = category.icon
 
   return (
     <div
-      className={`flex items-start gap-4 rounded-xl border p-4 transition-colors ${
-        notification.read
-          ? 'bg-card text-muted-foreground'
-          : 'bg-card border-primary/20 shadow-xs text-foreground'
+      className={`group flex items-start justify-between gap-4 px-5 py-4 transition-colors hover:bg-muted/40 sm:px-6 ${
+        notification.read ? 'bg-card' : 'bg-primary/[0.02]'
       }`}
     >
-      <div
-        className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${bg}`}
-      >
-        <Icon size={18} />
-      </div>
+      <div className="flex min-w-0 flex-1 items-start gap-3.5">
+        {/* Subtle category icon */}
+        <div
+          className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl ${category.bgIconClass}`}
+        >
+          <Icon size={16} />
+        </div>
 
-      <div className="min-w-0 flex-1 space-y-1">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
+        {/* Text details */}
+        <div className="min-w-0 flex-1 space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
             {!notification.read && (
               <span
-                className="size-2 rounded-full bg-primary shrink-0"
+                className="size-2 shrink-0 rounded-full bg-primary"
                 title="No leída"
                 aria-label="No leída"
               />
             )}
             <h3
-              className={`text-sm ${notification.read ? 'font-medium' : 'font-bold text-foreground'}`}
+              className={`text-sm ${
+                notification.read
+                  ? 'font-medium text-foreground/80'
+                  : 'font-bold text-foreground'
+              }`}
             >
               {notification.title}
             </h3>
           </div>
-          <span className="text-[11px] text-muted-foreground shrink-0">
-            {formatNotificationDate(notification.createdAt)}
-          </span>
+
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            {notification.message}
+          </p>
+
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            {notification.link && (
+              <Link
+                to={notification.link}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+              >
+                <span>Ver detalle</span>
+                <ExternalLink size={12} />
+              </Link>
+            )}
+
+            {!notification.read && (
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={isMarking}
+                onClick={() => onMarkAsRead(notification.id)}
+                className="h-6 px-2 text-[11px] text-muted-foreground hover:text-foreground"
+              >
+                <Check size={12} className="mr-1" />
+                Marcar como leída
+              </Button>
+            )}
+          </div>
         </div>
+      </div>
 
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          {notification.message}
-        </p>
-
-        <div className="flex flex-wrap items-center gap-3 pt-2">
-          {notification.link && (
-            <Link
-              to={notification.link}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
-            >
-              <span>Ver detalle</span>
-              <ExternalLink size={12} />
-            </Link>
-          )}
-
-          {!notification.read && (
-            <Button
-              variant="ghost"
-              disabled={isMarking}
-              onClick={() => onMarkAsRead(notification.id)}
-              className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
-            >
-              <Check size={13} className="mr-1" />
-              Marcar como leída
-            </Button>
-          )}
-        </div>
+      {/* Right column: Category badge + timestamp */}
+      <div className="flex shrink-0 flex-col items-end justify-between self-stretch pl-2 text-right">
+        <span
+          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${category.badgeClass}`}
+        >
+          {category.label}
+        </span>
+        <span
+          className="mt-2 text-[11px] text-muted-foreground"
+          title={formatNotificationDate(notification.createdAt)}
+        >
+          {formatRelativeNotificationDate(notification.createdAt)}
+        </span>
       </div>
     </div>
   )
