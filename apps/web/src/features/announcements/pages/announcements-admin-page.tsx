@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
 import { Pagination } from '@/components/ui/pagination'
+import { SmartSelect } from '@/components/ui/smart-select'
 import { AnnouncementAdminFormModal } from '../components/announcement-admin-form-modal'
 import {
   useActiveVersion,
@@ -139,44 +140,48 @@ export default function AnnouncementsAdminPage() {
 
       {/* Filter toolbar */}
       <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3 shadow-xs">
-        <div className="flex items-center gap-2 text-xs">
-          <span className="font-semibold text-muted-foreground">Tipo:</span>
-          <select
-            value={filters.type ?? ''}
-            onChange={(e) =>
+        <div className="w-52">
+          <SmartSelect
+            id="filter-type"
+            value={filters.type ?? 'all'}
+            onChange={(val) =>
               setFilters((prev) => ({
                 ...prev,
-                type: (e.target.value as AnnouncementType) || undefined,
+                type: val === 'all' ? undefined : (val as AnnouncementType),
                 page: 1,
               }))
             }
-            className="rounded-md border border-input bg-background px-2.5 py-1 text-xs"
-          >
-            <option value="">Todos los tipos</option>
-            <option value="UPDATE">Actualizaciones</option>
-            <option value="MAINTENANCE">Mantenimientos</option>
-            <option value="COMMUNICATION">Comunicados</option>
-          </select>
+            options={[
+              { value: 'all', label: 'Todos los tipos' },
+              { value: 'UPDATE', label: 'Actualizaciones' },
+              { value: 'MAINTENANCE', label: 'Mantenimientos' },
+              { value: 'COMMUNICATION', label: 'Comunicados' },
+            ]}
+            placeholder="Todos los tipos"
+            aria-label="Filtrar por tipo"
+          />
         </div>
 
-        <div className="flex items-center gap-2 text-xs">
-          <span className="font-semibold text-muted-foreground">Estado:</span>
-          <select
-            value={filters.status ?? ''}
-            onChange={(e) =>
+        <div className="w-52">
+          <SmartSelect
+            id="filter-status"
+            value={filters.status ?? 'all'}
+            onChange={(val) =>
               setFilters((prev) => ({
                 ...prev,
-                status: (e.target.value as AnnouncementStatus) || undefined,
+                status: val === 'all' ? undefined : (val as AnnouncementStatus),
                 page: 1,
               }))
             }
-            className="rounded-md border border-input bg-background px-2.5 py-1 text-xs"
-          >
-            <option value="">Todos los estados</option>
-            <option value="PUBLISHED">Publicados</option>
-            <option value="DRAFT">Borradores</option>
-            <option value="ARCHIVED">Archivados</option>
-          </select>
+            options={[
+              { value: 'all', label: 'Todos los estados' },
+              { value: 'PUBLISHED', label: 'Publicados' },
+              { value: 'DRAFT', label: 'Borradores' },
+              { value: 'ARCHIVED', label: 'Archivados' },
+            ]}
+            placeholder="Todos los estados"
+            aria-label="Filtrar por estado"
+          />
         </div>
       </div>
 

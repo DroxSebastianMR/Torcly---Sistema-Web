@@ -1,4 +1,4 @@
-import type { RouteObject } from 'react-router-dom'
+import { Navigate, type RouteObject } from 'react-router-dom'
 import { AppLayout } from '@/layouts/app/app-layout'
 import { ProtectedRoute } from '../guards/protected-route'
 import { PermissionRoute } from '../guards/permission-route'
@@ -31,6 +31,14 @@ export const protectedRoutes: RouteObject[] = [
                     )
                   ).default,
                 }),
+              },
+              {
+                path: '/plataforma',
+                element: <Navigate to={paths.platform} replace />,
+              },
+              {
+                path: '/plataforma/anuncios',
+                element: <Navigate to={paths.platformAnnouncements} replace />,
               },
             ],
           },
