@@ -14,10 +14,13 @@ import {
   Users,
   Wrench,
   Package,
+  Power,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { Input } from '@/components/ui/input'
+import { Modal } from '@/components/ui/modal'
 import { Pagination } from '@/components/ui/pagination'
 import { SmartSelect } from '@/components/ui/smart-select'
 import { usePlatformOrganizations } from '@/features/platform/hooks/use-platform-organizations'
@@ -103,6 +106,9 @@ export default function PlatformSubscriptionsPage() {
     open: false,
     plan: null,
   })
+  const [planToToggle, setPlanToToggle] = useState<Plan | null>(null)
+  const [deactivateBlockedPlan, setDeactivateBlockedPlan] =
+    useState<Plan | null>(null)
 
   const deferredSearch = useDeferredValue(filters.search)
   const queryFilters = useMemo(
@@ -198,6 +204,37 @@ export default function PlatformSubscriptionsPage() {
         error instanceof Error
           ? error.message
           : 'No se pudo actualizar el plan.',
+      )
+    }
+  }
+
+  const handleRequestTogglePlan = (plan: Plan) => {
+    if (plan.active && (plan.activeSubscriptionsCount ?? 0) > 0) {
+      setDeactivateBlockedPlan(plan)
+      return
+    }
+    setPlanToToggle(plan)
+  }
+
+  const handleConfirmTogglePlan = async () => {
+    if (!planToToggle) return
+    const nextActive = !planToToggle.active
+    try {
+      await updatePlanMutation.mutateAsync({
+        planId: planToToggle.id,
+        input: { active: nextActive },
+      })
+      toast.success(
+        nextActive
+          ? `Plan "${planToToggle.name}" activado correctamente.`
+          : `Plan "${planToToggle.name}" desactivado correctamente.`,
+      )
+      setPlanToToggle(null)
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'No se pudo actualizar el estado del plan.',
       )
     }
   }
@@ -539,7 +576,7 @@ export default function PlatformSubscriptionsPage() {
                     {/* Header del Plan */}
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-1.5">
                           <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-xs font-bold text-emerald-800">
                             {plan.code}
                           </span>
@@ -553,6 +590,15 @@ export default function PlatformSubscriptionsPage() {
                               Oculto
                             </span>
                           )}
+                          {plan.activeSubscriptionsCount !== undefined &&
+                            plan.activeSubscriptionsCount > 0 && (
+                              <span className="rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-800">
+                                {plan.activeSubscriptionsCount}{' '}
+                                {plan.activeSubscriptionsCount === 1
+                                  ? 'taller activo'
+                                  : 'talleres activos'}
+                              </span>
+                            )}
                         </div>
                         <h3 className="mt-2 flex items-center gap-1.5 text-lg font-bold text-brand-forest">
                           <Crown className="size-4 shrink-0 text-primary" />
@@ -641,17 +687,30 @@ export default function PlatformSubscriptionsPage() {
                   </div>
 
                   {/* Acciones */}
-                  <div className="mt-5 border-t border-border pt-4">
+                  <div className="mt-5 flex items-center gap-2 border-t border-border pt-4">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() =>
                         setPlanModalState({ open: true, plan: plan })
                       }
-                      className="w-full gap-1.5 text-xs"
+                      className="flex-1 gap-1.5 text-xs"
                     >
                       <Pencil className="size-3.5" />
                       Editar Plan
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleRequestTogglePlan(plan)}
+                      className={
+                        plan.active
+                          ? 'gap-1.5 text-xs text-rose-600 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700'
+                          : 'gap-1.5 text-xs text-emerald-600 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700'
+                      }
+                    >
+                      <Power className="size-3.5" />
+                      {plan.active ? 'Desactivar' : 'Activar'}
                     </Button>
                   </div>
                 </div>
@@ -691,6 +750,60 @@ export default function PlatformSubscriptionsPage() {
           onSubmit={handleUpdate}
         />
       )}
+
+      {/* Modal informativo si el plan no se puede desactivar por tener talleres */}
+      <Modal
+        open={Boolean(deactivateBlockedPlan)}
+        onClose={() => setDeactivateBlockedPlan(null)}
+        visual={
+          <span className="flex size-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 ring-8 ring-amber-50/50">
+            <AlertTriangle className="size-6" />
+          </span>
+        }
+        title="No se puede desactivar este plan"
+        description={
+          deactivateBlockedPlan
+            ? `El plan "${deactivateBlockedPlan.name}" se encuentra actualmente asignado a ${deactivateBlockedPlan.activeSubscriptionsCount} ${
+                deactivateBlockedPlan.activeSubscriptionsCount === 1
+                  ? 'taller con suscripción activa'
+                  : 'talleres con suscripciones activas'
+              }. Para desactivarlo, debes migrar primero esos talleres a otro plan comercial.`
+            : ''
+        }
+        className="max-w-md"
+        footer={
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeactivateBlockedPlan(null)}
+            >
+              Entendido
+            </Button>
+          </div>
+        }
+      />
+
+      {/* Confirmación para Activar / Desactivar plan */}
+      <ConfirmationDialog
+        open={Boolean(planToToggle)}
+        title={
+          planToToggle?.active
+            ? '¿Desactivar plan comercial?'
+            : '¿Activar plan comercial?'
+        }
+        description={
+          planToToggle?.active
+            ? `El plan "${planToToggle.name}" quedará inactivo. Ningún nuevo taller podrá contratarlo ni ser asignado a este plan mientras permanezca inactivo.`
+            : `El plan "${planToToggle?.name}" volverá a estar disponible para asignaciones y nuevas suscripciones.`
+        }
+        variant={planToToggle?.active ? 'danger' : 'success'}
+        confirmLabel={planToToggle?.active ? 'Sí, desactivar' : 'Sí, activar'}
+        cancelLabel="Cancelar"
+        pending={updatePlanMutation.isPending}
+        onConfirm={handleConfirmTogglePlan}
+        onCancel={() => setPlanToToggle(null)}
+      />
     </div>
   )
 }

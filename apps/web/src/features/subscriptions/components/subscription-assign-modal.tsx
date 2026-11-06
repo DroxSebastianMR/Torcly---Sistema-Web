@@ -167,7 +167,7 @@ function SubscriptionAssignForm({
       }
       title="Asignar nueva membresía SaaS"
       description="Vincula o actualiza el plan comercial y la vigencia para un taller existente en la plataforma."
-      className="max-w-2xl"
+      className="max-w-3xl sm:max-w-3xl"
       footer={
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button
@@ -254,7 +254,7 @@ function SubscriptionAssignForm({
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Estado inicial" required>
             <SmartSelect
               value={status}
@@ -264,6 +264,20 @@ function SubscriptionAssignForm({
             />
           </Field>
 
+          <Field
+            label="Observaciones o notas comerciales"
+            hint="Opcional. Queda en el historial."
+          >
+            <Input
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Ej. Membresía anual pagada por transferencia."
+              maxLength={500}
+            />
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Fecha de inicio" required>
             <Input
               type="date"
@@ -287,18 +301,6 @@ function SubscriptionAssignForm({
             />
           </Field>
         </div>
-
-        <Field
-          label="Observaciones o notas comerciales"
-          hint="Opcional. Queda registrado en el historial de la organización."
-        >
-          <Input
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Ej. Membresía anual pagada por transferencia. Válida hasta 2027."
-            maxLength={500}
-          />
-        </Field>
       </form>
     </Modal>
   )

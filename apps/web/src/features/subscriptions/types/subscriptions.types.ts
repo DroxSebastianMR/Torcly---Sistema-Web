@@ -21,6 +21,7 @@ export interface Plan {
   features: string[]
   active: boolean
   isPublic: boolean
+  activeSubscriptionsCount?: number
   createdAt: string
   updatedAt: string
 }

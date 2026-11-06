@@ -264,4 +264,40 @@ describe('subscriptionsService', () => {
     expect(result.data.name).toBe('Plan Inicial Mejorado')
     expect(result.data.maxMembers).toBe(4)
   })
+
+  it('rechaza la desactivación de un plan cuando tiene suscripciones activas asociadas', async () => {
+    vi.spyOn(subscriptionsRepository, 'findPlanById').mockResolvedValue(
+      mockPlan as any,
+    )
+    vi.spyOn(
+      subscriptionsRepository,
+      'countActiveSubscriptionsForPlan',
+    ).mockResolvedValue(2)
+
+    await expect(
+      subscriptionsService.updatePlan('plan-1', { active: false }),
+    ).rejects.toThrow(
+      'No se puede desactivar el plan "Plan Inicial" porque actualmente está asignado a 2 taller(es) con membresía activa.',
+    )
+  })
+
+  it('permite la desactivación de un plan cuando no tiene suscripciones activas', async () => {
+    vi.spyOn(subscriptionsRepository, 'findPlanById').mockResolvedValue(
+      mockPlan as any,
+    )
+    vi.spyOn(
+      subscriptionsRepository,
+      'countActiveSubscriptionsForPlan',
+    ).mockResolvedValue(0)
+    vi.spyOn(subscriptionsRepository, 'updatePlan').mockResolvedValue({
+      ...mockPlan,
+      active: false,
+    } as any)
+
+    const result = await subscriptionsService.updatePlan('plan-1', {
+      active: false,
+    })
+
+    expect(result.data.active).toBe(false)
+  })
 })

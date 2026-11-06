@@ -30,6 +30,7 @@ function toPlanDto(record: {
   features: unknown
   active: boolean
   isPublic: boolean
+  _count?: { subscriptions?: number }
   createdAt: Date
   updatedAt: Date
 }): PlanDto {
@@ -55,6 +56,10 @@ function toPlanDto(record: {
     features: featuresList,
     active: record.active,
     isPublic: record.isPublic,
+    activeSubscriptionsCount:
+      record._count?.subscriptions !== undefined
+        ? record._count.subscriptions
+        : undefined,
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),
   }
@@ -307,6 +312,18 @@ export const subscriptionsService = {
     const existing = await subscriptionsRepository.findPlanById(planId)
     if (!existing) {
       throw new AppError(404, 'PLAN_NOT_FOUND', 'Plan no encontrado.')
+    }
+
+    if (input.active === false && existing.active === true) {
+      const activeCount =
+        await subscriptionsRepository.countActiveSubscriptionsForPlan(planId)
+      if (activeCount > 0) {
+        throw new AppError(
+          409,
+          'PLAN_IN_USE',
+          `No se puede desactivar el plan "${existing.name}" porque actualmente está asignado a ${activeCount} taller(es) con membresía activa. Modifica o migra primero sus suscripciones antes de desactivarlo.`,
+        )
+      }
     }
 
     const plan = await subscriptionsRepository.updatePlan(planId, input)

@@ -17,6 +17,7 @@ export interface PlanDto {
   features: string[]
   active: boolean
   isPublic: boolean
+  activeSubscriptionsCount?: number
   createdAt: string
   updatedAt: string
 }

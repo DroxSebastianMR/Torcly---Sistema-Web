@@ -236,4 +236,119 @@ describe('PlatformSubscriptionsPage', () => {
 
     expect(screen.getByText(/crear nuevo plan comercial/i)).toBeTruthy()
   })
+
+  it('bloquea la desactivación de un plan si tiene talleres con suscripciones activas', async () => {
+    const plansWithActiveWorkshop = [
+      {
+        ...mockPlans[0]!,
+        activeSubscriptionsCount: 3,
+      },
+    ]
+
+    vi.spyOn(useSubscriptionsModule, 'usePlatformPlans').mockReturnValue({
+      data: { data: plansWithActiveWorkshop },
+      isLoading: false,
+    } as any)
+
+    render(<PlatformSubscriptionsPage />)
+
+    const plansTabBtn = screen.getByRole('button', {
+      name: /planes comerciales/i,
+    })
+    await userEvent.click(plansTabBtn)
+
+    const deactivateBtn = screen.getByRole('button', { name: /desactivar/i })
+    await userEvent.click(deactivateBtn)
+
+    expect(screen.getByText('No se puede desactivar este plan')).toBeTruthy()
+    expect(
+      screen.getByText(/se encuentra actualmente asignado a 3 talleres/i),
+    ).toBeTruthy()
+
+    // Dismiss with Entendido
+    const entendidoBtn = screen.getByRole('button', { name: /entendido/i })
+    await userEvent.click(entendidoBtn)
+    expect(screen.queryByText('No se puede desactivar este plan')).toBeNull()
+  })
+
+  it('muestra diálogo de confirmación y permite desactivar un plan sin talleres activos', async () => {
+    const mutateAsyncMock = vi.fn().mockResolvedValue({})
+    vi.spyOn(useSubscriptionsModule, 'useUpdatePlan').mockReturnValue({
+      mutateAsync: mutateAsyncMock,
+      isPending: false,
+    } as any)
+
+    const freePlan = [
+      {
+        ...mockPlans[0]!,
+        activeSubscriptionsCount: 0,
+      },
+    ]
+
+    vi.spyOn(useSubscriptionsModule, 'usePlatformPlans').mockReturnValue({
+      data: { data: freePlan },
+      isLoading: false,
+    } as any)
+
+    render(<PlatformSubscriptionsPage />)
+
+    const plansTabBtn = screen.getByRole('button', {
+      name: /planes comerciales/i,
+    })
+    await userEvent.click(plansTabBtn)
+
+    const deactivateBtn = screen.getByRole('button', { name: /desactivar/i })
+    await userEvent.click(deactivateBtn)
+
+    expect(screen.getByText('¿Desactivar plan comercial?')).toBeTruthy()
+
+    const confirmBtn = screen.getByRole('button', { name: /sí, desactivar/i })
+    await userEvent.click(confirmBtn)
+
+    expect(mutateAsyncMock).toHaveBeenCalledWith({
+      planId: 'plan-1',
+      input: { active: false },
+    })
+  })
+
+  it('permite reactivar un plan inactivo mediante el botón Activar', async () => {
+    const mutateAsyncMock = vi.fn().mockResolvedValue({})
+    vi.spyOn(useSubscriptionsModule, 'useUpdatePlan').mockReturnValue({
+      mutateAsync: mutateAsyncMock,
+      isPending: false,
+    } as any)
+
+    const inactivePlan = [
+      {
+        ...mockPlans[0]!,
+        active: false,
+        activeSubscriptionsCount: 0,
+      },
+    ]
+
+    vi.spyOn(useSubscriptionsModule, 'usePlatformPlans').mockReturnValue({
+      data: { data: inactivePlan },
+      isLoading: false,
+    } as any)
+
+    render(<PlatformSubscriptionsPage />)
+
+    const plansTabBtn = screen.getByRole('button', {
+      name: /planes comerciales/i,
+    })
+    await userEvent.click(plansTabBtn)
+
+    const activateBtn = screen.getByRole('button', { name: /activar/i })
+    await userEvent.click(activateBtn)
+
+    expect(screen.getByText('¿Activar plan comercial?')).toBeTruthy()
+
+    const confirmBtn = screen.getByRole('button', { name: /sí, activar/i })
+    await userEvent.click(confirmBtn)
+
+    expect(mutateAsyncMock).toHaveBeenCalledWith({
+      planId: 'plan-1',
+      input: { active: true },
+    })
+  })
 })

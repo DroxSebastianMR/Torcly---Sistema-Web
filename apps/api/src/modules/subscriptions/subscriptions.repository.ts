@@ -51,8 +51,32 @@ export const subscriptionsRepository = {
 
   listAllPlans() {
     return databaseService.client.plan.findMany({
-      select: planSelect,
+      select: {
+        ...planSelect,
+        _count: {
+          select: {
+            subscriptions: {
+              where: {
+                status: {
+                  in: ['ACTIVE', 'TRIAL', 'PAST_DUE', 'SUSPENDED'],
+                },
+              },
+            },
+          },
+        },
+      },
       orderBy: [{ active: 'desc' }, { priceMonthly: 'asc' }],
+    })
+  },
+
+  countActiveSubscriptionsForPlan(planId: string) {
+    return databaseService.client.organizationSubscription.count({
+      where: {
+        planId,
+        status: {
+          in: ['ACTIVE', 'TRIAL', 'PAST_DUE', 'SUSPENDED'],
+        },
+      },
     })
   },
 

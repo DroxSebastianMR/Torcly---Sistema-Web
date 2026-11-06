@@ -353,7 +353,8 @@ function PlanForm({
             onChange={(e) => setFeaturesText(e.target.value)}
             rows={3}
             placeholder="Hasta 10 miembros en taller&#10;Asistente IA conversacional&#10;Múltiples sesiones de caja"
-            className="flex w-full rounded-[10px] border border-input bg-card px-3 py-2.5 text-sm transition-[border-color,background-color] duration-150 ease-out hover:bg-background focus:border-primary/70 focus:outline-none"
+            className="no-scrollbar flex w-full rounded-[10px] border border-input bg-card px-3 py-2.5 text-sm transition-[border-color,background-color] duration-150 ease-out hover:bg-background focus:border-primary/70 focus:outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           />
         </Field>
 
