@@ -208,7 +208,11 @@ export function NotificationSummaryPopover({
                     <div className="flex items-start gap-3">
                       {/* Avatar / Icon circle */}
                       <div
-                        className={`relative flex size-8 shrink-0 items-center justify-center rounded-full ${category.bgIconClass}`}
+                        style={{
+                          backgroundColor: category.bg,
+                          color: category.accent,
+                        }}
+                        className="relative flex size-8 shrink-0 items-center justify-center rounded-full"
                       >
                         <Icon size={14} />
                         {!notification.read && (
@@ -248,7 +252,11 @@ export function NotificationSummaryPopover({
                           </span>
                           <span>•</span>
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${category.badgeClass}`}
+                            style={{
+                              backgroundColor: category.bg,
+                              color: category.accent,
+                            }}
+                            className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
                           >
                             {category.label}
                           </span>

@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Bell, CheckCircle2, Clock } from 'lucide-react'
 import { ErrorState } from '@/components/ui/error-state'
 import { Pagination } from '@/components/ui/pagination'
-import { IndicatorCard } from '@/features/reports/components/indicator-card'
 import { NotificationsList } from '../components/notifications-list'
 import { NotificationsToolbar } from '../components/notifications-toolbar'
 import {
@@ -123,30 +121,6 @@ export default function NotificationsPage() {
           })}
         </div>
       </header>
-
-      {/* Metric indicator cards matching Reportes */}
-      <div className="grid gap-3 sm:grid-cols-3">
-        <IndicatorCard
-          label="Total avisos"
-          value={String(pagination?.total ?? 0)}
-          icon={<Bell className="size-4" />}
-          tone="blue"
-        />
-        <IndicatorCard
-          label="Sin leer"
-          value={String(unreadCount)}
-          hint={unreadCount === 0 ? 'Bandeja al día' : 'Requieren atención'}
-          icon={<Clock className="size-4" />}
-          tone={unreadCount > 0 ? 'amber' : 'green'}
-        />
-        <IndicatorCard
-          label="Atendidas"
-          value={String(Math.max((pagination?.total ?? 0) - unreadCount, 0))}
-          hint="Notificaciones revisadas"
-          icon={<CheckCircle2 className="size-4" />}
-          tone="purple"
-        />
-      </div>
 
       {/* Categories and Filters Bar */}
       <section

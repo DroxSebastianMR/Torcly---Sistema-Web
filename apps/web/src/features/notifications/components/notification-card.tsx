@@ -29,9 +29,13 @@ export function NotificationCard({
       }`}
     >
       <div className="flex min-w-0 flex-1 items-start gap-3.5">
-        {/* Subtle category icon */}
+        {/* Category icon with exact pastel background and accent color */}
         <div
-          className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl ${category.bgIconClass}`}
+          style={{
+            backgroundColor: category.bg,
+            color: category.accent,
+          }}
+          className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl"
         >
           <Icon size={16} />
         </div>
@@ -88,15 +92,19 @@ export function NotificationCard({
         </div>
       </div>
 
-      {/* Right column: Vivid Category badge + timestamp */}
+      {/* Right column: Exact color pill badge + timestamp */}
       <div className="flex shrink-0 flex-col items-end justify-start self-stretch pl-2 text-right">
         <span
-          className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-semibold shadow-2xs ${category.badgeClass}`}
+          style={{
+            backgroundColor: category.bg,
+            color: category.accent,
+          }}
+          className="inline-flex items-center rounded-full px-3 py-0.5 text-xs font-semibold"
         >
           {category.label}
         </span>
         <span
-          className="mt-1.5 text-xs font-medium text-muted-foreground"
+          className="mt-1.5 text-xs text-muted-foreground"
           title={formatNotificationDate(notification.createdAt)}
         >
           {formatRelativeNotificationDate(notification.createdAt)}

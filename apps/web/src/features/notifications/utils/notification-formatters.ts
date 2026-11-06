@@ -5,6 +5,7 @@ import {
   Truck,
   Wallet,
   Warehouse,
+  type LucideIcon,
 } from 'lucide-react'
 
 export const notificationDateFormatter = new Intl.DateTimeFormat('es-PE', {
@@ -58,89 +59,81 @@ export type NotificationCategoryKey =
   | 'caja'
   | 'sistema'
 
-export function getNotificationCategory(type: string) {
+export interface CategoryAppearance {
+  key: NotificationCategoryKey
+  label: string
+  icon: LucideIcon
+  bg: string
+  accent: string
+}
+
+export function getNotificationCategory(type: string): CategoryAppearance {
   switch (type) {
     case 'WORK_ORDER_READY':
       return {
-        key: 'taller' as NotificationCategoryKey,
+        key: 'taller',
         label: 'Taller',
         icon: ClipboardList,
-        badgeClass:
-          'bg-[#E7F6EF] text-[#329B78] border border-[#329B78]/40 dark:bg-[#329B78]/15 dark:text-[#6EE7B7] dark:border-[#329B78]/40',
-        bgIconClass:
-          'bg-[#E7F6EF] text-[#329B78] border border-[#329B78]/30 dark:bg-[#329B78]/15 dark:text-[#6EE7B7] dark:border-[#329B78]/40',
+        bg: '#E7F6EF', // Verde menta
+        accent: '#329B78',
       }
     case 'APPOINTMENT_SCHEDULED':
     case 'APPOINTMENT_RESCHEDULED':
       return {
-        key: 'citas' as NotificationCategoryKey,
+        key: 'citas',
         label: 'Citas',
         icon: CalendarDays,
-        badgeClass:
-          'bg-[#EAF4FD] text-[#4385C7] border border-[#4385C7]/40 dark:bg-[#4385C7]/15 dark:text-[#93C5FD] dark:border-[#4385C7]/40',
-        bgIconClass:
-          'bg-[#EAF4FD] text-[#4385C7] border border-[#4385C7]/30 dark:bg-[#4385C7]/15 dark:text-[#93C5FD] dark:border-[#4385C7]/40',
+        bg: '#EAF4FD', // Azul cielo
+        accent: '#4385C7',
       }
     case 'APPOINTMENT_OVERDUE':
       return {
-        key: 'citas' as NotificationCategoryKey,
+        key: 'citas',
         label: 'Cita Vencida',
         icon: CalendarDays,
-        badgeClass:
-          'bg-[#FFF0F4] text-[#CE4779] border border-[#CE4779]/40 dark:bg-[#CE4779]/15 dark:text-[#FDA4AF] dark:border-[#CE4779]/40',
-        bgIconClass:
-          'bg-[#FFF0F4] text-[#CE4779] border border-[#CE4779]/30 dark:bg-[#CE4779]/15 dark:text-[#FDA4AF] dark:border-[#CE4779]/40',
+        bg: '#FFF0F4', // Rosa suave
+        accent: '#CE4779',
       }
     case 'STOCK_LOW':
       return {
-        key: 'inventario' as NotificationCategoryKey,
+        key: 'inventario',
         label: 'Stock Bajo',
         icon: Warehouse,
-        badgeClass:
-          'bg-[#FFFBE8] text-[#C58A24] border border-[#C58A24]/40 dark:bg-[#C58A24]/15 dark:text-[#FCD34D] dark:border-[#C58A24]/40',
-        bgIconClass:
-          'bg-[#FFFBE8] text-[#C58A24] border border-[#C58A24]/30 dark:bg-[#C58A24]/15 dark:text-[#FCD34D] dark:border-[#C58A24]/40',
+        bg: '#FFFBE8', // Amarillo crema
+        accent: '#C58A24',
       }
     case 'PURCHASE_RECEIVED':
       return {
-        key: 'inventario' as NotificationCategoryKey,
+        key: 'inventario',
         label: 'Inventario',
         icon: Truck,
-        badgeClass:
-          'bg-[#E7F6EF] text-[#329B78] border border-[#329B78]/40 dark:bg-[#329B78]/15 dark:text-[#6EE7B7] dark:border-[#329B78]/40',
-        bgIconClass:
-          'bg-[#E7F6EF] text-[#329B78] border border-[#329B78]/30 dark:bg-[#329B78]/15 dark:text-[#6EE7B7] dark:border-[#329B78]/40',
+        bg: '#E7F6EF', // Verde menta
+        accent: '#329B78',
       }
     case 'PAYMENT_COMPENSATED':
       return {
-        key: 'caja' as NotificationCategoryKey,
+        key: 'caja',
         label: 'Caja',
         icon: Wallet,
-        badgeClass:
-          'bg-[#FCEBFA] text-[#C34AB7] border border-[#C34AB7]/40 dark:bg-[#C34AB7]/15 dark:text-[#F472B6] dark:border-[#C34AB7]/40',
-        bgIconClass:
-          'bg-[#FCEBFA] text-[#C34AB7] border border-[#C34AB7]/30 dark:bg-[#C34AB7]/15 dark:text-[#F472B6] dark:border-[#C34AB7]/40',
+        bg: '#FCEBFA', // Rosa lavanda
+        accent: '#C34AB7',
       }
     case 'PAYMENT_DUE':
       return {
-        key: 'caja' as NotificationCategoryKey,
+        key: 'caja',
         label: 'Cobro Vencido',
         icon: Wallet,
-        badgeClass:
-          'bg-[#FFF0F4] text-[#CE4779] border border-[#CE4779]/40 dark:bg-[#CE4779]/15 dark:text-[#FDA4AF] dark:border-[#CE4779]/40',
-        bgIconClass:
-          'bg-[#FFF0F4] text-[#CE4779] border border-[#CE4779]/30 dark:bg-[#CE4779]/15 dark:text-[#FDA4AF] dark:border-[#CE4779]/40',
+        bg: '#FFF0F4', // Rosa suave
+        accent: '#CE4779',
       }
     case 'SYSTEM':
     default:
       return {
-        key: 'sistema' as NotificationCategoryKey,
+        key: 'sistema',
         label: 'Sistema',
         icon: Bell,
-        badgeClass:
-          'bg-[#F3EFFD] text-[#7852C9] border border-[#7852C9]/40 dark:bg-[#7852C9]/15 dark:text-[#C4B5FD] dark:border-[#7852C9]/40',
-        bgIconClass:
-          'bg-[#F3EFFD] text-[#7852C9] border border-[#7852C9]/30 dark:bg-[#7852C9]/15 dark:text-[#C4B5FD] dark:border-[#7852C9]/40',
+        bg: '#EAF4FD', // Azul cielo
+        accent: '#4385C7',
       }
   }
 }
