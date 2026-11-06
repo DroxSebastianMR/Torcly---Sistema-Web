@@ -1,6 +1,7 @@
 import { Prisma } from '../../generated/prisma/client.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import type { RequestContext } from '../auth/auth.types.js'
+import { subscriptionsService } from '../subscriptions/subscriptions.service.js'
 import {
   techniciansRepository,
   type TechnicianRecord,
@@ -65,6 +66,7 @@ export const techniciansService = {
     organizationId: string,
     context: RequestContext,
   ) {
+    await subscriptionsService.checkTechnicianQuota(organizationId)
     try {
       return {
         data: toResponse(

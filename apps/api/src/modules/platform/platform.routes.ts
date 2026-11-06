@@ -12,6 +12,12 @@ import {
   updateOrganization,
   updateOrganizationStatus,
 } from './platform.controller.js'
+import {
+  getPlatformSubscriptionMetrics,
+  listPlatformPlans,
+  listPlatformSubscriptions,
+  updatePlatformSubscription,
+} from '../subscriptions/subscriptions.controller.js'
 
 export const platformRouter = Router()
 
@@ -40,4 +46,13 @@ platformRouter.patch(
 platformRouter.post(
   '/organizations/:organizationId/members/:userId/reset-password',
   resetOrganizationMemberPassword,
+)
+
+// Suscripciones y planes comerciales (Sprint 28)
+platformRouter.get('/plans', listPlatformPlans)
+platformRouter.get('/subscriptions', listPlatformSubscriptions)
+platformRouter.get('/subscriptions/metrics', getPlatformSubscriptionMetrics)
+platformRouter.patch(
+  '/subscriptions/:organizationId',
+  updatePlatformSubscription,
 )

@@ -236,7 +236,8 @@ model Organization {
   purchases   Purchase[]
   assistantConversations AssistantConversation[]
   notifications Notification[]
-    auditLogs   AuditLog[]
+  subscription  OrganizationSubscription?
+  auditLogs   AuditLog[]
   createdAt   DateTime                 @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt   DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(3)
 
@@ -1066,4 +1067,63 @@ model AnnouncementRead {
   @@index([userId])
   @@map("announcement_reads")
 }
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIAL
+  PAST_DUE
+  CANCELED
+  SUSPENDED
+
+  @@map("subscription_status")
+}
+
+enum BillingCycle {
+  MONTHLY
+  ANNUAL
+
+  @@map("billing_cycle")
+}
+
+model Plan {
+  id              String                     @id @default(uuid()) @db.Uuid
+  code            String                     @unique @db.VarChar(40)
+  name            String                     @db.VarChar(120)
+  description     String?                    @db.VarChar(300)
+  priceMonthly    Decimal                    @default(0) @map("price_monthly") @db.Decimal(10, 2)
+  priceYearly     Decimal                    @default(0) @map("price_yearly") @db.Decimal(10, 2)
+  currency        String                     @default("PEN") @db.VarChar(3)
+  maxMembers      Int                        @default(5) @map("max_members")
+  maxTechnicians  Int                        @default(10) @map("max_technicians")
+  maxProducts     Int                        @default(500) @map("max_products")
+  features        Json?                      @default("[]")
+  active          Boolean                    @default(true)
+  isPublic        Boolean                    @default(true) @map("is_public")
+  createdAt       DateTime                   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime                   @updatedAt @map("updated_at") @db.Timestamptz(3)
+  subscriptions   OrganizationSubscription[]
+
+  @@map("plans")
+}
+
+model OrganizationSubscription {
+  id             String             @id @default(uuid()) @db.Uuid
+  organizationId String             @unique @map("organization_id") @db.Uuid
+  planId         String             @map("plan_id") @db.Uuid
+  status         SubscriptionStatus @default(ACTIVE)
+  billingCycle   BillingCycle       @default(MONTHLY) @map("billing_cycle")
+  startsAt       DateTime           @default(now()) @map("starts_at") @db.Timestamptz(3)
+  renewsAt       DateTime?          @map("renews_at") @db.Timestamptz(3)
+  canceledAt     DateTime?          @map("canceled_at") @db.Timestamptz(3)
+  notes          String?            @db.VarChar(500)
+  createdAt      DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan           Plan               @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([status])
+  @@index([planId])
+  @@map("organization_subscriptions")
+}
+
 

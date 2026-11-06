@@ -24,12 +24,14 @@ import { announcementsRouter } from './modules/announcements/announcements.route
 import { assistantRouter } from './modules/assistant/assistant.routes.js'
 import { techniciansRouter } from './modules/technicians/technicians.routes.js'
 import { platformRouter } from './modules/platform/platform.routes.js'
+import { subscriptionsRouter } from './modules/subscriptions/subscriptions.routes.js'
 
 export const apiRouter = Router()
 
 apiRouter.use('/health', healthRouter)
 apiRouter.use('/auth', authRouter)
 apiRouter.use('/platform', platformRouter)
+apiRouter.use('/subscriptions', subscriptionsRouter)
 apiRouter.use('/profile', profileRouter)
 apiRouter.use('/notifications', notificationsRouter)
 apiRouter.use('/announcements', announcementsRouter)

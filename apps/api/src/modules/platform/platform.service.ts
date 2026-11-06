@@ -2,6 +2,7 @@ import { Prisma } from '../../generated/prisma/client.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import { generateTemporaryPassword, hashPassword } from '../auth/password.js'
 import { authService } from '../auth/auth.service.js'
+import { subscriptionsService } from '../subscriptions/subscriptions.service.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import {
   platformRepository,
@@ -217,6 +218,7 @@ export const platformService = {
         'Selecciona un rol activo para el miembro.',
       )
     }
+    await subscriptionsService.checkMemberQuota(organizationId)
     try {
       const member = await platformRepository.createOrganizationMember({
         organizationId,
@@ -243,6 +245,9 @@ export const platformService = {
           'Selecciona un rol activo para el miembro.',
         )
       }
+    }
+    if (input.active === true) {
+      await subscriptionsService.checkMemberQuota(organizationId)
     }
     try {
       const member = await platformRepository.updateOrganizationMember(

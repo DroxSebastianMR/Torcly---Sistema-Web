@@ -309,6 +309,23 @@ export const platformRepository = {
           roleId: input.owner.roleId,
         },
       })
+      const defaultPlan = await transaction.plan.findFirst({
+        where: { code: 'PRO' },
+        select: { id: true },
+      })
+      if (defaultPlan) {
+        await transaction.organizationSubscription.create({
+          data: {
+            organizationId: organization.id,
+            planId: defaultPlan.id,
+            status: 'ACTIVE',
+            billingCycle: 'MONTHLY',
+            startsAt: new Date(),
+            renewsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            notes: 'Suscripción asignada al crear taller.',
+          },
+        })
+      }
       return transaction.organization.findUniqueOrThrow({
         where: { id: organization.id },
         include: organizationInclude,

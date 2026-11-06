@@ -338,6 +338,155 @@ export async function seedDatabase(database: PrismaClient, input: SeedInput) {
     )
   }
 
+  // Seeding de planes comerciales SaaS y suscripción de organización
+  const plansData = [
+    {
+      code: 'STARTER',
+      name: 'Plan Inicial',
+      description:
+        'Para talleres independientes y mecánicos que inician su digitalización.',
+      priceMonthly: 79.0,
+      priceYearly: 790.0,
+      currency: 'PEN',
+      maxMembers: 3,
+      maxTechnicians: 5,
+      maxProducts: 250,
+      features: [
+        'Hasta 3 miembros en el taller',
+        'Hasta 5 técnicos en catálogo',
+        '250 productos en inventario',
+        'Gestión de citas y órdenes de trabajo',
+        'Cobros y arqueo de caja básicos',
+      ],
+      active: true,
+      isPublic: true,
+    },
+    {
+      code: 'PRO',
+      name: 'Plan Profesional',
+      description:
+        'Para talleres en crecimiento con equipo técnico, recepción y almacén.',
+      priceMonthly: 149.0,
+      priceYearly: 1490.0,
+      currency: 'PEN',
+      maxMembers: 10,
+      maxTechnicians: 15,
+      maxProducts: 2500,
+      features: [
+        'Hasta 10 miembros en el taller',
+        'Hasta 15 técnicos en catálogo',
+        '2,500 productos en inventario',
+        'Asistente IA conversacional',
+        'Múltiples sesiones de caja',
+        'Analítica y reportes avanzados',
+        'Reabastecimiento predictivo',
+      ],
+      active: true,
+      isPublic: true,
+    },
+    {
+      code: 'ENTERPRISE',
+      name: 'Plan Corporativo',
+      description:
+        'Para cadenas de talleres automotrices con operaciones de alto volumen.',
+      priceMonthly: 299.0,
+      priceYearly: 2990.0,
+      currency: 'PEN',
+      maxMembers: 50,
+      maxTechnicians: 50,
+      maxProducts: 20000,
+      features: [
+        'Hasta 50 miembros en el taller',
+        'Hasta 50 técnicos en catálogo',
+        '20,000 productos en inventario',
+        'Todas las funcionalidades Pro',
+        'Soporte prioritario 24/7',
+        'Auditoría y trazabilidad completa',
+      ],
+      active: true,
+      isPublic: true,
+    },
+  ]
+
+  const seededPlans: Record<string, string> = {}
+  for (const plan of plansData) {
+    const upsertedPlan = await database.plan.upsert({
+      where: { code: plan.code },
+      update: {
+        name: plan.name,
+        description: plan.description,
+        priceMonthly: plan.priceMonthly,
+        priceYearly: plan.priceYearly,
+        currency: plan.currency,
+        maxMembers: plan.maxMembers,
+        maxTechnicians: plan.maxTechnicians,
+        maxProducts: plan.maxProducts,
+        features: plan.features,
+        active: plan.active,
+        isPublic: plan.isPublic,
+      },
+      create: {
+        code: plan.code,
+        name: plan.name,
+        description: plan.description,
+        priceMonthly: plan.priceMonthly,
+        priceYearly: plan.priceYearly,
+        currency: plan.currency,
+        maxMembers: plan.maxMembers,
+        maxTechnicians: plan.maxTechnicians,
+        maxProducts: plan.maxProducts,
+        features: plan.features,
+        active: plan.active,
+        isPublic: plan.isPublic,
+      },
+    })
+    seededPlans[plan.code] = upsertedPlan.id
+  }
+
+  // Asignar suscripción a la organización semilla (ENTERPRISE)
+  const enterprisePlanId = seededPlans['ENTERPRISE']
+  if (enterprisePlanId) {
+    await database.organizationSubscription.upsert({
+      where: { organizationId: organization.id },
+      update: {
+        planId: enterprisePlanId,
+        status: 'ACTIVE',
+        billingCycle: 'ANNUAL',
+        renewsAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+      },
+      create: {
+        organizationId: organization.id,
+        planId: enterprisePlanId,
+        status: 'ACTIVE',
+        billingCycle: 'ANNUAL',
+        startsAt: new Date(),
+        renewsAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        notes: 'Suscripción corporativa inicial.',
+      },
+    })
+  }
+
+  // Garantizar que toda organización existente tenga suscripción activa
+  const allOrganizations = await database.organization.findMany({
+    where: { subscription: null },
+  })
+  const proPlanId = seededPlans['PRO']
+  if (proPlanId) {
+    for (const org of allOrganizations) {
+      await database.organizationSubscription.create({
+        data: {
+          organizationId: org.id,
+          planId: proPlanId,
+          status: 'ACTIVE',
+          billingCycle: 'MONTHLY',
+          startsAt: new Date(),
+          renewsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          notes: 'Suscripción asignada por migración de Sprint 28.',
+        },
+      })
+    }
+  }
+
   console.info(
     `Seed completado para ${seededAccounts.map((account) => account.email).join(', ')}.`,
   )
