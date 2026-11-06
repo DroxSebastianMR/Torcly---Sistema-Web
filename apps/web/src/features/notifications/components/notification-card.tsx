@@ -41,7 +41,7 @@ export function NotificationCard({
           <div className="flex flex-wrap items-center gap-2">
             {!notification.read && (
               <span
-                className="size-2 shrink-0 rounded-full bg-primary"
+                className="size-2 shrink-0 rounded-full bg-emerald-500"
                 title="No leída"
                 aria-label="No leída"
               />

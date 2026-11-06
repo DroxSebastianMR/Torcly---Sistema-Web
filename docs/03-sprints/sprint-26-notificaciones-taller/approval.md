@@ -12,8 +12,8 @@
 - [x] **Separador visual en cabecera:** Se integró un separador vertical `<div className="h-7 w-px bg-border" />` a la izquierda de la campana en `AppHeader`, equilibrando la división visual entre los datos de usuario y las acciones rápidas.
 - [x] **Popover desplegable con scroll y categorías (según referencias adjuntas):**
   - Despliegue con selector por pestañas (`Todas`, `Taller`, `Citas`, `Inventario`, `Caja`).
-  - Capacidad de scroll fluido (`max-h-[380px] overflow-y-auto`) permitiendo visualizar el lote completo de avisos sin limitarse a 5 elementos.
-  - Íconos circulares con micro-badge por área, títulos en negrita con indicador de no leído, timestamps relativos ("Hace 36 min • Taller") y enlaces contextuales.
+  - Capacidad de scroll fluido (`max-h-[380px] overflow-y-auto`) con barra de desplazamiento gris oculta (`[scrollbar-width:none] [&::-webkit-scrollbar]:hidden`) para un diseño limpio e interactivo.
+  - Colores e íconos originales de Torcly restaurados fielmente (sin tintes morados): verde esmeralda para caja y puntos de no leído (`bg-emerald-500`), ámbar para stock/cobros pendientes, cielo para citas e índigo para taller.
   - Acción rápida "Marcar todas como leídas" tanto en la cabecera como en el pie del desplegable.
   - Enlace al módulo completo "Ver todas".
 - [x] **Rediseño completo de la página de Notificaciones (`/notificaciones`):**

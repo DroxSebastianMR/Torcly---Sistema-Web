@@ -123,7 +123,7 @@ export function NotificationSummaryPopover({
                 Notificaciones
               </strong>
               {count > 0 && (
-                <span className="flex h-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-bold text-white">
+                <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
                   {count > 99 ? '99+' : count}
                 </span>
               )}
@@ -144,7 +144,7 @@ export function NotificationSummaryPopover({
           {/* Categorías / Tabs */}
           <div
             role="tablist"
-            className="flex items-center gap-1 overflow-x-auto border-b bg-muted/20 px-3 pt-2 text-xs scrollbar-none"
+            className="flex items-center gap-1 overflow-x-auto border-b bg-muted/20 px-3 pt-2 text-xs [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {CATEGORY_TABS.map((tab) => {
               const active = selectedTab === tab.id
@@ -172,8 +172,8 @@ export function NotificationSummaryPopover({
             })}
           </div>
 
-          {/* Scrollable list */}
-          <div className="max-h-[380px] overflow-y-auto divide-y divide-border/60">
+          {/* Scrollable list without visible scrollbar */}
+          <div className="max-h-[380px] overflow-y-auto divide-y divide-border/60 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {summary.isPending ? (
               <div className="flex items-center justify-center gap-2 px-5 py-10 text-xs text-muted-foreground">
                 <LoaderCircle
@@ -212,7 +212,7 @@ export function NotificationSummaryPopover({
                       >
                         <Icon size={14} />
                         {!notification.read && (
-                          <span className="absolute -bottom-0.5 -right-0.5 size-2 rounded-full border border-background bg-primary" />
+                          <span className="absolute -bottom-0.5 -right-0.5 size-2 rounded-full border border-background bg-emerald-500" />
                         )}
                       </div>
 
@@ -231,7 +231,7 @@ export function NotificationSummaryPopover({
                           {!notification.read && (
                             <span
                               aria-label="No leída"
-                              className="mt-1 size-2 shrink-0 rounded-full bg-primary"
+                              className="mt-1 size-2 shrink-0 rounded-full bg-emerald-500"
                             />
                           )}
                         </div>

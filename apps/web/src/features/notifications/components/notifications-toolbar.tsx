@@ -43,7 +43,7 @@ export function NotificationsToolbar({
   return (
     <div className="flex flex-col gap-4">
       {/* Category tabs */}
-      <div className="flex items-center justify-between gap-3 overflow-x-auto pb-1 scrollbar-none">
+      <div className="flex items-center justify-between gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex items-center gap-1.5">
           {CATEGORIES.map((cat) => {
             const isSelected = activeCategory === cat.value

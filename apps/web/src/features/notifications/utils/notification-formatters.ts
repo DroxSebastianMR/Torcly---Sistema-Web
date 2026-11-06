@@ -1,12 +1,10 @@
 import {
-  CalendarDays,
-  CheckCircle2,
-  Clock,
-  Package,
-  Wrench,
-  Receipt,
   Bell,
-  AlertTriangle,
+  CalendarDays,
+  ClipboardList,
+  Truck,
+  Wallet,
+  Warehouse,
 } from 'lucide-react'
 
 export const notificationDateFormatter = new Intl.DateTimeFormat('es-PE', {
@@ -66,7 +64,7 @@ export function getNotificationCategory(type: string) {
       return {
         key: 'taller' as NotificationCategoryKey,
         label: 'Taller',
-        icon: Wrench,
+        icon: ClipboardList,
         badgeClass:
           'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800',
         bgIconClass:
@@ -87,7 +85,7 @@ export function getNotificationCategory(type: string) {
       return {
         key: 'citas' as NotificationCategoryKey,
         label: 'Cita Vencida',
-        icon: Clock,
+        icon: CalendarDays,
         badgeClass:
           'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800',
         bgIconClass:
@@ -97,7 +95,7 @@ export function getNotificationCategory(type: string) {
       return {
         key: 'inventario' as NotificationCategoryKey,
         label: 'Stock Bajo',
-        icon: AlertTriangle,
+        icon: Warehouse,
         badgeClass:
           'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800',
         bgIconClass:
@@ -107,7 +105,7 @@ export function getNotificationCategory(type: string) {
       return {
         key: 'inventario' as NotificationCategoryKey,
         label: 'Inventario',
-        icon: Package,
+        icon: Truck,
         badgeClass:
           'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800',
         bgIconClass:
@@ -117,17 +115,17 @@ export function getNotificationCategory(type: string) {
       return {
         key: 'caja' as NotificationCategoryKey,
         label: 'Caja',
-        icon: CheckCircle2,
+        icon: Wallet,
         badgeClass:
-          'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800',
+          'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800',
         bgIconClass:
-          'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
+          'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
       }
     case 'PAYMENT_DUE':
       return {
         key: 'caja' as NotificationCategoryKey,
         label: 'Cobro Vencido',
-        icon: Receipt,
+        icon: Wallet,
         badgeClass:
           'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800',
         bgIconClass:
@@ -141,8 +139,7 @@ export function getNotificationCategory(type: string) {
         icon: Bell,
         badgeClass:
           'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
-        bgIconClass:
-          'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+        bgIconClass: 'bg-primary/10 text-primary',
       }
   }
 }

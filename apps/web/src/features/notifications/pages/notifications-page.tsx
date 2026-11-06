@@ -77,8 +77,8 @@ export default function NotificationsPage() {
               Notificaciones
             </h1>
             {unreadCount > 0 && (
-              <span className="flex h-5 items-center justify-center rounded-full bg-rose-500 px-2 text-xs font-bold text-white shadow-xs">
-                {unreadCount > 99 ? '99+' : unreadCount}
+              <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                {unreadCount} {unreadCount === 1 ? 'nueva' : 'nuevas'}
               </span>
             )}
           </div>
