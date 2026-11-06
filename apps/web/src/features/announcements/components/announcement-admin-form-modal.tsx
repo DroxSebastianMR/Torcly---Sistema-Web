@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Megaphone } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -63,6 +63,16 @@ export function AnnouncementAdminFormModal({
   const type = useWatch({ control, name: 'type' })
   const status = useWatch({ control, name: 'status' })
   const notifyUsers = useWatch({ control, name: 'notifyUsers' })
+  const contentValue = useWatch({ control, name: 'content' })
+  const contentRegister = register('content')
+  const contentTextareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+  useEffect(() => {
+    if (contentTextareaRef.current) {
+      contentTextareaRef.current.style.height = 'auto'
+      contentTextareaRef.current.style.height = `${Math.max(140, contentTextareaRef.current.scrollHeight)}px`
+    }
+  }, [contentValue, open])
 
   useEffect(() => {
     if (!open) return
@@ -289,14 +299,19 @@ export function AnnouncementAdminFormModal({
         >
           <textarea
             id="announcement-content"
-            {...register('content')}
+            {...contentRegister}
+            ref={(element) => {
+              contentRegister.ref(element)
+              contentTextareaRef.current = element
+            }}
             rows={6}
             aria-invalid={Boolean(error('content'))}
             placeholder="Detalle de cambios, changelog, guías de usuario o instrucciones operativas."
             className={cn(
-              'w-full min-w-0 resize-y rounded-[10px] border border-input bg-card px-3 py-2.5 text-sm leading-relaxed transition-[border-color,background-color] duration-150 ease-out hover:bg-background focus:border-primary/70 focus:outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 overflow-x-hidden break-words whitespace-pre-wrap',
+              'no-scrollbar w-full min-w-0 resize-y rounded-[10px] border border-input bg-card px-3 py-2.5 text-sm leading-relaxed transition-[border-color,background-color] duration-150 ease-out hover:bg-background focus:border-primary/70 focus:outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 overflow-x-hidden break-words whitespace-pre-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
               error('content') && 'border-red-500 focus:border-red-600',
             )}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           />
         </Field>
 
