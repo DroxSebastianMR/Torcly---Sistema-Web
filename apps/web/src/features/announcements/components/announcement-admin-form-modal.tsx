@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
+import { SmartSelect } from '@/components/ui/smart-select'
 import type {
   AnnouncementItem,
   AnnouncementStatus,
@@ -144,31 +145,45 @@ export function AnnouncementAdminFormModal({
         {/* Row Type & Status */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="space-y-1">
-            <label className="font-semibold text-foreground">
+            <label
+              htmlFor="announcement-form-type"
+              className="font-semibold text-foreground"
+            >
               Tipo de Anuncio
             </label>
-            <select
+            <SmartSelect
+              id="announcement-form-type"
               value={type}
-              onChange={(e) => setType(e.target.value as AnnouncementType)}
-              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <option value="UPDATE">Actualización (Release / Versión)</option>
-              <option value="MAINTENANCE">Mantenimiento Preventivo</option>
-              <option value="COMMUNICATION">Comunicado General</option>
-            </select>
+              onChange={(val) => setType(val as AnnouncementType)}
+              options={[
+                { value: 'UPDATE', label: 'Actualización (Release / Versión)' },
+                { value: 'MAINTENANCE', label: 'Mantenimiento Preventivo' },
+                { value: 'COMMUNICATION', label: 'Comunicado General' },
+              ]}
+              placeholder="Seleccionar tipo"
+              aria-label="Tipo de anuncio"
+            />
           </div>
 
           <div className="space-y-1">
-            <label className="font-semibold text-foreground">Estado</label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as AnnouncementStatus)}
-              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            <label
+              htmlFor="announcement-form-status"
+              className="font-semibold text-foreground"
             >
-              <option value="PUBLISHED">Publicado (Visible en feed)</option>
-              <option value="DRAFT">Borrador (Solo administradores)</option>
-              <option value="ARCHIVED">Archivado</option>
-            </select>
+              Estado
+            </label>
+            <SmartSelect
+              id="announcement-form-status"
+              value={status}
+              onChange={(val) => setStatus(val as AnnouncementStatus)}
+              options={[
+                { value: 'PUBLISHED', label: 'Publicado (Visible en feed)' },
+                { value: 'DRAFT', label: 'Borrador (Solo administradores)' },
+                { value: 'ARCHIVED', label: 'Archivado' },
+              ]}
+              placeholder="Seleccionar estado"
+              aria-label="Estado del anuncio"
+            />
           </div>
         </div>
 

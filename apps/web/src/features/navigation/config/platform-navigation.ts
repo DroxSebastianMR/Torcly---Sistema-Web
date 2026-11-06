@@ -14,6 +14,7 @@ export const platformNavigation: readonly NavigationGroup[] = [
         icon: Building2,
         path: paths.platform,
         visible: true,
+        end: true,
       },
       {
         id: 'platform-announcements',
@@ -21,6 +22,7 @@ export const platformNavigation: readonly NavigationGroup[] = [
         icon: Megaphone,
         path: paths.platformAnnouncements,
         visible: true,
+        end: true,
       },
     ],
   },

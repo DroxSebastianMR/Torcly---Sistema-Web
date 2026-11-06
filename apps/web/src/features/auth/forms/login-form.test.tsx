@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { AuthContext } from '@/features/auth/hooks/auth-context'
 import type { AuthContextValue } from '@/features/auth/hooks/auth-context'
+import { paths } from '@/app/router/constants/paths'
 import { LoginForm } from './login-form'
 
 const toastAdd = vi.hoisted(() => vi.fn())
@@ -32,7 +33,7 @@ function renderForm(
           <Route path="/login" element={<LoginForm />} />
           <Route path="/dashboard" element={<p>Panel principal</p>} />
           <Route path="/products" element={<p>Catálogo de productos</p>} />
-          <Route path="/plataforma" element={<p>Consola de plataforma</p>} />
+          <Route path={paths.platform} element={<p>Consola de plataforma</p>} />
         </Routes>
       </MemoryRouter>
     </AuthContext.Provider>,
