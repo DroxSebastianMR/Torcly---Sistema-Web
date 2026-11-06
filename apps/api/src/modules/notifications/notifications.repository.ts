@@ -24,6 +24,18 @@ export type NotificationRecord = Prisma.NotificationGetPayload<{
   select: typeof notificationSelect
 }>
 
+const CATEGORY_MAP: Record<string, string[]> = {
+  taller: ['WORK_ORDER_READY'],
+  citas: [
+    'APPOINTMENT_SCHEDULED',
+    'APPOINTMENT_RESCHEDULED',
+    'APPOINTMENT_OVERDUE',
+  ],
+  inventario: ['STOCK_LOW', 'PURCHASE_RECEIVED'],
+  caja: ['PAYMENT_COMPENSATED', 'PAYMENT_DUE'],
+  sistema: ['SYSTEM'],
+}
+
 function buildWhere(
   organizationId: string,
   userId: string,
@@ -41,7 +53,17 @@ function buildWhere(
 
   if (filters.read === 'true') where.read = true
   if (filters.read === 'false') where.read = false
-  if (filters.type) where.type = filters.type
+
+  if (filters.type) {
+    where.type = filters.type
+  } else if (filters.category && CATEGORY_MAP[filters.category.toLowerCase()]) {
+    where.type = { in: CATEGORY_MAP[filters.category.toLowerCase()] }
+  }
+
+  if (filters.days && filters.days > 0) {
+    const cutoffDate = new Date(Date.now() - filters.days * 24 * 60 * 60 * 1000)
+    where.createdAt = { gte: cutoffDate }
+  }
 
   return where
 }
@@ -210,6 +232,13 @@ export const notificationsRepository = {
     permission: string,
     preferenceKey?: keyof NotificationPreferences,
   ) {
+    if (
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        organizationId,
+      )
+    ) {
+      return []
+    }
     try {
       const users = await databaseService.client.user.findMany({
         where: {

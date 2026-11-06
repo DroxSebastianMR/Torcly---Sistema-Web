@@ -1,4 +1,5 @@
 import {
+  Bell,
   LayoutDashboard,
   ChartNoAxesCombined,
   ShoppingCart,
@@ -37,6 +38,14 @@ export const appNavigation: readonly NavigationGroup[] = [
         path: paths.reports,
         visible: true,
         permission: 'reports:read',
+      },
+      {
+        id: 'notifications',
+        label: 'Notificaciones',
+        icon: Bell,
+        path: paths.notifications,
+        visible: true,
+        permission: 'notifications:read',
       },
     ],
   },

@@ -22,19 +22,25 @@ describe('notificationQuerySchema', () => {
     const result = notificationQuerySchema.parse({})
     expect(result.read).toBe('all')
     expect(result.page).toBe(1)
-    expect(result.pageSize).toBe(20)
+    expect(result.pageSize).toBe(10)
     expect(result.type).toBeUndefined()
+    expect(result.category).toBeUndefined()
+    expect(result.days).toBeUndefined()
   })
 
   it('acepta parámetros personalizados', () => {
     const result = notificationQuerySchema.parse({
       read: 'false',
       type: 'STOCK_LOW',
+      category: 'inventario',
+      days: '30',
       page: '3',
       pageSize: '50',
     })
     expect(result.read).toBe('false')
     expect(result.type).toBe('STOCK_LOW')
+    expect(result.category).toBe('inventario')
+    expect(result.days).toBe(30)
     expect(result.page).toBe(3)
     expect(result.pageSize).toBe(50)
   })

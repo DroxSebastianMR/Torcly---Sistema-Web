@@ -8,6 +8,7 @@ interface NavigationBase {
   visible?: boolean
   disabled?: boolean
   permission?: Permission
+  badge?: number | string
 }
 
 export type NavigationItem = NavigationBase &

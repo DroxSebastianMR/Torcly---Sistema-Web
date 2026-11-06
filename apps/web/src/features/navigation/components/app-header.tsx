@@ -1,4 +1,6 @@
 import { Menu, LogOut } from 'lucide-react'
+import { paths } from '@/app/router/constants/paths'
+import { NotificationSummaryPopover } from '@/features/notifications/components/notification-summary-popover'
 import { useAppHeader } from '../hooks/use-app-header'
 import { Button } from '@/components/ui/button'
 
@@ -81,6 +83,16 @@ export function AppHeader({ sidebarOpen, onOpenSidebar }: AppHeaderProps) {
             </span>
           </div>
         </div>
+
+        {!header.isPlatformAdmin && (
+          <>
+            <div className="h-7 w-px bg-border" aria-hidden="true" />
+            <NotificationSummaryPopover
+              count={header.unreadCount}
+              path={paths.notifications}
+            />
+          </>
+        )}
 
         <div className="h-7 w-px bg-border" aria-hidden="true" />
 

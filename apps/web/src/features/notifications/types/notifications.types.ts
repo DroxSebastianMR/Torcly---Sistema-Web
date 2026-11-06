@@ -1,9 +1,12 @@
 export type NotificationType =
   | 'STOCK_LOW'
   | 'PURCHASE_RECEIVED'
+  | 'APPOINTMENT_SCHEDULED'
   | 'APPOINTMENT_RESCHEDULED'
+  | 'APPOINTMENT_OVERDUE'
   | 'WORK_ORDER_READY'
   | 'PAYMENT_COMPENSATED'
+  | 'PAYMENT_DUE'
   | 'SYSTEM'
 
 export interface NotificationItem {
@@ -21,6 +24,8 @@ export interface NotificationItem {
 export interface NotificationFilters {
   read: 'all' | 'true' | 'false'
   type?: string
+  category?: string
+  days?: number
   page: number
   pageSize: number
 }
