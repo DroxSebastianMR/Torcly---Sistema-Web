@@ -3,6 +3,7 @@ export const paths = {
   forgotPassword: '/recuperar-contrasena',
   resetPassword: '/restablecer-contrasena',
   platform: '/plataforma',
+  platformAnnouncements: '/plataforma/anuncios',
   dashboard: '/dashboard',
   assistantHistory: '/historial-ia',
   products: '/productos',
@@ -19,6 +20,7 @@ export const paths = {
   cash: '/caja',
   users: '/usuarios',
   notifications: '/notificaciones',
+  announcements: '/novedades',
   profile: '/perfil',
   reports: '/reportes',
 } as const

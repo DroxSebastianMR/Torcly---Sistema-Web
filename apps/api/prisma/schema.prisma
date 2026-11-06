@@ -199,6 +199,7 @@ model User {
   passwordResetTokens      PasswordResetToken[]
   notificationPreferences  Json?                   @map("notification_preferences")
   notifications            Notification[]
+  announcementReads        AnnouncementRead[]
   assistantConversations   AssistantConversation[]
   organizationMemberships  OrganizationMembership[]
   createdAt                DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -1016,3 +1017,53 @@ model Notification {
   @@index([organizationId, userId, createdAt])
   @@map("notifications")
 }
+
+enum AnnouncementType {
+  UPDATE
+  MAINTENANCE
+  COMMUNICATION
+}
+
+enum AnnouncementStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Announcement {
+  id          String             @id @default(uuid()) @db.Uuid
+  title       String             @db.VarChar(200)
+  summary     String             @db.VarChar(500)
+  content     String             @db.Text
+  type        AnnouncementType   @default(UPDATE)
+  status      AnnouncementStatus @default(PUBLISHED)
+  versionTag  String?            @map("version_tag") @db.VarChar(50)
+  videoUrl    String?            @map("video_url") @db.VarChar(500)
+  startsAt    DateTime?          @map("starts_at") @db.Timestamptz(3)
+  endsAt      DateTime?          @map("ends_at") @db.Timestamptz(3)
+  publishedAt DateTime           @default(now()) @map("published_at") @db.Timestamptz(3)
+  createdBy   String             @map("created_by") @db.VarChar(120)
+  createdAt   DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  reads       AnnouncementRead[]
+
+  @@index([status, publishedAt])
+  @@index([type, status])
+  @@map("announcements")
+}
+
+model AnnouncementRead {
+  id             String       @id @default(uuid()) @db.Uuid
+  announcementId String       @map("announcement_id") @db.Uuid
+  userId         String       @map("user_id") @db.Uuid
+  readAt         DateTime     @default(now()) @map("read_at") @db.Timestamptz(3)
+
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, userId])
+  @@index([userId])
+  @@map("announcement_reads")
+}
+

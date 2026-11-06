@@ -20,6 +20,7 @@ import { maintenanceRouter } from './modules/maintenance/maintenance.routes.js'
 import { auditRouter } from './modules/audit/audit.routes.js'
 import { profileRouter } from './modules/profile/profile.routes.js'
 import { notificationsRouter } from './modules/notifications/notifications.routes.js'
+import { announcementsRouter } from './modules/announcements/announcements.routes.js'
 import { assistantRouter } from './modules/assistant/assistant.routes.js'
 import { techniciansRouter } from './modules/technicians/technicians.routes.js'
 import { platformRouter } from './modules/platform/platform.routes.js'
@@ -31,6 +32,7 @@ apiRouter.use('/auth', authRouter)
 apiRouter.use('/platform', platformRouter)
 apiRouter.use('/profile', profileRouter)
 apiRouter.use('/notifications', notificationsRouter)
+apiRouter.use('/announcements', announcementsRouter)
 apiRouter.use('/assistant', assistantRouter)
 apiRouter.use('/products', productsRouter)
 apiRouter.use('/users', usersRouter)
