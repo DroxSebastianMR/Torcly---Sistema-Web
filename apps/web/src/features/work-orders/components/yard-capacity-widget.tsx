@@ -3,10 +3,14 @@ import { useYardCapacity } from '../hooks/use-work-orders'
 
 interface YardCapacityWidgetProps {
   className?: string
+  isFilteringToday?: boolean
+  onSelectTodayEntries?: () => void
 }
 
 export function YardCapacityWidget({
   className = '',
+  isFilteringToday = false,
+  onSelectTodayEntries,
 }: YardCapacityWidgetProps) {
   const { data: capacity, isLoading } = useYardCapacity()
 
@@ -112,18 +116,71 @@ export function YardCapacityWidget({
             })}
           </div>
 
-          <div className="text-right text-xs text-muted-foreground">
-            Ingresos de hoy:{' '}
-            <strong className="text-foreground">{todayEntries}</strong> (
-            <span className="text-primary font-medium">
-              {todayAppointments} citas
-            </span>{' '}
-            ·{' '}
-            <span className="text-emerald-700 font-medium">
-              {todayWalkIns} directos
-            </span>
-            )
-          </div>
+          {onSelectTodayEntries ? (
+            <button
+              type="button"
+              onClick={onSelectTodayEntries}
+              className={`group inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-right text-xs transition-colors ${
+                isFilteringToday
+                  ? 'bg-primary text-white font-semibold shadow-sm'
+                  : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+              }`}
+              title="Filtrar en la tabla los vehículos que ingresaron hoy"
+            >
+              <span>Ingresos de hoy:</span>{' '}
+              <strong
+                className={
+                  isFilteringToday
+                    ? 'text-white'
+                    : 'text-foreground underline decoration-dotted underline-offset-2'
+                }
+              >
+                {todayEntries}
+              </strong>{' '}
+              <span
+                className={
+                  isFilteringToday
+                    ? 'text-emerald-100'
+                    : 'text-muted-foreground'
+                }
+              >
+                (
+                <span
+                  className={
+                    isFilteringToday
+                      ? 'text-white font-semibold'
+                      : 'text-primary font-medium'
+                  }
+                >
+                  {todayAppointments} citas
+                </span>{' '}
+                ·{' '}
+                <span
+                  className={
+                    isFilteringToday
+                      ? 'text-white font-semibold'
+                      : 'text-emerald-700 font-medium'
+                  }
+                >
+                  {todayWalkIns} directos
+                </span>
+                )
+              </span>
+            </button>
+          ) : (
+            <div className="text-right text-xs text-muted-foreground">
+              Ingresos de hoy:{' '}
+              <strong className="text-foreground">{todayEntries}</strong> (
+              <span className="text-primary font-medium">
+                {todayAppointments} citas
+              </span>{' '}
+              ·{' '}
+              <span className="text-emerald-700 font-medium">
+                {todayWalkIns} directos
+              </span>
+              )
+            </div>
+          )}
         </div>
       </div>
 

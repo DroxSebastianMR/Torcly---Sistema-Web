@@ -45,6 +45,7 @@ export interface WorkOrderRow {
   status: WorkOrderStatus
   createdAt: Date
   deliveredAt: Date | null
+  source?: 'WALK_IN' | 'APPOINTMENT'
 }
 
 function confirmedAtPeriod(from: string, to: string): Prisma.SaleWhereInput {
@@ -249,13 +250,19 @@ export const reportsRepository = {
     return databaseService.measure('reports.workshop.orders', async () => {
       const rows = await databaseService.client.workOrder.findMany({
         where: { organizationId, ...createdAtPeriod(from, to) },
-        select: { status: true, createdAt: true, deliveredAt: true },
+        select: {
+          status: true,
+          createdAt: true,
+          deliveredAt: true,
+          source: true,
+        },
         orderBy: { createdAt: 'asc' },
       })
       return rows.map((row) => ({
         status: row.status,
         createdAt: row.createdAt,
         deliveredAt: row.deliveredAt,
+        source: (row.source ?? 'APPOINTMENT') as 'WALK_IN' | 'APPOINTMENT',
       }))
     })
   },

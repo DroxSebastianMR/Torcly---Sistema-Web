@@ -17,6 +17,7 @@ import {
   useOperationsAttention,
   useOperationsSummary,
 } from '../hooks/use-operations'
+import { useYardCapacity } from '@/features/work-orders/hooks/use-work-orders'
 import type { Attention, Period } from '../types/operations.types'
 
 const dateKey = (date: Date) => {
@@ -286,6 +287,7 @@ function WorkshopOverview({
 }: {
   workOrders: Record<string, unknown> | undefined
 }) {
+  const { data: capacity } = useYardCapacity()
   const statuses =
     workOrders?.byStatus && typeof workOrders.byStatus === 'object'
       ? (workOrders.byStatus as Record<string, unknown>)
@@ -311,20 +313,42 @@ function WorkshopOverview({
     },
   ]
   return (
-    <ul className="divide-y divide-border">
-      {items.map((item) => (
-        <li className="flex items-center gap-3 py-3" key={item.label}>
-          <span
-            aria-hidden
-            className={cn('size-2 shrink-0 rounded-full', item.dot)}
-          />
-          <p className="flex-1 text-sm font-medium text-ink">{item.label}</p>
-          <p className={cn('text-lg font-bold', item.valueClass)}>
-            {item.value}
-          </p>
-        </li>
-      ))}
-    </ul>
+    <div className="space-y-3">
+      {capacity && (
+        <div className="flex flex-col gap-2 rounded-xl border border-[#e2ebe6] bg-[#f7faf8] p-3 text-xs sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <span className="font-semibold text-brand-forest">
+              Aforo de patio:
+            </span>{' '}
+            <strong className="text-foreground">{capacity.occupiedBays}</strong>{' '}
+            de {capacity.maxCapacity} bahías ocupadas ({capacity.occupancyRate}
+            %)
+          </div>
+          <div className="text-muted-foreground">
+            Ingresos de hoy:{' '}
+            <strong className="text-foreground font-semibold">
+              {capacity.todayEntriesCount}
+            </strong>{' '}
+            ({capacity.todayAppointmentsCount} citas ·{' '}
+            {capacity.todayWalkInsCount} directos)
+          </div>
+        </div>
+      )}
+      <ul className="divide-y divide-border">
+        {items.map((item) => (
+          <li className="flex items-center gap-3 py-3" key={item.label}>
+            <span
+              aria-hidden
+              className={cn('size-2 shrink-0 rounded-full', item.dot)}
+            />
+            <p className="flex-1 text-sm font-medium text-ink">{item.label}</p>
+            <p className={cn('text-lg font-bold', item.valueClass)}>
+              {item.value}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 

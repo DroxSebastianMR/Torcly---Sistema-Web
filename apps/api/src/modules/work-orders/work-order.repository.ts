@@ -209,10 +209,22 @@ function buildWhere(
   organizationId: string,
 ): Prisma.WorkOrderWhereInput {
   const search = filters.search?.trim()
+  const createdAtFilter: Prisma.DateTimeFilter = {}
+  if (filters.from) {
+    createdAtFilter.gte = new Date(`${filters.from}T00:00:00.000Z`)
+  }
+  if (filters.to) {
+    createdAtFilter.lte = new Date(`${filters.to}T23:59:59.999Z`)
+  }
+
   return {
     organizationId,
     ...(filters.status === 'all' ? {} : { status: filters.status }),
     ...(filters.technicianId ? { technicianId: filters.technicianId } : {}),
+    ...(filters.source && filters.source !== 'all'
+      ? { source: filters.source }
+      : {}),
+    ...(filters.from || filters.to ? { createdAt: createdAtFilter } : {}),
     ...(search
       ? {
           OR: [

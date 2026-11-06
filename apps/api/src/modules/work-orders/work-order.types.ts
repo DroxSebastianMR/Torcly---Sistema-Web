@@ -16,6 +16,9 @@ export interface WorkOrderFilters {
   search?: string
   status: WorkOrderStatusFilter
   technicianId?: string
+  source?: 'WALK_IN' | 'APPOINTMENT' | 'all'
+  from?: string
+  to?: string
   page: number
   pageSize: number
 }

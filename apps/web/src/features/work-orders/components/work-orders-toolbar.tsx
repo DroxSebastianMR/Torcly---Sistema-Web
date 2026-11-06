@@ -1,7 +1,12 @@
 import { Trash2 } from 'lucide-react'
 import { SmartSelect } from '@/components/ui/smart-select'
-import type { WorkOrderFilters } from '../types/work-orders.types'
-import type { WorkOrderTechnician } from '../types/work-orders.types'
+import type {
+  WorkOrderFilters,
+  WorkOrderPeriodPreset,
+  WorkOrderSourceFilter,
+  WorkOrderTechnician,
+} from '../types/work-orders.types'
+import { getDateRangeFromPreset } from '../utils/work-order-formatters'
 
 interface WorkOrdersToolbarProps {
   filters: WorkOrderFilters
@@ -23,7 +28,31 @@ export function WorkOrdersToolbar({
   const hasFilters =
     Boolean(filters.search) ||
     Boolean(filters.technicianId) ||
-    filters.status !== 'all'
+    filters.status !== 'all' ||
+    (Boolean(filters.source) && filters.source !== 'all') ||
+    (Boolean(filters.periodPreset) && filters.periodPreset !== 'all') ||
+    Boolean(filters.from) ||
+    Boolean(filters.to)
+
+  const handlePeriodChange = (val: string) => {
+    const preset = val as WorkOrderPeriodPreset
+    const range = getDateRangeFromPreset(preset)
+    onChange({
+      ...filters,
+      periodPreset: preset,
+      from: range.from,
+      to: range.to,
+      page: 1,
+    })
+  }
+
+  const handleSourceChange = (val: string) => {
+    onChange({
+      ...filters,
+      source: val as WorkOrderSourceFilter,
+      page: 1,
+    })
+  }
 
   return (
     <div className="flex min-w-0 flex-col gap-3 xl:flex-row xl:items-center">
@@ -41,7 +70,33 @@ export function WorkOrdersToolbar({
         />
       </div>
       <div className="flex flex-wrap gap-3 xl:shrink-0">
-        <div className="w-full sm:w-52">
+        <div className="w-full sm:w-48">
+          <SmartSelect
+            value={filters.periodPreset ?? 'all'}
+            aria-label="Filtrar por fecha de ingreso"
+            options={[
+              { value: 'all', label: 'Todos los períodos' },
+              { value: 'today', label: 'Ingresos de hoy' },
+              { value: 'yesterday', label: 'Ingresos de ayer' },
+              { value: 'week', label: 'Esta semana' },
+              { value: 'month', label: 'Este mes' },
+            ]}
+            onChange={handlePeriodChange}
+          />
+        </div>
+        <div className="w-full sm:w-44">
+          <SmartSelect
+            value={filters.source ?? 'all'}
+            aria-label="Filtrar por origen"
+            options={[
+              { value: 'all', label: 'Todos los orígenes' },
+              { value: 'WALK_IN', label: 'Ingreso directo' },
+              { value: 'APPOINTMENT', label: 'Con cita previa' },
+            ]}
+            onChange={handleSourceChange}
+          />
+        </div>
+        <div className="w-full sm:w-48">
           <SmartSelect
             value={filters.status}
             aria-label="Estado de la orden"
@@ -65,7 +120,7 @@ export function WorkOrdersToolbar({
             }
           />
         </div>
-        <div className="w-full sm:w-56">
+        <div className="w-full sm:w-52">
           <SmartSelect
             value={filters.technicianId}
             aria-label="Filtrar por técnico"
@@ -91,6 +146,10 @@ export function WorkOrdersToolbar({
                 search: '',
                 status: 'all',
                 technicianId: '',
+                source: 'all',
+                periodPreset: 'all',
+                from: undefined,
+                to: undefined,
                 page: 1,
                 pageSize: filters.pageSize,
               })
