@@ -34,6 +34,10 @@ Los sprints son secuenciales y cada uno tiene una rama, alcance cerrado, criteri
 | 28     | `sprint-28-suscripciones-membresias`   | `feature/subscriptions-memberships`                 | Aprobado (v2.1.2 en develop)  |
 | 29     | `sprint-29-proveedores-compras`        | `feature/sprint-29-suppliers-purchases`             | Implementado (en develop)     |
 | 30     | `sprint-30-operaciones-directas-aforo` | `feature/sprint-30-bay-capacity-direct-work-orders` | Listo para prueba del usuario |
+| 31     | `sprint-31-clientes-historial-vehicular` | `feature/sprint-31-clientes-historial-vehicular`   | Planificado (Dev 1)           |
+| 32     | `sprint-32-operaciones-checklist-recepcion` | `feature/sprint-32-operaciones-checklist-recepcion` | Planificado (Dev 2)           |
+| 33     | `sprint-33-ventas-cobro-cotizaciones`   | `feature/sprint-33-ventas-cobro-cotizaciones`       | Planificado (Dev 3)           |
+| 34     | `sprint-34-superadmin-mantenimiento-inteligente` | `feature/sprint-34-superadmin-mantenimiento-inteligente` | Planificado (Lead Dev / USER) |
 
 El porcentaje solo cambia después de completar [Definition of Done](../04-calidad/definition-of-done.md) y registrar la aprobación.
 
