@@ -36,7 +36,7 @@ export function ImpersonationBanner() {
     <div
       role="alert"
       aria-live="assertive"
-      className="sticky top-0 z-40 flex flex-wrap items-center justify-between gap-3 border-b border-amber-600/30 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 px-4 py-2 text-xs font-semibold text-amber-950 shadow-sm"
+      className="flex flex-wrap items-center justify-between gap-3 border-b border-amber-600/30 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 px-4 py-2 text-xs font-semibold text-amber-950 shadow-sm"
     >
       <div className="flex items-center gap-2.5">
         <span className="flex size-6 items-center justify-center rounded-full bg-amber-950/15">

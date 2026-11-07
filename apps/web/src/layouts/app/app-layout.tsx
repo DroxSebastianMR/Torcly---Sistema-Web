@@ -64,8 +64,10 @@ export function AppLayout() {
         <AppSidebar onNavigate={() => setOpen(false)} />
       </aside>
       <div className="lg:pl-64">
-        <ImpersonationBanner />
-        <AppHeader sidebarOpen={open} onOpenSidebar={() => setOpen(true)} />
+        <div className="sticky top-0 z-20">
+          <ImpersonationBanner />
+          <AppHeader sidebarOpen={open} onOpenSidebar={() => setOpen(true)} />
+        </div>
         <main id="content" className="mx-auto max-w-7xl p-6 lg:p-10">
           <Outlet />
         </main>
