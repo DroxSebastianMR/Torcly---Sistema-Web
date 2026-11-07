@@ -1,7 +1,9 @@
 import type { Request, RequestHandler, Response } from 'express'
 import { AppError } from '../../shared/errors/app-error.js'
 import {
+  clearImpersonatorCookie,
   clearSessionCookie,
+  readImpersonatorCookie,
   readSessionCookie,
   setSessionCookie,
 } from './auth.cookies.js'
@@ -33,6 +35,31 @@ export const requireAuth: RequestHandler = async (request, response, next) => {
     )
     request.auth = authenticated.user
     request.sessionTokenHash = authenticated.tokenHash
+
+    const impersonatorToken = readImpersonatorCookie(request)
+    if (impersonatorToken) {
+      try {
+        const impersonator = await authService.authenticate(
+          impersonatorToken,
+          getRequestContext(request, response),
+        )
+        if (impersonator.user.isPlatformAdmin) {
+          request.auth = {
+            ...authenticated.user,
+            impersonatedBy: {
+              id: impersonator.user.id,
+              name: impersonator.user.name,
+              email: impersonator.user.email,
+            },
+          }
+        } else {
+          clearImpersonatorCookie(response)
+        }
+      } catch {
+        clearImpersonatorCookie(response)
+      }
+    }
+
     setSessionCookie(response, authenticated.renewedToken ?? token)
     next()
   } catch (error) {

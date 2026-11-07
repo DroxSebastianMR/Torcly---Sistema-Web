@@ -3,7 +3,9 @@ import { requireAuth, requirePlatformAdmin } from '../auth/auth.middleware.js'
 import {
   createOrganizationMember,
   createOrganization,
+  exitImpersonation,
   getPlatformAccess,
+  impersonateOrganization,
   listOrganizationMembers,
   listOrganizations,
   listPlatformRoles,
@@ -24,11 +26,18 @@ import {
 
 export const platformRouter = Router()
 
+// Salir de modo soporte solo requiere estar autenticado y portar la cookie de impersonador
+platformRouter.post('/exit-impersonation', requireAuth, exitImpersonation)
+
 platformRouter.use(requireAuth, requirePlatformAdmin)
 platformRouter.get('/access', getPlatformAccess)
 platformRouter.get('/roles', listPlatformRoles)
 platformRouter.get('/organizations', listOrganizations)
 platformRouter.post('/organizations', createOrganization)
+platformRouter.post(
+  '/organizations/:organizationId/impersonate',
+  impersonateOrganization,
+)
 platformRouter.patch('/organizations/:organizationId', updateOrganization)
 platformRouter.patch(
   '/organizations/:organizationId/status',

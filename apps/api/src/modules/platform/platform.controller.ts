@@ -1,5 +1,13 @@
 import type { RequestHandler } from 'express'
+import {
+  clearImpersonatorCookie,
+  readImpersonatorCookie,
+  readSessionCookie,
+  setImpersonatorCookie,
+  setSessionCookie,
+} from '../auth/auth.cookies.js'
 import { getRequestContext } from '../auth/auth.middleware.js'
+import { AppError } from '../../shared/errors/app-error.js'
 import {
   createPlatformOrganizationMemberSchema,
   createPlatformOrganizationSchema,
@@ -124,4 +132,52 @@ export const resetOrganizationMemberPassword: RequestHandler = async (
       getRequestContext(request, response),
     ),
   )
+}
+
+export const impersonateOrganization: RequestHandler = async (
+  request,
+  response,
+) => {
+  const { organizationId } = platformOrganizationParamsSchema.parse(
+    request.params,
+  )
+  const currentToken = readSessionCookie(request)
+  if (!currentToken || !request.auth) {
+    throw new AppError(401, 'AUTH_REQUIRED', 'Debes iniciar sesión.')
+  }
+
+  const result = await platformService.impersonateOrganization(
+    organizationId,
+    request.auth,
+    getRequestContext(request, response),
+  )
+
+  // Guardar token original de super admin en cookie de impersonador
+  setImpersonatorCookie(response, currentToken)
+  // Establecer sesión del usuario impersonado
+  setSessionCookie(response, result.token)
+
+  response.status(200).json({ data: result.user })
+}
+
+export const exitImpersonation: RequestHandler = async (request, response) => {
+  const impersonatorToken = readImpersonatorCookie(request)
+  if (!impersonatorToken) {
+    throw new AppError(
+      400,
+      'IMPERSONATION_NOT_ACTIVE',
+      'No hay una sesión de soporte activa para finalizar.',
+    )
+  }
+
+  const adminUser = await platformService.exitImpersonation(
+    request.sessionTokenHash,
+    impersonatorToken,
+    getRequestContext(request, response),
+  )
+
+  clearImpersonatorCookie(response)
+  setSessionCookie(response, impersonatorToken)
+
+  response.status(200).json({ data: adminUser })
 }

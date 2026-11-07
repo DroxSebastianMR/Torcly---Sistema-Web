@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation, useNavigation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { AppHeader } from '@/features/navigation/components/app-header'
+import { ImpersonationBanner } from '@/features/navigation/components/impersonation-banner'
 import { ForcePasswordChangeModal } from '@/features/auth/components/force-password-change-modal'
 import { AppSidebar } from './components/app-sidebar'
 import { reportModuleLoad } from '@/features/navigation/utils/module-load-metrics'
@@ -63,6 +64,7 @@ export function AppLayout() {
         <AppSidebar onNavigate={() => setOpen(false)} />
       </aside>
       <div className="lg:pl-64">
+        <ImpersonationBanner />
         <AppHeader sidebarOpen={open} onOpenSidebar={() => setOpen(true)} />
         <main id="content" className="mx-auto max-w-7xl p-6 lg:p-10">
           <Outlet />

@@ -179,6 +179,16 @@ export const protectedRoutes: RouteObject[] = [
                   ).default,
                 }),
               },
+              {
+                path: paths.preventiveMaintenance,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/preventive-maintenance/pages/preventive-maintenance-page'
+                    )
+                  ).default,
+                }),
+              },
             ],
           },
           {

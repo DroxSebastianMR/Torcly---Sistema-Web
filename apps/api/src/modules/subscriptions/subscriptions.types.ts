@@ -69,6 +69,8 @@ export interface PlatformSubscriptionMetricsDto {
   trial: number
   pastDue: number
   suspended: number
+  estimatedMrr: number
+  currency: string
 }
 
 export interface PlatformSubscriptionFilters {

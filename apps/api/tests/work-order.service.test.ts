@@ -33,6 +33,12 @@ vi.mock('../src/modules/work-orders/work-order.repository.js', () => ({
   workOrdersRepository: repository,
 }))
 
+vi.mock('../src/modules/notifications/notifications.service.js', () => ({
+  notificationsService: {
+    notifyUsersSafely: vi.fn().mockResolvedValue(undefined),
+  },
+}))
+
 import { workOrdersService } from '../src/modules/work-orders/work-order.service.js'
 
 const context = {

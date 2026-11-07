@@ -18,6 +18,7 @@ import {
   Megaphone,
   ShoppingBag,
   Building2,
+  Sparkles,
 } from 'lucide-react'
 import { paths } from '@/app/router/constants/paths'
 import type { NavigationGroup } from '../types/navigation.types'
@@ -123,6 +124,14 @@ export const appNavigation: readonly NavigationGroup[] = [
         label: 'Técnicos',
         icon: HardHat,
         path: paths.technicians,
+        visible: true,
+        permission: 'workshop:read',
+      },
+      {
+        id: 'preventiveMaintenance',
+        label: 'Mantenimiento preventivo',
+        icon: Sparkles,
+        path: paths.preventiveMaintenance,
         visible: true,
         permission: 'workshop:read',
       },

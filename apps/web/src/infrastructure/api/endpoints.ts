@@ -26,6 +26,12 @@ export const endpoints = {
     subscriptionMetrics: '/platform/subscriptions/metrics',
     subscription: (organizationId: string) =>
       `/platform/subscriptions/${organizationId}`,
+    impersonate: (organizationId: string) =>
+      `/platform/organizations/${organizationId}/impersonate`,
+    exitImpersonation: '/platform/exit-impersonation',
+  },
+  preventiveMaintenance: {
+    root: '/preventive-maintenance',
   },
   subscriptions: {
     current: '/subscriptions/current',

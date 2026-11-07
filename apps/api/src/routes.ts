@@ -25,6 +25,7 @@ import { assistantRouter } from './modules/assistant/assistant.routes.js'
 import { techniciansRouter } from './modules/technicians/technicians.routes.js'
 import { platformRouter } from './modules/platform/platform.routes.js'
 import { subscriptionsRouter } from './modules/subscriptions/subscriptions.routes.js'
+import { preventiveMaintenanceRouter } from './modules/preventive-maintenance/preventive-maintenance.routes.js'
 
 export const apiRouter = Router()
 
@@ -53,4 +54,5 @@ apiRouter.use('/operations', operationsRouter)
 apiRouter.use('/reports', reportsRouter)
 apiRouter.use('/metrics', metricsRouter)
 apiRouter.use('/maintenance', maintenanceRouter)
+apiRouter.use('/preventive-maintenance', preventiveMaintenanceRouter)
 apiRouter.use('/audit', auditRouter)
