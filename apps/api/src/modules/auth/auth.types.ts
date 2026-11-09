@@ -15,6 +15,11 @@ export interface AuthUser {
     code: string
     name: string
   }
+  impersonatedBy?: {
+    id: string
+    name: string
+    email: string
+  }
 }
 
 export interface RequestContext {

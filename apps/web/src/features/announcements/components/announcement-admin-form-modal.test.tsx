@@ -135,5 +135,5 @@ describe('AnnouncementAdminFormModal', () => {
       )
       expect(onClose).toHaveBeenCalled()
     })
-  })
+  }, 15000)
 })

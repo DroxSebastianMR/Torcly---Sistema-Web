@@ -1,18 +1,25 @@
 import { useDeferredValue, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   Building2,
+  DollarSign,
+  Headphones,
   Pencil,
   Power,
   Plus,
   ShieldCheck,
+  TrendingUp,
   UsersRound,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { paths } from '@/app/router/constants/paths'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Pagination } from '@/components/ui/pagination'
 import { SmartSelect } from '@/components/ui/smart-select'
-import { useAuth } from '@/features/auth/hooks/auth-context'
+import { usePlatformSubscriptionMetrics } from '@/features/subscriptions/hooks/use-subscriptions'
+import { platformService } from '../services/platform.service'
 import { OrganizationFormModal } from '../components/organization-form-modal'
 import { OrganizationEditModal } from '../components/organization-edit-modal'
 import { OrganizationMembersModal } from '../components/organization-members-modal'
@@ -47,9 +54,11 @@ function organizationError(error: unknown) {
 }
 
 export default function PlatformPage() {
-  const { user } = useAuth()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [filters, setFilters] = useState(initialFilters)
   const [formOpen, setFormOpen] = useState(false)
+  const [isImpersonatingId, setIsImpersonatingId] = useState<string | null>(null)
   const [selectedOrganization, setSelectedOrganization] =
     useState<PlatformOrganization | null>(null)
   const [editingOrganization, setEditingOrganization] =
@@ -60,6 +69,7 @@ export default function PlatformPage() {
     [deferredSearch, filters],
   )
   const organizations = usePlatformOrganizations(queryFilters)
+  const subscriptionMetrics = usePlatformSubscriptionMetrics()
   const roles = usePlatformRoles()
   const createOrganization = useCreatePlatformOrganization()
   const members = usePlatformOrganizationMembers(selectedOrganization?.id)
@@ -119,8 +129,29 @@ export default function PlatformPage() {
     }
   }
 
+  const handleImpersonate = async (org: PlatformOrganization) => {
+    try {
+      setIsImpersonatingId(org.id)
+      const res = await platformService.impersonateOrganization(org.id)
+      queryClient.removeQueries({
+        predicate: (query) => query.queryKey[0] !== 'auth',
+      })
+      queryClient.setQueryData(['auth', 'session'], res.data)
+      toast.success(`Iniciando modo soporte para ${org.name}...`)
+      navigate(paths.dashboard)
+    } catch (error) {
+      toast.error(organizationError(error))
+    } finally {
+      setIsImpersonatingId(null)
+    }
+  }
+
   const total = organizations.data?.pagination.total ?? 0
   const totalPages = organizations.data?.pagination.totalPages ?? 1
+  const metrics = subscriptionMetrics.data?.data
+  const activeSubs = metrics?.active ?? 0
+  const trialSubs = metrics?.trial ?? 0
+  const estimatedMrr = metrics?.estimatedMrr ?? 0
 
   return (
     <div className="space-y-6">
@@ -146,33 +177,56 @@ export default function PlatformPage() {
         </Button>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <article className="rounded-2xl border border-violet-100 bg-violet-50/70 p-5 shadow-sm">
-          <ShieldCheck aria-hidden className="size-7 text-violet-600" />
-          <h2 className="mt-5 text-base font-semibold text-brand-forest">
-            Acceso de plataforma
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            {user?.name ?? 'Administrador Torcly'} administra el catálogo
-            global, sin entrar al espacio de ningún taller.
-          </p>
-        </article>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-2xl border border-sky-100 bg-sky-50/70 p-5 shadow-sm">
-          <Building2 aria-hidden className="size-7 text-sky-600" />
-          <h2 className="mt-5 text-base font-semibold text-brand-forest">
-            Organizaciones registradas
-          </h2>
-          <p className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-brand-forest">
+          <Building2 aria-hidden className="size-6 text-sky-600" />
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Organizaciones
+          </p>
+          <p className="mt-1 text-2xl font-bold text-brand-forest">
             {total}
           </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Talleres registrados en la plataforma
+          </p>
         </article>
+
+        <article className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-5 shadow-sm">
+          <TrendingUp aria-hidden className="size-6 text-emerald-600" />
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Suscripciones Activas
+          </p>
+          <p className="mt-1 text-2xl font-bold text-emerald-700">
+            {activeSubs}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Talleres con membresía vigente
+          </p>
+        </article>
+
+        <article className="rounded-2xl border border-violet-100 bg-violet-50/70 p-5 shadow-sm">
+          <DollarSign aria-hidden className="size-6 text-violet-600" />
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            MRR Estimado
+          </p>
+          <p className="mt-1 text-2xl font-bold text-violet-800">
+            S/ {estimatedMrr.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Ingreso recurrente mensualizado
+          </p>
+        </article>
+
         <article className="rounded-2xl border border-amber-100 bg-amber-50/70 p-5 shadow-sm">
-          <UsersRound aria-hidden className="size-7 text-amber-700" />
-          <h2 className="mt-5 text-base font-semibold text-brand-forest">
-            Aislamiento operativo
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Cada sesión del taller opera únicamente con sus propios datos.
+          <ShieldCheck aria-hidden className="size-6 text-amber-600" />
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            En Período de Prueba
+          </p>
+          <p className="mt-1 text-2xl font-bold text-amber-700">
+            {trialSubs}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Talleres en evaluación o prueba
           </p>
         </article>
       </div>
@@ -305,6 +359,23 @@ export default function PlatformPage() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <div className="flex justify-end gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900"
+                          disabled={
+                            !organization.active ||
+                            isImpersonatingId === organization.id
+                          }
+                          onClick={() => void handleImpersonate(organization)}
+                          title="Ingresar en modo soporte a este taller"
+                        >
+                          <Headphones aria-hidden className="size-4 text-amber-600" />
+                          {isImpersonatingId === organization.id
+                            ? 'Asistiendo...'
+                            : 'Asistir'}
+                        </Button>
                         <Button
                           type="button"
                           variant="outline"

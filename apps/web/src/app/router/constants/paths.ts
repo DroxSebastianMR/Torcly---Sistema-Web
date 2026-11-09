@@ -17,6 +17,7 @@ export const paths = {
   appointments: '/citas',
   workOrders: '/ordenes-taller',
   technicians: '/tecnicos',
+  preventiveMaintenance: '/mantenimiento-preventivo',
   customers: '/clientes',
   customerDetail: '/clientes/:id',
   vehicles: '/vehiculos',

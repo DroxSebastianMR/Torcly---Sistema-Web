@@ -396,7 +396,7 @@ export default function Page() {
           aria-hidden
           className="pointer-events-none absolute bottom-0 left-0 h-3 w-[min(38rem,90%)] rounded-[50%] bg-primary/10 blur-xl"
         />
-        <div className="relative z-10">
+        <div className="relative">
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             Operación de hoy
           </p>
@@ -407,7 +407,7 @@ export default function Page() {
             Este es el resumen de lo que necesita atención en tu taller.
           </p>
         </div>
-        <div className="relative z-10 hidden shrink-0 sm:block">
+        <div className="relative hidden shrink-0 sm:block">
           <span className="absolute inset-x-2 -bottom-1 h-3 rounded-[50%] bg-primary/20 blur-md" />
           <img
             alt="Asistente de Torcly"

@@ -1,9 +1,11 @@
 import { Prisma } from '../../generated/prisma/client.js'
+import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import { generateTemporaryPassword, hashPassword } from '../auth/password.js'
 import { authService } from '../auth/auth.service.js'
+import { createSessionToken, hashSessionToken } from '../auth/session-token.js'
 import { subscriptionsService } from '../subscriptions/subscriptions.service.js'
-import type { RequestContext } from '../auth/auth.types.js'
+import type { AuthUser, RequestContext } from '../auth/auth.types.js'
 import {
   platformRepository,
   type PlatformOrganizationRecord,
@@ -308,5 +310,159 @@ export const platformService = {
       }
       throw error
     }
+  },
+
+  async impersonateOrganization(
+    organizationId: string,
+    adminUser: AuthUser,
+    context?: RequestContext,
+  ) {
+    if (!adminUser.isPlatformAdmin) {
+      throw new AppError(
+        403,
+        'PLATFORM_ACCESS_FORBIDDEN',
+        'Solo administradores de plataforma pueden usar el modo soporte.',
+      )
+    }
+
+    const organization = await databaseService.client.organization.findUnique({
+      where: { id: organizationId },
+      include: {
+        memberships: {
+          where: { active: true },
+          include: {
+            user: true,
+            role: {
+              include: {
+                permissions: {
+                  include: { permission: { select: { code: true } } },
+                },
+              },
+            },
+          },
+          orderBy: { joinedAt: 'asc' },
+        },
+      },
+    })
+
+    if (!organization) {
+      throw new AppError(
+        404,
+        'PLATFORM_ORGANIZATION_NOT_FOUND',
+        'No se encontró la organización.',
+      )
+    }
+
+    if (!organization.active) {
+      throw new AppError(
+        400,
+        'ORGANIZATION_INACTIVE',
+        'La organización se encuentra desactivada.',
+      )
+    }
+
+    const targetMembership =
+      organization.memberships.find((m) =>
+        ['owner', 'admin', 'workshop_manager'].includes(m.role.code),
+      ) ?? organization.memberships[0]
+
+    if (!targetMembership) {
+      throw new AppError(
+        400,
+        'ORGANIZATION_HAS_NO_MEMBERS',
+        'La organización no cuenta con miembros activos para impersonar.',
+      )
+    }
+
+    const impersonationToken = createSessionToken()
+    const tokenHash = hashSessionToken(impersonationToken)
+    const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000)
+
+    await databaseService.client.authSession.create({
+      data: {
+        tokenHash,
+        userId: targetMembership.userId,
+        activeOrganizationId: organization.id,
+        expiresAt,
+        ipAddress: context?.ipAddress,
+        userAgent: `Impersonated by ${adminUser.email} | ${context?.userAgent ?? ''}`.slice(0, 300),
+      },
+    })
+
+    await databaseService.client.auditLog.create({
+      data: {
+        event: 'LOGIN_SUCCESS',
+        userId: targetMembership.userId,
+        identifier: targetMembership.user.email,
+        ipAddress: context?.ipAddress,
+        requestId: context?.requestId,
+        organizationId: organization.id,
+        metadata: {
+          type: 'IMPERSONATION_STARTED',
+          impersonatorId: adminUser.id,
+          impersonatorEmail: adminUser.email,
+          targetOrganizationId: organization.id,
+          targetOrganizationName: organization.name,
+        },
+      },
+    })
+
+    const permissions = new Set(
+      targetMembership.role.permissions.map((p) => p.permission.code),
+    )
+
+    return {
+      token: impersonationToken,
+      user: {
+        id: targetMembership.user.id,
+        name: targetMembership.user.displayName,
+        email: targetMembership.user.email,
+        username: targetMembership.user.username,
+        permissions: [...permissions].sort(),
+        isPlatformAdmin: targetMembership.user.isPlatformAdmin,
+        mustChangePassword: false,
+        role: {
+          code: targetMembership.role.code,
+          name: targetMembership.role.name,
+        },
+        organization: {
+          id: organization.id,
+          code: organization.code,
+          name: organization.name,
+        },
+        impersonatedBy: {
+          id: adminUser.id,
+          name: adminUser.name,
+          email: adminUser.email,
+        },
+      },
+    }
+  },
+
+  async exitImpersonation(
+    currentSessionTokenHash: string | undefined,
+    impersonatorToken: string,
+    context?: RequestContext,
+  ) {
+    if (currentSessionTokenHash) {
+      await databaseService.client.authSession.deleteMany({
+        where: { tokenHash: currentSessionTokenHash },
+      })
+    }
+
+    const impersonatorAuth = await authService.authenticate(
+      impersonatorToken,
+      context ?? {},
+    )
+
+    if (!impersonatorAuth.user.isPlatformAdmin) {
+      throw new AppError(
+        403,
+        'PLATFORM_ACCESS_FORBIDDEN',
+        'Sesión de administrador de plataforma no válida.',
+      )
+    }
+
+    return impersonatorAuth.user
   },
 }

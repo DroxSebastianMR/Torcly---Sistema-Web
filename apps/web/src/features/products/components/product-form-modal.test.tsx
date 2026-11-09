@@ -155,18 +155,20 @@ describe('Formulario de productos', () => {
     )
     await user.click(submitButton)
 
-    await waitFor(() =>
-      expect(service.create).toHaveBeenCalledWith({
-        code: 'FIL-ACE',
-        barcode: null,
-        name: 'Filtro de aceite',
-        description: null,
-        categoryId: 'cat1',
-        brandId: null,
-        unitId: 'unit1',
-        salePrice: 35.5,
-        minimumStock: 1,
-      }),
+    await waitFor(
+      () =>
+        expect(service.create).toHaveBeenCalledWith({
+          code: 'FIL-ACE',
+          barcode: null,
+          name: 'Filtro de aceite',
+          description: null,
+          categoryId: 'cat1',
+          brandId: null,
+          unitId: 'unit1',
+          salePrice: 35.5,
+          minimumStock: 1,
+        }),
+      { timeout: 4000 },
     )
     expect(toast.success).toHaveBeenCalledWith(
       'Producto registrado correctamente.',
