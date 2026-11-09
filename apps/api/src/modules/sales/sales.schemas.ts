@@ -69,5 +69,32 @@ export const saleCancelSchema = z
   })
   .strict()
 
+export const splitPaymentItemSchema = z
+  .object({
+    method: z.enum(['CASH', 'CARD', 'TRANSFER', 'DIGITAL_WALLET']),
+    amount: z.coerce.number().positive('El monto debe ser mayor a cero.'),
+  })
+  .strict()
+
+export const saleConfirmAndPaySchema = z
+  .object({
+    paymentMethod: z.enum([
+      'CASH',
+      'CARD',
+      'TRANSFER',
+      'DIGITAL_WALLET',
+      'MIXED',
+    ]),
+    amountPaid: z.coerce
+      .number()
+      .positive('El monto a cobrar debe ser mayor a cero.'),
+    cashReceived: z.coerce.number().positive().optional(),
+    cashChange: z.coerce.number().nonnegative().optional(),
+    notes: z.string().trim().max(300).optional(),
+    splitPayments: z.array(splitPaymentItemSchema).optional(),
+  })
+  .strict()
+
 export type SaleInputDto = z.infer<typeof saleInputSchema>
 export type SaleQueryDto = z.infer<typeof saleQuerySchema>
+export type SaleConfirmAndPayDto = z.infer<typeof saleConfirmAndPaySchema>

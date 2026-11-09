@@ -91,7 +91,13 @@ export const endpoints = {
     catalog: '/sales/catalogo',
     detail: (id: string) => `/sales/${id}`,
     confirm: (id: string) => `/sales/${id}/confirm`,
+    confirmAndPay: (id: string) => `/sales/${id}/confirm-and-pay`,
     cancel: (id: string) => `/sales/${id}/cancel`,
+  },
+  quotations: {
+    root: '/quotations',
+    detail: (id: string) => `/quotations/${id}`,
+    convertToOrder: (id: string) => `/quotations/${id}/convert-to-order`,
   },
   appointments: {
     root: '/appointments',
