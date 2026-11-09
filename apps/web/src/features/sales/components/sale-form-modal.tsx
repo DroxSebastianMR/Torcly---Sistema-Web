@@ -23,7 +23,13 @@ import {
   type SaleLineDraft,
 } from '../forms/sale.schema'
 import { useSaleCatalog, useSaleMutations } from '../hooks/use-sales'
-import type { SaleDetail, SaleInput, SaleLineInput } from '../types/sales.types'
+import type {
+  SaleConfirmAndPayInput,
+  SaleDetail,
+  SaleInput,
+  SaleLineInput,
+} from '../types/sales.types'
+import { SalePaymentModal } from './sale-payment-modal'
 import {
   currencyFormatter,
   getSaleErrorMessage,
@@ -58,6 +64,7 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
   )
   const [selectedProductId, setSelectedProductId] = useState('')
   const [selectedServiceId, setSelectedServiceId] = useState('')
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false)
 
   const form = useForm<SaleFormValues>({
     resolver: zodResolver(saleFormSchema),
@@ -74,7 +81,8 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
     mutations.create.isPending ||
     mutations.createConfirmed?.isPending ||
     mutations.update.isPending ||
-    mutations.confirm.isPending
+    mutations.confirm.isPending ||
+    Boolean(mutations.confirmAndPay?.isPending)
   const isEditing = sale !== null
   const formState = useFormState({ control })
   const linesError = formState.errors.lines?.message
@@ -246,7 +254,7 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
     return { customerId: getValues('customerId') || null, lines: linesInput }
   }
 
-  const save = async ({ confirm }: { confirm: boolean }) => {
+  const saveDraft = async () => {
     const valid = await trigger()
     if (!valid) {
       const message =
@@ -259,29 +267,68 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
     try {
       if (sale) {
         await mutations.update.mutateAsync({ id: sale.id, input })
-        if (confirm) await mutations.confirm.mutateAsync(sale.id)
-        toast.success(
-          confirm
-            ? 'Venta actualizada y confirmada.'
-            : 'Venta actualizada correctamente.',
-        )
+        toast.success('Venta actualizada correctamente.')
       } else {
-        if (confirm) {
-          await mutations.createConfirmed.mutateAsync(input)
-        } else {
-          await mutations.create.mutateAsync(input)
-        }
-        toast.success(
-          confirm
-            ? 'Venta confirmada correctamente.'
-            : 'Venta registrada como borrador.',
-        )
+        await mutations.create.mutateAsync(input)
+        toast.success('Venta registrada como borrador.')
       }
+      closeModal()
     } catch (error) {
       toast.error(getSaleErrorMessage(error))
+    }
+  }
+
+  const startConfirm = async () => {
+    const valid = await trigger()
+    if (!valid) {
+      const message =
+        form.getFieldState('lines').error?.message ??
+        'Revisa las líneas de la venta.'
+      toast.error(message)
       return
     }
-    closeModal()
+    setPaymentModalOpen(true)
+  }
+
+  const handleConfirmAndPay = async (paymentInput: SaleConfirmAndPayInput) => {
+    const input = buildInput()
+    try {
+      if (sale) {
+        await mutations.update.mutateAsync({ id: sale.id, input })
+        await mutations.confirmAndPay.mutateAsync({
+          id: sale.id,
+          input: paymentInput,
+        })
+      } else {
+        const created = await mutations.create.mutateAsync(input)
+        await mutations.confirmAndPay.mutateAsync({
+          id: created.data.id,
+          input: paymentInput,
+        })
+      }
+      toast.success('Venta cobrada y finalizada correctamente.')
+      setPaymentModalOpen(false)
+      closeModal()
+    } catch (error) {
+      toast.error(getSaleErrorMessage(error))
+    }
+  }
+
+  const handleConfirmPending = async () => {
+    const input = buildInput()
+    try {
+      if (sale) {
+        await mutations.update.mutateAsync({ id: sale.id, input })
+        await mutations.confirm.mutateAsync(sale.id)
+      } else {
+        await mutations.createConfirmed.mutateAsync(input)
+      }
+      toast.success('Venta confirmada como cobro pendiente en caja.')
+      setPaymentModalOpen(false)
+      closeModal()
+    } catch (error) {
+      toast.error(getSaleErrorMessage(error))
+    }
   }
 
   const updateQuantity = (index: number, value: number) => {
@@ -291,7 +338,8 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
   }
 
   return (
-    <Modal
+    <>
+      <Modal
       open={open}
       onClose={closeModal}
       title={isEditing ? 'Editar venta' : 'Nueva venta'}
@@ -306,14 +354,14 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
             type="button"
             variant="outline"
             disabled={busy}
-            onClick={() => void save({ confirm: false })}
+            onClick={() => void saveDraft()}
           >
             {busy ? 'Guardando…' : 'Guardar borrador'}
           </Button>
           <Button
             type="button"
             disabled={busy}
-            onClick={() => void save({ confirm: true })}
+            onClick={() => void startConfirm()}
           >
             {busy ? 'Confirmando…' : 'Confirmar venta'}
           </Button>
@@ -486,6 +534,16 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
         </p>
       </div>
     </Modal>
+    <SalePaymentModal
+      open={paymentModalOpen}
+      total={total}
+      saleCode={sale?.code}
+      loading={busy}
+      onClose={() => setPaymentModalOpen(false)}
+      onConfirmAndPay={handleConfirmAndPay}
+      onConfirmPending={handleConfirmPending}
+    />
+  </>
   )
 }
 

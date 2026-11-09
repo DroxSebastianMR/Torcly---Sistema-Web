@@ -11,6 +11,7 @@ const repository = vi.hoisted(() => ({
   create: vi.fn(),
   update: vi.fn(),
   confirm: vi.fn(),
+  confirmAndPay: vi.fn(),
   cancel: vi.fn(),
   getCatalog: vi.fn(),
 }))
@@ -551,5 +552,48 @@ describe('Servicio de ventas', () => {
       status: 503,
       code: 'SALE_TRANSACTION_TIMEOUT',
     })
+  })
+
+  it('confirma una venta con cobro inmediato registrando el pago', async () => {
+    const saleRecord = record({
+      status: 'CONFIRMED',
+      confirmedBy: 'actor-1',
+      confirmedAt: new Date('2026-01-02T10:00:00.000Z'),
+    })
+    repository.confirmAndPay.mockResolvedValue({
+      ...saleRecord,
+      payments: [
+        {
+          id: 'pay-1',
+          code: 'PAGO-000001',
+          amount: 71,
+          method: 'CASH',
+        },
+      ],
+    })
+
+    const result = await salesService.confirmAndPay(
+      'sale-1',
+      {
+        paymentMethod: 'CASH',
+        amountPaid: 71,
+        cashReceived: 100,
+        cashChange: 29,
+      },
+      'actor-1',
+      context,
+      organizationId,
+    )
+
+    expect(repository.confirmAndPay).toHaveBeenCalledWith(
+      'sale-1',
+      expect.objectContaining({ paymentMethod: 'CASH', amountPaid: 71 }),
+      { id: 'actor-1', name: 'actor-1' },
+      context,
+      organizationId,
+    )
+    expect(result.data.status).toBe('CONFIRMED')
+    expect(result.data.payments).toHaveLength(1)
+    expect(result.data.payments[0].code).toBe('PAGO-000001')
   })
 })

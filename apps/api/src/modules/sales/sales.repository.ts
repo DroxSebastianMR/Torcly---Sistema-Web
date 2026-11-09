@@ -1,8 +1,13 @@
+import { randomUUID } from 'node:crypto'
 import type { AuditEventType, Prisma } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import type { RequestContext } from '../auth/auth.types.js'
-import type { SaleFilters } from './sales.types.js'
+import {
+  cashSessionsRepository,
+  lockCashSession,
+} from '../cash-sessions/cash-session.repository.js'
+import type { SaleConfirmAndPayInput, SaleFilters } from './sales.types.js'
 import {
   assertCanRegisterMovement,
   computeStock,
@@ -103,6 +108,16 @@ function auditData(
 
 async function lockSale(transaction: Prisma.TransactionClient, saleId: string) {
   await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`torcly:sale:${saleId}`}))`
+}
+
+async function nextPaymentCode(
+  transaction: Prisma.TransactionClient,
+  prefix: 'PAGO' | 'COMP',
+): Promise<string> {
+  const rows = await transaction.$queryRaw<
+    Array<{ seq: number | string }>
+  >`SELECT nextval('"payments_code_seq"') AS seq`
+  return `${prefix}-${String(Number(rows[0].seq)).padStart(6, '0')}`
 }
 
 async function confirmSaleWithinTransaction(
@@ -563,6 +578,165 @@ export const salesRepository = {
       })
 
       return updated
+    })
+  },
+
+  async confirmAndPay(
+    id: string,
+    paymentInput: SaleConfirmAndPayInput,
+    actor: { id: string; name: string },
+    context: RequestContext,
+    organizationId: string,
+  ): Promise<
+    SaleDetailRecord & {
+      payments: Array<{
+        id: string
+        code: string
+        amount: number
+        method: string
+      }>
+    }
+  > {
+    return databaseService.transaction(async (transaction) => {
+      await lockCashSession(transaction, organizationId)
+      const confirmedSale = await confirmSaleWithinTransaction(
+        transaction,
+        id,
+        organizationId,
+        actor,
+        context,
+      )
+
+      const cashSession = await cashSessionsRepository.requireOpenSession(
+        transaction,
+        organizationId,
+      )
+
+      const totalSale = Number(confirmedSale.total)
+      if (paymentInput.amountPaid > totalSale) {
+        throw new AppError(
+          400,
+          'PAYMENT_AMOUNT_EXCEEDS_TOTAL',
+          `El monto cobrado (S/ ${paymentInput.amountPaid}) no puede superar el total de la venta (S/ ${totalSale}).`,
+        )
+      }
+
+      const createdPayments: Array<{
+        id: string
+        code: string
+        amount: number
+        method: string
+      }> = []
+
+      if (
+        paymentInput.paymentMethod === 'MIXED' &&
+        paymentInput.splitPayments?.length
+      ) {
+        for (const split of paymentInput.splitPayments) {
+          const code = await nextPaymentCode(transaction, 'PAGO')
+          const idempotencyKey = `sale-pay:${id}:${randomUUID()}`
+          const payment = await transaction.payment.create({
+            data: {
+              organizationId,
+              code,
+              saleId: id,
+              customerId: confirmedSale.customerId,
+              cashSessionId: cashSession.id,
+              type: 'PAYMENT',
+              amount: split.amount,
+              method: split.method,
+              idempotencyKey,
+              notes: paymentInput.notes?.trim() || 'Pago mixto en mostrador',
+              performedBy: actor.name,
+              occurredAt: new Date(),
+            },
+            select: { id: true, code: true, amount: true, method: true },
+          })
+          createdPayments.push({
+            id: payment.id,
+            code: payment.code,
+            amount: Number(payment.amount),
+            method: payment.method,
+          })
+          await transaction.auditLog.create({
+            data: auditData(
+              'PAYMENT_REGISTERED',
+              actor.id,
+              confirmedSale.code,
+              context,
+              {
+                saleId: id,
+                code: confirmedSale.code,
+                paymentId: payment.id,
+                paymentCode: code,
+                amount: split.amount,
+                method: split.method,
+              },
+            ),
+          })
+        }
+      } else {
+        const method =
+          paymentInput.paymentMethod === 'MIXED'
+            ? 'CASH'
+            : paymentInput.paymentMethod
+        const code = await nextPaymentCode(transaction, 'PAGO')
+        const idempotencyKey = `sale-pay:${id}:${randomUUID()}`
+        const notes =
+          paymentInput.notes?.trim() ||
+          (paymentInput.cashReceived
+            ? `Efectivo recibido: S/ ${paymentInput.cashReceived.toFixed(2)}${
+                paymentInput.cashChange
+                  ? ` · Vuelto: S/ ${paymentInput.cashChange.toFixed(2)}`
+                  : ''
+              }`
+            : 'Pago inmediato en mostrador')
+
+        const payment = await transaction.payment.create({
+          data: {
+            organizationId,
+            code,
+            saleId: id,
+            customerId: confirmedSale.customerId,
+            cashSessionId: cashSession.id,
+            type: 'PAYMENT',
+            amount: paymentInput.amountPaid,
+            method,
+            idempotencyKey,
+            notes,
+            performedBy: actor.name,
+            occurredAt: new Date(),
+          },
+          select: { id: true, code: true, amount: true, method: true },
+        })
+        createdPayments.push({
+          id: payment.id,
+          code: payment.code,
+          amount: Number(payment.amount),
+          method: payment.method,
+        })
+        await transaction.auditLog.create({
+          data: auditData(
+            'PAYMENT_REGISTERED',
+            actor.id,
+            confirmedSale.code,
+            context,
+            {
+              saleId: id,
+              code: confirmedSale.code,
+              paymentId: payment.id,
+              paymentCode: code,
+              amount: paymentInput.amountPaid,
+              method,
+            },
+          ),
+        })
+      }
+
+      return {
+        ...confirmedSale,
+        payments: createdPayments,
+      }
     })
   },
 

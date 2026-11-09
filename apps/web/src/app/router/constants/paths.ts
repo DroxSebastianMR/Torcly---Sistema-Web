@@ -14,6 +14,7 @@ export const paths = {
   suppliers: '/proveedores',
   services: '/servicios',
   sales: '/ventas',
+  quotations: '/cotizaciones',
   appointments: '/citas',
   workOrders: '/ordenes-taller',
   technicians: '/tecnicos',

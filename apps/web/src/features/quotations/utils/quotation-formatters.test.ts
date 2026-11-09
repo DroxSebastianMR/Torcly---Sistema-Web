@@ -1,0 +1,52 @@
+import { describe, expect, it } from 'vitest'
+import {
+  generateQuotationWhatsAppMessage,
+  quotationStatusConfig,
+} from './quotation-formatters'
+import type { QuotationSummary } from '../types/quotations.types'
+
+describe('quotation-formatters', () => {
+  it('tiene etiquetas para todos los estados de cotización', () => {
+    expect(quotationStatusConfig.DRAFT.label).toBe('Borrador')
+    expect(quotationStatusConfig.SENT.label).toBe('Enviada')
+    expect(quotationStatusConfig.APPROVED.label).toBe('Aprobada')
+    expect(quotationStatusConfig.EXPIRED.label).toBe('Vencida')
+    expect(quotationStatusConfig.REJECTED.label).toBe('Rechazada')
+  })
+
+  it('genera mensaje formateado para WhatsApp correctamente', () => {
+    const mockQuotation: QuotationSummary = {
+      id: 'q-1',
+      code: 'COT-000042',
+      status: 'SENT',
+      customerId: 'c-1',
+      customer: {
+        id: 'c-1',
+        name: 'Carlos Mendoza',
+        phone: '987654321',
+      },
+      vehiclePlate: 'ABC-123',
+      vehicle: {
+        id: 'v-1',
+        plate: 'ABC-123',
+        brand: 'Toyota',
+        model: 'Corolla',
+      },
+      validUntil: '2026-12-31T00:00:00.000Z',
+      subtotal: 300,
+      discount: 0,
+      total: 300,
+      itemCount: 2,
+      notes: 'Incluye cambio de aceite y filtro.',
+      createdAt: '2026-11-09T10:00:00.000Z',
+      createdBy: 'Admin',
+    }
+
+    const message = generateQuotationWhatsAppMessage(mockQuotation, 'Taller Hermanos Motors')
+    expect(message).toContain('Hola Carlos Mendoza, te saludamos de *Taller Hermanos Motors*.')
+    expect(message).toContain('Toyota Corolla (ABC-123)')
+    expect(message).toContain('· N° Cotización: *COT-000042*')
+    expect(message).toContain('S/\u00a0300.00')
+    expect(message).toContain('· Observaciones: Incluye cambio de aceite y filtro.')
+  })
+})

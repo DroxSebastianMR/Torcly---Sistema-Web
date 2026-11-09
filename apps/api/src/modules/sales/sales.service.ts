@@ -5,6 +5,7 @@ import { salesRepository, type SaleDetailRecord } from './sales.repository.js'
 import { assertHasLines, computeSaleTotals } from './sales.rules.js'
 import type {
   SaleCatalog,
+  SaleConfirmAndPayInput,
   SaleDetail,
   SaleFilters,
   SaleInput,
@@ -379,6 +380,33 @@ export const salesService = {
         organizationId,
       )
       return { data: toDetail(sale) }
+    } catch (error) {
+      return mapPersistenceError(error)
+    }
+  },
+
+  async confirmAndPay(
+    id: string,
+    paymentInput: SaleConfirmAndPayInput,
+    actor: SaleActor | string,
+    context: RequestContext,
+    organizationId: string,
+  ) {
+    const normalizedActor = normalizeActor(actor)
+    try {
+      const saleWithPayments = await salesRepository.confirmAndPay(
+        id,
+        paymentInput,
+        normalizedActor,
+        context,
+        organizationId,
+      )
+      return {
+        data: {
+          ...toDetail(saleWithPayments),
+          payments: saleWithPayments.payments,
+        },
+      }
     } catch (error) {
       return mapPersistenceError(error)
     }

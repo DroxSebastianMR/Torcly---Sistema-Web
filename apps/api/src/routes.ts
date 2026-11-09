@@ -9,6 +9,7 @@ import { inventoryRouter } from './modules/inventory/inventory.routes.js'
 import { servicesRouter } from './modules/services/services.routes.js'
 import { purchasesRouter } from './modules/purchases/purchases.routes.js'
 import { salesRouter } from './modules/sales/sales.routes.js'
+import { quotationsRouter } from './modules/quotations/quotations.routes.js'
 import { appointmentsRouter } from './modules/appointments/appointment.routes.js'
 import { workOrdersRouter } from './modules/work-orders/work-order.routes.js'
 import { paymentsRouter } from './modules/payments/payment.routes.js'
@@ -45,6 +46,7 @@ apiRouter.use('/inventory', inventoryRouter)
 apiRouter.use('/services', servicesRouter)
 apiRouter.use('/purchases', purchasesRouter)
 apiRouter.use('/sales', salesRouter)
+apiRouter.use('/quotations', quotationsRouter)
 apiRouter.use('/appointments', appointmentsRouter)
 apiRouter.use('/work-orders', workOrdersRouter)
 apiRouter.use('/technicians', techniciansRouter)
