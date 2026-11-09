@@ -68,6 +68,17 @@ export interface WorkOrderBilling {
 
 export type WorkOrderSource = 'APPOINTMENT' | 'WALK_IN'
 export type FuelLevel = 'EMPTY' | 'QUARTER' | 'HALF' | 'THREE_QUARTERS' | 'FULL'
+export type ReceptionFuelLevel = 'E' | '1/4' | '1/2' | '3/4' | 'F'
+
+export interface ReceptionChecklist {
+  fuelLevel: ReceptionFuelLevel
+  hasSpareTire: boolean
+  hasJackAndTools: boolean
+  hasVehicleDocuments: boolean
+  hasRadioFaceplate: boolean
+  externalDamageNotes?: string | null
+  photos: string[]
+}
 
 export interface CreateDirectWorkOrderInput {
   customerId: string
@@ -75,12 +86,14 @@ export interface CreateDirectWorkOrderInput {
   currentMileage?: number | null
   fuelLevel?: string | null
   receptionNotes?: string | null
+  receptionChecklist?: ReceptionChecklist | null
 }
 
 export interface ReceptionInput {
   currentMileage?: number | null
   fuelLevel?: string | null
   receptionNotes?: string | null
+  receptionChecklist?: ReceptionChecklist | null
 }
 
 export interface YardCapacitySummary {
@@ -102,6 +115,7 @@ export interface WorkOrderSummary {
   currentMileage?: number | null
   fuelLevel?: string | null
   receptionNotes?: string | null
+  receptionChecklist?: ReceptionChecklist | null
   customer: WorkOrderCustomerRef
   vehicle: WorkOrderVehicleRef
   status: WorkOrderStatus

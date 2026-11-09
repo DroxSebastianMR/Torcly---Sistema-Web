@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { useQuery } from '@tanstack/react-query'
-import { AlertTriangle, Gauge, Fuel } from 'lucide-react'
+import { AlertTriangle, Gauge } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,7 +17,7 @@ import { vehicleKeys } from '@/features/vehicles/hooks/use-vehicles'
 import { vehiclesService } from '@/features/vehicles/services/vehicles.service'
 import {
   directWorkOrderFormSchema,
-  fuelLevelOptions,
+  receptionFuelLevelOptions,
   type DirectWorkOrderFormValues,
 } from '../forms/direct-work-order.schema'
 import {
@@ -36,8 +36,14 @@ const defaultValues: DirectWorkOrderFormValues = {
   customerId: '',
   vehicleId: '',
   currentMileage: null,
-  fuelLevel: null,
   receptionNotes: '',
+  receptionFuelLevel: '1/2',
+  hasSpareTire: false,
+  hasJackAndTools: false,
+  hasVehicleDocuments: false,
+  hasRadioFaceplate: false,
+  externalDamageNotes: '',
+  photoUrls: '',
 }
 
 export function DirectWorkOrderModal({
@@ -71,7 +77,10 @@ export function DirectWorkOrderModal({
 
   const customerId = useWatch({ control, name: 'customerId' })
   const vehicleId = useWatch({ control, name: 'vehicleId' })
-  const fuelLevel = useWatch({ control, name: 'fuelLevel' })
+  const receptionFuelLevel = useWatch({
+    control,
+    name: 'receptionFuelLevel',
+  })
 
   const vehiclesQuery = useQuery({
     queryKey: vehicleKeys.list({
@@ -129,8 +138,26 @@ export function DirectWorkOrderModal({
         customerId: values.customerId,
         vehicleId: values.vehicleId,
         currentMileage: values.currentMileage ?? null,
-        fuelLevel: values.fuelLevel ?? null,
+        fuelLevel: {
+          E: 'EMPTY',
+          '1/4': 'QUARTER',
+          '1/2': 'HALF',
+          '3/4': 'THREE_QUARTERS',
+          F: 'FULL',
+        }[values.receptionFuelLevel],
         receptionNotes: values.receptionNotes?.trim() || null,
+        receptionChecklist: {
+          fuelLevel: values.receptionFuelLevel,
+          hasSpareTire: values.hasSpareTire,
+          hasJackAndTools: values.hasJackAndTools,
+          hasVehicleDocuments: values.hasVehicleDocuments,
+          hasRadioFaceplate: values.hasRadioFaceplate,
+          externalDamageNotes: values.externalDamageNotes?.trim() || null,
+          photos: (values.photoUrls ?? '')
+            .split(/\r?\n|,/)
+            .map((url) => url.trim())
+            .filter(Boolean),
+        },
       })
 
       toast.success(
@@ -200,6 +227,52 @@ export function DirectWorkOrderModal({
           )}
         </div>
 
+        <fieldset className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-3.5">
+          <legend className="px-1 text-sm font-semibold">Checklist de recepción</legend>
+          <div className="space-y-1.5">
+            <label htmlFor="directReceptionFuelLevel" className="text-sm font-medium">
+              Combustible al recibir
+            </label>
+            <SmartSelect
+              id="directReceptionFuelLevel"
+              placeholder="Selecciona el nivel…"
+              options={receptionFuelLevelOptions.map((option) => ({
+                value: option.value,
+                label: option.label,
+              }))}
+              value={receptionFuelLevel}
+              onChange={(value) =>
+                setValue('receptionFuelLevel', value as DirectWorkOrderFormValues['receptionFuelLevel'], {
+                  shouldValidate: true,
+                })
+              }
+            />
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {(
+              [
+              ['hasSpareTire', 'Llanta de repuesto'],
+              ['hasJackAndTools', 'Gata y herramientas'],
+              ['hasVehicleDocuments', 'Documentos del vehículo'],
+              ['hasRadioFaceplate', 'Panel de radio'],
+              ] as const
+            ).map(([name, label]) => (
+              <label key={name} className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm">
+                <input type="checkbox" className="size-4 accent-brand-forest" {...register(name)} />
+                {label}: <span className="font-medium">Sí</span>
+              </label>
+            ))}
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="externalDamageNotes" className="text-sm font-medium">Daños externos observados</label>
+            <textarea id="externalDamageNotes" rows={2} placeholder="Describe rayones, golpes u observaciones visibles…" className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring" {...register('externalDamageNotes')} />
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="photoUrls" className="text-sm font-medium">Fotos (URLs, una por línea)</label>
+            <textarea id="photoUrls" rows={2} placeholder="https://…" className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring" {...register('photoUrls')} />
+          </div>
+        </fieldset>
+
         <div className="space-y-1.5">
           <label htmlFor="directVehicleId" className="text-sm font-medium">
             Vehículo <span className="text-red-600 dark:text-red-400">*</span>
@@ -233,7 +306,7 @@ export function DirectWorkOrderModal({
           )}
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3">
           <div className="space-y-1.5">
             <label
               htmlFor="directCurrentMileage"
@@ -268,31 +341,6 @@ export function DirectWorkOrderModal({
             )}
           </div>
 
-          <div className="space-y-1.5">
-            <label
-              htmlFor="directFuelLevel"
-              className="flex items-center gap-1.5 text-sm font-medium"
-            >
-              <Fuel size={14} className="text-muted-foreground" />
-              Nivel de combustible
-            </label>
-            <SmartSelect
-              id="directFuelLevel"
-              placeholder="Nivel de tanque…"
-              options={fuelLevelOptions.map((opt) => ({
-                value: opt.value,
-                label: opt.label,
-              }))}
-              value={fuelLevel ?? ''}
-              onChange={(val) =>
-                setValue(
-                  'fuelLevel',
-                  (val || null) as DirectWorkOrderFormValues['fuelLevel'],
-                  { shouldValidate: true },
-                )
-              }
-            />
-          </div>
         </div>
 
         <div className="space-y-1.5">

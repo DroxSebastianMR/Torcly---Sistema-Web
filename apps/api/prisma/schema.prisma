@@ -702,6 +702,7 @@ model WorkOrder {
   currentMileage     Int?                   @map("current_mileage")
   fuelLevel          String?                @map("fuel_level") @db.VarChar(20)
   receptionNotes     String?                @map("reception_notes") @db.VarChar(500)
+  receptionChecklist Json?                  @map("reception_checklist")
   status             WorkOrderStatus        @default(RECEPCIONADA)
   legacyTechnicianId String?                @map("technician_id") @db.Uuid
   legacyTechnician   User?                  @relation(fields: [legacyTechnicianId], references: [id], onDelete: SetNull, name: "WorkOrderTechnician")

@@ -29,6 +29,7 @@ import {
 import type {
   WorkOrderConsumptionType,
   WorkOrderFilters,
+  ReceptionChecklist,
 } from './work-order.types.js'
 
 const workOrderSummarySelect = {
@@ -39,6 +40,7 @@ const workOrderSummarySelect = {
   currentMileage: true,
   fuelLevel: true,
   receptionNotes: true,
+  receptionChecklist: true,
   status: true,
   technicianId: true,
   subtotal: true,
@@ -446,6 +448,7 @@ export const workOrdersRepository = {
       currentMileage?: number | null
       fuelLevel?: string | null
       receptionNotes?: string | null
+      receptionChecklist?: ReceptionChecklist | null
     },
   ): Promise<CreatedWorkOrderRecord> {
     return databaseService.transaction(async (transaction) => {
@@ -510,6 +513,9 @@ export const workOrdersRepository = {
           currentMileage: reception?.currentMileage ?? null,
           fuelLevel: reception?.fuelLevel ?? null,
           receptionNotes: reception?.receptionNotes ?? null,
+          receptionChecklist: reception?.receptionChecklist
+            ? (reception.receptionChecklist as unknown as Prisma.InputJsonValue)
+            : undefined,
           status: 'RECEPCIONADA',
           performedBy: actor.name,
         },
@@ -570,6 +576,7 @@ export const workOrdersRepository = {
       currentMileage?: number | null
       fuelLevel?: string | null
       receptionNotes?: string | null
+      receptionChecklist?: ReceptionChecklist | null
     },
     actor: { id: string; name: string },
     context: RequestContext,
@@ -616,6 +623,9 @@ export const workOrdersRepository = {
           currentMileage: input.currentMileage ?? null,
           fuelLevel: input.fuelLevel ?? null,
           receptionNotes: input.receptionNotes ?? null,
+          receptionChecklist: input.receptionChecklist
+            ? (input.receptionChecklist as unknown as Prisma.InputJsonValue)
+            : undefined,
           status: 'RECEPCIONADA',
           performedBy: actor.name,
         },
