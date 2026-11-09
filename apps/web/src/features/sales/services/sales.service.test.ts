@@ -80,11 +80,15 @@ describe('Servicio de ventas (web)', () => {
 
     await salesService.confirmAndPay('s1', {
       paymentMethod: 'CASH',
-      receivedAmount: 100,
+      amountPaid: 100,
+      cashReceived: 100,
+      cashChange: 0,
     })
     expect(api.post).toHaveBeenCalledWith('/sales/s1/confirm-and-pay', {
       paymentMethod: 'CASH',
-      receivedAmount: 100,
+      amountPaid: 100,
+      cashReceived: 100,
+      cashChange: 0,
     })
 
     await salesService.cancel('s1', { reason: 'Cliente desistió.' })

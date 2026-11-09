@@ -101,10 +101,12 @@ describe('DirectWorkOrderModal', () => {
     expect(
       screen.getByRole('heading', { name: /nueva orden directa en taller/i }),
     ).toBeTruthy()
-    expect(screen.getByLabelText(/cliente/i)).toBeTruthy()
-    expect(screen.getByLabelText(/vehículo/i)).toBeTruthy()
+    expect(screen.getByLabelText(/^cliente/i)).toBeTruthy()
+    expect(screen.getByLabelText(/^vehículo/i)).toBeTruthy()
     expect(screen.getByLabelText(/kilometraje actual/i)).toBeTruthy()
-    expect(screen.getByLabelText(/nivel de combustible/i)).toBeTruthy()
+    expect(screen.getByLabelText(/combustible/i)).toBeTruthy()
+    expect(screen.getByLabelText(/llanta de repuesto/i)).toBeTruthy()
+    expect(screen.getByLabelText(/gata y herramientas/i)).toBeTruthy()
   })
 
   it('muestra aviso de patio lleno cuando el aforo alcanza 8/8 bahías', () => {

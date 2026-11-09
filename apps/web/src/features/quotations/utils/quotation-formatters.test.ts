@@ -19,11 +19,12 @@ describe('quotation-formatters', () => {
       id: 'q-1',
       code: 'COT-000042',
       status: 'SENT',
-      customerId: 'c-1',
       customer: {
         id: 'c-1',
         name: 'Carlos Mendoza',
         phone: '987654321',
+        documentNumber: '12345678',
+        email: 'carlos@example.com',
       },
       vehiclePlate: 'ABC-123',
       vehicle: {
@@ -31,14 +32,16 @@ describe('quotation-formatters', () => {
         plate: 'ABC-123',
         brand: 'Toyota',
         model: 'Corolla',
+        year: 2020,
       },
       validUntil: '2026-12-31T00:00:00.000Z',
       subtotal: 300,
-      discount: 0,
       total: 300,
       itemCount: 2,
+      workOrderId: null,
       notes: 'Incluye cambio de aceite y filtro.',
       createdAt: '2026-11-09T10:00:00.000Z',
+      updatedAt: '2026-11-09T10:00:00.000Z',
       createdBy: 'Admin',
     }
 

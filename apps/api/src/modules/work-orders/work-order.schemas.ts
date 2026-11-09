@@ -19,6 +19,23 @@ export const workOrderStatusSchema = z.enum([
   'ENTREGADA',
 ])
 
+export const receptionChecklistSchema = z
+  .object({
+    fuelLevel: z.enum(['E', '1/4', '1/2', '3/4', 'F']),
+    hasSpareTire: z.boolean(),
+    hasJackAndTools: z.boolean(),
+    hasVehicleDocuments: z.boolean(),
+    hasRadioFaceplate: z.boolean(),
+    externalDamageNotes: z
+      .string()
+      .trim()
+      .max(1000, 'Los daños externos no pueden exceder los 1000 caracteres.')
+      .optional()
+      .nullable(),
+    photos: z.array(z.string().url('La foto debe ser una URL válida.')).max(10).default([]),
+  })
+  .strict()
+
 export const workOrderQuerySchema = z.object({
   search: z.string().trim().max(120).optional(),
   status: workOrderStatusSchema.or(z.literal('all')).default('all'),
@@ -56,6 +73,7 @@ export const createWorkOrderSchema = z
       .max(500, 'Las observaciones no pueden exceder los 500 caracteres.')
       .optional()
       .nullable(),
+    receptionChecklist: receptionChecklistSchema.optional().nullable(),
   })
   .strict()
 
@@ -80,6 +98,7 @@ export const createDirectWorkOrderSchema = z
       .max(500, 'Las observaciones no pueden exceder los 500 caracteres.')
       .optional()
       .nullable(),
+    receptionChecklist: receptionChecklistSchema.optional().nullable(),
   })
   .strict()
 

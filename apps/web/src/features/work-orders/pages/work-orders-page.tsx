@@ -1,14 +1,18 @@
 import { useDeferredValue, useMemo, useState } from 'react'
 import { BadgeCheck, Plus, Wrench } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { ErrorState } from '@/components/ui/error-state'
 import { ModuleMetrics } from '@/components/ui/module-metrics'
+import { PageHeader } from '@/components/ui/page-header'
 import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
+import AppointmentsPage from '@/features/appointments/pages/appointments-page'
 import { DirectWorkOrderModal } from '../components/direct-work-order-modal'
+import { WorkshopTabs, type WorkshopTab } from '../components/workshop-tabs'
 import { YardCapacityWidget } from '../components/yard-capacity-widget'
 import { WorkOrderActivityModal } from '../components/work-order-activity-modal'
 import { WorkOrderBudgetModal } from '../components/work-order-budget-modal'
@@ -46,6 +50,15 @@ const initialFilters: WorkOrderFilters = {
 }
 
 export default function Page() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tabParam = searchParams.get('tab')
+  const activeTab: WorkshopTab =
+    tabParam === 'appointments' || tabParam === 'citas' ? 'appointments' : 'orders'
+
+  const handleTabChange = (tab: WorkshopTab) => {
+    setSearchParams(tab === 'appointments' ? { tab: 'citas' } : {})
+  }
+
   const { user: currentUser } = useAuth()
   const canWrite = hasPermission(
     currentUser?.permissions ?? [],
@@ -222,120 +235,124 @@ export default function Page() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            Operación de taller
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
-            Órdenes de taller
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Control de ingresos de vehículos (citas y walk-ins), registro de
-            odómetro, presupuesto, ejecución técnica y entrega al cliente.
-          </p>
-        </div>
-        {canWrite && (
-          <div className="flex shrink-0">
-            <Button
-              onClick={() => setDirectOrderOpen(true)}
-              className="gap-1.5"
-            >
-              <Plus size={17} />
-              Nueva orden directa
-            </Button>
-          </div>
+      <PageHeader
+        title="Órdenes de taller"
+        description="Control unificado de órdenes de trabajo en patio y agenda de citas programadas."
+      >
+        {activeTab === 'orders' && canWrite && (
+          <Button
+            onClick={() => setDirectOrderOpen(true)}
+            className="gap-1.5"
+          >
+            <Plus size={17} />
+            Nueva orden directa
+          </Button>
         )}
-      </header>
+      </PageHeader>
 
-      <YardCapacityWidget
-        isFilteringToday={filters.periodPreset === 'today'}
-        onSelectTodayEntries={handleSelectTodayEntries}
+      <WorkshopTabs
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        ordersCount={total}
       />
 
-      <ModuleMetrics
-        items={[
-          { label: 'Órdenes encontradas', value: total },
-          { label: 'Recepcionadas', value: summary?.recepcionadas ?? 0 },
-          {
-            label: 'En diagnóstico',
-            value: summary?.enDiagnostico ?? 0,
-            tone: 'warning',
-          },
-          {
-            label: 'Pendientes de aprobación',
-            value: summary?.pendientesAprobacion ?? 0,
-            tone: 'info',
-          },
-          {
-            label: 'Aprobadas',
-            value: summary?.aprobadas ?? 0,
-            tone: 'success',
-          },
-          {
-            label: 'En ejecución',
-            value: summary?.enEjecucion ?? 0,
-            tone: 'info',
-          },
-          {
-            label: 'Listas para entrega',
-            value: summary?.listasParaEntrega ?? 0,
-            tone: 'info',
-          },
-          {
-            label: 'Entregadas',
-            value: summary?.entregadas ?? 0,
-            tone: 'success',
-          },
-        ]}
-      />
-
-      <section
-        aria-label="Filtros de órdenes de taller"
-        className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
-      >
-        <WorkOrdersToolbar
-          filters={filters}
-          onChange={setFilters}
-          suggestions={suggestions}
-          technicians={technicians.data ?? []}
+      {activeTab === 'appointments' ? (
+        <AppointmentsPage
+          hideHeader
+          onOrderCreated={() => handleTabChange('orders')}
         />
-      </section>
+      ) : (
+        <>
+          <YardCapacityWidget
+            isFilteringToday={filters.periodPreset === 'today'}
+            onSelectTodayEntries={handleSelectTodayEntries}
+          />
 
-      <section
-        aria-label="Resultados de órdenes de taller"
-        className="relative overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]"
-      >
-        <div className="relative z-0 overflow-hidden">
-          {orders.isError ? (
-            <ErrorState
-              title="No se pudo cargar las órdenes"
-              description="Verifica la conexión con la API e inténtalo nuevamente."
-              busy={orders.isFetching}
-              action={{
-                label: 'Reintentar',
-                onClick: () => void orders.refetch(),
-              }}
-            />
-          ) : (
-            <WorkOrdersTable
-              orders={visibleOrders}
-              loading={orders.isPending}
-              onOpen={openDetail}
-            />
-          )}
+          <ModuleMetrics
+            items={[
+              { label: 'Órdenes encontradas', value: total },
+              { label: 'Recepcionadas', value: summary?.recepcionadas ?? 0 },
+              {
+                label: 'En diagnóstico',
+                value: summary?.enDiagnostico ?? 0,
+                tone: 'warning',
+              },
+              {
+                label: 'Pendientes de aprobación',
+                value: summary?.pendientesAprobacion ?? 0,
+                tone: 'info',
+              },
+              {
+                label: 'Aprobadas',
+                value: summary?.aprobadas ?? 0,
+                tone: 'success',
+              },
+              {
+                label: 'En ejecución',
+                value: summary?.enEjecucion ?? 0,
+                tone: 'info',
+              },
+              {
+                label: 'Listas para entrega',
+                value: summary?.listasParaEntrega ?? 0,
+                tone: 'info',
+              },
+              {
+                label: 'Entregadas',
+                value: summary?.entregadas ?? 0,
+                tone: 'success',
+              },
+            ]}
+          />
 
-          {orders.data && (
-            <Pagination
-              page={filters.page}
-              totalPages={orders.data.pagination.totalPages}
-              onPageChange={(page) =>
-                setFilters((current) => ({ ...current, page }))
-              }
+          <section
+            aria-label="Filtros de órdenes de taller"
+            className="rounded-2xl border bg-card p-4 shadow-[0_10px_28px_rgb(16_44_37_/_5%)] sm:p-5"
+          >
+            <WorkOrdersToolbar
+              filters={filters}
+              onChange={setFilters}
+              suggestions={suggestions}
+              technicians={technicians.data ?? []}
             />
-          )}
-        </div>
-      </section>
+          </section>
+
+          <section
+            aria-label="Resultados de órdenes de taller"
+            className="relative overflow-hidden rounded-2xl border bg-card shadow-[0_10px_35px_rgba(16,44,37,0.04)]"
+          >
+            <div className="relative z-0 overflow-hidden">
+              {orders.isError ? (
+                <ErrorState
+                  title="No se pudo cargar las órdenes"
+                  description="Verifica la conexión con la API e inténtalo nuevamente."
+                  busy={orders.isFetching}
+                  action={{
+                    label: 'Reintentar',
+                    onClick: () => void orders.refetch(),
+                  }}
+                />
+              ) : (
+                <WorkOrdersTable
+                  orders={visibleOrders}
+                  loading={orders.isPending}
+                  onOpen={openDetail}
+                />
+              )}
+
+              {orders.data && (
+                <Pagination
+                  page={filters.page}
+                  totalPages={orders.data.pagination.totalPages}
+                  onPageChange={(page) =>
+                    setFilters((current) => ({ ...current, page }))
+                  }
+                />
+              )}
+            </div>
+          </section>
+        </>
+      )}
 
       <WorkOrderDetailModal
         open={Boolean(selectedId)}
