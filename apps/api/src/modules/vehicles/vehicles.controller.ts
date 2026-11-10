@@ -28,6 +28,16 @@ export const getVehicle: RequestHandler = async (request, response) => {
   )
 }
 
+export const getVehicleHistory: RequestHandler = async (request, response) => {
+  const { id } = vehicleIdSchema.parse(request.params)
+  response.json(
+    await vehiclesService.getHistory(
+      id,
+      requireOrganizationContext(request.auth).id,
+    ),
+  )
+}
+
 export const createVehicle: RequestHandler = async (request, response) => {
   const result = await vehiclesService.create(
     vehicleInputSchema.parse(request.body),

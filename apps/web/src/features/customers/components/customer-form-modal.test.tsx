@@ -247,4 +247,49 @@ describe('Formulario de clientes', () => {
     )
     expect(onClose).toHaveBeenCalledOnce()
   })
+
+  it('permite registrar cliente y vehículo atómicamente cuando el switch está activo', async () => {
+    service.create.mockResolvedValue({ data: {} })
+    const { onClose } = renderModal()
+
+    await userEvent.type(screen.getByLabelText(/^DNI/i), '71234567')
+    await userEvent.type(screen.getByLabelText(/^nombres/i), 'Carlos')
+    await userEvent.type(screen.getByLabelText(/^apellidos/i), 'Mendoza')
+    await userEvent.type(screen.getByLabelText(/teléfono/i), '987654321')
+
+    await userEvent.click(screen.getByLabelText(/¿Registrar vehículo ahora?/i))
+
+    await userEvent.type(screen.getByLabelText(/^placa/i), 'ABC-789')
+    await userEvent.type(screen.getByLabelText(/^marca/i), 'Toyota')
+    await userEvent.type(screen.getByLabelText(/^modelo/i), 'Corolla')
+    await userEvent.clear(screen.getByLabelText(/^año/i))
+    await userEvent.type(screen.getByLabelText(/^año/i), '2022')
+    await userEvent.type(screen.getByLabelText(/^kilometraje/i), '45000')
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Registrar cliente' }),
+    )
+
+    await waitFor(() =>
+      expect(service.create).toHaveBeenCalledWith({
+        type: 'NATURAL',
+        documentNumber: '71234567',
+        firstName: 'Carlos',
+        lastName: 'Mendoza',
+        phone: '987654321',
+        email: null,
+        vehicle: {
+          plate: 'ABC789',
+          brand: 'Toyota',
+          model: 'Corolla',
+          year: 2022,
+          mileage: 45000,
+        },
+      }),
+    )
+    expect(toast.success).toHaveBeenCalledWith(
+      'Cliente y vehículo registrados correctamente.',
+    )
+    expect(onClose).toHaveBeenCalledOnce()
+  })
 })

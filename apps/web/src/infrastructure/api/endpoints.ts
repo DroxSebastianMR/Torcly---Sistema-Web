@@ -142,6 +142,7 @@ export const endpoints = {
   vehicles: {
     root: '/vehicles',
     detail: (id: string) => `/vehicles/${id}`,
+    history: (id: string) => `/vehicles/${id}/history`,
   },
   payments: {
     root: '/payments',

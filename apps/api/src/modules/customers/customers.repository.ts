@@ -1,11 +1,12 @@
 import {
   type AuditEventType,
   type CustomerType,
+  type Vehicle,
   Prisma,
 } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import type { RequestContext } from '../auth/auth.types.js'
-import type { CustomerListFilters } from './customers.types.js'
+import type { CustomerListFilters, CustomerVehicleInput } from './customers.types.js'
 
 function auditData(
   event: AuditEventType,
@@ -81,6 +82,7 @@ export const customersRepository = {
     input: Prisma.CustomerUncheckedCreateInput,
     actorId: string,
     context: RequestContext,
+    vehicleInput?: CustomerVehicleInput | null,
   ) {
     return databaseService.transaction(async (transaction) => {
       const customer = await databaseService.measure(
@@ -98,7 +100,44 @@ export const customersRepository = {
           ),
         }),
       )
-      return customer
+
+      let createdVehicle: Vehicle | null = null
+      if (vehicleInput) {
+        createdVehicle = await databaseService.measure(
+          'customers.create.vehicle',
+          () =>
+            transaction.vehicle.create({
+              data: {
+                organizationId: input.organizationId,
+                customerId: customer.id,
+                plate: vehicleInput.plate,
+                brand: vehicleInput.brand,
+                model: vehicleInput.model,
+                year: vehicleInput.year,
+                mileage: vehicleInput.mileage ?? null,
+              },
+            }),
+        )
+        await databaseService.measure('customers.create.vehicle_audit', () =>
+          transaction.auditLog.create({
+            data: {
+              event: 'VEHICLE_CREATED',
+              userId: actorId,
+              organizationId: input.organizationId,
+              identifier: createdVehicle!.plate,
+              requestId: context.requestId,
+              ipAddress: context.ipAddress,
+              metadata: {
+                vehicleId: createdVehicle!.id,
+                customerId: customer.id,
+                source: 'ATOMIC_CUSTOMER_REGISTRATION',
+              },
+            },
+          }),
+        )
+      }
+
+      return { customer, createdVehicle }
     })
   },
 

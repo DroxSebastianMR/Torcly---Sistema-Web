@@ -39,6 +39,7 @@ export function CustomerFormModal({
   })
   const { reset } = form
   const customerType = useWatch({ control: form.control, name: 'type' })
+  const registerVehicle = useWatch({ control: form.control, name: 'registerVehicle' })
   const isNatural = customerType === 'NATURAL'
 
   useEffect(() => {
@@ -57,7 +58,9 @@ export function CustomerFormModal({
       toast.success(
         isEditing
           ? 'Cliente actualizado correctamente.'
-          : 'Cliente registrado correctamente.',
+          : values.registerVehicle
+            ? 'Cliente y vehículo registrados correctamente.'
+            : 'Cliente registrado correctamente.',
       )
       onClose()
     } catch (error) {
@@ -194,6 +197,94 @@ export function CustomerFormModal({
             />
           </Field>
         </div>
+
+        {!isEditing && (
+          <div className="rounded-xl border border-border/80 bg-muted/40 p-4 space-y-4">
+            <label className="flex items-start gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                {...form.register('registerVehicle')}
+                className="mt-0.5 size-4 rounded border-gray-300 text-brand-forest focus:ring-brand-forest"
+              />
+              <div>
+                <span className="text-sm font-semibold text-foreground">
+                  ¿Registrar vehículo ahora?
+                </span>
+                <p className="text-xs text-muted-foreground">
+                  Da de alta la primera unidad vehicular asociada a este cliente en este mismo paso.
+                </p>
+              </div>
+            </label>
+
+            {registerVehicle && (
+              <div className="space-y-4 pt-3 border-t border-border/60">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field
+                    label="Placa"
+                    error={error('vehiclePlate')}
+                    hint="5 a 8 caracteres alfanuméricos"
+                    required
+                  >
+                    <Input
+                      {...form.register('vehiclePlate')}
+                      placeholder="Ej. ABC-123"
+                      className="uppercase font-mono"
+                      maxLength={10}
+                    />
+                  </Field>
+                  <Field
+                    label="Marca"
+                    error={error('vehicleBrand')}
+                    required
+                  >
+                    <Input
+                      {...form.register('vehicleBrand')}
+                      placeholder="Ej. Toyota"
+                    />
+                  </Field>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <Field
+                    label="Modelo"
+                    error={error('vehicleModel')}
+                    required
+                  >
+                    <Input
+                      {...form.register('vehicleModel')}
+                      placeholder="Ej. Corolla"
+                    />
+                  </Field>
+                  <Field
+                    label="Año"
+                    error={error('vehicleYear')}
+                    required
+                  >
+                    <Input
+                      {...form.register('vehicleYear')}
+                      type="number"
+                      min={1950}
+                      max={new Date().getFullYear() + 1}
+                      placeholder="Ej. 2022"
+                    />
+                  </Field>
+                  <Field
+                    label="Kilometraje"
+                    error={error('vehicleMileage')}
+                    hint="Opcional"
+                  >
+                    <Input
+                      {...form.register('vehicleMileage')}
+                      type="number"
+                      min={0}
+                      placeholder="Ej. 45000"
+                    />
+                  </Field>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <p className="text-xs text-muted-foreground">
           <span className="font-semibold text-brand-forest">
