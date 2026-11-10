@@ -12,14 +12,20 @@ vi.mock('@/features/auth/hooks/auth-context', () => auth)
 
 const vehicles = vi.hoisted(() => ({ useVehicles: vi.fn() }))
 vi.mock('../hooks/use-vehicles', () => ({
-  vehicleKeys: { all: ['vehicles'], list: vi.fn(), detail: vi.fn() },
+  vehicleKeys: { all: ['vehicles'], list: vi.fn(), detail: vi.fn(), history: vi.fn() },
   useVehicles: vehicles.useVehicles,
   useVehicle: vi.fn(),
   useVehiclesByCustomer: vi.fn(),
+  useVehicleHistory: vi.fn().mockReturnValue({ data: null, isLoading: false, isError: false }),
 }))
 
 vi.mock('../components/vehicle-form-modal', () => ({
   VehicleFormModal: () => null,
+}))
+
+vi.mock('../components/vehicle-history-modal', () => ({
+  VehicleHistoryModal: ({ open }: { open: boolean }) =>
+    open ? <div role="dialog" aria-label="Historial clínico de vehículo">Historial clínico</div> : null,
 }))
 
 vi.mock('@/features/customers/components/customer-detail-modal', () => ({
@@ -209,5 +215,31 @@ describe('Página de vehículos', () => {
     renderPage()
 
     expect(screen.getByRole('button', { name: 'Propietario' })).toBeTruthy()
+  })
+
+  it('abre el modal de historial clínico al presionar la acción de historial', async () => {
+    auth.useAuth.mockReturnValue({ user: { permissions: ['vehicles:read'] } })
+    vehicles.useVehicles.mockReturnValue({
+      data: response({
+        data: [vehicleMock],
+        pagination: { page: 1, pageSize: 20, total: 1, totalPages: 1 },
+      }),
+      isPending: false,
+      isFetching: false,
+      isError: false,
+      refetch: vi.fn(),
+    })
+
+    renderPage()
+
+    const historyButtons = screen.getAllByRole('button', {
+      name: /Historial clínico de ABC123/i,
+    })
+    expect(historyButtons.length).toBeGreaterThan(0)
+    await userEvent.click(historyButtons[0])
+
+    expect(
+      screen.getByRole('dialog', { name: 'Historial clínico de vehículo' }),
+    ).toBeTruthy()
   })
 })

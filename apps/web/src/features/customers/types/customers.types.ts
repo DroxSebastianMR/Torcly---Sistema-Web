@@ -1,6 +1,14 @@
 export type CustomerType = 'NATURAL' | 'LEGAL'
 export type CustomerTypeFilter = 'all' | CustomerType
 
+export interface CustomerVehicleInput {
+  plate: string
+  brand: string
+  model: string
+  year: number
+  mileage?: number | null
+}
+
 export interface Customer {
   id: string
   type: CustomerType
@@ -12,6 +20,14 @@ export interface Customer {
   email: string | null
   createdAt: string
   updatedAt: string
+  createdVehicle?: {
+    id: string
+    plate: string
+    brand: string
+    model: string
+    year: number
+    mileage?: number | null
+  } | null
 }
 
 export interface CustomerFilters {
@@ -21,7 +37,7 @@ export interface CustomerFilters {
   pageSize: number
 }
 
-export type CustomerCreateInput =
+export type CustomerCreateInput = (
   | {
       type: 'NATURAL'
       documentNumber: string
@@ -37,6 +53,9 @@ export type CustomerCreateInput =
       phone: string
       email?: string | null
     }
+) & {
+  vehicle?: CustomerVehicleInput | null
+}
 
 export type CustomerUpdateInput = CustomerCreateInput
 

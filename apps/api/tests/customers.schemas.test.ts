@@ -78,6 +78,35 @@ describe('Schemas de clientes', () => {
     ).toBe(false)
   })
 
+  it('acepta el registro atómico con vehículo opcional válido', () => {
+    const result = customerInputSchema.parse({
+      ...naturalValid,
+      vehicle: {
+        plate: 'ABC-123',
+        brand: 'Toyota',
+        model: 'Corolla',
+        year: 2022,
+        mileage: 45000,
+      },
+    })
+    expect(result.vehicle?.plate).toBe('ABC123')
+    expect(result.vehicle?.brand).toBe('Toyota')
+    expect(result.vehicle?.mileage).toBe(45000)
+  })
+
+  it('rechaza vehículo con placa inválida dentro de cliente', () => {
+    const badVehicle = customerInputSchema.safeParse({
+      ...naturalValid,
+      vehicle: {
+        plate: 'A',
+        brand: 'Toyota',
+        model: 'Corolla',
+        year: 2022,
+      },
+    })
+    expect(badVehicle.success).toBe(false)
+  })
+
   it('aplica valores por defecto al listado', () => {
     expect(customerQuerySchema.parse({})).toEqual({
       type: 'all',

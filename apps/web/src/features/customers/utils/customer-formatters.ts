@@ -54,22 +54,43 @@ export function mapCustomerFormValues(
     phone: values.phone,
     email: values.email.trim() ? values.email.trim() : null,
   }
-  if (values.type === 'NATURAL') {
-    return {
-      ...base,
-      type: 'NATURAL',
-      firstName: values.firstName.trim(),
-      lastName: values.lastName.trim(),
-    }
-  }
-  return {
-    ...base,
-    type: 'LEGAL',
-    legalName: values.legalName.trim(),
-  }
+
+  const cleanPlate = values.vehiclePlate
+    ? values.vehiclePlate.toUpperCase().replace(/[\s-]/g, '').trim()
+    : ''
+
+  const vehicle =
+    values.registerVehicle && cleanPlate
+      ? {
+          plate: cleanPlate,
+          brand: values.vehicleBrand.trim(),
+          model: values.vehicleModel.trim(),
+          year: Number(values.vehicleYear),
+          mileage:
+            values.vehicleMileage !== '' && values.vehicleMileage !== undefined
+              ? Number(values.vehicleMileage)
+              : null,
+        }
+      : null
+
+  const customerData =
+    values.type === 'NATURAL'
+      ? {
+          ...base,
+          type: 'NATURAL' as const,
+          firstName: values.firstName.trim(),
+          lastName: values.lastName.trim(),
+        }
+      : {
+          ...base,
+          type: 'LEGAL' as const,
+          legalName: values.legalName.trim(),
+        }
+
+  return vehicle ? { ...customerData, vehicle } : customerData
 }
 
-export function mapCustomerToFormValues(customer: Customer) {
+export function mapCustomerToFormValues(customer: Customer): CustomerFormValues {
   return {
     type: customer.type,
     documentNumber: customer.documentNumber,
@@ -78,5 +99,11 @@ export function mapCustomerToFormValues(customer: Customer) {
     legalName: customer.legalName ?? '',
     phone: customer.phone,
     email: customer.email ?? '',
+    registerVehicle: false,
+    vehiclePlate: '',
+    vehicleBrand: '',
+    vehicleModel: '',
+    vehicleYear: new Date().getFullYear(),
+    vehicleMileage: '',
   }
 }
