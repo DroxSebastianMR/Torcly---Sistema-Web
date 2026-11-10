@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
 /* eslint-disable @typescript-eslint/no-explicit-any -- Los mocks parciales aíslan consultas y mutaciones del formulario. */
 
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DirectWorkOrderModal } from './direct-work-order-modal'
 import * as useWorkOrdersModule from '../hooks/use-work-orders'
 import * as useCustomersModule from '@/features/customers/hooks/use-customers'
+import * as customersServiceModule from '@/features/customers/services/customers.service'
 import * as vehiclesServiceModule from '@/features/vehicles/services/vehicles.service'
 
 const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }))
@@ -23,6 +24,7 @@ function renderWithClient(ui: React.ReactElement) {
 
 describe('DirectWorkOrderModal', () => {
   const mockMutateAsync = vi.fn()
+  const mockCreateCustomer = vi.fn()
 
   beforeEach(() => {
     vi.spyOn(useWorkOrdersModule, 'useYardCapacity').mockReturnValue({
@@ -72,6 +74,29 @@ describe('DirectWorkOrderModal', () => {
       refetch: vi.fn(),
     } as any)
 
+    vi.spyOn(customersServiceModule.customersService, 'create').mockImplementation(
+      mockCreateCustomer.mockResolvedValue({
+        data: {
+          id: 'new-cust-1',
+          type: 'NATURAL',
+          documentNumber: '87654321',
+          firstName: 'Carlos',
+          lastName: 'Mendoza',
+          legalName: null,
+          phone: '999888777',
+          email: 'carlos@example.com',
+          createdVehicle: {
+            id: 'new-veh-1',
+            plate: 'XYZ-789',
+            brand: 'Nissan',
+            model: 'Sentra',
+            year: 2021,
+            mileage: 45000,
+          },
+        },
+      } as any),
+    )
+
     vi.spyOn(vehiclesServiceModule.vehiclesService, 'list').mockResolvedValue({
       data: [
         {
@@ -107,6 +132,7 @@ describe('DirectWorkOrderModal', () => {
     expect(screen.getByLabelText(/combustible/i)).toBeTruthy()
     expect(screen.getByLabelText(/llanta de repuesto/i)).toBeTruthy()
     expect(screen.getByLabelText(/gata y herramientas/i)).toBeTruthy()
+    expect(screen.getByLabelText(/¿es un cliente nuevo\?/i)).toBeTruthy()
   })
 
   it('muestra aviso de patio lleno cuando el aforo alcanza 8/8 bahías', () => {
@@ -131,5 +157,21 @@ describe('DirectWorkOrderModal', () => {
     expect(
       screen.getByText(/capacidad de patio al 100% \(8\/8 bahías ocupadas\)/i),
     ).toBeTruthy()
+  })
+
+  it('permite alternar al modo de cliente nuevo y muestra los campos de cliente y vehículo', () => {
+    renderWithClient(<DirectWorkOrderModal open={true} onClose={vi.fn()} />)
+
+    const toggle = screen.getByLabelText(/¿es un cliente nuevo\?/i)
+    fireEvent.click(toggle)
+
+    expect(screen.getByText(/1\. Datos del Nuevo Cliente/i)).toBeTruthy()
+    expect(screen.getByText(/2\. Vehículo a Ingresar/i)).toBeTruthy()
+    expect(screen.getByLabelText(/DNI \(8 dígitos\)/i)).toBeTruthy()
+    expect(screen.getByLabelText(/Teléfono celular/i)).toBeTruthy()
+    expect(screen.getByLabelText(/Placa/i)).toBeTruthy()
+    expect(screen.getByLabelText(/Marca/i)).toBeTruthy()
+    expect(screen.getByLabelText(/Modelo/i)).toBeTruthy()
+    expect(screen.getByLabelText(/^Año/i)).toBeTruthy()
   })
 })

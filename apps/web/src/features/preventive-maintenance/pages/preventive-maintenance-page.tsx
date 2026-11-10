@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Sparkles } from 'lucide-react'
+import { CalendarClock } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { SmartSelect } from '@/components/ui/smart-select'
 import { ErrorState } from '@/components/ui/error-state'
+import { Pagination } from '@/components/ui/pagination'
 import { usePreventiveMaintenance } from '../hooks/use-preventive-maintenance'
 import { PreventiveMaintenanceMetricsCards } from '../components/preventive-maintenance-metrics'
 import { PreventiveMaintenanceTable } from '../components/preventive-maintenance-table'
@@ -13,14 +14,25 @@ const initialFilters: PreventiveMaintenanceFilters = {
   search: '',
 }
 
+const PAGE_SIZE = 10
+
 export default function PreventiveMaintenancePage() {
-  const [filters, setFilters] =
-    useState<PreventiveMaintenanceFilters>(initialFilters)
-  const { data, isLoading, isError, refetch } =
-    usePreventiveMaintenance(filters)
+  const [filters, setFilters] = useState<PreventiveMaintenanceFilters>(initialFilters)
+  const [page, setPage] = useState(1)
+  const { data, isLoading, isError, refetch } = usePreventiveMaintenance(filters)
 
   const items = data?.data ?? []
   const metrics = data?.metrics
+
+  const totalPages = Math.ceil(items.length / PAGE_SIZE)
+  const paginatedItems = items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  const handleFilterChange = (
+    updater: (prev: PreventiveMaintenanceFilters) => PreventiveMaintenanceFilters,
+  ) => {
+    setFilters(updater)
+    setPage(1)
+  }
 
   return (
     <div className="space-y-6">
@@ -34,23 +46,19 @@ export default function PreventiveMaintenancePage() {
             Mantenimiento Preventivo
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Detecta automáticamente vehículos que requieren cambio de aceite o
-            servicio periódico y genera campañas de contacto por WhatsApp para
-            agendar su retorno al taller.
+            Detecta automáticamente vehículos que requieren cambio de aceite o servicio periódico
+            y genera campañas de contacto por WhatsApp para agendar su retorno al taller.
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-semibold text-primary">
-          <Sparkles className="size-4" />
+        <div className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2 text-xs font-semibold text-emerald-800 shadow-xs dark:border-emerald-500/40 dark:bg-emerald-950/40 dark:text-emerald-300">
+          <CalendarClock className="size-4 text-emerald-600 dark:text-emerald-400" />
           <span>Frecuencia sugerida: 5,000 km o 6 meses</span>
         </div>
       </header>
 
       {/* Tarjetas de métricas de parque vehicular */}
-      <PreventiveMaintenanceMetricsCards
-        metrics={metrics}
-        isLoading={isLoading}
-      />
+      <PreventiveMaintenanceMetricsCards metrics={metrics} isLoading={isLoading} />
 
       {/* Barra de herramientas y filtros */}
       <section className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
@@ -63,7 +71,7 @@ export default function PreventiveMaintenancePage() {
               id="maintenance-search"
               value={filters.search}
               onChange={(e) =>
-                setFilters((prev) => ({ ...prev, search: e.target.value }))
+                handleFilterChange((prev) => ({ ...prev, search: e.target.value }))
               }
               placeholder="Buscar por placa, cliente o teléfono..."
             />
@@ -73,16 +81,43 @@ export default function PreventiveMaintenancePage() {
             <SmartSelect
               value={filters.priority}
               onChange={(value) =>
-                setFilters((prev) => ({
+                handleFilterChange((prev) => ({
                   ...prev,
                   priority: value as PreventiveMaintenanceFilters['priority'],
                 }))
               }
               options={[
                 { value: 'all', label: 'Todas las prioridades' },
-                { value: 'CRITICAL', label: '🔴 Vencido (>6 meses)' },
-                { value: 'WARNING', label: '🟡 Por Vencer (5-6 meses)' },
-                { value: 'UP_TO_DATE', label: '🟢 Al día (<5 meses)' },
+                {
+                  value: 'CRITICAL',
+                  label: 'Vencido (>6 meses)',
+                  icon: (
+                    <span
+                      aria-hidden
+                      className="size-2 rounded-full bg-rose-500 shrink-0"
+                    />
+                  ),
+                },
+                {
+                  value: 'WARNING',
+                  label: 'Por vencer (5-6 meses)',
+                  icon: (
+                    <span
+                      aria-hidden
+                      className="size-2 rounded-full bg-amber-500 shrink-0"
+                    />
+                  ),
+                },
+                {
+                  value: 'UP_TO_DATE',
+                  label: 'Al día (<5 meses)',
+                  icon: (
+                    <span
+                      aria-hidden
+                      className="size-2 rounded-full bg-emerald-500 shrink-0"
+                    />
+                  ),
+                },
               ]}
               placeholder="Filtrar por prioridad"
               searchThreshold={10}
@@ -94,21 +129,6 @@ export default function PreventiveMaintenancePage() {
 
       {/* Tabla de recordatorios */}
       <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <div>
-            <h2 className="text-lg font-semibold text-brand-forest">
-              Alertas y Oportunidades de Servicio
-            </h2>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Vehículos con recomendación de mantenimiento ordenados por
-              prioridad de atención.
-            </p>
-          </div>
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            {items.length} vehículos
-          </span>
-        </div>
-
         {isError ? (
           <div className="p-8">
             <ErrorState
@@ -121,7 +141,16 @@ export default function PreventiveMaintenancePage() {
             />
           </div>
         ) : (
-          <PreventiveMaintenanceTable items={items} isLoading={isLoading} />
+          <>
+            <PreventiveMaintenanceTable items={paginatedItems} isLoading={isLoading} />
+            {totalPages > 1 && (
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
+            )}
+          </>
         )}
       </section>
     </div>

@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, Warehouse } from 'lucide-react'
+import { AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { useYardCapacity } from '../hooks/use-work-orders'
 
 interface YardCapacityWidgetProps {
@@ -29,21 +29,8 @@ export function YardCapacityWidget({
       className={`relative isolate overflow-hidden rounded-2xl border border-[#e2ebe6] bg-card p-4 sm:p-5 shadow-[0_8px_24px_rgb(16_44_37_/_5%)] ${className}`}
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div
-            className={`flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors ${
-              isAtCapacity
-                ? 'bg-rose-100 text-rose-700'
-                : occupiedBays >= 6
-                  ? 'bg-amber-100 text-amber-700'
-                  : 'bg-emerald-100/70 text-brand-forest'
-            }`}
-          >
-            <Warehouse size={22} />
-          </div>
-
-          <div>
-            <div className="flex items-center gap-2">
+        <div>
+          <div className="flex items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Aforo y Capacidad de Patio
               </span>
@@ -84,7 +71,6 @@ export function YardCapacityWidget({
               )}
             </p>
           </div>
-        </div>
 
         {/* Visual 8 Bays Segmented Grid */}
         <div className="flex flex-col items-end gap-1.5">

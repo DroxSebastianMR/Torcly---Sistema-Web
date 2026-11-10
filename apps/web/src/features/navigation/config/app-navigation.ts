@@ -19,7 +19,7 @@ import {
   Megaphone,
   ShoppingBag,
   Building2,
-  Sparkles,
+  CalendarClock,
 } from 'lucide-react'
 import { paths } from '@/app/router/constants/paths'
 import type { NavigationGroup } from '../types/navigation.types'
@@ -139,7 +139,7 @@ export const appNavigation: readonly NavigationGroup[] = [
       {
         id: 'preventiveMaintenance',
         label: 'Mantenimiento preventivo',
-        icon: Sparkles,
+        icon: CalendarClock,
         path: paths.preventiveMaintenance,
         visible: true,
         permission: 'workshop:read',
