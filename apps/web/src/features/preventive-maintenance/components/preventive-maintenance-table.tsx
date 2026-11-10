@@ -163,19 +163,18 @@ export function PreventiveMaintenanceTable({
 
                   <Button
                     type="button"
-                    variant="outline"
                     size="sm"
                     disabled={!item.customer.phone}
                     onClick={() => handleOpenWhatsApp(item)}
-                    className="h-8 gap-1.5 border-emerald-500/30 bg-emerald-50/80 text-emerald-800 hover:bg-emerald-100 hover:text-emerald-950 dark:bg-emerald-950/40 dark:border-emerald-500/40 dark:text-emerald-300 font-semibold px-2.5 text-xs shadow-xs"
+                    className="h-8 min-h-8 gap-1.5 border-transparent bg-[#25D366] text-white hover:bg-[#20ba5a] active:bg-[#1caa52] dark:bg-[#25D366] dark:text-white dark:hover:bg-[#20ba5a] font-semibold px-3 text-xs shadow-xs"
                     title={
                       item.customer.phone
                         ? 'Enviar recordatorio por WhatsApp'
                         : 'Cliente sin teléfono registrado'
                     }
                   >
-                    <WhatsAppIcon className="size-3.5 text-emerald-600 dark:text-emerald-400" />
-                    WhatsApp
+                    <WhatsAppIcon className="size-3.5 shrink-0 fill-current text-white" />
+                    <span>WhatsApp</span>
                   </Button>
                 </div>
               </td>
