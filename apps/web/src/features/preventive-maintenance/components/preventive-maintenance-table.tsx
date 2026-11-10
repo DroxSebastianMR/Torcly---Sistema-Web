@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Copy, Check, MessageSquare, Phone, Wrench } from 'lucide-react'
+import { Copy, Check, Phone, Wrench } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
+import { WhatsAppIcon } from '@/components/icons/whatsapp-icon'
 import { toast } from 'sonner'
 import type { PreventiveMaintenanceItem } from '../types/preventive-maintenance.types'
 
@@ -166,14 +167,14 @@ export function PreventiveMaintenanceTable({
                     size="sm"
                     disabled={!item.customer.phone}
                     onClick={() => handleOpenWhatsApp(item)}
-                    className="border-emerald-500 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 hover:text-emerald-950 font-semibold"
+                    className="h-8 gap-1.5 border-emerald-500/30 bg-emerald-50/80 text-emerald-800 hover:bg-emerald-100 hover:text-emerald-950 dark:bg-emerald-950/40 dark:border-emerald-500/40 dark:text-emerald-300 font-semibold px-2.5 text-xs shadow-xs"
                     title={
                       item.customer.phone
                         ? 'Enviar recordatorio por WhatsApp'
                         : 'Cliente sin teléfono registrado'
                     }
                   >
-                    <MessageSquare className="size-3.5 text-emerald-600 fill-emerald-600" />
+                    <WhatsAppIcon className="size-3.5 text-emerald-600 dark:text-emerald-400" />
                     WhatsApp
                   </Button>
                 </div>

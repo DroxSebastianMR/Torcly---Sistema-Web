@@ -51,8 +51,8 @@ export default function PreventiveMaintenancePage() {
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2 text-xs font-semibold text-emerald-800 shadow-xs dark:border-emerald-500/40 dark:bg-emerald-950/40 dark:text-emerald-300">
-          <CalendarClock className="size-4 text-emerald-600 dark:text-emerald-400" />
+        <div className="inline-flex items-center gap-2 rounded-xl border border-[#C8E7DB] bg-[#E7F6EF] px-3.5 py-2 text-xs font-semibold text-[#206B52] shadow-xs dark:border-[#225742] dark:bg-[#133226] dark:text-[#6ee7b7]">
+          <CalendarClock className="size-4 text-[#329B78] dark:text-[#4ade80]" />
           <span>Frecuencia sugerida: 5,000 km o 6 meses</span>
         </div>
       </header>
