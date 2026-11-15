@@ -117,16 +117,9 @@ export default function AnnouncementsFeedPage() {
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             Plataforma SaaS
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
-              Novedades del Sistema
-            </h1>
-            {unreadCount > 0 && (
-              <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                {unreadCount} {unreadCount === 1 ? 'nueva' : 'nuevas'}
-              </span>
-            )}
-          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
+            Novedades del Sistema
+          </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             Historial de versiones de Torcly, mejoras operativas, tutoriales en
             video y avisos preventivos de mantenimiento de la plataforma.

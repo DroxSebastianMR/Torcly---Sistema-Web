@@ -60,7 +60,28 @@ conflicto controlado, nunca con error 500.
 
 **Esperado:** prioridad crítica desde 5,000 km o seis meses, filtros correctos y aislamiento por organización.
 
-## 6. Soporte de plataforma
+## 6. Ajustes de interfaz operativa
+
+1. Atiende una cita y verifica que kilometraje y combustible sean opcionales,
+   sin controles de peritaje.
+2. Crea una orden directa, alterna cliente nuevo y confirma que no hay
+   checklist de recepción; combustible y kilometraje se muestran juntos y son
+   opcionales.
+3. Abre una decisión de presupuesto y despliega el selector; el diálogo no
+   deja espacio vertical sobrante y la lista permanece navegable.
+4. Realiza un cobro mixto y verifica que ambos métodos usan `SmartSelect` y
+   que el botón principal conserva el verde estándar.
+5. Crea una cotización: los dos botones deben decir **Agregar** y usar los
+   componentes de fecha y selección propios de Torcly.
+6. Comprueba que Cotizaciones tiene eyebrow, título y descripción como Ventas;
+   en Notificaciones y Novedades no deben verse insignias de conteo junto al
+   título.
+
+**Esperado:** no hay controles nativos ni estilos ajenos al sistema de diseño,
+los diálogos se adaptan sin recortes y los contadores sólo permanecen en el
+sidebar y la campana.
+
+## 7. Soporte de plataforma
 
 1. Inicia sesión como administrador de plataforma.
 2. Abre la organización Taller A e ingresa a modo soporte.

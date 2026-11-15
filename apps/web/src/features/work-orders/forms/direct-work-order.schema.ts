@@ -42,17 +42,9 @@ export const directWorkOrderFormSchema = z
       .trim()
       .max(500, 'Las observaciones no pueden exceder los 500 caracteres.')
       .optional(),
-    receptionFuelLevel: z.enum(['E', '1/4', '1/2', '3/4', 'F']),
-    hasSpareTire: z.boolean(),
-    hasJackAndTools: z.boolean(),
-    hasVehicleDocuments: z.boolean(),
-    hasRadioFaceplate: z.boolean(),
-    externalDamageNotes: z
-      .string()
-      .trim()
-      .max(1000, 'Los daños externos no pueden exceder los 1000 caracteres.')
-      .optional(),
-    photoUrls: z.string().optional(),
+    receptionFuelLevel: z
+      .enum(['E', '1/4', '1/2', '3/4', 'F'])
+      .or(z.literal('')),
   })
   .superRefine((values, context) => {
     if (!values.isNewCustomer) {

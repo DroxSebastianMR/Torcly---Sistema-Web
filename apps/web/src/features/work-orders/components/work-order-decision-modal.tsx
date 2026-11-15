@@ -106,7 +106,7 @@ export function WorkOrderDecisionModal({
       description={
         order ? `Presupuesto enviado de la orden ${order.code}.` : undefined
       }
-      className="max-w-xl min-h-[540px]"
+      className="max-w-xl"
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button type="button" variant="outline" onClick={backToDetail}>

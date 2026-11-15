@@ -51,13 +51,7 @@ const defaultValues: DirectWorkOrderFormValues = {
   vehicleYear: new Date().getFullYear(),
   currentMileage: null,
   receptionNotes: '',
-  receptionFuelLevel: '1/2',
-  hasSpareTire: false,
-  hasJackAndTools: false,
-  hasVehicleDocuments: false,
-  hasRadioFaceplate: false,
-  externalDamageNotes: '',
-  photoUrls: '',
+  receptionFuelLevel: '',
 }
 
 export function DirectWorkOrderModal({
@@ -206,26 +200,16 @@ export function DirectWorkOrderModal({
         customerId: finalCustomerId,
         vehicleId: finalVehicleId,
         currentMileage: values.currentMileage ?? null,
-        fuelLevel: {
-          E: 'EMPTY',
-          '1/4': 'QUARTER',
-          '1/2': 'HALF',
-          '3/4': 'THREE_QUARTERS',
-          F: 'FULL',
-        }[values.receptionFuelLevel],
+        fuelLevel: values.receptionFuelLevel
+          ? {
+              E: 'EMPTY',
+              '1/4': 'QUARTER',
+              '1/2': 'HALF',
+              '3/4': 'THREE_QUARTERS',
+              F: 'FULL',
+            }[values.receptionFuelLevel]
+          : null,
         receptionNotes: values.receptionNotes?.trim() || null,
-        receptionChecklist: {
-          fuelLevel: values.receptionFuelLevel,
-          hasSpareTire: values.hasSpareTire,
-          hasJackAndTools: values.hasJackAndTools,
-          hasVehicleDocuments: values.hasVehicleDocuments,
-          hasRadioFaceplate: values.hasRadioFaceplate,
-          externalDamageNotes: values.externalDamageNotes?.trim() || null,
-          photos: (values.photoUrls ?? '')
-            .split(/\r?\n|,/)
-            .map((url) => url.trim())
-            .filter(Boolean),
-        },
       })
 
       toast.success(
@@ -309,9 +293,9 @@ export function DirectWorkOrderModal({
 
         {/* Sección de Cliente y Vehículo */}
         {isNewCustomer ? (
-          <div className="space-y-4 rounded-xl border border-emerald-500/30 bg-emerald-50/30 p-3.5 dark:bg-emerald-950/20">
+          <div className="space-y-4 rounded-xl border border-border bg-muted/20 p-4">
             <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
+              <span className="text-xs font-semibold uppercase tracking-wider text-primary">
                 1. Datos del Nuevo Cliente
               </span>
 
@@ -470,8 +454,8 @@ export function DirectWorkOrderModal({
             </div>
 
             {/* Datos del vehículo del nuevo cliente */}
-            <div className="space-y-2 border-t border-emerald-500/20 pt-3">
-              <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
+            <div className="space-y-2 border-t border-border pt-3">
+              <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
                 <Car className="size-3.5" />
                 2. Vehículo a Ingresar
               </span>
@@ -634,21 +618,47 @@ export function DirectWorkOrderModal({
           </>
         )}
 
-        {/* Checklist de Recepción */}
-        <fieldset className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-3.5">
-          <legend className="px-1 text-sm font-semibold">
-            Checklist de recepción
-          </legend>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label
+              htmlFor="directCurrentMileage"
+              className="flex items-center gap-1.5 text-sm font-medium"
+            >
+              <Gauge size={14} className="text-muted-foreground" />
+              Kilometraje actual (opcional)
+            </label>
+            <Input
+              id="directCurrentMileage"
+              type="number"
+              min={0}
+              placeholder="Ej. 45000"
+              {...register('currentMileage', {
+                setValueAs: (v) =>
+                  v === '' ||
+                  v === null ||
+                  v === undefined ||
+                  Number.isNaN(Number(v))
+                    ? null
+                    : Number(v),
+              })}
+              aria-invalid={Boolean(errors.currentMileage)}
+            />
+            {errors.currentMileage && (
+              <p className="text-xs font-medium text-destructive" role="alert">
+                {errors.currentMileage.message}
+              </p>
+            )}
+          </div>
           <div className="space-y-1.5">
             <label
               htmlFor="directReceptionFuelLevel"
               className="text-sm font-medium"
             >
-              Combustible al recibir
+              Combustible al recibir (opcional)
             </label>
             <SmartSelect
               id="directReceptionFuelLevel"
-              placeholder="Selecciona el nivel…"
+              placeholder="No registrar combustible"
               options={receptionFuelLevelOptions.map((option) => ({
                 value: option.value,
                 label: option.label,
@@ -658,94 +668,11 @@ export function DirectWorkOrderModal({
                 setValue(
                   'receptionFuelLevel',
                   value as DirectWorkOrderFormValues['receptionFuelLevel'],
-                  {
-                    shouldValidate: true,
-                  },
+                  { shouldValidate: true },
                 )
               }
             />
           </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {(
-              [
-                ['hasSpareTire', 'Llanta de repuesto'],
-                ['hasJackAndTools', 'Gata y herramientas'],
-                ['hasVehicleDocuments', 'Documentos del vehículo'],
-                ['hasRadioFaceplate', 'Panel de radio'],
-              ] as const
-            ).map(([name, label]) => (
-              <label
-                key={name}
-                className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  className="size-4 accent-brand-forest"
-                  {...register(name)}
-                />
-                {label}: <span className="font-medium">Sí</span>
-              </label>
-            ))}
-          </div>
-          <div className="space-y-1.5">
-            <label
-              htmlFor="externalDamageNotes"
-              className="text-sm font-medium"
-            >
-              Daños externos observados
-            </label>
-            <textarea
-              id="externalDamageNotes"
-              rows={2}
-              placeholder="Describe rayones, golpes u observaciones visibles…"
-              className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring"
-              {...register('externalDamageNotes')}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label htmlFor="photoUrls" className="text-sm font-medium">
-              Fotos (URLs, una por línea)
-            </label>
-            <textarea
-              id="photoUrls"
-              rows={2}
-              placeholder="https://…"
-              className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring"
-              {...register('photoUrls')}
-            />
-          </div>
-        </fieldset>
-
-        {/* Kilometraje actual */}
-        <div className="space-y-1.5">
-          <label
-            htmlFor="directCurrentMileage"
-            className="flex items-center gap-1.5 text-sm font-medium"
-          >
-            <Gauge size={14} className="text-muted-foreground" />
-            Kilometraje actual (km)
-          </label>
-          <Input
-            id="directCurrentMileage"
-            type="number"
-            min={0}
-            placeholder="Ej. 45000"
-            {...register('currentMileage', {
-              setValueAs: (v) =>
-                v === '' ||
-                v === null ||
-                v === undefined ||
-                Number.isNaN(Number(v))
-                  ? null
-                  : Number(v),
-            })}
-            aria-invalid={Boolean(errors.currentMileage)}
-          />
-          {errors.currentMileage && (
-            <p className="text-xs font-medium text-destructive" role="alert">
-              {errors.currentMileage.message}
-            </p>
-          )}
         </div>
 
         {/* Motivo de ingreso */}

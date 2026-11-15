@@ -9,7 +9,9 @@ import {
   Clock,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
+import { SmartSelect } from '@/components/ui/smart-select'
 import { currencyFormatter } from '../utils/sale-formatters'
 import type {
   ImmediatePaymentMethod,
@@ -25,6 +27,13 @@ interface SalePaymentModalProps {
   onConfirmAndPay: (input: SaleConfirmAndPayInput) => Promise<void>
   onConfirmPending: () => Promise<void>
 }
+
+const paymentMethodOptions = [
+  { value: 'CASH', label: 'Efectivo' },
+  { value: 'DIGITAL_WALLET', label: 'Yape / Plin' },
+  { value: 'CARD', label: 'Tarjeta' },
+  { value: 'TRANSFER', label: 'Transferencia' },
+]
 
 export function SalePaymentModal({
   open,
@@ -131,7 +140,6 @@ export function SalePaymentModal({
               type="button"
               disabled={loading || (method === 'CASH' && cashReceived < total)}
               onClick={handlePay}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               <CheckCircle2 size={16} className="mr-1.5" />
               {loading ? 'Procesando…' : 'Cobrar y Finalizar'}
@@ -247,13 +255,13 @@ export function SalePaymentModal({
               <label className="text-xs font-semibold text-foreground">
                 Monto recibido en efectivo (S/)
               </label>
-              <input
+              <Input
                 type="number"
                 min="0"
                 step="0.5"
                 value={cashReceived || ''}
                 onChange={(e) => setCashReceived(Number(e.target.value))}
-                className="h-11 w-full rounded-lg border border-input bg-background px-3 text-lg font-bold tabular-nums text-foreground focus-visible:outline-2 focus-visible:outline-primary"
+                className="text-lg font-bold tabular-nums"
               />
             </div>
 
@@ -305,20 +313,16 @@ export function SalePaymentModal({
               Desglose de montos por método
             </p>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <select
+              <div className="space-y-2">
+                <SmartSelect
                   value={mixedMethod1}
-                  onChange={(e) =>
-                    setMixedMethod1(e.target.value as typeof mixedMethod1)
+                  aria-label="Primer método de pago"
+                  options={paymentMethodOptions}
+                  onChange={(value) =>
+                    setMixedMethod1(value as typeof mixedMethod1)
                   }
-                  className="h-9 w-full rounded-lg border border-input bg-background px-2 text-xs"
-                >
-                  <option value="CASH">Efectivo</option>
-                  <option value="DIGITAL_WALLET">Yape / Plin</option>
-                  <option value="CARD">Tarjeta</option>
-                  <option value="TRANSFER">Transferencia</option>
-                </select>
-                <input
+                />
+                <Input
                   type="number"
                   min="0"
                   step="0.1"
@@ -333,30 +337,24 @@ export function SalePaymentModal({
                       ),
                     )
                   }}
-                  className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm font-semibold tabular-nums"
                 />
               </div>
 
-              <div className="space-y-1">
-                <select
+              <div className="space-y-2">
+                <SmartSelect
                   value={mixedMethod2}
-                  onChange={(e) =>
-                    setMixedMethod2(e.target.value as typeof mixedMethod2)
+                  aria-label="Segundo método de pago"
+                  options={paymentMethodOptions}
+                  onChange={(value) =>
+                    setMixedMethod2(value as typeof mixedMethod2)
                   }
-                  className="h-9 w-full rounded-lg border border-input bg-background px-2 text-xs"
-                >
-                  <option value="DIGITAL_WALLET">Yape / Plin</option>
-                  <option value="CASH">Efectivo</option>
-                  <option value="CARD">Tarjeta</option>
-                  <option value="TRANSFER">Transferencia</option>
-                </select>
-                <input
+                />
+                <Input
                   type="number"
                   min="0"
                   step="0.1"
                   value={mixedAmount2}
                   onChange={(e) => setMixedAmount2(Number(e.target.value))}
-                  className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm font-semibold tabular-nums"
                 />
               </div>
             </div>
@@ -374,12 +372,12 @@ export function SalePaymentModal({
           <label className="text-xs font-medium text-muted-foreground">
             Referencia o notas del cobro (opcional)
           </label>
-          <input
+          <Input
             type="text"
             placeholder="N° operación, banco, observaciones…"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="h-9 w-full rounded-lg border border-input bg-background px-3 text-xs focus-visible:outline-2 focus-visible:outline-primary"
+            className="h-9 text-xs"
           />
         </div>
       </div>

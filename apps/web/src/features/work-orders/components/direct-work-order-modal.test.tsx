@@ -122,7 +122,7 @@ describe('DirectWorkOrderModal', () => {
     vi.restoreAllMocks()
   })
 
-  it('renderiza los campos de cliente, vehículo, kilometraje y combustible', () => {
+  it('renderiza los campos operativos sin el peritaje de recepción', () => {
     renderWithClient(<DirectWorkOrderModal open={true} onClose={vi.fn()} />)
 
     expect(screen.getByRole('dialog')).toBeTruthy()
@@ -133,8 +133,8 @@ describe('DirectWorkOrderModal', () => {
     expect(screen.getByLabelText(/^vehículo/i)).toBeTruthy()
     expect(screen.getByLabelText(/kilometraje actual/i)).toBeTruthy()
     expect(screen.getByLabelText(/combustible/i)).toBeTruthy()
-    expect(screen.getByLabelText(/llanta de repuesto/i)).toBeTruthy()
-    expect(screen.getByLabelText(/gata y herramientas/i)).toBeTruthy()
+    expect(screen.queryByText(/checklist de recepción/i)).toBeNull()
+    expect(screen.queryByLabelText(/llanta de repuesto/i)).toBeNull()
     expect(screen.getByLabelText(/¿es un cliente nuevo\?/i)).toBeTruthy()
   })
 

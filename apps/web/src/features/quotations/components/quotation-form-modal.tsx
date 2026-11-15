@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Modal } from '@/components/ui/modal'
 import {
   SmartSelect,
@@ -214,11 +215,7 @@ export function QuotationFormModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={
-        quotation
-          ? `Editar ${quotation.code}`
-          : 'Nueva Cotización / Presupuesto'
-      }
+      title={quotation ? `Editar ${quotation.code}` : 'Nueva cotización'}
       description="Elabora una proforma con repuestos y mano de obra para compartir con el cliente."
       className="max-w-3xl"
       footer={
@@ -301,11 +298,13 @@ export function QuotationFormModal({
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Válido hasta
             </label>
-            <input
-              type="date"
+            <DatePicker
+              id="quotation-valid-until"
               value={validUntil}
-              onChange={(e) => setValidUntil(e.target.value)}
-              className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
+              onChange={setValidUntil}
+              placeholder="Seleccionar fecha"
+              min={new Date().toISOString().slice(0, 10)}
+              align="right"
             />
           </div>
         </div>
@@ -335,7 +334,7 @@ export function QuotationFormModal({
               className="h-10 rounded-lg border border-input bg-background px-2 text-center text-sm font-semibold tabular-nums"
             />
             <Button type="button" variant="outline" onClick={addProduct}>
-              <Plus size={15} className="mr-1" /> Repuesto
+              <Plus size={15} className="mr-1" /> Agregar
             </Button>
           </div>
 
@@ -350,7 +349,7 @@ export function QuotationFormModal({
               onChange={setSelectedServiceId}
             />
             <Button type="button" variant="outline" onClick={addService}>
-              <Plus size={15} className="mr-1" /> Servicio
+              <Plus size={15} className="mr-1" /> Agregar
             </Button>
           </div>
         </div>
