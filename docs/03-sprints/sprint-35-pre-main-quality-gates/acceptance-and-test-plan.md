@@ -40,6 +40,18 @@
 
 **Esperado:** la venta queda confirmada, el pago queda registrado y el vuelto coincide exactamente con la diferencia.
 
+### Aislamiento de caja entre talleres
+
+1. En **Taller Desarrollo**, abre una caja y déjala abierta.
+2. En una sesión distinta de **Taller A**, abre Caja y registra una apertura.
+3. Confirma que ambas sesiones abiertas se visualizan únicamente dentro de su
+   respectivo taller.
+4. En Taller A intenta abrir una segunda caja.
+
+**Esperado:** Taller A puede abrir su propia caja aunque Taller Desarrollo tenga
+una abierta. Sólo la segunda apertura dentro de Taller A responde con un
+conflicto controlado, nunca con error 500.
+
 ## 5. Mantenimiento preventivo
 
 1. Desde Taller A abre **Mantenimiento preventivo**.
