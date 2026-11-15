@@ -268,54 +268,100 @@ export function WorkOrderDetailModal({
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-muted-foreground">Llanta de repuesto:</span>
-                    <span className={cn('font-semibold', order.receptionChecklist.hasSpareTire ? 'text-emerald-700' : 'text-muted-foreground')}>
+                    <span className="text-muted-foreground">
+                      Llanta de repuesto:
+                    </span>
+                    <span
+                      className={cn(
+                        'font-semibold',
+                        order.receptionChecklist.hasSpareTire
+                          ? 'text-emerald-700'
+                          : 'text-muted-foreground',
+                      )}
+                    >
                       {order.receptionChecklist.hasSpareTire ? 'Sí' : 'No'}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-muted-foreground">Gata y herramientas:</span>
-                    <span className={cn('font-semibold', order.receptionChecklist.hasJackAndTools ? 'text-emerald-700' : 'text-muted-foreground')}>
+                    <span className="text-muted-foreground">
+                      Gata y herramientas:
+                    </span>
+                    <span
+                      className={cn(
+                        'font-semibold',
+                        order.receptionChecklist.hasJackAndTools
+                          ? 'text-emerald-700'
+                          : 'text-muted-foreground',
+                      )}
+                    >
                       {order.receptionChecklist.hasJackAndTools ? 'Sí' : 'No'}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-muted-foreground">Documentos del vehículo:</span>
-                    <span className={cn('font-semibold', order.receptionChecklist.hasVehicleDocuments ? 'text-emerald-700' : 'text-muted-foreground')}>
-                      {order.receptionChecklist.hasVehicleDocuments ? 'Sí' : 'No'}
+                    <span className="text-muted-foreground">
+                      Documentos del vehículo:
+                    </span>
+                    <span
+                      className={cn(
+                        'font-semibold',
+                        order.receptionChecklist.hasVehicleDocuments
+                          ? 'text-emerald-700'
+                          : 'text-muted-foreground',
+                      )}
+                    >
+                      {order.receptionChecklist.hasVehicleDocuments
+                        ? 'Sí'
+                        : 'No'}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-muted-foreground">Panel de radio:</span>
-                    <span className={cn('font-semibold', order.receptionChecklist.hasRadioFaceplate ? 'text-emerald-700' : 'text-muted-foreground')}>
+                    <span className="text-muted-foreground">
+                      Panel de radio:
+                    </span>
+                    <span
+                      className={cn(
+                        'font-semibold',
+                        order.receptionChecklist.hasRadioFaceplate
+                          ? 'text-emerald-700'
+                          : 'text-muted-foreground',
+                      )}
+                    >
                       {order.receptionChecklist.hasRadioFaceplate ? 'Sí' : 'No'}
                     </span>
                   </div>
                 </div>
                 {order.receptionChecklist.externalDamageNotes && (
                   <div className="pt-1 border-t border-border/60">
-                    <span className="font-semibold text-muted-foreground block mb-0.5">Daños externos observados:</span>
-                    <p className="text-foreground">{order.receptionChecklist.externalDamageNotes}</p>
+                    <span className="font-semibold text-muted-foreground block mb-0.5">
+                      Daños externos observados:
+                    </span>
+                    <p className="text-foreground">
+                      {order.receptionChecklist.externalDamageNotes}
+                    </p>
                   </div>
                 )}
-                {order.receptionChecklist.photos && order.receptionChecklist.photos.length > 0 && (
-                  <div className="pt-1 border-t border-border/60 space-y-1">
-                    <span className="font-semibold text-muted-foreground block mb-0.5">Fotos registradas ({order.receptionChecklist.photos.length}):</span>
-                    <div className="flex flex-wrap gap-2">
-                      {order.receptionChecklist.photos.map((url, idx) => (
-                        <a
-                          key={idx}
-                          href={url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-background border text-primary hover:underline"
-                        >
-                          Foto {idx + 1}
-                        </a>
-                      ))}
+                {order.receptionChecklist.photos &&
+                  order.receptionChecklist.photos.length > 0 && (
+                    <div className="pt-1 border-t border-border/60 space-y-1">
+                      <span className="font-semibold text-muted-foreground block mb-0.5">
+                        Fotos registradas (
+                        {order.receptionChecklist.photos.length}):
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {order.receptionChecklist.photos.map((url, idx) => (
+                          <a
+                            key={idx}
+                            href={url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-background border text-primary hover:underline"
+                          >
+                            Foto {idx + 1}
+                          </a>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             )}
           </div>

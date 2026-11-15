@@ -53,7 +53,9 @@ export default function Page() {
   const [searchParams, setSearchParams] = useSearchParams()
   const tabParam = searchParams.get('tab')
   const activeTab: WorkshopTab =
-    tabParam === 'appointments' || tabParam === 'citas' ? 'appointments' : 'orders'
+    tabParam === 'appointments' || tabParam === 'citas'
+      ? 'appointments'
+      : 'orders'
 
   const handleTabChange = (tab: WorkshopTab) => {
     setSearchParams(tab === 'appointments' ? { tab: 'citas' } : {})
@@ -240,10 +242,7 @@ export default function Page() {
         description="Control unificado de órdenes de trabajo en patio y agenda de citas programadas."
       >
         {activeTab === 'orders' && canWrite && (
-          <Button
-            onClick={() => setDirectOrderOpen(true)}
-            className="gap-1.5"
-          >
+          <Button onClick={() => setDirectOrderOpen(true)} className="gap-1.5">
             <Plus size={17} />
             Nueva orden directa
           </Button>

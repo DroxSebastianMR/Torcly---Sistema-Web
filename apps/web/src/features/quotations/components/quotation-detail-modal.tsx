@@ -92,12 +92,15 @@ export function QuotationDetailModal({
             {quotation.validUntil && (
               <p className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
                 <Calendar size={13} />
-                Válido hasta: {dateFormatter.format(new Date(quotation.validUntil))}
+                Válido hasta:{' '}
+                {dateFormatter.format(new Date(quotation.validUntil))}
               </p>
             )}
           </div>
           <div className="text-right">
-            <span className="text-xs text-muted-foreground">Total Presupuestado</span>
+            <span className="text-xs text-muted-foreground">
+              Total Presupuestado
+            </span>
             <p className="text-2xl font-black text-brand-forest tabular-nums">
               {currencyFormatter.format(quotation.total)}
             </p>
@@ -111,7 +114,9 @@ export function QuotationDetailModal({
               <User size={14} /> Cliente
             </p>
             <p className="text-sm font-semibold text-foreground">
-              {quotation.customer ? quotation.customer.name : 'Sin cliente asignado'}
+              {quotation.customer
+                ? quotation.customer.name
+                : 'Sin cliente asignado'}
             </p>
             {quotation.customer && (
               <p className="font-mono text-xs text-muted-foreground">
@@ -130,7 +135,9 @@ export function QuotationDetailModal({
                 : 'Vehículo tentativo'}
             </p>
             <p className="font-mono text-xs font-bold text-primary">
-              {quotation.vehicle?.plate || quotation.vehiclePlate || 'Sin placa'}
+              {quotation.vehicle?.plate ||
+                quotation.vehiclePlate ||
+                'Sin placa'}
             </p>
           </div>
         </div>
@@ -152,7 +159,8 @@ export function QuotationDetailModal({
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">{item.name}</p>
                     <p className="font-mono text-xs text-muted-foreground">
-                      {item.code} · {item.type === 'PRODUCT' ? 'Repuesto' : 'Mano de obra'}
+                      {item.code} ·{' '}
+                      {item.type === 'PRODUCT' ? 'Repuesto' : 'Mano de obra'}
                     </p>
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums text-muted-foreground">

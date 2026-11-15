@@ -14,8 +14,10 @@ const initialFilters: PreventiveMaintenanceFilters = {
 }
 
 export default function PreventiveMaintenancePage() {
-  const [filters, setFilters] = useState<PreventiveMaintenanceFilters>(initialFilters)
-  const { data, isLoading, isError, refetch } = usePreventiveMaintenance(filters)
+  const [filters, setFilters] =
+    useState<PreventiveMaintenanceFilters>(initialFilters)
+  const { data, isLoading, isError, refetch } =
+    usePreventiveMaintenance(filters)
 
   const items = data?.data ?? []
   const metrics = data?.metrics
@@ -32,8 +34,9 @@ export default function PreventiveMaintenancePage() {
             Mantenimiento Preventivo
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Detecta automáticamente vehículos que requieren cambio de aceite o servicio periódico
-            y genera campañas de contacto por WhatsApp para agendar su retorno al taller.
+            Detecta automáticamente vehículos que requieren cambio de aceite o
+            servicio periódico y genera campañas de contacto por WhatsApp para
+            agendar su retorno al taller.
           </p>
         </div>
 
@@ -44,7 +47,10 @@ export default function PreventiveMaintenancePage() {
       </header>
 
       {/* Tarjetas de métricas de parque vehicular */}
-      <PreventiveMaintenanceMetricsCards metrics={metrics} isLoading={isLoading} />
+      <PreventiveMaintenanceMetricsCards
+        metrics={metrics}
+        isLoading={isLoading}
+      />
 
       {/* Barra de herramientas y filtros */}
       <section className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
@@ -94,7 +100,8 @@ export default function PreventiveMaintenancePage() {
               Alertas y Oportunidades de Servicio
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Vehículos con recomendación de mantenimiento ordenados por prioridad de atención.
+              Vehículos con recomendación de mantenimiento ordenados por
+              prioridad de atención.
             </p>
           </div>
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">

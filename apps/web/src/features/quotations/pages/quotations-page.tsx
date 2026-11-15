@@ -63,7 +63,9 @@ export default function QuotationsPage() {
   const total = quotations.data?.pagination.total ?? 0
   const visibleQuotations = quotations.data?.data ?? []
 
-  const draftCount = visibleQuotations.filter((q) => q.status === 'DRAFT').length
+  const draftCount = visibleQuotations.filter(
+    (q) => q.status === 'DRAFT',
+  ).length
   const sentCount = visibleQuotations.filter((q) => q.status === 'SENT').length
   const approvedCount = visibleQuotations.filter(
     (q) => q.status === 'APPROVED',

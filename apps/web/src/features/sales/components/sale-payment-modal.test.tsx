@@ -67,7 +67,9 @@ describe('SalePaymentModal', () => {
     expect(screen.getByText(/Vuelto a entregar/i)).toBeTruthy()
 
     // Clic en registrar cobro
-    const submitBtn = screen.getByRole('button', { name: /Cobrar y Finalizar/i })
+    const submitBtn = screen.getByRole('button', {
+      name: /Cobrar y Finalizar/i,
+    })
     fireEvent.click(submitBtn)
 
     await waitFor(() => {
@@ -95,7 +97,9 @@ describe('SalePaymentModal', () => {
     const yapeBtn = screen.getByRole('button', { name: /Yape \/ Plin/i })
     fireEvent.click(yapeBtn)
 
-    const submitBtn = screen.getByRole('button', { name: /Cobrar y Finalizar/i })
+    const submitBtn = screen.getByRole('button', {
+      name: /Cobrar y Finalizar/i,
+    })
     fireEvent.click(submitBtn)
 
     await waitFor(() => {

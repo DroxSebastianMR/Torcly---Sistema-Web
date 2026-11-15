@@ -2,6 +2,16 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { preventiveMaintenanceService } from '../src/modules/preventive-maintenance/preventive-maintenance.service.js'
 import { databaseService } from '../src/infrastructure/database/prisma.service.js'
 
+type VehiclesQueryResult = Awaited<
+  ReturnType<typeof databaseService.client.vehicle.findMany>
+>
+
+function mockVehicles(vehicles: unknown) {
+  return vi
+    .spyOn(databaseService.client.vehicle, 'findMany')
+    .mockResolvedValueOnce(vehicles as VehiclesQueryResult)
+}
+
 describe('Preventive Maintenance Service', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -11,7 +21,7 @@ describe('Preventive Maintenance Service', () => {
     const mockDate = new Date()
     mockDate.setDate(mockDate.getDate() - 200) // 200 days ago
 
-    vi.spyOn(databaseService.client.vehicle, 'findMany').mockResolvedValueOnce([
+    mockVehicles([
       {
         id: 'vehicle-1',
         plate: 'ABC-123',
@@ -47,7 +57,7 @@ describe('Preventive Maintenance Service', () => {
           },
         ],
       },
-    ] as any)
+    ])
 
     const result = await preventiveMaintenanceService.getReminders(
       'org-1',
@@ -68,7 +78,7 @@ describe('Preventive Maintenance Service', () => {
     const mockDate = new Date()
     mockDate.setDate(mockDate.getDate() - 160) // 160 days ago
 
-    vi.spyOn(databaseService.client.vehicle, 'findMany').mockResolvedValueOnce([
+    mockVehicles([
       {
         id: 'vehicle-2',
         plate: 'XYZ-789',
@@ -98,7 +108,7 @@ describe('Preventive Maintenance Service', () => {
           },
         ],
       },
-    ] as any)
+    ])
 
     const result = await preventiveMaintenanceService.getReminders(
       'org-1',
@@ -119,7 +129,7 @@ describe('Preventive Maintenance Service', () => {
     const upToDateDate = new Date()
     upToDateDate.setDate(upToDateDate.getDate() - 30)
 
-    vi.spyOn(databaseService.client.vehicle, 'findMany').mockResolvedValueOnce([
+    mockVehicles([
       {
         id: 'vehicle-1',
         plate: 'AAA-111',
@@ -131,8 +141,23 @@ describe('Preventive Maintenance Service', () => {
         updatedAt: criticalDate,
         organizationId: 'org-1',
         customerId: 'cust-1',
-        customer: { id: 'cust-1', firstName: 'A', lastName: 'B', phone: null, email: null },
-        workOrders: [{ id: 'wo-1', code: 'OT-1', deliveredAt: criticalDate, createdAt: criticalDate, currentMileage: 25000, lines: [] }],
+        customer: {
+          id: 'cust-1',
+          firstName: 'A',
+          lastName: 'B',
+          phone: null,
+          email: null,
+        },
+        workOrders: [
+          {
+            id: 'wo-1',
+            code: 'OT-1',
+            deliveredAt: criticalDate,
+            createdAt: criticalDate,
+            currentMileage: 25000,
+            lines: [],
+          },
+        ],
       },
       {
         id: 'vehicle-2',
@@ -145,10 +170,25 @@ describe('Preventive Maintenance Service', () => {
         updatedAt: upToDateDate,
         organizationId: 'org-1',
         customerId: 'cust-2',
-        customer: { id: 'cust-2', firstName: 'C', lastName: 'D', phone: null, email: null },
-        workOrders: [{ id: 'wo-2', code: 'OT-2', deliveredAt: upToDateDate, createdAt: upToDateDate, currentMileage: 12000, lines: [] }],
+        customer: {
+          id: 'cust-2',
+          firstName: 'C',
+          lastName: 'D',
+          phone: null,
+          email: null,
+        },
+        workOrders: [
+          {
+            id: 'wo-2',
+            code: 'OT-2',
+            deliveredAt: upToDateDate,
+            createdAt: upToDateDate,
+            currentMileage: 12000,
+            lines: [],
+          },
+        ],
       },
-    ] as any)
+    ])
 
     const result = await preventiveMaintenanceService.getReminders(
       'org-1',

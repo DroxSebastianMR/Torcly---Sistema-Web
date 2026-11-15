@@ -17,7 +17,9 @@ describe('PageHeader', () => {
     )
 
     expect(screen.getByText('Catálogo de clientes')).toBeTruthy()
-    expect(screen.getByRole('heading', { level: 1, name: 'Clientes' })).toBeTruthy()
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Clientes' }),
+    ).toBeTruthy()
     expect(
       screen.getByText('Gestión integral de clientes y unidades vehiculares.'),
     ).toBeTruthy()
@@ -30,7 +32,9 @@ describe('PageHeader', () => {
       </PageHeader>,
     )
 
-    expect(screen.getByRole('heading', { level: 1, name: 'Vehículos' })).toBeTruthy()
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Vehículos' }),
+    ).toBeTruthy()
     expect(
       screen.getByRole('button', { name: 'Registrar vehículo' }),
     ).toBeTruthy()

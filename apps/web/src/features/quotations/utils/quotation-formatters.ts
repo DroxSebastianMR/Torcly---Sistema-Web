@@ -1,4 +1,8 @@
-import type { QuotationDetail, QuotationStatus, QuotationSummary } from '../types/quotations.types'
+import type {
+  QuotationDetail,
+  QuotationStatus,
+  QuotationSummary,
+} from '../types/quotations.types'
 
 export const currencyFormatter = new Intl.NumberFormat('es-PE', {
   style: 'currency',

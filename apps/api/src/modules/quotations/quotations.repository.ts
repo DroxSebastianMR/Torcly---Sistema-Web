@@ -86,6 +86,16 @@ const quotationDetailInclude = {
   },
 } satisfies Prisma.QuotationInclude
 
+export type QuotationSummaryRecord = Prisma.QuotationGetPayload<{
+  select: typeof quotationSummarySelect
+}>
+
+export type QuotationDetailRecord = Prisma.QuotationGetPayload<{
+  include: typeof quotationDetailInclude
+}>
+
+export type QuotationItemRecord = QuotationDetailRecord['items'][number]
+
 function auditData(
   event: AuditEventType,
   actorId: string,
@@ -131,7 +141,9 @@ export const quotationsRepository = {
                     { firstName: { contains: search, mode: 'insensitive' } },
                     { lastName: { contains: search, mode: 'insensitive' } },
                     { legalName: { contains: search, mode: 'insensitive' } },
-                    { documentNumber: { contains: search, mode: 'insensitive' } },
+                    {
+                      documentNumber: { contains: search, mode: 'insensitive' },
+                    },
                   ],
                 },
               },
@@ -199,11 +211,12 @@ export const quotationsRepository = {
               unitLabel: item.unitLabel ?? null,
               unitPrice: Number(item.unitPrice ?? 0),
               quantity: Number(item.quantity ?? 1),
-              subtotal: Math.round(
-                (Number(item.unitPrice ?? 0) * Number(item.quantity ?? 1) +
-                  Number.EPSILON) *
-                  100,
-              ) / 100,
+              subtotal:
+                Math.round(
+                  (Number(item.unitPrice ?? 0) * Number(item.quantity ?? 1) +
+                    Number.EPSILON) *
+                    100,
+                ) / 100,
             })),
           },
         },
@@ -211,13 +224,19 @@ export const quotationsRepository = {
       })
 
       await transaction.auditLog.create({
-        data: auditData('QUOTATION_CREATED', actor.id, quotation.code, context, {
-          quotationId: quotation.id,
-          code: quotation.code,
-          subtotal,
-          total,
-          itemCount: quotation.items.length,
-        }),
+        data: auditData(
+          'QUOTATION_CREATED',
+          actor.id,
+          quotation.code,
+          context,
+          {
+            quotationId: quotation.id,
+            code: quotation.code,
+            subtotal,
+            total,
+            itemCount: quotation.items.length,
+          },
+        ),
       })
 
       return quotation
@@ -236,7 +255,11 @@ export const quotationsRepository = {
         where: { id, organizationId },
       })
       if (!existing)
-        throw new AppError(404, 'QUOTATION_NOT_FOUND', 'Cotización no encontrada.')
+        throw new AppError(
+          404,
+          'QUOTATION_NOT_FOUND',
+          'Cotización no encontrada.',
+        )
       if (existing.status === 'APPROVED') {
         throw new AppError(
           409,
@@ -277,11 +300,12 @@ export const quotationsRepository = {
               unitLabel: item.unitLabel ?? null,
               unitPrice: Number(item.unitPrice ?? 0),
               quantity: Number(item.quantity ?? 1),
-              subtotal: Math.round(
-                (Number(item.unitPrice ?? 0) * Number(item.quantity ?? 1) +
-                  Number.EPSILON) *
-                  100,
-              ) / 100,
+              subtotal:
+                Math.round(
+                  (Number(item.unitPrice ?? 0) * Number(item.quantity ?? 1) +
+                    Number.EPSILON) *
+                    100,
+                ) / 100,
             })),
           },
         },
@@ -314,7 +338,11 @@ export const quotationsRepository = {
         include: { items: true },
       })
       if (!quotation)
-        throw new AppError(404, 'QUOTATION_NOT_FOUND', 'Cotización no encontrada.')
+        throw new AppError(
+          404,
+          'QUOTATION_NOT_FOUND',
+          'Cotización no encontrada.',
+        )
       if (quotation.status === 'APPROVED' || quotation.workOrderId) {
         throw new AppError(
           409,

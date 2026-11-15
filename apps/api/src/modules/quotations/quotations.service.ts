@@ -1,7 +1,12 @@
 import { AppError } from '../../shared/errors/app-error.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import { assertHasItems } from './quotations.rules.js'
-import { quotationsRepository } from './quotations.repository.js'
+import {
+  quotationsRepository,
+  type QuotationDetailRecord,
+  type QuotationItemRecord,
+  type QuotationSummaryRecord,
+} from './quotations.repository.js'
 import type {
   QuotationCreateInput,
   QuotationDetail,
@@ -13,7 +18,9 @@ import type {
 
 type Actor = { id: string; name: string }
 
-function toCustomerRef(customer: any) {
+type QuotationRecord = QuotationSummaryRecord | QuotationDetailRecord
+
+function toCustomerRef(customer: QuotationRecord['customer']) {
   if (!customer) return null
   return {
     id: customer.id,
@@ -27,7 +34,7 @@ function toCustomerRef(customer: any) {
   }
 }
 
-function toVehicleRef(vehicle: any) {
+function toVehicleRef(vehicle: QuotationRecord['vehicle']) {
   if (!vehicle) return null
   return {
     id: vehicle.id,
@@ -38,7 +45,7 @@ function toVehicleRef(vehicle: any) {
   }
 }
 
-function toItemResponse(item: any): QuotationItemResponse {
+function toItemResponse(item: QuotationItemRecord): QuotationItemResponse {
   return {
     id: item.id,
     type: item.type,
@@ -53,7 +60,7 @@ function toItemResponse(item: any): QuotationItemResponse {
   }
 }
 
-function toSummary(quotation: any): QuotationSummary {
+function toSummary(quotation: QuotationRecord): QuotationSummary {
   return {
     id: quotation.id,
     code: quotation.code,
@@ -63,17 +70,20 @@ function toSummary(quotation: any): QuotationSummary {
     status: quotation.status,
     subtotal: Number(quotation.subtotal),
     total: Number(quotation.total),
-    validUntil: quotation.validUntil ? quotation.validUntil.toISOString() : null,
+    validUntil: quotation.validUntil
+      ? quotation.validUntil.toISOString()
+      : null,
     notes: quotation.notes ?? null,
     workOrderId: quotation.workOrderId ?? null,
     createdBy: quotation.createdBy,
     createdAt: quotation.createdAt.toISOString(),
     updatedAt: quotation.updatedAt.toISOString(),
-    itemCount: quotation._count?.items ?? quotation.items?.length ?? 0,
+    itemCount:
+      'items' in quotation ? quotation.items.length : quotation._count.items,
   }
 }
 
-function toDetail(quotation: any): QuotationDetail {
+function toDetail(quotation: QuotationDetailRecord): QuotationDetail {
   return {
     ...toSummary(quotation),
     items: quotation.items.map(toItemResponse),
@@ -97,7 +107,11 @@ export const quotationsService = {
   async getById(id: string, organizationId: string) {
     const quotation = await quotationsRepository.findById(id, organizationId)
     if (!quotation) {
-      throw new AppError(404, 'QUOTATION_NOT_FOUND', 'Cotización no encontrada.')
+      throw new AppError(
+        404,
+        'QUOTATION_NOT_FOUND',
+        'Cotización no encontrada.',
+      )
     }
     return { data: toDetail(quotation) }
   },

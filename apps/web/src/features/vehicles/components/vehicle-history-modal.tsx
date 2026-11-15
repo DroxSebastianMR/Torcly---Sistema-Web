@@ -12,7 +12,10 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
 import { Modal } from '@/components/ui/modal'
-import { dateFormatter, documentLabel } from '@/features/customers/utils/customer-formatters'
+import {
+  dateFormatter,
+  documentLabel,
+} from '@/features/customers/utils/customer-formatters'
 import { useVehicleHistory } from '../hooks/use-vehicles'
 import type { Vehicle } from '../types/vehicles.types'
 import { vehicleOwnerDisplay } from '../utils/vehicle-formatters'
@@ -119,7 +122,8 @@ export function VehicleHistoryModal({
                   <span className="font-semibold text-foreground">
                     {vehicleOwnerDisplay(vehicle.owner)}
                   </span>{' '}
-                  · {documentLabel(vehicle.owner.type)} {vehicle.owner.documentNumber}
+                  · {documentLabel(vehicle.owner.type)}{' '}
+                  {vehicle.owner.documentNumber}
                 </p>
               </div>
 
@@ -143,7 +147,9 @@ export function VehicleHistoryModal({
                 <p className="mt-1.5 text-xl font-bold tracking-tight text-foreground">
                   {history.summary.totalVisits}{' '}
                   <span className="text-xs font-normal text-muted-foreground">
-                    {history.summary.totalVisits === 1 ? 'atención' : 'atenciones'}
+                    {history.summary.totalVisits === 1
+                      ? 'atención'
+                      : 'atenciones'}
                   </span>
                 </p>
               </div>
@@ -210,7 +216,9 @@ export function VehicleHistoryModal({
                             {statusLabels[entry.status] ?? entry.status}
                           </span>
                           <span className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
-                            {entry.source === 'APPOINTMENT' ? 'Con cita' : 'Directa'}
+                            {entry.source === 'APPOINTMENT'
+                              ? 'Con cita'
+                              : 'Directa'}
                           </span>
                         </div>
 
@@ -226,14 +234,17 @@ export function VehicleHistoryModal({
                           )}
                           {entry.technician && (
                             <span className="flex items-center gap-1">
-                              <User size={13} /> Mecánico: {entry.technician.fullName}
+                              <User size={13} /> Mecánico:{' '}
+                              {entry.technician.fullName}
                             </span>
                           )}
                         </div>
                       </div>
 
                       <div className="text-left sm:text-right">
-                        <span className="text-xs text-muted-foreground">Total orden:</span>
+                        <span className="text-xs text-muted-foreground">
+                          Total orden:
+                        </span>
                         <p className="text-base font-bold text-brand-forest">
                           S/ {entry.total.toFixed(2)}
                         </p>
@@ -267,8 +278,8 @@ export function VehicleHistoryModal({
                       {/* Servicios */}
                       <div className="rounded-xl border border-border/70 p-3">
                         <p className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
-                          <Wrench size={13} className="text-primary" /> Servicios realizados (
-                          {entry.services.length})
+                          <Wrench size={13} className="text-primary" />{' '}
+                          Servicios realizados ({entry.services.length})
                         </p>
                         {entry.services.length === 0 ? (
                           <p className="mt-1 text-xs text-muted-foreground">
@@ -281,7 +292,9 @@ export function VehicleHistoryModal({
                                 key={srv.id}
                                 className="flex items-center justify-between pt-1"
                               >
-                                <span className="truncate pr-2">{srv.name}</span>
+                                <span className="truncate pr-2">
+                                  {srv.name}
+                                </span>
                                 <span className="font-medium text-foreground tabular-nums shrink-0">
                                   S/ {srv.subtotal.toFixed(2)}
                                 </span>
@@ -294,8 +307,8 @@ export function VehicleHistoryModal({
                       {/* Repuestos */}
                       <div className="rounded-xl border border-border/70 p-3">
                         <p className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
-                          <Package size={13} className="text-emerald-600" /> Repuestos y consumibles (
-                          {entry.parts.length})
+                          <Package size={13} className="text-emerald-600" />{' '}
+                          Repuestos y consumibles ({entry.parts.length})
                         </p>
                         {entry.parts.length === 0 ? (
                           <p className="mt-1 text-xs text-muted-foreground">
@@ -309,7 +322,8 @@ export function VehicleHistoryModal({
                                 className="flex items-center justify-between pt-1"
                               >
                                 <span className="truncate pr-2">
-                                  {prt.quantity} {prt.unitLabel ?? 'und'} · {prt.name}
+                                  {prt.quantity} {prt.unitLabel ?? 'und'} ·{' '}
+                                  {prt.name}
                                 </span>
                                 <span className="font-medium text-foreground tabular-nums shrink-0">
                                   S/ {prt.subtotal.toFixed(2)}

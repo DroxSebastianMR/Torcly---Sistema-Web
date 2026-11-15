@@ -40,7 +40,10 @@ export function QuotationFormModal({
   onSubmit,
 }: QuotationFormModalProps) {
   const catalog = useSaleCatalog(open)
-  const customers = useCustomers({ search: '', type: 'all', page: 1, pageSize: 100 }, open)
+  const customers = useCustomers(
+    { search: '', type: 'all', page: 1, pageSize: 100 },
+    open,
+  )
   const vehicles = useVehicles({ search: '', page: 1, pageSize: 100 }, open)
 
   const [customerId, setCustomerId] = useState<string>(
@@ -182,7 +185,10 @@ export function QuotationFormModal({
   const total = useMemo(
     () =>
       items.reduce(
-        (sum, item) => sum + Math.round((item.unitPrice * item.quantity + Number.EPSILON) * 100) / 100,
+        (sum, item) =>
+          sum +
+          Math.round((item.unitPrice * item.quantity + Number.EPSILON) * 100) /
+            100,
         0,
       ),
     [items],
@@ -208,15 +214,28 @@ export function QuotationFormModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={quotation ? `Editar ${quotation.code}` : 'Nueva Cotización / Presupuesto'}
+      title={
+        quotation
+          ? `Editar ${quotation.code}`
+          : 'Nueva Cotización / Presupuesto'
+      }
       description="Elabora una proforma con repuestos y mano de obra para compartir con el cliente."
       className="max-w-3xl"
       footer={
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" disabled={loading} onClick={onClose}>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={loading}
+            onClick={onClose}
+          >
             Cancelar
           </Button>
-          <Button type="button" disabled={loading || items.length === 0} onClick={handleSubmit}>
+          <Button
+            type="button"
+            disabled={loading || items.length === 0}
+            onClick={handleSubmit}
+          >
             {loading ? 'Guardando…' : 'Guardar presupuesto'}
           </Button>
         </div>
@@ -354,7 +373,8 @@ export function QuotationFormModal({
                     {item.name}
                   </p>
                   <p className="font-mono text-xs text-muted-foreground">
-                    {item.code} · {item.type === 'PRODUCT' ? 'Repuesto' : 'Mano de obra'} ·{' '}
+                    {item.code} ·{' '}
+                    {item.type === 'PRODUCT' ? 'Repuesto' : 'Mano de obra'} ·{' '}
                     {currencyFormatter.format(item.unitPrice)}
                   </p>
                 </div>
@@ -397,7 +417,9 @@ export function QuotationFormModal({
               {items.length} {items.length === 1 ? 'ítem' : 'ítems'}
             </span>
             <div className="text-right">
-              <span className="text-xs text-muted-foreground mr-2">Total Presupuestado:</span>
+              <span className="text-xs text-muted-foreground mr-2">
+                Total Presupuestado:
+              </span>
               <span className="text-lg font-bold text-brand-forest tabular-nums">
                 {currencyFormatter.format(total)}
               </span>

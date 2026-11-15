@@ -243,9 +243,18 @@ describe('Formulario de productos', () => {
     expect(screen.getByText('Solo lectura')).toBeTruthy()
 
     const nameInput = screen.getByLabelText(/^nombre del producto/i)
+    await waitFor(() =>
+      expect((nameInput as HTMLInputElement).value).toBe('Filtro de aceite'),
+    )
     await user.clear(nameInput)
     await user.type(nameInput, 'Filtro premium')
-    await user.click(screen.getByRole('button', { name: 'Guardar producto' }))
+    const submitButton = screen.getByRole('button', {
+      name: 'Guardar producto',
+    })
+    await waitFor(() =>
+      expect((submitButton as HTMLButtonElement).disabled).toBe(false),
+    )
+    await user.click(submitButton)
 
     await waitFor(() =>
       expect(service.update).toHaveBeenCalledWith(

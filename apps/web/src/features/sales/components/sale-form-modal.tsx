@@ -340,210 +340,212 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
   return (
     <>
       <Modal
-      open={open}
-      onClose={closeModal}
-      title={isEditing ? 'Editar venta' : 'Nueva venta'}
-      description="Agrega productos y servicios; la venta queda en borrador hasta confirmarla."
-      className="max-w-3xl"
-      footer={
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={closeModal}>
-            Cancelar
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={busy}
-            onClick={() => void saveDraft()}
-          >
-            {busy ? 'Guardando…' : 'Guardar borrador'}
-          </Button>
-          <Button
-            type="button"
-            disabled={busy}
-            onClick={() => void startConfirm()}
-          >
-            {busy ? 'Confirmando…' : 'Confirmar venta'}
-          </Button>
-        </div>
-      }
-    >
-      <div className="space-y-5">
-        <Field label="Cliente" hint="Opcional">
-          <SmartSelect
-            value={customerId}
-            aria-label="Cliente de la venta"
-            placeholder="Seleccionar cliente"
-            searchPlaceholder="Buscar cliente o documento…"
-            emptyMessage="Sin clientes registrados."
-            options={customerOptions}
-            disabled={mutations.create.isPending}
-            onChange={(value) => setValue('customerId', value)}
-          />
-        </Field>
+        open={open}
+        onClose={closeModal}
+        title={isEditing ? 'Editar venta' : 'Nueva venta'}
+        description="Agrega productos y servicios; la venta queda en borrador hasta confirmarla."
+        className="max-w-3xl"
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button type="button" variant="outline" onClick={closeModal}>
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy}
+              onClick={() => void saveDraft()}
+            >
+              {busy ? 'Guardando…' : 'Guardar borrador'}
+            </Button>
+            <Button
+              type="button"
+              disabled={busy}
+              onClick={() => void startConfirm()}
+            >
+              {busy ? 'Confirmando…' : 'Confirmar venta'}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-5">
+          <Field label="Cliente" hint="Opcional">
+            <SmartSelect
+              value={customerId}
+              aria-label="Cliente de la venta"
+              placeholder="Seleccionar cliente"
+              searchPlaceholder="Buscar cliente o documento…"
+              emptyMessage="Sin clientes registrados."
+              options={customerOptions}
+              disabled={mutations.create.isPending}
+              onChange={(value) => setValue('customerId', value)}
+            />
+          </Field>
 
-        <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-          <Field label="Agregar producto" hint="Solo con stock disponible">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_6.5rem_auto]">
+          <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+            <Field label="Agregar producto" hint="Solo con stock disponible">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_6.5rem_auto]">
+                <SmartSelect
+                  value={selectedProductId}
+                  aria-label="Producto a vender"
+                  placeholder="Seleccionar producto"
+                  searchPlaceholder="Buscar producto…"
+                  emptyMessage="No hay productos activos."
+                  options={productOptions}
+                  disabled={!catalog.data || mutations.create.isPending}
+                  onChange={setSelectedProductId}
+                />
+                <Input
+                  type="number"
+                  min="0.001"
+                  step="0.001"
+                  aria-label="Cantidad del producto"
+                  value={addQuantity}
+                  onChange={(event) =>
+                    setValue('addQuantity', Number(event.target.value))
+                  }
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={mutations.create.isPending}
+                  onClick={addProduct}
+                >
+                  <Plus size={16} /> Agregar
+                </Button>
+              </div>
+            </Field>
+          </div>
+
+          <Field label="Agregar servicio">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
               <SmartSelect
-                value={selectedProductId}
-                aria-label="Producto a vender"
-                placeholder="Seleccionar producto"
-                searchPlaceholder="Buscar producto…"
-                emptyMessage="No hay productos activos."
-                options={productOptions}
+                value={selectedServiceId}
+                aria-label="Servicio a vender"
+                placeholder="Seleccionar servicio"
+                searchPlaceholder="Buscar servicio…"
+                emptyMessage="No hay servicios activos."
+                options={serviceOptions}
                 disabled={!catalog.data || mutations.create.isPending}
-                onChange={setSelectedProductId}
-              />
-              <Input
-                type="number"
-                min="0.001"
-                step="0.001"
-                aria-label="Cantidad del producto"
-                value={addQuantity}
-                onChange={(event) =>
-                  setValue('addQuantity', Number(event.target.value))
-                }
+                onChange={setSelectedServiceId}
               />
               <Button
                 type="button"
                 variant="outline"
                 disabled={mutations.create.isPending}
-                onClick={addProduct}
+                onClick={addService}
               >
                 <Plus size={16} /> Agregar
               </Button>
             </div>
           </Field>
-        </div>
 
-        <Field label="Agregar servicio">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
-            <SmartSelect
-              value={selectedServiceId}
-              aria-label="Servicio a vender"
-              placeholder="Seleccionar servicio"
-              searchPlaceholder="Buscar servicio…"
-              emptyMessage="No hay servicios activos."
-              options={serviceOptions}
-              disabled={!catalog.data || mutations.create.isPending}
-              onChange={setSelectedServiceId}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              disabled={mutations.create.isPending}
-              onClick={addService}
-            >
-              <Plus size={16} /> Agregar
-            </Button>
-          </div>
-        </Field>
-
-        <div className="overflow-hidden rounded-xl border">
-          <div className="divide-y">
-            {fields.length === 0 && (
-              <p className="px-4 py-6 text-center text-sm text-muted-foreground">
-                Aún no hay líneas. Agrega productos o servicios.
+          <div className="overflow-hidden rounded-xl border">
+            <div className="divide-y">
+              {fields.length === 0 && (
+                <p className="px-4 py-6 text-center text-sm text-muted-foreground">
+                  Aún no hay líneas. Agrega productos o servicios.
+                </p>
+              )}
+              {fields.map((field, index) => {
+                const line = field as SaleLineDraft
+                const invalidQuantity =
+                  !Number.isFinite(line.quantity) ||
+                  line.quantity <= 0 ||
+                  !hasAtMostThreeDecimals(line.quantity)
+                return (
+                  <div
+                    key={field.id}
+                    className="grid gap-3 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto_7rem_2.25rem_6.5rem_2.25rem] sm:items-center"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">
+                        {line.name}
+                      </p>
+                      <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+                        {line.code} · {currencyFormatter.format(line.unitPrice)}
+                      </p>
+                    </div>
+                    <span className="text-sm text-muted-foreground">Cant.</span>
+                    <input
+                      type="number"
+                      min="0.001"
+                      step="0.001"
+                      aria-label={`Cantidad de ${line.name}`}
+                      value={String(line.quantity)}
+                      onChange={(event) => {
+                        const nextQuantity = Number(event.target.value)
+                        if (!hasAtMostThreeDecimals(nextQuantity)) {
+                          toast.error(QUANTITY_MAX_DECIMALS_MESSAGE)
+                          return
+                        }
+                        updateQuantity(index, nextQuantity)
+                      }}
+                      className={`h-10 w-full rounded-lg border bg-background px-3 text-sm tabular-nums focus-visible:outline-2 focus-visible:outline-ring ${
+                        invalidQuantity ? 'border-red-500' : 'border-input'
+                      }`}
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      {line.unitLabel ?? ''}
+                    </span>
+                    <p className="text-right text-sm font-semibold tabular-nums">
+                      {currencyFormatter.format(saleLineSubtotal(line))}
+                    </p>
+                    <button
+                      type="button"
+                      aria-label={`Quitar ${line.name}`}
+                      onClick={() => remove(index)}
+                      className="flex size-9 items-center justify-center rounded-lg border text-muted-foreground hover:bg-red-50 hover:text-red-600"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+            {linesError && (
+              <p className="border-t px-4 py-2 text-xs text-red-600">
+                {String(linesError)}
               </p>
             )}
-            {fields.map((field, index) => {
-              const line = field as SaleLineDraft
-              const invalidQuantity =
-                !Number.isFinite(line.quantity) ||
-                line.quantity <= 0 ||
-                !hasAtMostThreeDecimals(line.quantity)
-              return (
-                <div
-                  key={field.id}
-                  className="grid gap-3 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto_7rem_2.25rem_6.5rem_2.25rem] sm:items-center"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{line.name}</p>
-                    <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-                      {line.code} · {currencyFormatter.format(line.unitPrice)}
-                    </p>
-                  </div>
-                  <span className="text-sm text-muted-foreground">Cant.</span>
-                  <input
-                    type="number"
-                    min="0.001"
-                    step="0.001"
-                    aria-label={`Cantidad de ${line.name}`}
-                    value={String(line.quantity)}
-                    onChange={(event) => {
-                      const nextQuantity = Number(event.target.value)
-                      if (!hasAtMostThreeDecimals(nextQuantity)) {
-                        toast.error(QUANTITY_MAX_DECIMALS_MESSAGE)
-                        return
-                      }
-                      updateQuantity(index, nextQuantity)
-                    }}
-                    className={`h-10 w-full rounded-lg border bg-background px-3 text-sm tabular-nums focus-visible:outline-2 focus-visible:outline-ring ${
-                      invalidQuantity ? 'border-red-500' : 'border-input'
-                    }`}
-                  />
-                  <span className="text-xs text-muted-foreground">
-                    {line.unitLabel ?? ''}
+            <div className="flex items-center justify-between border-t bg-[#f8faf9] px-4 py-3 text-sm">
+              <span className="text-muted-foreground">
+                {fields.length} {fields.length === 1 ? 'línea' : 'líneas'}
+              </span>
+              <div className="text-right">
+                <p className="flex justify-between gap-6 text-muted-foreground">
+                  Subtotal
+                  <span className="tabular-nums">
+                    {currencyFormatter.format(subtotal)}
                   </span>
-                  <p className="text-right text-sm font-semibold tabular-nums">
-                    {currencyFormatter.format(saleLineSubtotal(line))}
-                  </p>
-                  <button
-                    type="button"
-                    aria-label={`Quitar ${line.name}`}
-                    onClick={() => remove(index)}
-                    className="flex size-9 items-center justify-center rounded-lg border text-muted-foreground hover:bg-red-50 hover:text-red-600"
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-          {linesError && (
-            <p className="border-t px-4 py-2 text-xs text-red-600">
-              {String(linesError)}
-            </p>
-          )}
-          <div className="flex items-center justify-between border-t bg-[#f8faf9] px-4 py-3 text-sm">
-            <span className="text-muted-foreground">
-              {fields.length} {fields.length === 1 ? 'línea' : 'líneas'}
-            </span>
-            <div className="text-right">
-              <p className="flex justify-between gap-6 text-muted-foreground">
-                Subtotal
-                <span className="tabular-nums">
-                  {currencyFormatter.format(subtotal)}
-                </span>
-              </p>
-              <p className="mt-1 flex justify-between gap-6 text-base font-bold text-brand-forest">
-                Total
-                <span className="tabular-nums">
-                  {currencyFormatter.format(total)}
-                </span>
-              </p>
+                </p>
+                <p className="mt-1 flex justify-between gap-6 text-base font-bold text-brand-forest">
+                  Total
+                  <span className="tabular-nums">
+                    {currencyFormatter.format(total)}
+                  </span>
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <p className="flex items-start gap-2 rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
-          <PackagePlus aria-hidden size={14} className="mt-0.5 shrink-0" />
-          Al confirmar se registrarán las salidas de inventario y los precios
-          quedarán congelados para la venta.
-        </p>
-      </div>
-    </Modal>
-    <SalePaymentModal
-      open={paymentModalOpen}
-      total={total}
-      saleCode={sale?.code}
-      loading={busy}
-      onClose={() => setPaymentModalOpen(false)}
-      onConfirmAndPay={handleConfirmAndPay}
-      onConfirmPending={handleConfirmPending}
-    />
-  </>
+          <p className="flex items-start gap-2 rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
+            <PackagePlus aria-hidden size={14} className="mt-0.5 shrink-0" />
+            Al confirmar se registrarán las salidas de inventario y los precios
+            quedarán congelados para la venta.
+          </p>
+        </div>
+      </Modal>
+      <SalePaymentModal
+        open={paymentModalOpen}
+        total={total}
+        saleCode={sale?.code}
+        loading={busy}
+        onClose={() => setPaymentModalOpen(false)}
+        onConfirmAndPay={handleConfirmAndPay}
+        onConfirmPending={handleConfirmPending}
+      />
+    </>
   )
 }
 

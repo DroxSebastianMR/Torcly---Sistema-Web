@@ -108,7 +108,10 @@ export const vehiclesService = {
       lastVisitAt = vehicle.workOrders[0].createdAt.toISOString()
       for (const order of vehicle.workOrders) {
         totalSpent += Number(order.total)
-        if (order.currentMileage !== null && order.currentMileage !== undefined) {
+        if (
+          order.currentMileage !== null &&
+          order.currentMileage !== undefined
+        ) {
           if (lastMileage === null || order.currentMileage > lastMileage) {
             lastMileage = order.currentMileage
           }
@@ -116,55 +119,57 @@ export const vehiclesService = {
       }
     }
 
-    const timeline: VehicleHistoryTimelineEntry[] = vehicle.workOrders.map((order) => {
-      const services: VehicleHistoryServiceLine[] = []
-      const parts: VehicleHistoryPartLine[] = []
+    const timeline: VehicleHistoryTimelineEntry[] = vehicle.workOrders.map(
+      (order) => {
+        const services: VehicleHistoryServiceLine[] = []
+        const parts: VehicleHistoryPartLine[] = []
 
-      for (const line of order.lines) {
-        if (line.type === 'SERVICE') {
-          services.push({
-            id: line.id,
-            name: line.name,
-            code: line.code,
-            quantity: Number(line.quantity),
-            unitPrice: Number(line.unitPrice),
-            subtotal: Number(line.subtotal),
-          })
-        } else {
-          parts.push({
-            id: line.id,
-            name: line.name,
-            code: line.code,
-            unitLabel: line.unitLabel,
-            quantity: Number(line.quantity),
-            unitPrice: Number(line.unitPrice),
-            subtotal: Number(line.subtotal),
-          })
+        for (const line of order.lines) {
+          if (line.type === 'SERVICE') {
+            services.push({
+              id: line.id,
+              name: line.name,
+              code: line.code,
+              quantity: Number(line.quantity),
+              unitPrice: Number(line.unitPrice),
+              subtotal: Number(line.subtotal),
+            })
+          } else {
+            parts.push({
+              id: line.id,
+              name: line.name,
+              code: line.code,
+              unitLabel: line.unitLabel,
+              quantity: Number(line.quantity),
+              unitPrice: Number(line.unitPrice),
+              subtotal: Number(line.subtotal),
+            })
+          }
         }
-      }
 
-      return {
-        id: order.id,
-        code: order.code,
-        status: order.status,
-        source: order.source,
-        entryDate: order.createdAt.toISOString(),
-        deliveredDate: order.deliveredAt?.toISOString() ?? null,
-        mileage: order.currentMileage,
-        fuelLevel: order.fuelLevel,
-        diagnosis: order.diagnosis,
-        receptionNotes: order.receptionNotes,
-        technician: order.technician
-          ? {
-              id: order.technician.id,
-              fullName: order.technician.fullName,
-            }
-          : null,
-        services,
-        parts,
-        total: Number(order.total),
-      }
-    })
+        return {
+          id: order.id,
+          code: order.code,
+          status: order.status,
+          source: order.source,
+          entryDate: order.createdAt.toISOString(),
+          deliveredDate: order.deliveredAt?.toISOString() ?? null,
+          mileage: order.currentMileage,
+          fuelLevel: order.fuelLevel,
+          diagnosis: order.diagnosis,
+          receptionNotes: order.receptionNotes,
+          technician: order.technician
+            ? {
+                id: order.technician.id,
+                fullName: order.technician.fullName,
+              }
+            : null,
+          services,
+          parts,
+          total: Number(order.total),
+        }
+      },
+    )
 
     return {
       data: {

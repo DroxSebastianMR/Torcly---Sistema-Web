@@ -45,11 +45,18 @@ describe('quotation-formatters', () => {
       createdBy: 'Admin',
     }
 
-    const message = generateQuotationWhatsAppMessage(mockQuotation, 'Taller Hermanos Motors')
-    expect(message).toContain('Hola Carlos Mendoza, te saludamos de *Taller Hermanos Motors*.')
+    const message = generateQuotationWhatsAppMessage(
+      mockQuotation,
+      'Taller Hermanos Motors',
+    )
+    expect(message).toContain(
+      'Hola Carlos Mendoza, te saludamos de *Taller Hermanos Motors*.',
+    )
     expect(message).toContain('Toyota Corolla (ABC-123)')
     expect(message).toContain('· N° Cotización: *COT-000042*')
     expect(message).toContain('S/\u00a0300.00')
-    expect(message).toContain('· Observaciones: Incluye cambio de aceite y filtro.')
+    expect(message).toContain(
+      '· Observaciones: Incluye cambio de aceite y filtro.',
+    )
   })
 })

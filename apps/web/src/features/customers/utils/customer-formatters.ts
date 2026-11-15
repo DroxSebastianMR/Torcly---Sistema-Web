@@ -90,7 +90,9 @@ export function mapCustomerFormValues(
   return vehicle ? { ...customerData, vehicle } : customerData
 }
 
-export function mapCustomerToFormValues(customer: Customer): CustomerFormValues {
+export function mapCustomerToFormValues(
+  customer: Customer,
+): CustomerFormValues {
   return {
     type: customer.type,
     documentNumber: customer.documentNumber,

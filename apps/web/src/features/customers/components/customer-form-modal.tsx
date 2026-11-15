@@ -39,7 +39,10 @@ export function CustomerFormModal({
   })
   const { reset } = form
   const customerType = useWatch({ control: form.control, name: 'type' })
-  const registerVehicle = useWatch({ control: form.control, name: 'registerVehicle' })
+  const registerVehicle = useWatch({
+    control: form.control,
+    name: 'registerVehicle',
+  })
   const isNatural = customerType === 'NATURAL'
 
   useEffect(() => {
@@ -211,7 +214,8 @@ export function CustomerFormModal({
                   ¿Registrar vehículo ahora?
                 </span>
                 <p className="text-xs text-muted-foreground">
-                  Da de alta la primera unidad vehicular asociada a este cliente en este mismo paso.
+                  Da de alta la primera unidad vehicular asociada a este cliente
+                  en este mismo paso.
                 </p>
               </div>
             </label>
@@ -232,11 +236,7 @@ export function CustomerFormModal({
                       maxLength={10}
                     />
                   </Field>
-                  <Field
-                    label="Marca"
-                    error={error('vehicleBrand')}
-                    required
-                  >
+                  <Field label="Marca" error={error('vehicleBrand')} required>
                     <Input
                       {...form.register('vehicleBrand')}
                       placeholder="Ej. Toyota"
@@ -245,21 +245,13 @@ export function CustomerFormModal({
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-3">
-                  <Field
-                    label="Modelo"
-                    error={error('vehicleModel')}
-                    required
-                  >
+                  <Field label="Modelo" error={error('vehicleModel')} required>
                     <Input
                       {...form.register('vehicleModel')}
                       placeholder="Ej. Corolla"
                     />
                   </Field>
-                  <Field
-                    label="Año"
-                    error={error('vehicleYear')}
-                    required
-                  >
+                  <Field label="Año" error={error('vehicleYear')} required>
                     <Input
                       {...form.register('vehicleYear')}
                       type="number"

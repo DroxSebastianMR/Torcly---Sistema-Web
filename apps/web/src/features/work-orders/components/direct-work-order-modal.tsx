@@ -228,9 +228,14 @@ export function DirectWorkOrderModal({
         </div>
 
         <fieldset className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-3.5">
-          <legend className="px-1 text-sm font-semibold">Checklist de recepción</legend>
+          <legend className="px-1 text-sm font-semibold">
+            Checklist de recepción
+          </legend>
           <div className="space-y-1.5">
-            <label htmlFor="directReceptionFuelLevel" className="text-sm font-medium">
+            <label
+              htmlFor="directReceptionFuelLevel"
+              className="text-sm font-medium"
+            >
               Combustible al recibir
             </label>
             <SmartSelect
@@ -242,34 +247,64 @@ export function DirectWorkOrderModal({
               }))}
               value={receptionFuelLevel}
               onChange={(value) =>
-                setValue('receptionFuelLevel', value as DirectWorkOrderFormValues['receptionFuelLevel'], {
-                  shouldValidate: true,
-                })
+                setValue(
+                  'receptionFuelLevel',
+                  value as DirectWorkOrderFormValues['receptionFuelLevel'],
+                  {
+                    shouldValidate: true,
+                  },
+                )
               }
             />
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
             {(
               [
-              ['hasSpareTire', 'Llanta de repuesto'],
-              ['hasJackAndTools', 'Gata y herramientas'],
-              ['hasVehicleDocuments', 'Documentos del vehículo'],
-              ['hasRadioFaceplate', 'Panel de radio'],
+                ['hasSpareTire', 'Llanta de repuesto'],
+                ['hasJackAndTools', 'Gata y herramientas'],
+                ['hasVehicleDocuments', 'Documentos del vehículo'],
+                ['hasRadioFaceplate', 'Panel de radio'],
               ] as const
             ).map(([name, label]) => (
-              <label key={name} className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm">
-                <input type="checkbox" className="size-4 accent-brand-forest" {...register(name)} />
+              <label
+                key={name}
+                className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm"
+              >
+                <input
+                  type="checkbox"
+                  className="size-4 accent-brand-forest"
+                  {...register(name)}
+                />
                 {label}: <span className="font-medium">Sí</span>
               </label>
             ))}
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="externalDamageNotes" className="text-sm font-medium">Daños externos observados</label>
-            <textarea id="externalDamageNotes" rows={2} placeholder="Describe rayones, golpes u observaciones visibles…" className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring" {...register('externalDamageNotes')} />
+            <label
+              htmlFor="externalDamageNotes"
+              className="text-sm font-medium"
+            >
+              Daños externos observados
+            </label>
+            <textarea
+              id="externalDamageNotes"
+              rows={2}
+              placeholder="Describe rayones, golpes u observaciones visibles…"
+              className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring"
+              {...register('externalDamageNotes')}
+            />
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="photoUrls" className="text-sm font-medium">Fotos (URLs, una por línea)</label>
-            <textarea id="photoUrls" rows={2} placeholder="https://…" className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring" {...register('photoUrls')} />
+            <label htmlFor="photoUrls" className="text-sm font-medium">
+              Fotos (URLs, una por línea)
+            </label>
+            <textarea
+              id="photoUrls"
+              rows={2}
+              placeholder="https://…"
+              className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring"
+              {...register('photoUrls')}
+            />
           </div>
         </fieldset>
 
@@ -340,7 +375,6 @@ export function DirectWorkOrderModal({
               </p>
             )}
           </div>
-
         </div>
 
         <div className="space-y-1.5">

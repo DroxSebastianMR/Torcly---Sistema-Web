@@ -12,11 +12,18 @@ vi.mock('@/features/auth/hooks/auth-context', () => auth)
 
 const vehicles = vi.hoisted(() => ({ useVehicles: vi.fn() }))
 vi.mock('../hooks/use-vehicles', () => ({
-  vehicleKeys: { all: ['vehicles'], list: vi.fn(), detail: vi.fn(), history: vi.fn() },
+  vehicleKeys: {
+    all: ['vehicles'],
+    list: vi.fn(),
+    detail: vi.fn(),
+    history: vi.fn(),
+  },
   useVehicles: vehicles.useVehicles,
   useVehicle: vi.fn(),
   useVehiclesByCustomer: vi.fn(),
-  useVehicleHistory: vi.fn().mockReturnValue({ data: null, isLoading: false, isError: false }),
+  useVehicleHistory: vi
+    .fn()
+    .mockReturnValue({ data: null, isLoading: false, isError: false }),
 }))
 
 vi.mock('../components/vehicle-form-modal', () => ({
@@ -25,7 +32,11 @@ vi.mock('../components/vehicle-form-modal', () => ({
 
 vi.mock('../components/vehicle-history-modal', () => ({
   VehicleHistoryModal: ({ open }: { open: boolean }) =>
-    open ? <div role="dialog" aria-label="Historial clínico de vehículo">Historial clínico</div> : null,
+    open ? (
+      <div role="dialog" aria-label="Historial clínico de vehículo">
+        Historial clínico
+      </div>
+    ) : null,
 }))
 
 vi.mock('@/features/customers/components/customer-detail-modal', () => ({

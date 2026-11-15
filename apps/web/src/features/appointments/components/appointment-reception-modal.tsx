@@ -119,32 +119,65 @@ export function AppointmentReceptionModal({
         </div>
 
         <fieldset className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-3.5">
-          <legend className="px-1 text-sm font-semibold">Peritaje de recepción</legend>
+          <legend className="px-1 text-sm font-semibold">
+            Peritaje de recepción
+          </legend>
           <div className="grid gap-2 sm:grid-cols-2">
             {[
               ['Llanta de repuesto', hasSpareTire, setHasSpareTire],
               ['Gata y herramientas', hasJackAndTools, setHasJackAndTools],
-              ['Documentos del vehículo', hasVehicleDocuments, setHasVehicleDocuments],
+              [
+                'Documentos del vehículo',
+                hasVehicleDocuments,
+                setHasVehicleDocuments,
+              ],
               ['Panel de radio', hasRadioFaceplate, setHasRadioFaceplate],
             ].map(([label, checked, onChange]) => (
-              <label key={label as string} className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm">
+              <label
+                key={label as string}
+                className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm"
+              >
                 <input
                   type="checkbox"
                   className="size-4 accent-brand-forest"
                   checked={checked as boolean}
-                  onChange={(event) => (onChange as (value: boolean) => void)(event.target.checked)}
+                  onChange={(event) =>
+                    (onChange as (value: boolean) => void)(event.target.checked)
+                  }
                 />
                 {label as string}
               </label>
             ))}
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="externalDamageNotes" className="text-sm font-medium">Daños externos observados</label>
-            <textarea id="externalDamageNotes" rows={2} maxLength={1000} placeholder="Rayones, golpes u observaciones visibles…" className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring" value={externalDamageNotes} onChange={(event) => setExternalDamageNotes(event.target.value)} />
+            <label
+              htmlFor="externalDamageNotes"
+              className="text-sm font-medium"
+            >
+              Daños externos observados
+            </label>
+            <textarea
+              id="externalDamageNotes"
+              rows={2}
+              maxLength={1000}
+              placeholder="Rayones, golpes u observaciones visibles…"
+              className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring"
+              value={externalDamageNotes}
+              onChange={(event) => setExternalDamageNotes(event.target.value)}
+            />
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="photoUrls" className="text-sm font-medium">Fotos (URLs, una por línea)</label>
-            <textarea id="photoUrls" rows={2} placeholder="https://…" className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring" value={photoUrls} onChange={(event) => setPhotoUrls(event.target.value)} />
+            <label htmlFor="photoUrls" className="text-sm font-medium">
+              Fotos (URLs, una por línea)
+            </label>
+            <textarea
+              id="photoUrls"
+              rows={2}
+              placeholder="https://…"
+              className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring"
+              value={photoUrls}
+              onChange={(event) => setPhotoUrls(event.target.value)}
+            />
           </div>
         </fieldset>
 

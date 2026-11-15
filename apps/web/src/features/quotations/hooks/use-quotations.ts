@@ -49,8 +49,13 @@ export function useQuotationMutations() {
         finishActionToast(context?.toastId),
     }),
     update: useMutation({
-      mutationFn: ({ id, input }: { id: string; input: QuotationUpdateInput }) =>
-        quotationsService.update(id, input),
+      mutationFn: ({
+        id,
+        input,
+      }: {
+        id: string
+        input: QuotationUpdateInput
+      }) => quotationsService.update(id, input),
       onMutate: () => ({
         toastId: startActionToast('Actualizando presupuesto…'),
       }),

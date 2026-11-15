@@ -18,7 +18,10 @@ import { AppointmentFormModal } from '../components/appointment-form-modal'
 import { AppointmentReceptionModal } from '../components/appointment-reception-modal'
 import { AppointmentsTable } from '../components/appointments-table'
 import { AppointmentsToolbar } from '../components/appointments-toolbar'
-import type { FuelLevel, ReceptionChecklist } from '@/features/work-orders/types/work-orders.types'
+import type {
+  FuelLevel,
+  ReceptionChecklist,
+} from '@/features/work-orders/types/work-orders.types'
 import {
   appointmentKeys,
   useAppointment,
@@ -184,8 +187,8 @@ export default function Page({
               Citas
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              Programa citas de atención por cliente y vehículo; se permiten hasta
-              8 citas activas por fecha y hora.
+              Programa citas de atención por cliente y vehículo; se permiten
+              hasta 8 citas activas por fecha y hora.
             </p>
           </div>
           {canWrite && (

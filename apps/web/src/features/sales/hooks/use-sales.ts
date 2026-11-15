@@ -105,8 +105,9 @@ export function useSaleMutations() {
         id: string
         input: SaleConfirmAndPayInput
       }) => salesService.confirmAndPay(id, input),
-      onMutate: () =>
-        ({ toastId: startActionToast('Procesando cobro y venta…') }),
+      onMutate: () => ({
+        toastId: startActionToast('Procesando cobro y venta…'),
+      }),
       onSuccess: refreshSales,
       onSettled: (_data, _error, _variables, context) =>
         finishActionToast(context?.toastId),

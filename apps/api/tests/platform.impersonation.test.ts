@@ -3,6 +3,19 @@ import { platformService } from '../src/modules/platform/platform.service.js'
 import { databaseService } from '../src/infrastructure/database/prisma.service.js'
 import { authService } from '../src/modules/auth/auth.service.js'
 
+type OrganizationLookupResult = Awaited<
+  ReturnType<typeof databaseService.client.organization.findUnique>
+>
+type AuthSessionCreateResult = Awaited<
+  ReturnType<typeof databaseService.client.authSession.create>
+>
+type AuditLogCreateResult = Awaited<
+  ReturnType<typeof databaseService.client.auditLog.create>
+>
+type AuthSessionDeleteResult = Awaited<
+  ReturnType<typeof databaseService.client.authSession.deleteMany>
+>
+
 describe('Platform Impersonation Service', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -18,11 +31,16 @@ describe('Platform Impersonation Service', () => {
         permissions: [],
         isPlatformAdmin: false,
       }),
-    ).rejects.toThrow('Solo administradores de plataforma pueden usar el modo soporte.')
+    ).rejects.toThrow(
+      'Solo administradores de plataforma pueden usar el modo soporte.',
+    )
   })
 
   it('rejects impersonation if target organization does not exist', async () => {
-    vi.spyOn(databaseService.client.organization, 'findUnique').mockResolvedValueOnce(null)
+    vi.spyOn(
+      databaseService.client.organization,
+      'findUnique',
+    ).mockResolvedValueOnce(null)
 
     await expect(
       platformService.impersonateOrganization('org-not-found', {
@@ -67,9 +85,17 @@ describe('Platform Impersonation Service', () => {
       ],
     }
 
-    vi.spyOn(databaseService.client.organization, 'findUnique').mockResolvedValueOnce(mockOrg as any)
-    vi.spyOn(databaseService.client.authSession, 'create').mockResolvedValueOnce({} as any)
-    vi.spyOn(databaseService.client.auditLog, 'create').mockResolvedValueOnce({} as any)
+    vi.spyOn(
+      databaseService.client.organization,
+      'findUnique',
+    ).mockResolvedValueOnce(mockOrg as unknown as OrganizationLookupResult)
+    vi.spyOn(
+      databaseService.client.authSession,
+      'create',
+    ).mockResolvedValueOnce({} as AuthSessionCreateResult)
+    vi.spyOn(databaseService.client.auditLog, 'create').mockResolvedValueOnce(
+      {} as AuditLogCreateResult,
+    )
 
     const result = await platformService.impersonateOrganization('org-test', {
       id: 'admin-super',
@@ -94,7 +120,10 @@ describe('Platform Impersonation Service', () => {
   })
 
   it('successfully exits impersonation and returns original admin user', async () => {
-    vi.spyOn(databaseService.client.authSession, 'deleteMany').mockResolvedValueOnce({ count: 1 } as any)
+    vi.spyOn(
+      databaseService.client.authSession,
+      'deleteMany',
+    ).mockResolvedValueOnce({ count: 1 } as AuthSessionDeleteResult)
     vi.spyOn(authService, 'authenticate').mockResolvedValueOnce({
       tokenHash: 'hash-admin',
       user: {
@@ -107,7 +136,10 @@ describe('Platform Impersonation Service', () => {
       },
     })
 
-    const result = await platformService.exitImpersonation('impersonation-token-hash', 'admin-token')
+    const result = await platformService.exitImpersonation(
+      'impersonation-token-hash',
+      'admin-token',
+    )
 
     expect(result.id).toBe('admin-super')
     expect(result.isPlatformAdmin).toBe(true)

@@ -32,7 +32,10 @@ export const receptionChecklistSchema = z
       .max(1000, 'Los daños externos no pueden exceder los 1000 caracteres.')
       .optional()
       .nullable(),
-    photos: z.array(z.string().url('La foto debe ser una URL válida.')).max(10).default([]),
+    photos: z
+      .array(z.string().url('La foto debe ser una URL válida.'))
+      .max(10)
+      .default([]),
   })
   .strict()
 

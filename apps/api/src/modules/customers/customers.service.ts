@@ -72,7 +72,9 @@ function mapPersistenceError(error: unknown): never {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === 'P2002') {
       const target = (error.meta?.target as string[] | string) || ''
-      const targetStr = Array.isArray(target) ? target.join(',') : String(target)
+      const targetStr = Array.isArray(target)
+        ? target.join(',')
+        : String(target)
       if (targetStr.includes('plate') || error.message.includes('plate')) {
         throw new AppError(
           409,

@@ -40,19 +40,27 @@ export function SalePaymentModal({
   const [notes, setNotes] = useState('')
 
   // Para pago mixto
-  const [mixedMethod1, setMixedMethod1] =
-    useState<'CASH' | 'CARD' | 'TRANSFER' | 'DIGITAL_WALLET'>('CASH')
+  const [mixedMethod1, setMixedMethod1] = useState<
+    'CASH' | 'CARD' | 'TRANSFER' | 'DIGITAL_WALLET'
+  >('CASH')
   const [mixedAmount1, setMixedAmount1] = useState<number>(
     Math.round(total / 2),
   )
-  const [mixedMethod2, setMixedMethod2] =
-    useState<'CASH' | 'CARD' | 'TRANSFER' | 'DIGITAL_WALLET'>('DIGITAL_WALLET')
+  const [mixedMethod2, setMixedMethod2] = useState<
+    'CASH' | 'CARD' | 'TRANSFER' | 'DIGITAL_WALLET'
+  >('DIGITAL_WALLET')
   const [mixedAmount2, setMixedAmount2] = useState<number>(
     Math.round((total - Math.round(total / 2) + Number.EPSILON) * 100) / 100,
   )
 
-  const change = Math.max(0, Math.round((cashReceived - total + Number.EPSILON) * 100) / 100)
-  const missingCash = cashReceived < total ? Math.round((total - cashReceived + Number.EPSILON) * 100) / 100 : 0
+  const change = Math.max(
+    0,
+    Math.round((cashReceived - total + Number.EPSILON) * 100) / 100,
+  )
+  const missingCash =
+    cashReceived < total
+      ? Math.round((total - cashReceived + Number.EPSILON) * 100) / 100
+      : 0
 
   const handlePay = async () => {
     if (method === 'CASH') {
@@ -65,7 +73,8 @@ export function SalePaymentModal({
         notes: notes.trim() || undefined,
       })
     } else if (method === 'MIXED') {
-      const sum = Math.round((mixedAmount1 + mixedAmount2 + Number.EPSILON) * 100) / 100
+      const sum =
+        Math.round((mixedAmount1 + mixedAmount2 + Number.EPSILON) * 100) / 100
       if (sum !== total) return
       await onConfirmAndPay({
         paymentMethod: 'MIXED',
@@ -93,7 +102,9 @@ export function SalePaymentModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={saleCode ? `Cobro de venta ${saleCode}` : 'Cobro inmediato en mostrador'}
+      title={
+        saleCode ? `Cobro de venta ${saleCode}` : 'Cobro inmediato en mostrador'
+      }
       description="Selecciona el método de cobro directo para registrar el ingreso a caja."
       className="max-w-xl"
       footer={
@@ -158,7 +169,10 @@ export function SalePaymentModal({
                   : 'border-border bg-card text-muted-foreground hover:bg-muted/50'
               }`}
             >
-              <Banknote size={20} className={method === 'CASH' ? 'text-emerald-600' : ''} />
+              <Banknote
+                size={20}
+                className={method === 'CASH' ? 'text-emerald-600' : ''}
+              />
               <span>Efectivo</span>
             </button>
             <button
@@ -170,7 +184,12 @@ export function SalePaymentModal({
                   : 'border-border bg-card text-muted-foreground hover:bg-muted/50'
               }`}
             >
-              <QrCode size={20} className={method === 'DIGITAL_WALLET' ? 'text-emerald-600' : ''} />
+              <QrCode
+                size={20}
+                className={
+                  method === 'DIGITAL_WALLET' ? 'text-emerald-600' : ''
+                }
+              />
               <span>Yape / Plin</span>
             </button>
             <button
@@ -182,7 +201,10 @@ export function SalePaymentModal({
                   : 'border-border bg-card text-muted-foreground hover:bg-muted/50'
               }`}
             >
-              <CreditCard size={20} className={method === 'CARD' ? 'text-emerald-600' : ''} />
+              <CreditCard
+                size={20}
+                className={method === 'CARD' ? 'text-emerald-600' : ''}
+              />
               <span>Tarjeta</span>
             </button>
             <button
@@ -194,7 +216,10 @@ export function SalePaymentModal({
                   : 'border-border bg-card text-muted-foreground hover:bg-muted/50'
               }`}
             >
-              <ArrowRightLeft size={20} className={method === 'TRANSFER' ? 'text-emerald-600' : ''} />
+              <ArrowRightLeft
+                size={20}
+                className={method === 'TRANSFER' ? 'text-emerald-600' : ''}
+              />
               <span>Transferencia</span>
             </button>
             <button
@@ -206,7 +231,10 @@ export function SalePaymentModal({
                   : 'border-border bg-card text-muted-foreground hover:bg-muted/50'
               }`}
             >
-              <Coins size={20} className={method === 'MIXED' ? 'text-emerald-600' : ''} />
+              <Coins
+                size={20}
+                className={method === 'MIXED' ? 'text-emerald-600' : ''}
+              />
               <span>Mixto</span>
             </button>
           </div>
@@ -298,7 +326,12 @@ export function SalePaymentModal({
                   onChange={(e) => {
                     const val = Number(e.target.value)
                     setMixedAmount1(val)
-                    setMixedAmount2(Math.max(0, Math.round((total - val + Number.EPSILON) * 100) / 100))
+                    setMixedAmount2(
+                      Math.max(
+                        0,
+                        Math.round((total - val + Number.EPSILON) * 100) / 100,
+                      ),
+                    )
                   }}
                   className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm font-semibold tabular-nums"
                 />
@@ -328,7 +361,9 @@ export function SalePaymentModal({
               </div>
             </div>
             <div className="flex justify-between text-xs text-muted-foreground pt-1">
-              <span>Suma: {currencyFormatter.format(mixedAmount1 + mixedAmount2)}</span>
+              <span>
+                Suma: {currencyFormatter.format(mixedAmount1 + mixedAmount2)}
+              </span>
               <span>Total requerido: {currencyFormatter.format(total)}</span>
             </div>
           </div>
