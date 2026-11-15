@@ -17,9 +17,11 @@ const initialFilters: PreventiveMaintenanceFilters = {
 const PAGE_SIZE = 10
 
 export default function PreventiveMaintenancePage() {
-  const [filters, setFilters] = useState<PreventiveMaintenanceFilters>(initialFilters)
+  const [filters, setFilters] =
+    useState<PreventiveMaintenanceFilters>(initialFilters)
   const [page, setPage] = useState(1)
-  const { data, isLoading, isError, refetch } = usePreventiveMaintenance(filters)
+  const { data, isLoading, isError, refetch } =
+    usePreventiveMaintenance(filters)
 
   const items = data?.data ?? []
   const metrics = data?.metrics
@@ -28,7 +30,9 @@ export default function PreventiveMaintenancePage() {
   const paginatedItems = items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const handleFilterChange = (
-    updater: (prev: PreventiveMaintenanceFilters) => PreventiveMaintenanceFilters,
+    updater: (
+      prev: PreventiveMaintenanceFilters,
+    ) => PreventiveMaintenanceFilters,
   ) => {
     setFilters(updater)
     setPage(1)
@@ -46,8 +50,9 @@ export default function PreventiveMaintenancePage() {
             Mantenimiento Preventivo
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Detecta automáticamente vehículos que requieren cambio de aceite o servicio periódico
-            y genera campañas de contacto por WhatsApp para agendar su retorno al taller.
+            Detecta automáticamente vehículos que requieren cambio de aceite o
+            servicio periódico y genera campañas de contacto por WhatsApp para
+            agendar su retorno al taller.
           </p>
         </div>
 
@@ -58,13 +63,19 @@ export default function PreventiveMaintenancePage() {
           }}
           className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold shadow-xs"
         >
-          <CalendarClock className="size-4 shrink-0" style={{ color: '#329B78' }} />
+          <CalendarClock
+            className="size-4 shrink-0"
+            style={{ color: '#329B78' }}
+          />
           <span>Frecuencia sugerida: 5,000 km o 6 meses</span>
         </div>
       </header>
 
       {/* Tarjetas de métricas de parque vehicular */}
-      <PreventiveMaintenanceMetricsCards metrics={metrics} isLoading={isLoading} />
+      <PreventiveMaintenanceMetricsCards
+        metrics={metrics}
+        isLoading={isLoading}
+      />
 
       {/* Barra de herramientas y filtros */}
       <section className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
@@ -77,7 +88,10 @@ export default function PreventiveMaintenancePage() {
               id="maintenance-search"
               value={filters.search}
               onChange={(e) =>
-                handleFilterChange((prev) => ({ ...prev, search: e.target.value }))
+                handleFilterChange((prev) => ({
+                  ...prev,
+                  search: e.target.value,
+                }))
               }
               placeholder="Buscar por placa, cliente o teléfono..."
             />
@@ -148,7 +162,10 @@ export default function PreventiveMaintenancePage() {
           </div>
         ) : (
           <>
-            <PreventiveMaintenanceTable items={paginatedItems} isLoading={isLoading} />
+            <PreventiveMaintenanceTable
+              items={paginatedItems}
+              isLoading={isLoading}
+            />
             {totalPages > 1 && (
               <Pagination
                 page={page}

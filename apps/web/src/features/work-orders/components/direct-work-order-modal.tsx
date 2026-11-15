@@ -193,7 +193,9 @@ export function DirectWorkOrderModal({
         finalVehicleId = customerResponse.data.createdVehicle?.id || ''
 
         if (!finalVehicleId) {
-          throw new Error('No se pudo asociar el vehículo registrado a la orden.')
+          throw new Error(
+            'No se pudo asociar el vehículo registrado a la orden.',
+          )
         }
 
         void queryClient.invalidateQueries({ queryKey: ['customers'] })
@@ -278,7 +280,10 @@ export function DirectWorkOrderModal({
           <div className="flex items-center gap-2.5">
             <UserPlus className="size-4 text-primary shrink-0" />
             <div>
-              <label htmlFor="isNewCustomerToggle" className="text-sm font-semibold text-foreground cursor-pointer">
+              <label
+                htmlFor="isNewCustomerToggle"
+                className="text-sm font-semibold text-foreground cursor-pointer"
+              >
                 ¿Es un cliente nuevo?
               </label>
               <p className="text-xs text-muted-foreground">
@@ -293,7 +298,9 @@ export function DirectWorkOrderModal({
               className="sr-only peer"
               checked={isNewCustomer}
               onChange={(e) => {
-                setValue('isNewCustomer', e.target.checked, { shouldValidate: true })
+                setValue('isNewCustomer', e.target.checked, {
+                  shouldValidate: true,
+                })
               }}
             />
             <div className="peer h-6 w-11 rounded-full bg-input peer-checked:bg-brand-forest transition-colors after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full" />
@@ -315,7 +322,11 @@ export function DirectWorkOrderModal({
                     type="radio"
                     value="NATURAL"
                     checked={customerType === 'NATURAL'}
-                    onChange={() => setValue('customerType', 'NATURAL', { shouldValidate: true })}
+                    onChange={() =>
+                      setValue('customerType', 'NATURAL', {
+                        shouldValidate: true,
+                      })
+                    }
                     className="accent-brand-forest"
                   />
                   Persona Natural
@@ -325,7 +336,11 @@ export function DirectWorkOrderModal({
                     type="radio"
                     value="LEGAL"
                     checked={customerType === 'LEGAL'}
-                    onChange={() => setValue('customerType', 'LEGAL', { shouldValidate: true })}
+                    onChange={() =>
+                      setValue('customerType', 'LEGAL', {
+                        shouldValidate: true,
+                      })
+                    }
                     className="accent-brand-forest"
                   />
                   Empresa / Jurídica
@@ -336,13 +351,17 @@ export function DirectWorkOrderModal({
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1">
                   <label htmlFor="newDocNumber" className="text-xs font-medium">
-                    {customerType === 'NATURAL' ? 'DNI (8 dígitos)' : 'RUC (11 dígitos)'}{' '}
+                    {customerType === 'NATURAL'
+                      ? 'DNI (8 dígitos)'
+                      : 'RUC (11 dígitos)'}{' '}
                     <span className="text-destructive">*</span>
                   </label>
                   <Input
                     id="newDocNumber"
                     maxLength={customerType === 'NATURAL' ? 8 : 11}
-                    placeholder={customerType === 'NATURAL' ? '12345678' : '20123456789'}
+                    placeholder={
+                      customerType === 'NATURAL' ? '12345678' : '20123456789'
+                    }
                     {...register('documentNumber')}
                     aria-invalid={Boolean(errors.documentNumber)}
                   />
@@ -374,7 +393,10 @@ export function DirectWorkOrderModal({
               {customerType === 'NATURAL' ? (
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="space-y-1">
-                    <label htmlFor="newFirstName" className="text-xs font-medium">
+                    <label
+                      htmlFor="newFirstName"
+                      className="text-xs font-medium"
+                    >
                       Nombres <span className="text-destructive">*</span>
                     </label>
                     <Input
@@ -390,7 +412,10 @@ export function DirectWorkOrderModal({
                     )}
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="newLastName" className="text-xs font-medium">
+                    <label
+                      htmlFor="newLastName"
+                      className="text-xs font-medium"
+                    >
                       Apellidos <span className="text-destructive">*</span>
                     </label>
                     <Input
@@ -453,7 +478,10 @@ export function DirectWorkOrderModal({
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1">
-                  <label htmlFor="newVehiclePlate" className="text-xs font-medium">
+                  <label
+                    htmlFor="newVehiclePlate"
+                    className="text-xs font-medium"
+                  >
                     Placa <span className="text-destructive">*</span>
                   </label>
                   <Input
@@ -477,7 +505,10 @@ export function DirectWorkOrderModal({
                 </div>
 
                 <div className="space-y-1">
-                  <label htmlFor="newVehicleBrand" className="text-xs font-medium">
+                  <label
+                    htmlFor="newVehicleBrand"
+                    className="text-xs font-medium"
+                  >
                     Marca <span className="text-destructive">*</span>
                   </label>
                   <Input
@@ -496,7 +527,10 @@ export function DirectWorkOrderModal({
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1">
-                  <label htmlFor="newVehicleModel" className="text-xs font-medium">
+                  <label
+                    htmlFor="newVehicleModel"
+                    className="text-xs font-medium"
+                  >
                     Modelo <span className="text-destructive">*</span>
                   </label>
                   <Input
@@ -513,7 +547,10 @@ export function DirectWorkOrderModal({
                 </div>
 
                 <div className="space-y-1">
-                  <label htmlFor="newVehicleYear" className="text-xs font-medium">
+                  <label
+                    htmlFor="newVehicleYear"
+                    className="text-xs font-medium"
+                  >
                     Año <span className="text-destructive">*</span>
                   </label>
                   <Input
@@ -599,9 +636,14 @@ export function DirectWorkOrderModal({
 
         {/* Checklist de Recepción */}
         <fieldset className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-3.5">
-          <legend className="px-1 text-sm font-semibold">Checklist de recepción</legend>
+          <legend className="px-1 text-sm font-semibold">
+            Checklist de recepción
+          </legend>
           <div className="space-y-1.5">
-            <label htmlFor="directReceptionFuelLevel" className="text-sm font-medium">
+            <label
+              htmlFor="directReceptionFuelLevel"
+              className="text-sm font-medium"
+            >
               Combustible al recibir
             </label>
             <SmartSelect
@@ -613,9 +655,13 @@ export function DirectWorkOrderModal({
               }))}
               value={receptionFuelLevel}
               onChange={(value) =>
-                setValue('receptionFuelLevel', value as DirectWorkOrderFormValues['receptionFuelLevel'], {
-                  shouldValidate: true,
-                })
+                setValue(
+                  'receptionFuelLevel',
+                  value as DirectWorkOrderFormValues['receptionFuelLevel'],
+                  {
+                    shouldValidate: true,
+                  },
+                )
               }
             />
           </div>
@@ -628,19 +674,45 @@ export function DirectWorkOrderModal({
                 ['hasRadioFaceplate', 'Panel de radio'],
               ] as const
             ).map(([name, label]) => (
-              <label key={name} className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm cursor-pointer">
-                <input type="checkbox" className="size-4 accent-brand-forest" {...register(name)} />
+              <label
+                key={name}
+                className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  className="size-4 accent-brand-forest"
+                  {...register(name)}
+                />
                 {label}: <span className="font-medium">Sí</span>
               </label>
             ))}
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="externalDamageNotes" className="text-sm font-medium">Daños externos observados</label>
-            <textarea id="externalDamageNotes" rows={2} placeholder="Describe rayones, golpes u observaciones visibles…" className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring" {...register('externalDamageNotes')} />
+            <label
+              htmlFor="externalDamageNotes"
+              className="text-sm font-medium"
+            >
+              Daños externos observados
+            </label>
+            <textarea
+              id="externalDamageNotes"
+              rows={2}
+              placeholder="Describe rayones, golpes u observaciones visibles…"
+              className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring"
+              {...register('externalDamageNotes')}
+            />
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="photoUrls" className="text-sm font-medium">Fotos (URLs, una por línea)</label>
-            <textarea id="photoUrls" rows={2} placeholder="https://…" className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring" {...register('photoUrls')} />
+            <label htmlFor="photoUrls" className="text-sm font-medium">
+              Fotos (URLs, una por línea)
+            </label>
+            <textarea
+              id="photoUrls"
+              rows={2}
+              placeholder="https://…"
+              className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring"
+              {...register('photoUrls')}
+            />
           </div>
         </fieldset>
 
@@ -670,10 +742,7 @@ export function DirectWorkOrderModal({
             aria-invalid={Boolean(errors.currentMileage)}
           />
           {errors.currentMileage && (
-            <p
-              className="text-xs font-medium text-destructive"
-              role="alert"
-            >
+            <p className="text-xs font-medium text-destructive" role="alert">
               {errors.currentMileage.message}
             </p>
           )}
@@ -692,10 +761,7 @@ export function DirectWorkOrderModal({
             {...register('receptionNotes')}
           />
           {errors.receptionNotes && (
-            <p
-              className="text-xs font-medium text-destructive"
-              role="alert"
-            >
+            <p className="text-xs font-medium text-destructive" role="alert">
               {errors.receptionNotes.message}
             </p>
           )}

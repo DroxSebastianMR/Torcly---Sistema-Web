@@ -185,7 +185,12 @@ export const directWorkOrderFormSchema = z
 
     const currentYear = new Date().getFullYear() + 1
     const yearNum = Number(values.vehicleYear)
-    if (!yearNum || Number.isNaN(yearNum) || yearNum < 1950 || yearNum > currentYear) {
+    if (
+      !yearNum ||
+      Number.isNaN(yearNum) ||
+      yearNum < 1950 ||
+      yearNum > currentYear
+    ) {
       context.addIssue({
         code: 'custom',
         path: ['vehicleYear'],

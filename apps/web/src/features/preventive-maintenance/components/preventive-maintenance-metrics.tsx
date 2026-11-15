@@ -36,7 +36,9 @@ export function PreventiveMaintenanceMetricsCards({
           value: critical,
           tone: 'danger',
           description:
-            critical > 0 ? 'Más de 6 meses sin servicio' : 'Sin atrasos críticos',
+            critical > 0
+              ? 'Más de 6 meses sin servicio'
+              : 'Sin atrasos críticos',
         },
         {
           label: 'Por vencer',

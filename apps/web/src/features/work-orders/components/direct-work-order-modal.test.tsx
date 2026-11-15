@@ -74,7 +74,10 @@ describe('DirectWorkOrderModal', () => {
       refetch: vi.fn(),
     } as any)
 
-    vi.spyOn(customersServiceModule.customersService, 'create').mockImplementation(
+    vi.spyOn(
+      customersServiceModule.customersService,
+      'create',
+    ).mockImplementation(
       mockCreateCustomer.mockResolvedValue({
         data: {
           id: 'new-cust-1',

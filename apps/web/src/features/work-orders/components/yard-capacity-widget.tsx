@@ -31,46 +31,45 @@ export function YardCapacityWidget({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Aforo y Capacidad de Patio
-              </span>
-              <span
-                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                  isAtCapacity
-                    ? 'bg-rose-100 text-rose-800'
-                    : occupiedBays >= 6
-                      ? 'bg-amber-100 text-amber-800'
-                      : 'bg-emerald-100 text-emerald-800'
-                }`}
-              >
-                {isAtCapacity ? (
-                  <>
-                    <AlertTriangle size={11} /> Patio lleno (8/8)
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 size={11} /> {availableBays} bahías
-                    disponibles
-                  </>
-                )}
-              </span>
-            </div>
-
-            <p className="mt-0.5 text-lg font-bold text-brand-forest">
-              {isLoading ? (
-                'Consultando patio…'
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Aforo y Capacidad de Patio
+            </span>
+            <span
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                isAtCapacity
+                  ? 'bg-rose-100 text-rose-800'
+                  : occupiedBays >= 6
+                    ? 'bg-amber-100 text-amber-800'
+                    : 'bg-emerald-100 text-emerald-800'
+              }`}
+            >
+              {isAtCapacity ? (
+                <>
+                  <AlertTriangle size={11} /> Patio lleno (8/8)
+                </>
               ) : (
                 <>
-                  <span className="text-2xl font-extrabold tabular-nums">
-                    {occupiedBays}
-                  </span>{' '}
-                  <span className="text-sm font-medium text-muted-foreground">
-                    de {maxCapacity} bahías ocupadas ({occupancyRate}%)
-                  </span>
+                  <CheckCircle2 size={11} /> {availableBays} bahías disponibles
                 </>
               )}
-            </p>
+            </span>
           </div>
+
+          <p className="mt-0.5 text-lg font-bold text-brand-forest">
+            {isLoading ? (
+              'Consultando patio…'
+            ) : (
+              <>
+                <span className="text-2xl font-extrabold tabular-nums">
+                  {occupiedBays}
+                </span>{' '}
+                <span className="text-sm font-medium text-muted-foreground">
+                  de {maxCapacity} bahías ocupadas ({occupancyRate}%)
+                </span>
+              </>
+            )}
+          </p>
+        </div>
 
         {/* Visual 8 Bays Segmented Grid */}
         <div className="flex flex-col items-end gap-1.5">
