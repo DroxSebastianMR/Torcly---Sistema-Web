@@ -110,7 +110,9 @@ export type QuotationDetailRecord = Prisma.QuotationGetPayload<{
   include: typeof quotationDetailInclude
 }>
 
-export type QuotationItemRecord = QuotationDetailRecord['items'][number]
+export type QuotationItemRecord =
+  | QuotationSummaryRecord['items'][number]
+  | QuotationDetailRecord['items'][number]
 
 function auditData(
   event: AuditEventType,

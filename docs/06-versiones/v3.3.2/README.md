@@ -46,6 +46,15 @@ cotizaciones preliminares en órdenes sin abandonar el flujo comercial.
 - El mensaje de WhatsApp incluye cada repuesto o servicio presupuestado, su
   cantidad y subtotal; conserva la selección de destinatario del dispositivo.
 
+### Sprint 35 — Calidad, aislamiento y consistencia UI
+
+- Sesiones de caja abiertas aisladas por organización, sin bloquear talleres
+  distintos.
+- Componentes reutilizables para selectores, fechas e inputs en flujos
+  operativos.
+- Estandarización de modales, encabezados, notificaciones y acciones de
+  recepción para evitar controles duplicados o solapamientos.
+
 ## Reglas funcionales relevantes
 
 - La conversión a orden requiere siempre cliente y vehículo de la misma
