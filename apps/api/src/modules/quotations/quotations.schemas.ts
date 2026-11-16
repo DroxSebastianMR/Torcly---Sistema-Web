@@ -45,8 +45,8 @@ export const quotationItemSchema = z
 
 export const quotationCreateSchema = z
   .object({
-    customerId: z.uuid('Selecciona un cliente válido.'),
-    vehicleId: z.uuid('Selecciona un vehículo válido.'),
+    customerId: z.uuid('Selecciona un cliente válido.').nullish(),
+    vehicleId: z.uuid('Selecciona un vehículo válido.').nullish(),
     vehiclePlate: z
       .string()
       .trim()

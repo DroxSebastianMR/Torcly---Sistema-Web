@@ -229,71 +229,79 @@ export function PaymentFormModal({
           </Button>
         </div>
 
-        <div className="space-y-2">
-          <label
-            htmlFor="payment-amount"
-            className="text-sm font-medium text-foreground"
-          >
-            {splitPayment ? 'Primer importe' : 'Importe'}
-          </label>
-          <Controller
-            control={form.control}
-            name="amount"
-            render={({ field }) => (
-              <Input
-                id="payment-amount"
-                aria-label="Importe a cobrar"
-                type="text"
-                inputMode="decimal"
-                autoComplete="off"
-                placeholder="0.00"
-                name={field.name}
-                ref={field.ref}
-                value={field.value}
-                onChange={(event) => field.onChange(event.target.value)}
-                onBlur={() => {
-                  const parsed = parsePaymentAmount(field.value)
-                  if (parsed !== null) {
-                    field.onChange(formatPaymentAmount(parsed))
-                  }
-                }}
-              />
+        <div
+          className={
+            splitPayment
+              ? 'grid gap-4 rounded-xl border border-primary/20 bg-emerald-50/35 p-4 sm:grid-cols-2'
+              : 'space-y-4'
+          }
+        >
+          <div className="space-y-2">
+            <label
+              htmlFor="payment-amount"
+              className="text-sm font-medium text-foreground"
+            >
+              {splitPayment ? 'Primer importe' : 'Importe'}
+            </label>
+            <Controller
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <Input
+                  id="payment-amount"
+                  aria-label="Importe a cobrar"
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  placeholder="0.00"
+                  name={field.name}
+                  ref={field.ref}
+                  value={field.value}
+                  onChange={(event) => field.onChange(event.target.value)}
+                  onBlur={() => {
+                    const parsed = parsePaymentAmount(field.value)
+                    if (parsed !== null) {
+                      field.onChange(formatPaymentAmount(parsed))
+                    }
+                  }}
+                />
+              )}
+            />
+            {formState.errors.amount && (
+              <p className="text-xs text-red-600">
+                {formState.errors.amount.message}
+              </p>
             )}
-          />
-          {formState.errors.amount && (
-            <p className="text-xs text-red-600">
-              {formState.errors.amount.message}
-            </p>
-          )}
-        </div>
+          </div>
 
-        <div className="space-y-2">
-          <label
-            htmlFor="payment-method"
-            className="text-sm font-medium text-foreground"
-          >
-            {splitPayment ? 'Primer método' : 'Método de pago'}
-          </label>
-          <SmartSelect
-            value={firstMethod}
-            aria-label="Método de pago"
-            options={methodOptions}
-            disabled={busy}
-            onChange={(method) =>
-              setValue(
-                'method',
-                method as PaymentRegisterFormValues['method'],
-                {
-                  shouldValidate: true,
-                },
-              )
-            }
-          />
-          {formState.errors.method && (
-            <p className="text-xs text-red-600">
-              {formState.errors.method.message}
-            </p>
-          )}
+          <div className="space-y-2">
+            <label
+              htmlFor="payment-method"
+              className="text-sm font-medium text-foreground"
+            >
+              {splitPayment ? 'Primer método' : 'Método de pago'}
+            </label>
+            <SmartSelect
+              value={firstMethod}
+              aria-label="Método de pago"
+              options={methodOptions}
+              disabled={busy}
+              onChange={(method) =>
+                setValue(
+                  'method',
+                  method as PaymentRegisterFormValues['method'],
+                  {
+                    shouldValidate: true,
+                  },
+                )
+              }
+            />
+            {formState.errors.method && (
+              <p className="text-xs text-red-600">
+                {formState.errors.method.message}
+              </p>
+            )}
+          </div>
         </div>
 
         {splitPayment && (
