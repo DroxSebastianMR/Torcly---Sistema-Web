@@ -286,9 +286,7 @@ describe('Formulario de ventas', () => {
 
     await addProduct(user)
     await user.click(screen.getByRole('button', { name: 'Confirmar venta' }))
-    await user.click(
-      screen.getByRole('button', { name: /Dejar pendiente \(Crédito\)/i }),
-    )
+    await user.click(screen.getByRole('button', { name: /Dejar a crédito/i }))
 
     await waitFor(() =>
       expect(mutations.createConfirmed.mutateAsync).toHaveBeenCalled(),
@@ -340,9 +338,7 @@ describe('Formulario de ventas', () => {
     expect(screen.getByLabelText('Cantidad de Filtro de aceite')).toBeTruthy()
 
     await user.click(screen.getByRole('button', { name: 'Confirmar venta' }))
-    await user.click(
-      screen.getByRole('button', { name: /Dejar pendiente \(Crédito\)/i }),
-    )
+    await user.click(screen.getByRole('button', { name: /Dejar a crédito/i }))
 
     await waitFor(() =>
       expect(mutations.update.mutateAsync).toHaveBeenCalledWith({
