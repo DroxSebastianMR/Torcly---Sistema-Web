@@ -314,16 +314,37 @@ export function SaleFormModal({ open, sale, onClose }: SaleFormModalProps) {
     }
   }
 
-  const handleConfirmPending = async () => {
+  const handleConfirmPending = async (
+    paymentInput?: SaleConfirmAndPayInput,
+  ) => {
     const input = buildInput()
     try {
       if (sale) {
         await mutations.update.mutateAsync({ id: sale.id, input })
-        await mutations.confirm.mutateAsync(sale.id)
+        if (paymentInput) {
+          await mutations.confirmAndPay.mutateAsync({
+            id: sale.id,
+            input: paymentInput,
+          })
+        } else {
+          await mutations.confirm.mutateAsync(sale.id)
+        }
       } else {
-        await mutations.createConfirmed.mutateAsync(input)
+        if (paymentInput) {
+          const created = await mutations.create.mutateAsync(input)
+          await mutations.confirmAndPay.mutateAsync({
+            id: created.data.id,
+            input: paymentInput,
+          })
+        } else {
+          await mutations.createConfirmed.mutateAsync(input)
+        }
       }
-      toast.success('Venta confirmada como cobro pendiente en caja.')
+      toast.success(
+        paymentInput
+          ? 'Pago parcial registrado; el saldo quedó pendiente en caja.'
+          : 'Venta confirmada como cobro pendiente en caja.',
+      )
       setPaymentModalOpen(false)
       closeModal()
     } catch (error) {
