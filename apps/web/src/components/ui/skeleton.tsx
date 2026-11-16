@@ -78,3 +78,54 @@ export function TableSkeleton({
     </div>
   )
 }
+
+interface ModuleListSkeletonProps {
+  rows?: number
+  label: string
+  className?: string
+}
+
+/** Patrón de carga de filas usado por Ventas, Clientes y Citas. */
+export function ModuleListSkeleton({
+  rows = 6,
+  label,
+  className,
+}: ModuleListSkeletonProps) {
+  return (
+    <div className={cn('divide-y', className)} aria-label={label}>
+      {Array.from({ length: rows }, (_, index) => (
+        <div
+          key={index}
+          className="flex animate-pulse items-center gap-4 px-5 py-5"
+        >
+          <Skeleton className="size-10 shrink-0 rounded-xl" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-3 w-48 max-w-[70%]" />
+            <Skeleton className="h-2.5 w-28" />
+          </div>
+          <Skeleton className="hidden h-3 w-28 sm:block" />
+          <Skeleton className="size-8 rounded-lg" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export function ModuleMetricsSkeleton({ count = 4 }: { count?: number }) {
+  return (
+    <div
+      className="grid grid-cols-2 gap-3 sm:grid-cols-4"
+      aria-label="Cargando indicadores"
+    >
+      {Array.from({ length: count }, (_, index) => (
+        <div
+          key={index}
+          className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm"
+        >
+          <Skeleton className="h-3 w-3/4" />
+          <Skeleton className="h-7 w-12" />
+        </div>
+      ))}
+    </div>
+  )
+}

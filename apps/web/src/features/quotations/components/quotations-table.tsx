@@ -1,6 +1,6 @@
 import { Eye, MessageCircle, Wrench, CheckCircle2 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
-import { TableSkeleton } from '@/components/ui/skeleton'
+import { ModuleListSkeleton } from '@/components/ui/skeleton'
 import { TableActionButton } from '@/components/ui/table-action-button'
 import type { QuotationSummary } from '../types/quotations.types'
 import {
@@ -25,7 +25,7 @@ export function QuotationsTable({
   onOpen,
   onConvertToOrder,
 }: QuotationsTableProps) {
-  if (loading) return <TableSkeleton columns={7} />
+  if (loading) return <ModuleListSkeleton label="Cargando cotizaciones" />
 
   if (!loading && quotations.length === 0) {
     return (
