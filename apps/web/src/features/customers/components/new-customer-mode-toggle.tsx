@@ -39,7 +39,9 @@ export function NewCustomerModeToggle({
           disabled={disabled}
           onChange={(event) => onCheckedChange(event.target.checked)}
         />
-        <span className="h-6 w-11 rounded-full bg-input transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-brand-forest peer-checked:after:translate-x-full peer-disabled:cursor-not-allowed peer-disabled:opacity-50" />
+        <span
+          className={`h-6 w-11 rounded-full transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] ${checked ? 'bg-brand-forest after:translate-x-full' : 'bg-input'} ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
+        />
       </label>
     </div>
   )

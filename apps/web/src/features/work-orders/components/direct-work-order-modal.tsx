@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlertTriangle, Car, Gauge } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -434,7 +434,6 @@ export function DirectWorkOrderModal({
             {/* Datos del vehículo del nuevo cliente */}
             <div className="space-y-2 border-t border-border pt-3">
               <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
-                <Car className="size-3.5" />
                 2. Vehículo a Ingresar
               </span>
 
@@ -602,7 +601,6 @@ export function DirectWorkOrderModal({
               htmlFor="directCurrentMileage"
               className="flex items-center gap-1.5 text-sm font-medium"
             >
-              <Gauge size={14} className="text-muted-foreground" />
               Kilometraje actual (opcional)
             </label>
             <Input
