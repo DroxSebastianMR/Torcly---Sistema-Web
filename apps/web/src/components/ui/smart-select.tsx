@@ -39,6 +39,7 @@ interface SmartSelectProps {
   className?: string
   filterOption?: (option: SmartSelectOption, query: string) => boolean
   onOpen?: () => void
+  onOpenChange?: (open: boolean) => void
   'aria-label'?: string
   'aria-invalid'?: boolean
 }
@@ -63,6 +64,7 @@ export function SmartSelect({
   className,
   filterOption,
   onOpen,
+  onOpenChange,
   'aria-label': ariaLabel,
   'aria-invalid': ariaInvalid,
 }: SmartSelectProps) {
@@ -143,6 +145,10 @@ export function SmartSelect({
     if (open && showsSearchInput)
       requestAnimationFrame(() => searchRef.current?.focus())
   }, [open, showsSearchInput])
+
+  useEffect(() => {
+    onOpenChange?.(open)
+  }, [onOpenChange, open])
 
   const openMenu = () => {
     onOpen?.()

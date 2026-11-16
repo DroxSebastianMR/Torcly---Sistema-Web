@@ -3,6 +3,7 @@ import { Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
+import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
 import {
   SmartSelect,
@@ -95,14 +96,17 @@ export function QuotationFormModal({
 
   const vehicleOptions = useMemo<SmartSelectOption[]>(
     () =>
-      (vehicles.data?.data ?? [])
-        .filter((v) => !customerId || v.customerId === customerId)
-        .map((v) => ({
-          value: v.id,
-          label: `${v.plate} · ${v.brand} ${v.model}`,
-          meta: `${v.year}`,
-          searchTerms: [v.plate, v.brand, v.model],
-        })),
+      (!customerId
+        ? []
+        : (vehicles.data?.data ?? []).filter(
+            (vehicle) => vehicle.customerId === customerId,
+          )
+      ).map((v) => ({
+        value: v.id,
+        label: `${v.plate} · ${v.brand} ${v.model}`,
+        meta: `${v.year}`,
+        searchTerms: [v.plate, v.brand, v.model],
+      })),
     [vehicles.data, customerId],
   )
 
@@ -266,10 +270,19 @@ export function QuotationFormModal({
             <SmartSelect
               value={vehicleId}
               aria-label="Seleccionar vehículo"
-              placeholder="Seleccionar vehículo…"
+              placeholder={
+                customerId
+                  ? 'Seleccionar vehículo…'
+                  : 'Primero selecciona un cliente'
+              }
               searchPlaceholder="Buscar por placa o modelo…"
-              emptyMessage="No hay vehículos registrados para este cliente."
+              emptyMessage={
+                customerId
+                  ? 'No hay vehículos registrados para este cliente.'
+                  : 'Selecciona primero un cliente.'
+              }
               options={vehicleOptions}
+              disabled={!customerId}
               onChange={(val) => {
                 setVehicleId(val)
                 const veh = vehicles.data?.data.find((v) => v.id === val)
@@ -285,12 +298,12 @@ export function QuotationFormModal({
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Placa tentativa / Referencia
             </label>
-            <input
+            <Input
               type="text"
               placeholder="Ej: ABC-123"
               value={vehiclePlate}
               onChange={(e) => setVehiclePlate(e.target.value.toUpperCase())}
-              className="h-10 w-full rounded-lg border border-input bg-background px-3 font-mono text-sm uppercase"
+              className="font-mono uppercase"
             />
           </div>
 
@@ -325,13 +338,13 @@ export function QuotationFormModal({
               options={productOptions}
               onChange={setSelectedProductId}
             />
-            <input
+            <Input
               type="number"
               min="0.1"
               step="1"
               value={addQuantity}
               onChange={(e) => setAddQuantity(Number(e.target.value))}
-              className="h-10 rounded-lg border border-input bg-background px-2 text-center text-sm font-semibold tabular-nums"
+              className="text-center font-semibold tabular-nums"
             />
             <Button type="button" variant="outline" onClick={addProduct}>
               <Plus size={15} className="mr-1" /> Agregar
@@ -378,7 +391,7 @@ export function QuotationFormModal({
                   </p>
                 </div>
                 <div>
-                  <input
+                  <Input
                     type="number"
                     min="0.1"
                     step="0.1"
@@ -386,7 +399,7 @@ export function QuotationFormModal({
                     onChange={(e) =>
                       updateItemQuantity(index, Number(e.target.value))
                     }
-                    className="h-8 w-full rounded border border-input bg-background px-2 text-center text-xs font-semibold tabular-nums"
+                    className="min-h-8 text-center text-xs font-semibold tabular-nums"
                   />
                 </div>
                 <div className="text-right">

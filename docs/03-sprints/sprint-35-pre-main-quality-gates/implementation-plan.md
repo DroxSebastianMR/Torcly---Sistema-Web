@@ -13,3 +13,9 @@
    `Modal`, `SmartSelect`, `DatePicker` y la paleta de acciones primarias.
 9. Estandarizar los encabezados de Cotizaciones, Notificaciones y Novedades
    con el patrón de Ventas, sin contadores duplicados fuera del sidebar.
+10. Aplicar la regla de superposición en modales: cuando un `SmartSelect` pueda
+    ocupar el pie de acciones, el contenido debe reservar espacio mientras su
+    menú está abierto; al alcanzar el alto disponible, el cuerpo del `Modal`
+    conserva su desplazamiento interno.
+11. En Cotizaciones, habilitar el selector de vehículo sólo después de elegir
+    un cliente y listar exclusivamente los vehículos asociados a éste.

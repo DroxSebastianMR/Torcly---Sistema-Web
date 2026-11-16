@@ -19,10 +19,12 @@
 
 1. En Taller A abre **Taller** y crea una cita para hoy.
 2. En la pestaña de citas, atiéndela e inicia la orden.
-3. Completa el checklist: combustible, kilometraje, accesorios, daños y una URL de foto opcional.
+3. Registra, si corresponde, combustible y kilometraje; ambos campos son
+   opcionales y el peritaje no se muestra.
 4. Abre el detalle de la orden creada.
 
-**Esperado:** la cita pasa a orden, el checklist se visualiza completo y no aparece un acceso directo redundante a Citas en el sidebar.
+**Esperado:** la cita pasa a orden con sus datos operativos opcionales y no
+aparece un acceso directo redundante a Citas en el sidebar.
 
 ## 3. Cotización y conversión
 
@@ -67,12 +69,15 @@ conflicto controlado, nunca con error 500.
 2. Crea una orden directa, alterna cliente nuevo y confirma que no hay
    checklist de recepción; combustible y kilometraje se muestran juntos y son
    opcionales.
-3. Abre una decisión de presupuesto y despliega el selector; el diálogo no
-   deja espacio vertical sobrante y la lista permanece navegable.
+3. Abre una decisión de presupuesto y despliega el selector; la lista debe
+   abrirse antes del pie de acciones. Si el espacio vertical no alcanza, el
+   cuerpo del diálogo debe desplazarse sin tapar los botones.
 4. Realiza un cobro mixto y verifica que ambos métodos usan `SmartSelect` y
    que el botón principal conserva el verde estándar.
 5. Crea una cotización: los dos botones deben decir **Agregar** y usar los
-   componentes de fecha y selección propios de Torcly.
+   componentes de fecha y selección propios de Torcly. Elige primero un
+   cliente y comprueba que el selector de vehículo sólo se habilita y muestra
+   los vehículos asociados a ese cliente.
 6. Comprueba que Cotizaciones tiene eyebrow, título y descripción como Ventas;
    en Notificaciones y Novedades no deben verse insignias de conteo junto al
    título.
