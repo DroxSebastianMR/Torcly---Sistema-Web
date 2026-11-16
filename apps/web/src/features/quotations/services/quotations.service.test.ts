@@ -60,6 +60,7 @@ describe('Servicio de cotizaciones (web)', () => {
   it('crea, actualiza y convierte presupuestos', async () => {
     const input = {
       customerId: 'c-1',
+      vehicleId: 'v-1',
       items: [
         {
           type: 'PRODUCT' as const,

@@ -9,7 +9,14 @@ import {
   SmartSelect,
   type SmartSelectOption,
 } from '@/components/ui/smart-select'
-import { useCustomers } from '@/features/customers/hooks/use-customers'
+import {
+  useCustomerMutations,
+  useCustomers,
+} from '@/features/customers/hooks/use-customers'
+import type {
+  CustomerCreateInput,
+  CustomerType,
+} from '@/features/customers/types/customers.types'
 import { customerDisplayName } from '@/features/customers/utils/customer-formatters'
 import { useVehicles } from '@/features/vehicles/hooks/use-vehicles'
 import { useSaleCatalog } from '@/features/sales/hooks/use-sales'
@@ -28,6 +35,19 @@ interface QuotationFormModalProps {
   onSubmit: (input: QuotationCreateInput) => Promise<void>
 }
 
+const emptyNewCustomer = {
+  documentNumber: '',
+  firstName: '',
+  lastName: '',
+  legalName: '',
+  phone: '',
+  email: '',
+  plate: '',
+  brand: '',
+  model: '',
+  year: String(new Date().getFullYear()),
+}
+
 const defaultValidityDays = () => {
   const date = new Date()
   date.setDate(date.getDate() + 7)
@@ -42,6 +62,7 @@ export function QuotationFormModal({
   onSubmit,
 }: QuotationFormModalProps) {
   const catalog = useSaleCatalog(open)
+  const customerMutations = useCustomerMutations()
   const customers = useCustomers(
     { search: '', type: 'all', page: 1, pageSize: 100 },
     open,
@@ -79,6 +100,9 @@ export function QuotationFormModal({
   const [selectedProductId, setSelectedProductId] = useState('')
   const [selectedServiceId, setSelectedServiceId] = useState('')
   const [addQuantity, setAddQuantity] = useState(1)
+  const [isNewCustomer, setIsNewCustomer] = useState(false)
+  const [customerType, setCustomerType] = useState<CustomerType>('NATURAL')
+  const [newCustomer, setNewCustomer] = useState(emptyNewCustomer)
 
   const customerOptions = useMemo<SmartSelectOption[]>(
     () =>
@@ -205,10 +229,80 @@ export function QuotationFormModal({
       return
     }
 
+    let assignedCustomerId = customerId
+    let assignedVehicleId = vehicleId
+    let assignedPlate = vehiclePlate
+
+    if (isNewCustomer) {
+      const vehicle = {
+        plate: newCustomer.plate.trim().toUpperCase(),
+        brand: newCustomer.brand.trim(),
+        model: newCustomer.model.trim(),
+        year: Number(newCustomer.year),
+      }
+      const isValidCustomer =
+        customerType === 'NATURAL'
+          ? newCustomer.documentNumber.trim().length === 8 &&
+            newCustomer.firstName.trim() &&
+            newCustomer.lastName.trim()
+          : newCustomer.documentNumber.trim().length === 11 &&
+            newCustomer.legalName.trim()
+
+      if (
+        !isValidCustomer ||
+        !newCustomer.phone.trim() ||
+        !vehicle.plate ||
+        !vehicle.brand ||
+        !vehicle.model ||
+        !vehicle.year
+      ) {
+        toast.error('Completa los datos obligatorios del cliente y vehículo.')
+        return
+      }
+
+      const customerInput: CustomerCreateInput =
+        customerType === 'NATURAL'
+          ? {
+              type: 'NATURAL',
+              documentNumber: newCustomer.documentNumber.trim(),
+              firstName: newCustomer.firstName.trim(),
+              lastName: newCustomer.lastName.trim(),
+              phone: newCustomer.phone.trim(),
+              email: newCustomer.email.trim() || null,
+              vehicle,
+            }
+          : {
+              type: 'LEGAL',
+              documentNumber: newCustomer.documentNumber.trim(),
+              legalName: newCustomer.legalName.trim(),
+              phone: newCustomer.phone.trim(),
+              email: newCustomer.email.trim() || null,
+              vehicle,
+            }
+
+      try {
+        const created =
+          await customerMutations.create.mutateAsync(customerInput)
+        assignedCustomerId = created.data.id
+        assignedVehicleId = created.data.createdVehicle?.id ?? ''
+        assignedPlate = vehicle.plate
+      } catch {
+        toast.error('No se pudo registrar el cliente y su vehículo.')
+        return
+      }
+    }
+
+    if (!assignedCustomerId || !assignedVehicleId) {
+      toast.error(
+        'Selecciona un cliente y uno de sus vehículos, o registra uno nuevo.',
+      )
+      return
+    }
+
     await onSubmit({
-      customerId: customerId || null,
-      vehicleId: vehicleId || null,
-      vehiclePlate: vehiclePlate.trim() || undefined,
+      customerId: assignedCustomerId,
+      vehicleId: assignedVehicleId,
+      vehiclePlate: assignedPlate.trim() || undefined,
       validUntil: validUntil || null,
       notes: notes.trim() || null,
       items,
@@ -234,20 +328,26 @@ export function QuotationFormModal({
           </Button>
           <Button
             type="button"
-            disabled={loading || items.length === 0}
+            disabled={
+              loading ||
+              customerMutations.create.isPending ||
+              items.length === 0
+            }
             onClick={handleSubmit}
           >
-            {loading ? 'Guardando…' : 'Guardar presupuesto'}
+            {loading || customerMutations.create.isPending
+              ? 'Guardando…'
+              : 'Guardar presupuesto'}
           </Button>
         </div>
       }
     >
       <div className="space-y-5">
-        {/* Cliente y Vehículo */}
+        {/* Cliente y vehículo asignados a la cotización */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Cliente
+              Cliente *
             </label>
             <SmartSelect
               value={customerId}
@@ -256,6 +356,7 @@ export function QuotationFormModal({
               searchPlaceholder="Buscar por nombre o DNI…"
               emptyMessage="Sin clientes registrados."
               options={customerOptions}
+              disabled={isNewCustomer}
               onChange={(val) => {
                 setCustomerId(val)
                 setVehicleId('')
@@ -265,7 +366,7 @@ export function QuotationFormModal({
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Vehículo (Opcional)
+              Vehículo *
             </label>
             <SmartSelect
               value={vehicleId}
@@ -282,7 +383,7 @@ export function QuotationFormModal({
                   : 'Selecciona primero un cliente.'
               }
               options={vehicleOptions}
-              disabled={!customerId}
+              disabled={!customerId || isNewCustomer}
               onChange={(val) => {
                 setVehicleId(val)
                 const veh = vehicles.data?.data.find((v) => v.id === val)
@@ -292,34 +393,186 @@ export function QuotationFormModal({
           </div>
         </div>
 
-        {/* Placa manual y Vigencia */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Placa tentativa / Referencia
-            </label>
-            <Input
-              type="text"
-              placeholder="Ej: ABC-123"
-              value={vehiclePlate}
-              onChange={(e) => setVehiclePlate(e.target.value.toUpperCase())}
-              className="font-mono uppercase"
-            />
+        <div className="rounded-xl border border-border bg-muted/20 p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                ¿Es un cliente nuevo?
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Regístralo junto con su vehículo y asígnalo a la cotización.
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isNewCustomer}
+              aria-label="¿Es un cliente nuevo?"
+              onClick={() => {
+                setIsNewCustomer((current) => !current)
+                setCustomerId('')
+                setVehicleId('')
+              }}
+              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${isNewCustomer ? 'bg-primary' : 'bg-input'}`}
+            >
+              <span
+                className={`absolute top-0.5 size-5 rounded-full bg-white transition-transform ${isNewCustomer ? 'translate-x-5' : 'translate-x-0.5'}`}
+              />
+            </button>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Válido hasta
-            </label>
-            <DatePicker
-              id="quotation-valid-until"
-              value={validUntil}
-              onChange={setValidUntil}
-              placeholder="Seleccionar fecha"
-              min={new Date().toISOString().slice(0, 10)}
-              align="right"
-            />
-          </div>
+          {isNewCustomer && (
+            <div className="mt-4 space-y-4 border-t border-border pt-4">
+              <div className="flex gap-4 text-sm font-medium">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    checked={customerType === 'NATURAL'}
+                    onChange={() => setCustomerType('NATURAL')}
+                  />
+                  Persona natural
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    checked={customerType === 'LEGAL'}
+                    onChange={() => setCustomerType('LEGAL')}
+                  />
+                  Empresa / jurídica
+                </label>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Input
+                  placeholder={
+                    customerType === 'NATURAL'
+                      ? 'DNI (8 dígitos) *'
+                      : 'RUC (11 dígitos) *'
+                  }
+                  value={newCustomer.documentNumber}
+                  onChange={(event) =>
+                    setNewCustomer((current) => ({
+                      ...current,
+                      documentNumber: event.target.value.replace(/\D/g, ''),
+                    }))
+                  }
+                />
+                <Input
+                  placeholder="Teléfono *"
+                  value={newCustomer.phone}
+                  onChange={(event) =>
+                    setNewCustomer((current) => ({
+                      ...current,
+                      phone: event.target.value,
+                    }))
+                  }
+                />
+                {customerType === 'NATURAL' ? (
+                  <>
+                    <Input
+                      placeholder="Nombres *"
+                      value={newCustomer.firstName}
+                      onChange={(event) =>
+                        setNewCustomer((current) => ({
+                          ...current,
+                          firstName: event.target.value,
+                        }))
+                      }
+                    />
+                    <Input
+                      placeholder="Apellidos *"
+                      value={newCustomer.lastName}
+                      onChange={(event) =>
+                        setNewCustomer((current) => ({
+                          ...current,
+                          lastName: event.target.value,
+                        }))
+                      }
+                    />
+                  </>
+                ) : (
+                  <Input
+                    className="sm:col-span-2"
+                    placeholder="Razón social *"
+                    value={newCustomer.legalName}
+                    onChange={(event) =>
+                      setNewCustomer((current) => ({
+                        ...current,
+                        legalName: event.target.value,
+                      }))
+                    }
+                  />
+                )}
+                <Input
+                  className="sm:col-span-2"
+                  placeholder="Correo electrónico (opcional)"
+                  value={newCustomer.email}
+                  onChange={(event) =>
+                    setNewCustomer((current) => ({
+                      ...current,
+                      email: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="grid gap-3 border-t border-border pt-4 sm:grid-cols-2">
+                <Input
+                  placeholder="Placa *"
+                  value={newCustomer.plate}
+                  onChange={(event) =>
+                    setNewCustomer((current) => ({
+                      ...current,
+                      plate: event.target.value.toUpperCase(),
+                    }))
+                  }
+                />
+                <Input
+                  placeholder="Marca *"
+                  value={newCustomer.brand}
+                  onChange={(event) =>
+                    setNewCustomer((current) => ({
+                      ...current,
+                      brand: event.target.value,
+                    }))
+                  }
+                />
+                <Input
+                  placeholder="Modelo *"
+                  value={newCustomer.model}
+                  onChange={(event) =>
+                    setNewCustomer((current) => ({
+                      ...current,
+                      model: event.target.value,
+                    }))
+                  }
+                />
+                <Input
+                  type="number"
+                  placeholder="Año *"
+                  value={newCustomer.year}
+                  onChange={(event) =>
+                    setNewCustomer((current) => ({
+                      ...current,
+                      year: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Válido hasta
+          </label>
+          <DatePicker
+            id="quotation-valid-until"
+            value={validUntil}
+            onChange={setValidUntil}
+            placeholder="Seleccionar fecha"
+            min={new Date().toISOString().slice(0, 10)}
+            align="right"
+          />
         </div>
 
         {/* Agregar Productos y Servicios */}

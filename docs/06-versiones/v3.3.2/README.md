@@ -9,7 +9,7 @@ Estado: Preparada para validación en desarrollo
 La versión **v3.3.2** reúne los sprints operativos integrados después de
 v2.2.2. El sistema refuerza la trazabilidad de clientes y vehículos, organiza
 la atención de taller, permite ventas con cobro inmediato y convierte
-cotizaciones preliminares en órdenes sin abandonar el flujo comercial.
+cotizaciones vinculadas en órdenes sin abandonar el flujo comercial.
 
 ## Capacidades incluidas
 
@@ -39,10 +39,11 @@ cotizaciones preliminares en órdenes sin abandonar el flujo comercial.
 
 ### Sprint 36 — Completar datos al convertir cotizaciones
 
-- Las cotizaciones preliminares pueden mantenerse sin cliente ni vehículo.
-- Al convertir, el sistema solicita seleccionar cliente y vehículo vinculados.
-- Puede registrarse un cliente nuevo con su primer vehículo durante la
-  conversión, en una única transacción.
+- Una cotización nueva requiere cliente y vehículo vinculados.
+- Durante su creación se puede seleccionar un cliente existente o registrar
+  uno nuevo con su primer vehículo.
+- Las cotizaciones históricas sin asignación se regularizan al convertirlas:
+  el sistema solicita cliente y vehículo vinculados o permite crearlos.
 - El mensaje de WhatsApp incluye cada repuesto o servicio presupuestado, su
   cantidad y subtotal; conserva la selección de destinatario del dispositivo.
 
@@ -60,8 +61,8 @@ cotizaciones preliminares en órdenes sin abandonar el flujo comercial.
 - La conversión a orden requiere siempre cliente y vehículo de la misma
   organización.
 - Un vehículo seleccionado debe pertenecer al cliente seleccionado.
-- WhatsApp es una acción de compartición: no obliga a registrar cliente ni
-  teléfono para una cotización preliminar.
+- WhatsApp es una acción de compartición: permite elegir manualmente el
+  contacto o número destinatario; no fuerza el teléfono registrado.
 - El aislamiento por organización aplica a clientes, vehículos, cotizaciones,
   órdenes, ventas, caja, inventario y mantenimiento.
 

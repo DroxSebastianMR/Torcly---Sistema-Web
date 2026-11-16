@@ -152,7 +152,7 @@ describe('Servicio de Cotizaciones', () => {
   it('rechaza crear una cotización sin ítems', async () => {
     await expect(
       quotationsService.create(
-        { customerId, items: [] },
+        { customerId, vehicleId, items: [] },
         { id: 'u-1', name: 'Juan Asesor' },
         context,
         organizationId,

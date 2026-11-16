@@ -142,6 +142,26 @@ async function nextQuotationCode(
   return `COT-${String(count + 1).padStart(6, '0')}`
 }
 
+async function assertCustomerVehicleOwnership(
+  transaction: Prisma.TransactionClient,
+  customerId: string,
+  vehicleId: string,
+  organizationId: string,
+) {
+  const vehicle = await transaction.vehicle.findFirst({
+    where: { id: vehicleId, customerId, organizationId },
+    select: { id: true, plate: true },
+  })
+  if (!vehicle) {
+    throw new AppError(
+      422,
+      'QUOTATION_CUSTOMER_VEHICLE_MISMATCH',
+      'El vehículo seleccionado no pertenece al cliente o a esta organización.',
+    )
+  }
+  return vehicle
+}
+
 export const quotationsRepository = {
   async list(filters: QuotationFilters, organizationId: string) {
     const search = filters.search?.trim()
@@ -198,6 +218,12 @@ export const quotationsRepository = {
     organizationId: string,
   ) {
     return databaseService.transaction(async (transaction) => {
+      const vehicle = await assertCustomerVehicleOwnership(
+        transaction,
+        input.customerId,
+        input.vehicleId,
+        organizationId,
+      )
       const code = await nextQuotationCode(transaction, organizationId)
       const { subtotal, total } = computeQuotationTotals(
         input.items.map((i) => ({
@@ -210,9 +236,9 @@ export const quotationsRepository = {
         data: {
           organizationId,
           code,
-          customerId: input.customerId ?? null,
-          vehicleId: input.vehicleId ?? null,
-          vehiclePlate: input.vehiclePlate?.trim() || null,
+          customerId: input.customerId,
+          vehicleId: input.vehicleId,
+          vehiclePlate: input.vehiclePlate?.trim() || vehicle.plate,
           status: 'DRAFT',
           subtotal,
           total,
@@ -286,6 +312,13 @@ export const quotationsRepository = {
         )
       }
 
+      const vehicle = await assertCustomerVehicleOwnership(
+        transaction,
+        input.customerId,
+        input.vehicleId,
+        organizationId,
+      )
+
       const { subtotal, total } = computeQuotationTotals(
         input.items.map((i) => ({
           unitPrice: Number(i.unitPrice ?? 0),
@@ -300,9 +333,9 @@ export const quotationsRepository = {
       const updated = await transaction.quotation.update({
         where: { id },
         data: {
-          customerId: input.customerId ?? null,
-          vehicleId: input.vehicleId ?? null,
-          vehiclePlate: input.vehiclePlate?.trim() || null,
+          customerId: input.customerId,
+          vehicleId: input.vehicleId,
+          vehiclePlate: input.vehiclePlate?.trim() || vehicle.plate,
           status: input.status ?? existing.status,
           subtotal,
           total,

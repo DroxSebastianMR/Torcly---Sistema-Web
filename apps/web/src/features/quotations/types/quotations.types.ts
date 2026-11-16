@@ -71,8 +71,8 @@ export interface QuotationItemInput {
 }
 
 export interface QuotationCreateInput {
-  customerId?: string | null
-  vehicleId?: string | null
+  customerId: string
+  vehicleId: string
   vehiclePlate?: string | null
   validUntil?: string | null
   notes?: string | null
