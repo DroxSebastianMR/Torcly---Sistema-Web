@@ -38,6 +38,42 @@ export interface QuotationUpdateInput extends QuotationCreateInput {
   status?: QuotationStatus
 }
 
+export type QuotationConversionInput =
+  | { mode: 'EXISTING'; customerId: string; vehicleId: string }
+  | {
+      mode: 'NEW'
+      customer:
+        | {
+            type: 'NATURAL'
+            documentNumber: string
+            firstName: string
+            lastName: string
+            phone: string
+            email?: string | null
+            vehicle: {
+              plate: string
+              brand: string
+              model: string
+              year: number
+              mileage?: number | null
+            }
+          }
+        | {
+            type: 'LEGAL'
+            documentNumber: string
+            legalName: string
+            phone: string
+            email?: string | null
+            vehicle: {
+              plate: string
+              brand: string
+              model: string
+              year: number
+              mileage?: number | null
+            }
+          }
+    }
+
 export interface QuotationCustomerRef {
   id: string
   documentNumber: string
@@ -83,6 +119,7 @@ export interface QuotationSummary {
   createdAt: string
   updatedAt: string
   itemCount: number
+  items?: QuotationItemResponse[]
 }
 
 export interface QuotationDetail extends QuotationSummary {

@@ -38,6 +38,32 @@ describe('quotation-formatters', () => {
       subtotal: 300,
       total: 300,
       itemCount: 2,
+      items: [
+        {
+          id: 'qi-1',
+          type: 'PRODUCT',
+          productId: 'p-1',
+          serviceId: null,
+          name: 'Filtro de aceite',
+          code: 'FIL-001',
+          unitLabel: 'und',
+          unitPrice: 100,
+          quantity: 2,
+          subtotal: 200,
+        },
+        {
+          id: 'qi-2',
+          type: 'SERVICE',
+          productId: null,
+          serviceId: 's-1',
+          name: 'Cambio de aceite',
+          code: 'SERV-001',
+          unitLabel: null,
+          unitPrice: 100,
+          quantity: 1,
+          subtotal: 100,
+        },
+      ],
       workOrderId: null,
       notes: 'Incluye cambio de aceite y filtro.',
       createdAt: '2026-11-09T10:00:00.000Z',
@@ -45,11 +71,21 @@ describe('quotation-formatters', () => {
       createdBy: 'Admin',
     }
 
-    const message = generateQuotationWhatsAppMessage(mockQuotation, 'Taller Hermanos Motors')
-    expect(message).toContain('Hola Carlos Mendoza, te saludamos de *Taller Hermanos Motors*.')
+    const message = generateQuotationWhatsAppMessage(
+      mockQuotation,
+      'Taller Hermanos Motors',
+    )
+    expect(message).toContain(
+      'Hola Carlos Mendoza, te saludamos de *Taller Hermanos Motors*.',
+    )
     expect(message).toContain('Toyota Corolla (ABC-123)')
     expect(message).toContain('· N° Cotización: *COT-000042*')
     expect(message).toContain('S/\u00a0300.00')
-    expect(message).toContain('· Observaciones: Incluye cambio de aceite y filtro.')
+    expect(message).toContain('Detalle del presupuesto:')
+    expect(message).toContain('• Filtro de aceite — 2 und (S/\u00a0200.00)')
+    expect(message).toContain('• Cambio de aceite — 1 (S/\u00a0100.00)')
+    expect(message).toContain(
+      '· Observaciones: Incluye cambio de aceite y filtro.',
+    )
   })
 })

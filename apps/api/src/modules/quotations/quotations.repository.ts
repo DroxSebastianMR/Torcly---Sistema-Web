@@ -4,6 +4,7 @@ import { AppError } from '../../shared/errors/app-error.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import type {
   QuotationCreateInput,
+  QuotationConversionInput,
   QuotationFilters,
   QuotationUpdateInput,
 } from './quotations.types.js'
@@ -43,6 +44,21 @@ const quotationSummarySelect = {
       model: true,
       year: true,
     },
+  },
+  items: {
+    select: {
+      id: true,
+      type: true,
+      productId: true,
+      serviceId: true,
+      name: true,
+      code: true,
+      unitLabel: true,
+      unitPrice: true,
+      quantity: true,
+      subtotal: true,
+    },
+    orderBy: { createdAt: 'asc' },
   },
   _count: { select: { items: true } },
 } satisfies Prisma.QuotationSelect
@@ -131,7 +147,9 @@ export const quotationsRepository = {
                     { firstName: { contains: search, mode: 'insensitive' } },
                     { lastName: { contains: search, mode: 'insensitive' } },
                     { legalName: { contains: search, mode: 'insensitive' } },
-                    { documentNumber: { contains: search, mode: 'insensitive' } },
+                    {
+                      documentNumber: { contains: search, mode: 'insensitive' },
+                    },
                   ],
                 },
               },
@@ -199,11 +217,12 @@ export const quotationsRepository = {
               unitLabel: item.unitLabel ?? null,
               unitPrice: Number(item.unitPrice ?? 0),
               quantity: Number(item.quantity ?? 1),
-              subtotal: Math.round(
-                (Number(item.unitPrice ?? 0) * Number(item.quantity ?? 1) +
-                  Number.EPSILON) *
-                  100,
-              ) / 100,
+              subtotal:
+                Math.round(
+                  (Number(item.unitPrice ?? 0) * Number(item.quantity ?? 1) +
+                    Number.EPSILON) *
+                    100,
+                ) / 100,
             })),
           },
         },
@@ -211,13 +230,19 @@ export const quotationsRepository = {
       })
 
       await transaction.auditLog.create({
-        data: auditData('QUOTATION_CREATED', actor.id, quotation.code, context, {
-          quotationId: quotation.id,
-          code: quotation.code,
-          subtotal,
-          total,
-          itemCount: quotation.items.length,
-        }),
+        data: auditData(
+          'QUOTATION_CREATED',
+          actor.id,
+          quotation.code,
+          context,
+          {
+            quotationId: quotation.id,
+            code: quotation.code,
+            subtotal,
+            total,
+            itemCount: quotation.items.length,
+          },
+        ),
       })
 
       return quotation
@@ -236,7 +261,11 @@ export const quotationsRepository = {
         where: { id, organizationId },
       })
       if (!existing)
-        throw new AppError(404, 'QUOTATION_NOT_FOUND', 'Cotización no encontrada.')
+        throw new AppError(
+          404,
+          'QUOTATION_NOT_FOUND',
+          'Cotización no encontrada.',
+        )
       if (existing.status === 'APPROVED') {
         throw new AppError(
           409,
@@ -277,11 +306,12 @@ export const quotationsRepository = {
               unitLabel: item.unitLabel ?? null,
               unitPrice: Number(item.unitPrice ?? 0),
               quantity: Number(item.quantity ?? 1),
-              subtotal: Math.round(
-                (Number(item.unitPrice ?? 0) * Number(item.quantity ?? 1) +
-                  Number.EPSILON) *
-                  100,
-              ) / 100,
+              subtotal:
+                Math.round(
+                  (Number(item.unitPrice ?? 0) * Number(item.quantity ?? 1) +
+                    Number.EPSILON) *
+                    100,
+                ) / 100,
             })),
           },
         },
@@ -304,6 +334,7 @@ export const quotationsRepository = {
 
   async convertToOrder(
     id: string,
+    input: QuotationConversionInput,
     actor: Actor,
     context: RequestContext,
     organizationId: string,
@@ -314,7 +345,11 @@ export const quotationsRepository = {
         include: { items: true },
       })
       if (!quotation)
-        throw new AppError(404, 'QUOTATION_NOT_FOUND', 'Cotización no encontrada.')
+        throw new AppError(
+          404,
+          'QUOTATION_NOT_FOUND',
+          'Cotización no encontrada.',
+        )
       if (quotation.status === 'APPROVED' || quotation.workOrderId) {
         throw new AppError(
           409,
@@ -322,11 +357,93 @@ export const quotationsRepository = {
           'La cotización ya fue convertida a Orden de Taller.',
         )
       }
-      if (!quotation.customerId || !quotation.vehicleId) {
+      let customerId = quotation.customerId
+      let vehicleId = quotation.vehicleId
+
+      if (input.mode === 'EXISTING') {
+        const customer = await transaction.customer.findFirst({
+          where: { id: input.customerId, organizationId },
+          select: { id: true },
+        })
+        const vehicle = await transaction.vehicle.findFirst({
+          where: {
+            id: input.vehicleId,
+            organizationId,
+            customerId: input.customerId,
+          },
+          select: { id: true },
+        })
+        if (!customer || !vehicle) {
+          throw new AppError(
+            400,
+            'QUOTATION_CONVERSION_ASSOCIATION_INVALID',
+            'Selecciona un cliente y un vehículo vinculados de tu organización.',
+          )
+        }
+        customerId = customer.id
+        vehicleId = vehicle.id
+      } else if (input.mode === 'NEW') {
+        const customerInput = input.customer
+        const customer = await transaction.customer.create({
+          data:
+            customerInput.type === 'NATURAL'
+              ? {
+                  organizationId,
+                  type: 'NATURAL',
+                  documentNumber: customerInput.documentNumber,
+                  firstName: customerInput.firstName,
+                  lastName: customerInput.lastName,
+                  phone: customerInput.phone,
+                  email: customerInput.email ?? null,
+                }
+              : {
+                  organizationId,
+                  type: 'LEGAL',
+                  documentNumber: customerInput.documentNumber,
+                  legalName: customerInput.legalName,
+                  phone: customerInput.phone,
+                  email: customerInput.email ?? null,
+                },
+        })
+        const vehicle = await transaction.vehicle.create({
+          data: {
+            organizationId,
+            customerId: customer.id,
+            plate: customerInput.vehicle.plate,
+            brand: customerInput.vehicle.brand,
+            model: customerInput.vehicle.model,
+            year: customerInput.vehicle.year,
+            mileage: customerInput.vehicle.mileage ?? null,
+          },
+        })
+        customerId = customer.id
+        vehicleId = vehicle.id
+        await transaction.auditLog.createMany({
+          data: [
+            auditData(
+              'CUSTOMER_CREATED',
+              actor.id,
+              customer.documentNumber,
+              context,
+              {
+                customerId: customer.id,
+                source: 'QUOTATION_CONVERSION',
+              },
+            ),
+            auditData('VEHICLE_CREATED', actor.id, vehicle.plate, context, {
+              vehicleId: vehicle.id,
+              customerId: customer.id,
+              source: 'QUOTATION_CONVERSION',
+            }),
+          ],
+        })
+      }
+
+      if (!customerId || !vehicleId) {
         throw new AppError(
           400,
           'QUOTATION_INCOMPLETE_FOR_CONVERSION',
-          'La cotización debe tener un cliente y un vehículo registrados para convertirse en orden de taller.',
+          'Completa un cliente y un vehículo antes de convertir la cotización.',
         )
       }
 
@@ -341,8 +458,8 @@ export const quotationsRepository = {
           code: orderCode,
           organizationId,
           appointmentId: null,
-          customerId: quotation.customerId,
-          vehicleId: quotation.vehicleId,
+          customerId,
+          vehicleId,
           source: 'WALK_IN',
           receptionNotes: `Convertido desde Cotización ${quotation.code}. ${
             quotation.notes ? `Notas: ${quotation.notes}` : ''
@@ -374,6 +491,9 @@ export const quotationsRepository = {
         data: {
           status: 'APPROVED',
           workOrderId: workOrder.id,
+          customerId,
+          vehicleId,
+          vehiclePlate: null,
         },
         include: quotationDetailInclude,
       })

@@ -77,7 +77,15 @@ describe('Servicio de cotizaciones (web)', () => {
     await quotationsService.update('q-1', input)
     expect(api.put).toHaveBeenCalledWith('/quotations/q-1', input)
 
-    await quotationsService.convertToOrder('q-1')
-    expect(api.post).toHaveBeenCalledWith('/quotations/q-1/convert-to-order')
+    const conversionInput = {
+      mode: 'EXISTING' as const,
+      customerId: 'c-1',
+      vehicleId: 'v-1',
+    }
+    await quotationsService.convertToOrder('q-1', conversionInput)
+    expect(api.post).toHaveBeenCalledWith(
+      '/quotations/q-1/convert-to-order',
+      conversionInput,
+    )
   })
 })

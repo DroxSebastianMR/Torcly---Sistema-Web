@@ -4,6 +4,7 @@ import { assertHasItems } from './quotations.rules.js'
 import { quotationsRepository } from './quotations.repository.js'
 import type {
   QuotationCreateInput,
+  QuotationConversionInput,
   QuotationDetail,
   QuotationFilters,
   QuotationItemResponse,
@@ -63,13 +64,16 @@ function toSummary(quotation: any): QuotationSummary {
     status: quotation.status,
     subtotal: Number(quotation.subtotal),
     total: Number(quotation.total),
-    validUntil: quotation.validUntil ? quotation.validUntil.toISOString() : null,
+    validUntil: quotation.validUntil
+      ? quotation.validUntil.toISOString()
+      : null,
     notes: quotation.notes ?? null,
     workOrderId: quotation.workOrderId ?? null,
     createdBy: quotation.createdBy,
     createdAt: quotation.createdAt.toISOString(),
     updatedAt: quotation.updatedAt.toISOString(),
     itemCount: quotation._count?.items ?? quotation.items?.length ?? 0,
+    items: quotation.items?.map(toItemResponse),
   }
 }
 
@@ -97,7 +101,11 @@ export const quotationsService = {
   async getById(id: string, organizationId: string) {
     const quotation = await quotationsRepository.findById(id, organizationId)
     if (!quotation) {
-      throw new AppError(404, 'QUOTATION_NOT_FOUND', 'Cotización no encontrada.')
+      throw new AppError(
+        404,
+        'QUOTATION_NOT_FOUND',
+        'Cotización no encontrada.',
+      )
     }
     return { data: toDetail(quotation) }
   },
@@ -138,12 +146,14 @@ export const quotationsService = {
 
   async convertToOrder(
     id: string,
+    input: QuotationConversionInput,
     actor: Actor,
     context: RequestContext,
     organizationId: string,
   ) {
     const result = await quotationsRepository.convertToOrder(
       id,
+      input,
       actor,
       context,
       organizationId,

@@ -4,6 +4,7 @@ import type {
   DataResponse,
   QuotationCreateInput,
   QuotationDetail,
+  QuotationConversionInput,
   QuotationFilters,
   QuotationsResponse,
   QuotationUpdateInput,
@@ -44,12 +45,12 @@ export const quotationsService = {
       input,
     )
   },
-  convertToOrder(id: string) {
+  convertToOrder(id: string, input: QuotationConversionInput) {
     return api.post<
       DataResponse<{
         quotation: QuotationDetail
         workOrder: { id: string; code: string }
       }>
-    >(endpoints.quotations.convertToOrder(id))
+    >(endpoints.quotations.convertToOrder(id), input)
   },
 }
