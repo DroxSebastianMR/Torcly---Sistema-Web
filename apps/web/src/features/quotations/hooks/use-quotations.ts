@@ -3,6 +3,7 @@ import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { quotationsService } from '../services/quotations.service'
 import type {
   QuotationCreateInput,
+  QuotationConversionInput,
   QuotationFilters,
   QuotationUpdateInput,
 } from '../types/quotations.types'
@@ -49,8 +50,13 @@ export function useQuotationMutations() {
         finishActionToast(context?.toastId),
     }),
     update: useMutation({
-      mutationFn: ({ id, input }: { id: string; input: QuotationUpdateInput }) =>
-        quotationsService.update(id, input),
+      mutationFn: ({
+        id,
+        input,
+      }: {
+        id: string
+        input: QuotationUpdateInput
+      }) => quotationsService.update(id, input),
       onMutate: () => ({
         toastId: startActionToast('Actualizando presupuesto…'),
       }),
@@ -59,7 +65,13 @@ export function useQuotationMutations() {
         finishActionToast(context?.toastId),
     }),
     convertToOrder: useMutation({
-      mutationFn: (id: string) => quotationsService.convertToOrder(id),
+      mutationFn: ({
+        id,
+        input,
+      }: {
+        id: string
+        input: QuotationConversionInput
+      }) => quotationsService.convertToOrder(id, input),
       onMutate: () => ({
         toastId: startActionToast('Convirtiendo a orden de taller…'),
       }),

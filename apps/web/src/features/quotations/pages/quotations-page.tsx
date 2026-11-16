@@ -13,6 +13,7 @@ import { paths } from '@/app/router/constants/paths'
 import { QuotationsTable } from '../components/quotations-table'
 import { QuotationFormModal } from '../components/quotation-form-modal'
 import { QuotationDetailModal } from '../components/quotation-detail-modal'
+import { QuotationConversionModal } from '../components/quotation-conversion-modal'
 import {
   useQuotation,
   useQuotations,
@@ -24,6 +25,7 @@ import type {
   QuotationFilters,
   QuotationStatusFilter,
   QuotationSummary,
+  QuotationConversionInput,
 } from '../types/quotations.types'
 
 const initialFilters: QuotationFilters = {
@@ -52,6 +54,9 @@ export default function QuotationsPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [editingQuotation, setEditingQuotation] =
     useState<QuotationDetail | null>(null)
+  const [conversionQuotation, setConversionQuotation] = useState<
+    QuotationSummary | QuotationDetail | null
+  >(null)
 
   const debouncedSearch = useDebouncedValue(filters.search)
   const queryFilters = { ...filters, search: debouncedSearch }
@@ -63,7 +68,9 @@ export default function QuotationsPage() {
   const total = quotations.data?.pagination.total ?? 0
   const visibleQuotations = quotations.data?.data ?? []
 
-  const draftCount = visibleQuotations.filter((q) => q.status === 'DRAFT').length
+  const draftCount = visibleQuotations.filter(
+    (q) => q.status === 'DRAFT',
+  ).length
   const sentCount = visibleQuotations.filter((q) => q.status === 'SENT').length
   const approvedCount = visibleQuotations.filter(
     (q) => q.status === 'APPROVED',
@@ -96,22 +103,40 @@ export default function QuotationsPage() {
     quotation: QuotationSummary | QuotationDetail,
   ) => {
     if (!quotation.customer || !quotation.vehicle) {
-      toast.error(
-        'La cotización debe tener un cliente y un vehículo asignados para convertirse en orden de taller.',
-      )
+      setConversionQuotation(quotation)
       return
     }
 
+    await convertQuotation(quotation, {
+      mode: 'EXISTING',
+      customerId: quotation.customer.id,
+      vehicleId: quotation.vehicle.id,
+    })
+  }
+
+  const convertQuotation = async (
+    quotation: QuotationSummary | QuotationDetail,
+    input: QuotationConversionInput,
+  ) => {
     try {
-      const result = await mutations.convertToOrder.mutateAsync(quotation.id)
+      const result = await mutations.convertToOrder.mutateAsync({
+        id: quotation.id,
+        input,
+      })
       toast.success(
         `¡Cotización aprobada! Se generó la orden de taller ${result.data.workOrder.code}`,
       )
       setSelectedId(null)
+      setConversionQuotation(null)
       navigate(paths.workOrders)
     } catch {
       toast.error('No se pudo convertir la cotización a orden de taller.')
     }
+  }
+
+  const handleCompleteConversion = async (input: QuotationConversionInput) => {
+    if (!conversionQuotation) return
+    await convertQuotation(conversionQuotation, input)
   }
 
   const statusTabs: Array<{ id: QuotationStatusFilter; label: string }> = [
@@ -259,6 +284,17 @@ export default function QuotationsPage() {
         onClose={() => setSelectedId(null)}
         onConvertToOrder={handleConvertToOrder}
       />
+
+      {conversionQuotation && (
+        <QuotationConversionModal
+          key={conversionQuotation.id}
+          open
+          quotation={conversionQuotation}
+          loading={mutations.convertToOrder.isPending}
+          onClose={() => setConversionQuotation(null)}
+          onSubmit={handleCompleteConversion}
+        />
+      )}
 
       {/* Modal de Formulario */}
       {formOpen && (

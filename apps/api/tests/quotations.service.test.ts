@@ -173,13 +173,26 @@ describe('Servicio de Cotizaciones', () => {
       workOrder: { id: 'order-99', code: 'OT-000005' },
     })
 
+    const conversionInput = {
+      mode: 'EXISTING' as const,
+      customerId: 'customer-1',
+      vehicleId: 'vehicle-1',
+    }
     const result = await quotationsService.convertToOrder(
       'quote-1',
+      conversionInput,
       { id: 'u-1', name: 'Juan Asesor' },
       context,
       organizationId,
     )
 
+    expect(repository.convertToOrder).toHaveBeenCalledWith(
+      'quote-1',
+      conversionInput,
+      { id: 'u-1', name: 'Juan Asesor' },
+      context,
+      organizationId,
+    )
     expect(result.data.quotation.status).toBe('APPROVED')
     expect(result.data.workOrder.code).toBe('OT-000005')
   })

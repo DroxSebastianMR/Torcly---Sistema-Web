@@ -3,6 +3,7 @@ import { getRequestContext } from '../auth/auth.middleware.js'
 import { requireOrganizationContext } from '../auth/organization-context.js'
 import {
   quotationCreateSchema,
+  quotationConversionSchema,
   quotationIdSchema,
   quotationQuerySchema,
   quotationUpdateSchema,
@@ -64,9 +65,11 @@ export const convertQuotationToOrder: RequestHandler = async (
   response,
 ) => {
   const { id } = quotationIdSchema.parse(request.params)
+  const input = quotationConversionSchema.parse(request.body)
   response.json(
     await quotationsService.convertToOrder(
       id,
+      input,
       actor(request),
       getRequestContext(request, response),
       organizationId(request),

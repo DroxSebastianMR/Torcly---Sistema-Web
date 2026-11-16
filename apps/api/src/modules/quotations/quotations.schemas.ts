@@ -3,6 +3,10 @@ import {
   hasAtMostThreeDecimals,
   QUANTITY_MAX_DECIMALS_MESSAGE,
 } from '../../shared/validation/quantity.js'
+import {
+  customerInputSchema,
+  customerVehicleInputSchema,
+} from '../customers/customers.schemas.js'
 
 export const quotationIdSchema = z.object({
   id: z.uuid('Cotización inválida.'),
@@ -65,6 +69,25 @@ export const quotationUpdateSchema = quotationCreateSchema
   })
   .strict()
 
+export const quotationConversionSchema = z.discriminatedUnion('mode', [
+  z
+    .object({
+      mode: z.literal('EXISTING'),
+      customerId: z.uuid('Cliente inválido.'),
+      vehicleId: z.uuid('Vehículo inválido.'),
+    })
+    .strict(),
+  z
+    .object({
+      mode: z.literal('NEW'),
+      customer: customerInputSchema.and(
+        z.object({ vehicle: customerVehicleInputSchema }),
+      ),
+    })
+    .strict(),
+])
+
 export type QuotationCreateDto = z.infer<typeof quotationCreateSchema>
 export type QuotationUpdateDto = z.infer<typeof quotationUpdateSchema>
 export type QuotationQueryDto = z.infer<typeof quotationQuerySchema>
+export type QuotationConversionDto = z.infer<typeof quotationConversionSchema>
