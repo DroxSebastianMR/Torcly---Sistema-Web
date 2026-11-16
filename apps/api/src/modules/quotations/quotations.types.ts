@@ -119,6 +119,7 @@ export interface QuotationSummary {
   createdAt: string
   updatedAt: string
   itemCount: number
+  items?: QuotationItemResponse[]
 }
 
 export interface QuotationDetail extends QuotationSummary {

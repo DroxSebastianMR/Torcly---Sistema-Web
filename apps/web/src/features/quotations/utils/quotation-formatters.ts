@@ -1,4 +1,8 @@
-import type { QuotationDetail, QuotationStatus, QuotationSummary } from '../types/quotations.types'
+import type {
+  QuotationDetail,
+  QuotationStatus,
+  QuotationSummary,
+} from '../types/quotations.types'
 
 export const currencyFormatter = new Intl.NumberFormat('es-PE', {
   style: 'currency',
@@ -49,6 +53,14 @@ export function generateQuotationWhatsAppMessage(
   const validText = quotation.validUntil
     ? `· Válido hasta: ${dateFormatter.format(new Date(quotation.validUntil))}\n`
     : ''
+  const itemsText = quotation.items?.length
+    ? `\nDetalle del presupuesto:\n${quotation.items
+        .map(
+          (item) =>
+            `• ${item.name} — ${item.quantity}${item.unitLabel ? ` ${item.unitLabel}` : ''} (${currencyFormatter.format(item.subtotal)})`,
+        )
+        .join('\n')}\n`
+    : ''
 
   return (
     `Hola ${customerName}, te saludamos de *${workshopName}*.\n\n` +
@@ -56,6 +68,7 @@ export function generateQuotationWhatsAppMessage(
     `· N° Cotización: *${quotation.code}*\n` +
     `· Total: *${currencyFormatter.format(quotation.total)}*\n` +
     validText +
+    itemsText +
     (quotation.notes ? `· Observaciones: ${quotation.notes}\n` : '') +
     `\nQuedamos atentos a tu confirmación para coordinar los trabajos. ¡Muchas gracias!`
   )

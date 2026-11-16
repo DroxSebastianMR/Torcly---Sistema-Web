@@ -45,6 +45,21 @@ const quotationSummarySelect = {
       year: true,
     },
   },
+  items: {
+    select: {
+      id: true,
+      type: true,
+      productId: true,
+      serviceId: true,
+      name: true,
+      code: true,
+      unitLabel: true,
+      unitPrice: true,
+      quantity: true,
+      subtotal: true,
+    },
+    orderBy: { createdAt: 'asc' },
+  },
   _count: { select: { items: true } },
 } satisfies Prisma.QuotationSelect
 

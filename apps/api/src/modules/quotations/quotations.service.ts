@@ -73,6 +73,7 @@ function toSummary(quotation: any): QuotationSummary {
     createdAt: quotation.createdAt.toISOString(),
     updatedAt: quotation.updatedAt.toISOString(),
     itemCount: quotation._count?.items ?? quotation.items?.length ?? 0,
+    items: quotation.items?.map(toItemResponse),
   }
 }
 
