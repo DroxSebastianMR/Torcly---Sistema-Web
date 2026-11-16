@@ -4,6 +4,7 @@ import type {
   Vehicle,
   VehicleCreateInput,
   VehicleFilters,
+  VehicleHistoryResponse,
   VehicleUpdateInput,
   VehiclesResponse,
 } from '../types/vehicles.types'
@@ -32,6 +33,12 @@ export const vehiclesService = {
   },
   get(id: string, signal?: AbortSignal) {
     return api.get<DataResponse<Vehicle>>(endpoints.vehicles.detail(id), signal)
+  },
+  getHistory(id: string, signal?: AbortSignal) {
+    return api.get<DataResponse<VehicleHistoryResponse>>(
+      endpoints.vehicles.history(id),
+      signal,
+    )
   },
   create(input: VehicleCreateInput) {
     return api.post<DataResponse<Vehicle>>(endpoints.vehicles.root, input)

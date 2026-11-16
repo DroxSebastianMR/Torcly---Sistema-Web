@@ -2,6 +2,7 @@
 
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { WorkOrdersResponse } from '../types/work-orders.types'
 import Page from './work-orders-page'
@@ -77,6 +78,9 @@ vi.mock('../components/work-order-return-modal', () => ({
 vi.mock('../components/work-order-delivery-modal', () => ({
   WorkOrderDeliveryModal: () => null,
 }))
+vi.mock('@/features/appointments/pages/appointments-page', () => ({
+  default: () => <div data-testid="appointments-page-stub">Vista de Citas</div>,
+}))
 
 const orderMock = {
   id: 'wo1',
@@ -136,8 +140,12 @@ function response(
   }
 }
 
-function renderPage() {
-  return render(<Page />)
+function renderPage(initialEntries = ['/ordenes']) {
+  return render(
+    <MemoryRouter initialEntries={initialEntries}>
+      <Page />
+    </MemoryRouter>,
+  )
 }
 
 function defaultMocks(permissions: string[]) {
@@ -280,5 +288,43 @@ describe('Página de órdenes de taller', () => {
         expect.objectContaining({ search: 'HILUX' }),
       ),
     )
+  })
+
+  it('permite alternar entre la pestaña de órdenes y la de citas', async () => {
+    defaultMocks(['workshop:read'])
+    orders.useWorkOrders.mockReturnValue({
+      data: response(),
+      isPending: false,
+      isFetching: false,
+      isError: false,
+      refetch: vi.fn(),
+    })
+    orders.useWorkOrder.mockReturnValue({ data: undefined, isPending: false })
+
+    const user = userEvent.setup()
+    renderPage(['/ordenes'])
+
+    expect(screen.getByRole('tab', { name: /Órdenes de taller/i })).toBeTruthy()
+    expect(screen.getByRole('tab', { name: /Citas programadas/i })).toBeTruthy()
+
+    await user.click(screen.getByRole('tab', { name: /Citas programadas/i }))
+
+    expect(screen.getByTestId('appointments-page-stub')).toBeTruthy()
+  })
+
+  it('abre directamente en citas cuando el parámetro query tab=citas está presente', () => {
+    defaultMocks(['workshop:read'])
+    orders.useWorkOrders.mockReturnValue({
+      data: response(),
+      isPending: false,
+      isFetching: false,
+      isError: false,
+      refetch: vi.fn(),
+    })
+    orders.useWorkOrder.mockReturnValue({ data: undefined, isPending: false })
+
+    renderPage(['/ordenes?tab=citas'])
+
+    expect(screen.getByTestId('appointments-page-stub')).toBeTruthy()
   })
 })

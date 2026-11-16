@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ReactNode,
 } from 'react'
 import { Check, ChevronDown, Search } from 'lucide-react'
 import { ClearInputButton } from './clear-input-button'
@@ -15,6 +16,7 @@ import { cn } from '@/lib/utils'
 export interface SmartSelectOption {
   value: string
   label: string
+  icon?: ReactNode
   meta?: string
   disabled?: boolean
   searchTerms?: readonly string[]
@@ -37,6 +39,7 @@ interface SmartSelectProps {
   className?: string
   filterOption?: (option: SmartSelectOption, query: string) => boolean
   onOpen?: () => void
+  onOpenChange?: (open: boolean) => void
   'aria-label'?: string
   'aria-invalid'?: boolean
 }
@@ -61,6 +64,7 @@ export function SmartSelect({
   className,
   filterOption,
   onOpen,
+  onOpenChange,
   'aria-label': ariaLabel,
   'aria-invalid': ariaInvalid,
 }: SmartSelectProps) {
@@ -142,6 +146,10 @@ export function SmartSelect({
       requestAnimationFrame(() => searchRef.current?.focus())
   }, [open, showsSearchInput])
 
+  useEffect(() => {
+    onOpenChange?.(open)
+  }, [onOpenChange, open])
+
   const openMenu = () => {
     onOpen?.()
     setQuery(showsSearchInput ? (selected?.label ?? value) : '')
@@ -194,11 +202,14 @@ export function SmartSelect({
         <span
           className={
             selected
-              ? 'truncate text-foreground'
+              ? 'flex items-center gap-2 min-w-0 flex-1 truncate text-foreground'
               : 'truncate text-muted-foreground'
           }
         >
-          {selected?.label ?? (value || placeholder)}
+          {selected?.icon}
+          <span className="truncate">
+            {selected?.label ?? (value || placeholder)}
+          </span>
         </span>
         <ChevronDown
           aria-hidden
@@ -277,8 +288,9 @@ export function SmartSelect({
                         closeMenu(true)
                       }}
                     >
-                      <span className="min-w-0 flex-1 truncate">
-                        {option.label}
+                      <span className="flex items-center gap-2 min-w-0 flex-1 truncate">
+                        {option.icon}
+                        <span className="truncate">{option.label}</span>
                       </span>
                       <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
                         {option.meta}

@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, Warehouse } from 'lucide-react'
+import { AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { useYardCapacity } from '../hooks/use-work-orders'
 
 interface YardCapacityWidgetProps {
@@ -29,61 +29,46 @@ export function YardCapacityWidget({
       className={`relative isolate overflow-hidden rounded-2xl border border-[#e2ebe6] bg-card p-4 sm:p-5 shadow-[0_8px_24px_rgb(16_44_37_/_5%)] ${className}`}
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div
-            className={`flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors ${
-              isAtCapacity
-                ? 'bg-rose-100 text-rose-700'
-                : occupiedBays >= 6
-                  ? 'bg-amber-100 text-amber-700'
-                  : 'bg-emerald-100/70 text-brand-forest'
-            }`}
-          >
-            <Warehouse size={22} />
-          </div>
-
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Aforo y Capacidad de Patio
-              </span>
-              <span
-                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                  isAtCapacity
-                    ? 'bg-rose-100 text-rose-800'
-                    : occupiedBays >= 6
-                      ? 'bg-amber-100 text-amber-800'
-                      : 'bg-emerald-100 text-emerald-800'
-                }`}
-              >
-                {isAtCapacity ? (
-                  <>
-                    <AlertTriangle size={11} /> Patio lleno (8/8)
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 size={11} /> {availableBays} bahías
-                    disponibles
-                  </>
-                )}
-              </span>
-            </div>
-
-            <p className="mt-0.5 text-lg font-bold text-brand-forest">
-              {isLoading ? (
-                'Consultando patio…'
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Aforo y Capacidad de Patio
+            </span>
+            <span
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                isAtCapacity
+                  ? 'bg-rose-100 text-rose-800'
+                  : occupiedBays >= 6
+                    ? 'bg-amber-100 text-amber-800'
+                    : 'bg-emerald-100 text-emerald-800'
+              }`}
+            >
+              {isAtCapacity ? (
+                <>
+                  <AlertTriangle size={11} /> Patio lleno (8/8)
+                </>
               ) : (
                 <>
-                  <span className="text-2xl font-extrabold tabular-nums">
-                    {occupiedBays}
-                  </span>{' '}
-                  <span className="text-sm font-medium text-muted-foreground">
-                    de {maxCapacity} bahías ocupadas ({occupancyRate}%)
-                  </span>
+                  <CheckCircle2 size={11} /> {availableBays} bahías disponibles
                 </>
               )}
-            </p>
+            </span>
           </div>
+
+          <p className="mt-0.5 text-lg font-bold text-brand-forest">
+            {isLoading ? (
+              'Consultando patio…'
+            ) : (
+              <>
+                <span className="text-2xl font-extrabold tabular-nums">
+                  {occupiedBays}
+                </span>{' '}
+                <span className="text-sm font-medium text-muted-foreground">
+                  de {maxCapacity} bahías ocupadas ({occupancyRate}%)
+                </span>
+              </>
+            )}
+          </p>
         </div>
 
         {/* Visual 8 Bays Segmented Grid */}

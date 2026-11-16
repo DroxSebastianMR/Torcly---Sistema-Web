@@ -5,6 +5,7 @@ import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { salesService } from '../services/sales.service'
 import type {
   SaleCancellationInput,
+  SaleConfirmAndPayInput,
   SaleFilters,
   SaleInput,
 } from '../types/sales.types'
@@ -92,6 +93,21 @@ export function useSaleMutations() {
     confirm: useMutation({
       mutationFn: (id: string) => salesService.confirm(id),
       onMutate: () => ({ toastId: startActionToast('Confirmando venta…') }),
+      onSuccess: refreshSales,
+      onSettled: (_data, _error, _variables, context) =>
+        finishActionToast(context?.toastId),
+    }),
+    confirmAndPay: useMutation({
+      mutationFn: ({
+        id,
+        input,
+      }: {
+        id: string
+        input: SaleConfirmAndPayInput
+      }) => salesService.confirmAndPay(id, input),
+      onMutate: () => ({
+        toastId: startActionToast('Procesando cobro y venta…'),
+      }),
       onSuccess: refreshSales,
       onSettled: (_data, _error, _variables, context) =>
         finishActionToast(context?.toastId),

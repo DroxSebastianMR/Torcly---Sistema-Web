@@ -60,8 +60,13 @@ export const getWorkOrderTechnicians: RequestHandler = async (
 }
 
 export const createWorkOrder: RequestHandler = async (request, response) => {
-  const { appointmentId, currentMileage, fuelLevel, receptionNotes } =
-    createWorkOrderSchema.parse(request.body)
+  const {
+    appointmentId,
+    currentMileage,
+    fuelLevel,
+    receptionNotes,
+    receptionChecklist,
+  } = createWorkOrderSchema.parse(request.body)
   response
     .status(201)
     .json(
@@ -70,7 +75,7 @@ export const createWorkOrder: RequestHandler = async (request, response) => {
         actor(request),
         getRequestContext(request, response),
         organizationId(request),
-        { currentMileage, fuelLevel, receptionNotes },
+        { currentMileage, fuelLevel, receptionNotes, receptionChecklist },
       ),
     )
 }

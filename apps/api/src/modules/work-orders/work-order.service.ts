@@ -42,6 +42,7 @@ import type {
   WorkOrderVehicleHistoryItem,
   WorkOrderVehicleRef,
   CreateDirectWorkOrderInput,
+  ReceptionChecklist,
 } from './work-order.types.js'
 
 type WorkOrderActor = { id: string; name: string }
@@ -109,6 +110,50 @@ function toLineResponse(line: {
   }
 }
 
+function toReceptionChecklist(value: unknown): ReceptionChecklist | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const checklist = value as Partial<ReceptionChecklist>
+  const validFuelLevels: ReceptionChecklist['fuelLevel'][] = [
+    'E',
+    '1/4',
+    '1/2',
+    '3/4',
+    'F',
+  ]
+
+  if (
+    !validFuelLevels.includes(
+      checklist.fuelLevel as ReceptionChecklist['fuelLevel'],
+    ) ||
+    typeof checklist.hasSpareTire !== 'boolean' ||
+    typeof checklist.hasJackAndTools !== 'boolean' ||
+    typeof checklist.hasVehicleDocuments !== 'boolean' ||
+    typeof checklist.hasRadioFaceplate !== 'boolean'
+  ) {
+    return null
+  }
+
+  return {
+    fuelLevel: checklist.fuelLevel as ReceptionChecklist['fuelLevel'],
+    hasSpareTire: checklist.hasSpareTire,
+    hasJackAndTools: checklist.hasJackAndTools,
+    hasVehicleDocuments: checklist.hasVehicleDocuments,
+    hasRadioFaceplate: checklist.hasRadioFaceplate,
+    externalDamageNotes:
+      typeof checklist.externalDamageNotes === 'string'
+        ? checklist.externalDamageNotes
+        : null,
+    photos: Array.isArray(checklist.photos)
+      ? checklist.photos.filter(
+          (photo): photo is string => typeof photo === 'string',
+        )
+      : [],
+  }
+}
+
 function toSummary(
   order: {
     id: string
@@ -118,6 +163,7 @@ function toSummary(
     currentMileage?: number | null
     fuelLevel?: string | null
     receptionNotes?: string | null
+    receptionChecklist?: unknown
     customer: WorkOrderRecord['customer']
     vehicle: WorkOrderRecord['vehicle']
     status: WorkOrderSummary['status']
@@ -177,6 +223,7 @@ function toSummary(
     currentMileage: order.currentMileage ?? null,
     fuelLevel: order.fuelLevel ?? null,
     receptionNotes: order.receptionNotes ?? null,
+    receptionChecklist: toReceptionChecklist(order.receptionChecklist),
     customer: toCustomerRef(order.customer),
     vehicle: toVehicleRef(order.vehicle),
     status: order.status,
@@ -649,6 +696,7 @@ export const workOrdersService = {
       currentMileage?: number | null
       fuelLevel?: string | null
       receptionNotes?: string | null
+      receptionChecklist?: ReceptionChecklist | null
     },
   ) {
     try {

@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ErrorState } from '@/components/ui/error-state'
 import { ModuleMetrics } from '@/components/ui/module-metrics'
+import { PageHeader } from '@/components/ui/page-header'
 import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
@@ -70,25 +71,17 @@ export default function Page() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            Punto de venta
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
-            Ventas
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Registra ventas en borrador, confirma las que generan salida de
-            inventario y consulta el historial.
-          </p>
-        </div>
+      <PageHeader
+        eyebrow="Punto de venta"
+        title="Ventas"
+        description="Registra ventas en borrador, confirma las que generan salida de inventario y consulta el historial."
+      >
         {canWrite && (
           <Button onClick={openCreate}>
             <Plus size={17} /> Nueva venta
           </Button>
         )}
-      </header>
+      </PageHeader>
 
       <ModuleMetrics
         items={[

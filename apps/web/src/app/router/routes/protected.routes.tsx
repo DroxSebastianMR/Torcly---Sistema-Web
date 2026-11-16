@@ -139,6 +139,14 @@ export const protectedRoutes: RouteObject[] = [
                     .default,
                 }),
               },
+              {
+                path: paths.quotations,
+                lazy: async () => ({
+                  Component: (
+                    await import('@/features/quotations/pages/quotations-page')
+                  ).default,
+                }),
+              },
             ],
           },
           {
@@ -175,6 +183,16 @@ export const protectedRoutes: RouteObject[] = [
                   Component: (
                     await import(
                       '@/features/technicians/pages/technicians-page'
+                    )
+                  ).default,
+                }),
+              },
+              {
+                path: paths.preventiveMaintenance,
+                lazy: async () => ({
+                  Component: (
+                    await import(
+                      '@/features/preventive-maintenance/pages/preventive-maintenance-page'
                     )
                   ).default,
                 }),

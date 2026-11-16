@@ -1,3 +1,4 @@
+import { Prisma } from '../../generated/prisma/client.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import { roundCash } from './cash-session.rules.js'
 import {
@@ -13,6 +14,21 @@ import type {
   CashSessionTotals,
 } from './cash-session.types.js'
 import type { RequestContext } from '../auth/auth.types.js'
+
+function mapPersistenceError(error: unknown): never {
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === 'P2002'
+  ) {
+    throw new AppError(
+      409,
+      'CASH_SESSION_ALREADY_OPEN',
+      'Ya existe una caja abierta en este taller. Debes cerrarla antes de abrir otra.',
+    )
+  }
+
+  throw error
+}
 
 function serialize(
   row: CashSessionRow,
@@ -85,13 +101,17 @@ export const cashSessionsService = {
     context: RequestContext,
     organizationId: string,
   ) {
-    const result = await cashSessionsRepository.open(
-      input,
-      actor,
-      context,
-      organizationId,
-    )
-    return { data: serialize(result.row, result.totals) }
+    try {
+      const result = await cashSessionsRepository.open(
+        input,
+        actor,
+        context,
+        organizationId,
+      )
+      return { data: serialize(result.row, result.totals) }
+    } catch (error) {
+      mapPersistenceError(error)
+    }
   },
 
   async close(

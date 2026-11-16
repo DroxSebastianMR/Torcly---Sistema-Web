@@ -187,23 +187,45 @@ export const subscriptionsRepository = {
   },
 
   async countMetrics() {
-    const [total, active, trial, pastDue, suspended] = await Promise.all([
-      databaseService.client.organizationSubscription.count(),
-      databaseService.client.organizationSubscription.count({
-        where: { status: 'ACTIVE' },
-      }),
-      databaseService.client.organizationSubscription.count({
-        where: { status: 'TRIAL' },
-      }),
-      databaseService.client.organizationSubscription.count({
-        where: { status: 'PAST_DUE' },
-      }),
-      databaseService.client.organizationSubscription.count({
-        where: { status: 'SUSPENDED' },
-      }),
-    ])
+    const [total, active, trial, pastDue, suspended, activeSubscriptions] =
+      await Promise.all([
+        databaseService.client.organizationSubscription.count(),
+        databaseService.client.organizationSubscription.count({
+          where: { status: 'ACTIVE' },
+        }),
+        databaseService.client.organizationSubscription.count({
+          where: { status: 'TRIAL' },
+        }),
+        databaseService.client.organizationSubscription.count({
+          where: { status: 'PAST_DUE' },
+        }),
+        databaseService.client.organizationSubscription.count({
+          where: { status: 'SUSPENDED' },
+        }),
+        databaseService.client.organizationSubscription.findMany({
+          where: { status: 'ACTIVE' },
+          include: { plan: true },
+        }),
+      ])
 
-    return { total, active, trial, pastDue, suspended }
+    const estimatedMrr = activeSubscriptions.reduce((acc, sub) => {
+      const priceMonthly = Number(sub.plan.priceMonthly)
+      const priceYearly = Number(sub.plan.priceYearly)
+      if (sub.billingCycle === 'ANNUAL') {
+        return acc + priceYearly / 12
+      }
+      return acc + priceMonthly
+    }, 0)
+
+    return {
+      total,
+      active,
+      trial,
+      pastDue,
+      suspended,
+      estimatedMrr: Math.round(estimatedMrr * 100) / 100,
+      currency: 'PEN',
+    }
   },
 
   async getOrganizationResourceCounts(organizationId: string) {

@@ -18,7 +18,10 @@ import { AppointmentFormModal } from '../components/appointment-form-modal'
 import { AppointmentReceptionModal } from '../components/appointment-reception-modal'
 import { AppointmentsTable } from '../components/appointments-table'
 import { AppointmentsToolbar } from '../components/appointments-toolbar'
-import type { FuelLevel } from '@/features/work-orders/types/work-orders.types'
+import type {
+  FuelLevel,
+  ReceptionChecklist,
+} from '@/features/work-orders/types/work-orders.types'
 import {
   appointmentKeys,
   useAppointment,
@@ -40,7 +43,15 @@ const initialFilters: AppointmentFilters = {
   pageSize: 10,
 }
 
-export default function Page() {
+interface AppointmentsPageProps {
+  hideHeader?: boolean
+  onOrderCreated?: () => void
+}
+
+export default function Page({
+  hideHeader = false,
+  onOrderCreated,
+}: AppointmentsPageProps = {}) {
   const { user: currentUser } = useAuth()
   const canWrite = hasPermission(
     currentUser?.permissions ?? [],
@@ -138,6 +149,7 @@ export default function Page() {
     currentMileage?: number | null
     fuelLevel?: FuelLevel | null
     receptionNotes?: string | null
+    receptionChecklist?: ReceptionChecklist
   }) => {
     if (!attendTarget) return
     setAttending(true)
@@ -155,6 +167,7 @@ export default function Page() {
       )
       setAttendTarget(null)
       setSelectedId(null)
+      onOrderCreated?.()
     } catch (error) {
       toast.error(getAppointmentErrorMessage(error))
     } finally {
@@ -164,30 +177,32 @@ export default function Page() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            Agenda del taller
+      {!hideHeader && (
+        <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              Agenda del taller
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
+              Citas
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              Programa citas de atención por cliente y vehículo; se permiten
+              hasta 8 citas activas por fecha y hora.
+            </p>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
-            Citas
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Programa citas de atención por cliente y vehículo; se permiten hasta
-            8 citas activas por fecha y hora.
-          </p>
-        </div>
-        {canWrite && (
-          <Button
-            onClick={() => {
-              setRescheduleTarget(null)
-              setCreateOpen(true)
-            }}
-          >
-            <Plus size={17} /> Nueva cita
-          </Button>
-        )}
-      </header>
+          {canWrite && (
+            <Button
+              onClick={() => {
+                setRescheduleTarget(null)
+                setCreateOpen(true)
+              }}
+            >
+              <Plus size={17} /> Nueva cita
+            </Button>
+          )}
+        </header>
+      )}
 
       <ModuleMetrics
         items={[

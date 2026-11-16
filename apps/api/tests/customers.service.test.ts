@@ -106,6 +106,7 @@ describe('Servicio de clientes', () => {
       },
       'actor-1',
       context,
+      undefined,
     )
     expect(result.data.id).toBe('c1')
   })
@@ -146,6 +147,7 @@ describe('Servicio de clientes', () => {
       },
       'actor-1',
       context,
+      undefined,
     )
   })
 
@@ -213,6 +215,84 @@ describe('Servicio de clientes', () => {
     ).rejects.toMatchObject({
       status: 409,
       code: 'CUSTOMER_DOCUMENT_DUPLICATE',
+    })
+  })
+
+  it('crea cliente con vehículo en una sola operación atómica', async () => {
+    repository.create.mockResolvedValue({
+      customer: record(),
+      createdVehicle: {
+        id: 'v1',
+        plate: 'ABC123',
+        brand: 'Toyota',
+        model: 'Yaris',
+        year: 2021,
+        mileage: 30000,
+      },
+    })
+
+    const result = await customersService.create(
+      {
+        type: 'NATURAL',
+        documentNumber: '12345678',
+        firstName: 'María',
+        lastName: 'Pérez',
+        phone: '987654321',
+        vehicle: {
+          plate: 'ABC123',
+          brand: 'Toyota',
+          model: 'Yaris',
+          year: 2021,
+          mileage: 30000,
+        },
+      },
+      'actor-1',
+      organizationId,
+      context,
+    )
+
+    expect(result.data.id).toBe('c1')
+    expect(result.data.createdVehicle).toEqual({
+      id: 'v1',
+      plate: 'ABC123',
+      brand: 'Toyota',
+      model: 'Yaris',
+      year: 2021,
+      mileage: 30000,
+    })
+  })
+
+  it('traduce el error de placa duplicada en creación atómica', async () => {
+    repository.create.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('Duplicate plate', {
+        code: 'P2002',
+        clientVersion: '7.10.0',
+        meta: { target: ['organization_id', 'plate'] },
+      }),
+    )
+
+    await expect(
+      customersService.create(
+        {
+          type: 'NATURAL',
+          documentNumber: '12345678',
+          firstName: 'María',
+          lastName: 'Pérez',
+          phone: '987654321',
+          vehicle: {
+            plate: 'ABC123',
+            brand: 'Toyota',
+            model: 'Yaris',
+            year: 2021,
+          },
+        },
+        'actor-1',
+        organizationId,
+        context,
+      ),
+    ).rejects.toMatchObject({
+      status: 409,
+      code: 'VEHICLE_PLATE_DUPLICATE',
     })
   })
 

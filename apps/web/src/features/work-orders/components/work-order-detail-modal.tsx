@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
+import { cn } from '@/lib/utils'
 import type {
   WorkOrderDetail,
   WorkOrderExecution,
@@ -244,6 +245,123 @@ export function WorkOrderDetailModal({
                   Observaciones de recepción:
                 </span>
                 <span className="text-foreground">{order.receptionNotes}</span>
+              </div>
+            )}
+            {order.receptionChecklist && (
+              <div className="sm:col-span-2 space-y-2.5 rounded-xl border border-border/80 bg-muted/20 p-3.5 text-xs">
+                <span className="font-semibold text-foreground uppercase tracking-wider block">
+                  Peritaje y checklist de recepción
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-muted-foreground">Combustible:</span>
+                    <span className="font-semibold text-foreground">
+                      {order.receptionChecklist.fuelLevel === 'E'
+                        ? 'Vacío (Reserva)'
+                        : order.receptionChecklist.fuelLevel === '1/4'
+                          ? '1/4 de tanque'
+                          : order.receptionChecklist.fuelLevel === '1/2'
+                            ? '1/2 tanque'
+                            : order.receptionChecklist.fuelLevel === '3/4'
+                              ? '3/4 de tanque'
+                              : 'Tanque lleno'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-muted-foreground">
+                      Llanta de repuesto:
+                    </span>
+                    <span
+                      className={cn(
+                        'font-semibold',
+                        order.receptionChecklist.hasSpareTire
+                          ? 'text-emerald-700'
+                          : 'text-muted-foreground',
+                      )}
+                    >
+                      {order.receptionChecklist.hasSpareTire ? 'Sí' : 'No'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-muted-foreground">
+                      Gata y herramientas:
+                    </span>
+                    <span
+                      className={cn(
+                        'font-semibold',
+                        order.receptionChecklist.hasJackAndTools
+                          ? 'text-emerald-700'
+                          : 'text-muted-foreground',
+                      )}
+                    >
+                      {order.receptionChecklist.hasJackAndTools ? 'Sí' : 'No'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-muted-foreground">
+                      Documentos del vehículo:
+                    </span>
+                    <span
+                      className={cn(
+                        'font-semibold',
+                        order.receptionChecklist.hasVehicleDocuments
+                          ? 'text-emerald-700'
+                          : 'text-muted-foreground',
+                      )}
+                    >
+                      {order.receptionChecklist.hasVehicleDocuments
+                        ? 'Sí'
+                        : 'No'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-muted-foreground">
+                      Panel de radio:
+                    </span>
+                    <span
+                      className={cn(
+                        'font-semibold',
+                        order.receptionChecklist.hasRadioFaceplate
+                          ? 'text-emerald-700'
+                          : 'text-muted-foreground',
+                      )}
+                    >
+                      {order.receptionChecklist.hasRadioFaceplate ? 'Sí' : 'No'}
+                    </span>
+                  </div>
+                </div>
+                {order.receptionChecklist.externalDamageNotes && (
+                  <div className="pt-1 border-t border-border/60">
+                    <span className="font-semibold text-muted-foreground block mb-0.5">
+                      Daños externos observados:
+                    </span>
+                    <p className="text-foreground">
+                      {order.receptionChecklist.externalDamageNotes}
+                    </p>
+                  </div>
+                )}
+                {order.receptionChecklist.photos &&
+                  order.receptionChecklist.photos.length > 0 && (
+                    <div className="pt-1 border-t border-border/60 space-y-1">
+                      <span className="font-semibold text-muted-foreground block mb-0.5">
+                        Fotos registradas (
+                        {order.receptionChecklist.photos.length}):
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {order.receptionChecklist.photos.map((url, idx) => (
+                          <a
+                            key={idx}
+                            href={url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-background border text-primary hover:underline"
+                          >
+                            Foto {idx + 1}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
               </div>
             )}
           </div>

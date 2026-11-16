@@ -106,6 +106,7 @@ describe('Formulario de ventas', () => {
       createConfirmed: { isPending: false, mutateAsync: vi.fn() },
       update: { isPending: false, mutateAsync: vi.fn() },
       confirm: { isPending: false, mutateAsync: vi.fn() },
+      confirmAndPay: { isPending: false, mutateAsync: vi.fn() },
     })
   })
 
@@ -278,12 +279,16 @@ describe('Formulario de ventas', () => {
       },
       update: { isPending: false, mutateAsync: vi.fn() },
       confirm: { isPending: false, mutateAsync: vi.fn().mockResolvedValue({}) },
+      confirmAndPay: { isPending: false, mutateAsync: vi.fn() },
     }
     sales.useSaleMutations.mockReturnValue(mutations)
     const { onClose } = renderModal()
 
     await addProduct(user)
     await user.click(screen.getByRole('button', { name: 'Confirmar venta' }))
+    await user.click(
+      screen.getByRole('button', { name: /Dejar pendiente \(Crédito\)/i }),
+    )
 
     await waitFor(() =>
       expect(mutations.createConfirmed.mutateAsync).toHaveBeenCalled(),
@@ -291,7 +296,7 @@ describe('Formulario de ventas', () => {
     expect(mutations.create.mutateAsync).not.toHaveBeenCalled()
     expect(mutations.confirm.mutateAsync).not.toHaveBeenCalled()
     expect(toast.success).toHaveBeenCalledWith(
-      'Venta confirmada correctamente.',
+      'Venta confirmada como cobro pendiente en caja.',
     )
     expect(onClose).toHaveBeenCalledOnce()
   })
@@ -326,6 +331,7 @@ describe('Formulario de ventas', () => {
         mutateAsync: vi.fn().mockResolvedValue({ data: existingSale }),
       },
       confirm: { isPending: false, mutateAsync: vi.fn().mockResolvedValue({}) },
+      confirmAndPay: { isPending: false, mutateAsync: vi.fn() },
     }
     sales.useSaleMutations.mockReturnValue(mutations)
     const { onClose } = renderModal({ sale: existingSale })
@@ -334,6 +340,9 @@ describe('Formulario de ventas', () => {
     expect(screen.getByLabelText('Cantidad de Filtro de aceite')).toBeTruthy()
 
     await user.click(screen.getByRole('button', { name: 'Confirmar venta' }))
+    await user.click(
+      screen.getByRole('button', { name: /Dejar pendiente \(Crédito\)/i }),
+    )
 
     await waitFor(() =>
       expect(mutations.update.mutateAsync).toHaveBeenCalledWith({
@@ -346,7 +355,7 @@ describe('Formulario de ventas', () => {
     )
     expect(mutations.confirm.mutateAsync).toHaveBeenCalledWith('s1')
     expect(toast.success).toHaveBeenCalledWith(
-      'Venta actualizada y confirmada.',
+      'Venta confirmada como cobro pendiente en caja.',
     )
     expect(onClose).toHaveBeenCalledOnce()
   })

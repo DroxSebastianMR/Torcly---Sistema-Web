@@ -4,6 +4,7 @@ import {
   ChartNoAxesCombined,
   CreditCard,
   ShoppingCart,
+  FileText,
   UsersRound,
   Car,
   Wallet,
@@ -18,6 +19,7 @@ import {
   Megaphone,
   ShoppingBag,
   Building2,
+  CalendarClock,
 } from 'lucide-react'
 import { paths } from '@/app/router/constants/paths'
 import type { NavigationGroup } from '../types/navigation.types'
@@ -69,6 +71,14 @@ export const appNavigation: readonly NavigationGroup[] = [
         label: 'Ventas',
         icon: ShoppingCart,
         path: paths.sales,
+        visible: true,
+        permission: 'sales:read',
+      },
+      {
+        id: 'quotations',
+        label: 'Cotizaciones',
+        icon: FileText,
+        path: paths.quotations,
         visible: true,
         permission: 'sales:read',
       },
@@ -126,6 +136,14 @@ export const appNavigation: readonly NavigationGroup[] = [
         visible: true,
         permission: 'workshop:read',
       },
+      {
+        id: 'preventiveMaintenance',
+        label: 'Mantenimiento preventivo',
+        icon: CalendarClock,
+        path: paths.preventiveMaintenance,
+        visible: true,
+        permission: 'workshop:read',
+      },
     ],
   },
   {
@@ -153,7 +171,7 @@ export const appNavigation: readonly NavigationGroup[] = [
         label: 'Compras',
         icon: ShoppingBag,
         path: paths.purchases,
-        visible: true,
+        visible: false,
         permission: 'purchases:read',
       },
       {
@@ -161,7 +179,7 @@ export const appNavigation: readonly NavigationGroup[] = [
         label: 'Proveedores',
         icon: Building2,
         path: paths.suppliers,
-        visible: true,
+        visible: false,
         permission: 'purchases:read',
       },
       {

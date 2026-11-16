@@ -100,6 +100,30 @@ export const vehiclesRepository = {
     })
   },
 
+  getHistory(id: string, organizationId: string) {
+    return databaseService.client.vehicle.findFirst({
+      where: { id, organizationId },
+      include: {
+        customer: findUniqueInclude.customer,
+        workOrders: {
+          where: { organizationId },
+          orderBy: { createdAt: 'desc' },
+          include: {
+            technician: {
+              select: {
+                id: true,
+                fullName: true,
+              },
+            },
+            lines: {
+              orderBy: { createdAt: 'asc' },
+            },
+          },
+        },
+      },
+    })
+  },
+
   findCustomerById(id: string, organizationId: string) {
     return databaseService.client.customer.findFirst({
       where: { id, organizationId },
