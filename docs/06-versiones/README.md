@@ -8,7 +8,7 @@ Este directorio almacena la documentación detallada y formal de cada versión p
 
 | Versión    | Fecha      | Nombre Clave                                                   | Estado                            | Enlace                                                  |
 | :--------- | :--------- | :------------------------------------------------------------- | :-------------------------------- | :------------------------------------------------------ |
-| **v3.3.3** | 16/11/2026 | Consistencia de carga y cotizaciones vinculadas                | En validación para `develop`      | [Detalle v3.3.3](v3.3.3/README.md)                      |
+| **v3.3.3** | 16/11/2026 | Consistencia de carga y cotizaciones vinculadas                | Integrada en `develop`            | [Detalle v3.3.3](v3.3.3/README.md)                      |
 | **v3.3.2** | 15/11/2026 | Operación Comercial, Taller y Conversión de Cotizaciones       | Preparada para `develop`          | [Detalle v3.3.2](v3.3.2/README.md)                      |
 | **v2.2.2** | 06/11/2026 | Proveedores, Compras, Órdenes Directas, Aforo y Flujo de Patio | Desplegada en producción (`main`) | [Detalle v2.2.2](v2.2.2/README.md)                      |
 | **v2.1.2** | 06/11/2026 | Notificaciones, Anuncios Globales, Planes y Membresías SaaS    | Integrada en `develop`            | [Detalle v2.1.2](v2.1.2/README.md)                      |

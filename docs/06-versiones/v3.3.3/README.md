@@ -2,7 +2,7 @@
 
 Fecha de preparación: 16 de noviembre de 2026  
 Rama de integración: `team/develop` -> `develop`  
-Estado: En validación para integración
+Estado: Integrada en `develop`; pendiente de validación manual para `main`
 
 ## Incluye
 
