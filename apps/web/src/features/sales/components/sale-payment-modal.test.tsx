@@ -68,7 +68,7 @@ describe('SalePaymentModal', () => {
 
     // Clic en registrar cobro
     const submitBtn = screen.getByRole('button', {
-      name: /Cobrar y Finalizar/i,
+      name: /Finalizar cobro/i,
     })
     fireEvent.click(submitBtn)
 
@@ -98,7 +98,7 @@ describe('SalePaymentModal', () => {
     fireEvent.click(yapeBtn)
 
     const submitBtn = screen.getByRole('button', {
-      name: /Cobrar y Finalizar/i,
+      name: /Finalizar cobro/i,
     })
     fireEvent.click(submitBtn)
 
@@ -135,7 +135,7 @@ describe('SalePaymentModal', () => {
     expect(
       (
         screen.getByRole('button', {
-          name: /Cobrar y Finalizar/i,
+          name: /Finalizar cobro/i,
         }) as HTMLButtonElement
       ).disabled,
     ).toBe(true)
@@ -178,9 +178,7 @@ describe('SalePaymentModal', () => {
     fireEvent.change(screen.getByLabelText('Segundo importe de pago mixto'), {
       target: { value: '200' },
     })
-    fireEvent.click(
-      screen.getByRole('button', { name: /Dejar pendiente \(Crédito\)/i }),
-    )
+    fireEvent.click(screen.getByRole('button', { name: /Dejar a crédito/i }))
 
     await waitFor(() => {
       expect(onConfirmPending).toHaveBeenCalledWith({
@@ -207,7 +205,7 @@ describe('SalePaymentModal', () => {
     )
 
     const creditBtn = screen.getByRole('button', {
-      name: /Dejar pendiente \(Crédito\)/i,
+      name: /Dejar a crédito/i,
     })
     fireEvent.click(creditBtn)
 

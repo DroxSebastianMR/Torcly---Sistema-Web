@@ -158,12 +158,12 @@ export function SalePaymentModal({
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between w-full">
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             disabled={loading || (method === 'MIXED' && mixedDifference < 0)}
             onClick={() => void handleLeavePending()}
-            className="text-xs text-muted-foreground hover:text-foreground"
+            className="shrink-0 border-amber-500/80 bg-amber-50 text-amber-900 hover:border-amber-600 hover:bg-amber-100"
           >
-            <Clock size={14} className="mr-1" /> Dejar pendiente (Crédito)
+            <Clock size={16} /> Dejar a crédito
           </Button>
           <div className="flex gap-2">
             <Button
@@ -184,7 +184,7 @@ export function SalePaymentModal({
               onClick={handlePay}
             >
               <CheckCircle2 size={16} className="mr-1.5" />
-              {loading ? 'Procesando…' : 'Cobrar y Finalizar'}
+              {loading ? 'Procesando…' : 'Finalizar cobro'}
             </Button>
           </div>
         </div>
