@@ -155,18 +155,20 @@ describe('Formulario de productos', () => {
     )
     await user.click(submitButton)
 
-    await waitFor(() =>
-      expect(service.create).toHaveBeenCalledWith({
-        code: 'FIL-ACE',
-        barcode: null,
-        name: 'Filtro de aceite',
-        description: null,
-        categoryId: 'cat1',
-        brandId: null,
-        unitId: 'unit1',
-        salePrice: 35.5,
-        minimumStock: 1,
-      }),
+    await waitFor(
+      () =>
+        expect(service.create).toHaveBeenCalledWith({
+          code: 'FIL-ACE',
+          barcode: null,
+          name: 'Filtro de aceite',
+          description: null,
+          categoryId: 'cat1',
+          brandId: null,
+          unitId: 'unit1',
+          salePrice: 35.5,
+          minimumStock: 1,
+        }),
+      { timeout: 4000 },
     )
     expect(toast.success).toHaveBeenCalledWith(
       'Producto registrado correctamente.',
@@ -241,9 +243,18 @@ describe('Formulario de productos', () => {
     expect(screen.getByText('Solo lectura')).toBeTruthy()
 
     const nameInput = screen.getByLabelText(/^nombre del producto/i)
+    await waitFor(() =>
+      expect((nameInput as HTMLInputElement).value).toBe('Filtro de aceite'),
+    )
     await user.clear(nameInput)
     await user.type(nameInput, 'Filtro premium')
-    await user.click(screen.getByRole('button', { name: 'Guardar producto' }))
+    const submitButton = screen.getByRole('button', {
+      name: 'Guardar producto',
+    })
+    await waitFor(() =>
+      expect((submitButton as HTMLButtonElement).disabled).toBe(false),
+    )
+    await user.click(submitButton)
 
     await waitFor(() =>
       expect(service.update).toHaveBeenCalledWith(

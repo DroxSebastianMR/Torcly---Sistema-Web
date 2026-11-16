@@ -17,6 +17,11 @@ export interface User {
     code: string
     name: string
   }
+  impersonatedBy?: {
+    id: string
+    name: string
+    email: string
+  }
 }
 export interface LoginInput {
   identifier: string

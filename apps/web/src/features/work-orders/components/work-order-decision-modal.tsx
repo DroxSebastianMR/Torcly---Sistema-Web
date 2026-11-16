@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useFormState, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -41,6 +41,7 @@ export function WorkOrderDecisionModal({
     defaultValues: { decision: 'APPROVED', notes: '' },
   })
   const { reset, register, trigger, setValue } = form
+  const [decisionMenuOpen, setDecisionMenuOpen] = useState(false)
   const formState = useFormState({ control: form.control })
   const decision = useWatch({ control: form.control, name: 'decision' })
   const busy = mutations.decide.isPending
@@ -51,12 +52,14 @@ export function WorkOrderDecisionModal({
 
   const closeModal = () => {
     if (busy) return
+    setDecisionMenuOpen(false)
     reset({ decision: 'APPROVED', notes: '' })
     onClose()
   }
 
   const backToDetail = () => {
     if (busy) return
+    setDecisionMenuOpen(false)
     reset({ decision: 'APPROVED', notes: '' })
     ;(onBack ?? onClose)()
   }
@@ -106,7 +109,7 @@ export function WorkOrderDecisionModal({
       description={
         order ? `Presupuesto enviado de la orden ${order.code}.` : undefined
       }
-      className="max-w-xl min-h-[540px]"
+      className="max-w-xl"
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button type="button" variant="outline" onClick={backToDetail}>
@@ -118,7 +121,11 @@ export function WorkOrderDecisionModal({
         </div>
       }
     >
-      <div className="space-y-5">
+      <div
+        className={`space-y-5 transition-[padding] duration-150 ${
+          decisionMenuOpen ? 'pb-36' : ''
+        }`}
+      >
         {order && (
           <div className="rounded-xl bg-muted/60 px-4 py-3">
             <p className="text-xs text-muted-foreground">
@@ -139,6 +146,7 @@ export function WorkOrderDecisionModal({
             placeholder="Seleccionar decisión"
             options={decisionOptions}
             disabled={busy}
+            onOpenChange={setDecisionMenuOpen}
             onChange={(value) =>
               setValue('decision', value as 'APPROVED' | 'REJECTED')
             }

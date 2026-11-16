@@ -2,6 +2,23 @@ import type { RequestContext } from '../auth/auth.types.js'
 
 export type CustomerType = 'NATURAL' | 'LEGAL'
 
+export interface CustomerVehicleInput {
+  plate: string
+  brand: string
+  model: string
+  year: number
+  mileage?: number | null
+}
+
+export interface CreatedVehicleSummary {
+  id: string
+  plate: string
+  brand: string
+  model: string
+  year: number
+  mileage: number | null
+}
+
 export interface CustomerIdentity {
   id: string
   type: CustomerType
@@ -13,6 +30,7 @@ export interface CustomerIdentity {
   email: string | null
   createdAt: string
   updatedAt: string
+  createdVehicle?: CreatedVehicleSummary | null
 }
 
 export interface CustomerListFilters {
@@ -25,6 +43,7 @@ export interface CustomerListFilters {
 interface CustomerBaseInput {
   phone: string
   email?: string | null
+  vehicle?: CustomerVehicleInput | null
 }
 
 export interface NaturalCustomerInput extends CustomerBaseInput {

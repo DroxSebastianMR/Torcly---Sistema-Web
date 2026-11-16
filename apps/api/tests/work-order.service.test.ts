@@ -33,6 +33,12 @@ vi.mock('../src/modules/work-orders/work-order.repository.js', () => ({
   workOrdersRepository: repository,
 }))
 
+vi.mock('../src/modules/notifications/notifications.service.js', () => ({
+  notificationsService: {
+    notifyUsersSafely: vi.fn().mockResolvedValue(undefined),
+  },
+}))
+
 import { workOrdersService } from '../src/modules/work-orders/work-order.service.js'
 
 const context = {
@@ -173,6 +179,7 @@ describe('Servicio de órdenes de taller', () => {
           currentMileage: null,
           fuelLevel: null,
           receptionNotes: null,
+          receptionChecklist: null,
           customer: {
             id: customerId,
             documentNumber: '12345678',
@@ -1101,6 +1108,15 @@ describe('Servicio de órdenes de taller', () => {
       currentMileage: 85000,
       fuelLevel: 'QUARTER',
       receptionNotes: 'Llega de emergencia con ruido en motor',
+      receptionChecklist: {
+        fuelLevel: '1/4' as const,
+        hasSpareTire: true,
+        hasJackAndTools: true,
+        hasVehicleDocuments: false,
+        hasRadioFaceplate: true,
+        externalDamageNotes: 'Rayón leve puerta derecha',
+        photos: ['https://example.com/photo1.jpg'],
+      },
     }
 
     repository.createDirectWorkOrder.mockResolvedValue({

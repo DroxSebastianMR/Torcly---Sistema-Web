@@ -2,23 +2,35 @@ import { describe, expect, it } from 'vitest'
 import { customerInputSchema } from './customers.schema'
 
 const naturalValid = {
-  type: 'NATURAL',
+  type: 'NATURAL' as const,
   documentNumber: '12345678',
   firstName: 'María',
   lastName: 'Pérez',
   legalName: '',
   phone: '987654321',
   email: '',
+  registerVehicle: false,
+  vehiclePlate: '',
+  vehicleBrand: '',
+  vehicleModel: '',
+  vehicleYear: 2022,
+  vehicleMileage: '',
 }
 
 const legalValid = {
-  type: 'LEGAL',
+  type: 'LEGAL' as const,
   documentNumber: '20123456789',
   firstName: '',
   lastName: '',
   legalName: 'Torcly Repuestos S.A.C.',
   phone: '+51987654321',
   email: 'ventas@torcly.local',
+  registerVehicle: false,
+  vehiclePlate: '',
+  vehicleBrand: '',
+  vehicleModel: '',
+  vehicleYear: 2022,
+  vehicleMileage: '',
 }
 
 describe('Validación de clientes', () => {
@@ -95,5 +107,32 @@ describe('Validación de clientes', () => {
         legalName: 'X'.repeat(161),
       }).success,
     ).toBe(false)
+  })
+
+  it('valida datos del vehículo cuando registerVehicle está activo', () => {
+    const validWithVehicle = customerInputSchema.safeParse({
+      ...naturalValid,
+      registerVehicle: true,
+      vehiclePlate: 'ABC-123',
+      vehicleBrand: 'Toyota',
+      vehicleModel: 'Corolla',
+      vehicleYear: 2022,
+      vehicleMileage: 40000,
+    })
+    expect(validWithVehicle.success).toBe(true)
+
+    const invalidVehicle = customerInputSchema.safeParse({
+      ...naturalValid,
+      registerVehicle: true,
+      vehiclePlate: '',
+      vehicleBrand: '',
+      vehicleModel: '',
+    })
+    expect(invalidVehicle.success).toBe(false)
+    expect(
+      invalidVehicle.error?.issues.find(
+        (issue) => issue.path[0] === 'vehiclePlate',
+      )?.message,
+    ).toBe('Ingresa la placa del vehículo.')
   })
 })

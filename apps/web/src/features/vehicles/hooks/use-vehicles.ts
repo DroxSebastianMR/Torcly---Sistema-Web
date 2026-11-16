@@ -12,6 +12,7 @@ export const vehicleKeys = {
   list: (filters: VehicleFilters) =>
     [...vehicleKeys.all, 'list', filters] as const,
   detail: (id: string) => [...vehicleKeys.all, 'detail', id] as const,
+  history: (id: string) => [...vehicleKeys.all, 'history', id] as const,
 }
 
 export function useVehicles(filters: VehicleFilters, enabled = true) {
@@ -28,6 +29,15 @@ export function useVehicle(id: string) {
   return useQuery({
     queryKey: vehicleKeys.detail(id),
     queryFn: ({ signal }) => vehiclesService.get(id, signal),
+    select: (response) => response.data,
+    enabled: Boolean(id),
+  })
+}
+
+export function useVehicleHistory(id: string | null) {
+  return useQuery({
+    queryKey: id ? vehicleKeys.history(id) : ['vehicles', 'history', 'none'],
+    queryFn: ({ signal }) => vehiclesService.getHistory(id!, signal),
     select: (response) => response.data,
     enabled: Boolean(id),
   })

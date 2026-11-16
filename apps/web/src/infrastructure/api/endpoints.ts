@@ -26,6 +26,12 @@ export const endpoints = {
     subscriptionMetrics: '/platform/subscriptions/metrics',
     subscription: (organizationId: string) =>
       `/platform/subscriptions/${organizationId}`,
+    impersonate: (organizationId: string) =>
+      `/platform/organizations/${organizationId}/impersonate`,
+    exitImpersonation: '/platform/exit-impersonation',
+  },
+  preventiveMaintenance: {
+    root: '/preventive-maintenance',
   },
   subscriptions: {
     current: '/subscriptions/current',
@@ -85,7 +91,13 @@ export const endpoints = {
     catalog: '/sales/catalogo',
     detail: (id: string) => `/sales/${id}`,
     confirm: (id: string) => `/sales/${id}/confirm`,
+    confirmAndPay: (id: string) => `/sales/${id}/confirm-and-pay`,
     cancel: (id: string) => `/sales/${id}/cancel`,
+  },
+  quotations: {
+    root: '/quotations',
+    detail: (id: string) => `/quotations/${id}`,
+    convertToOrder: (id: string) => `/quotations/${id}/convert-to-order`,
   },
   appointments: {
     root: '/appointments',
@@ -130,6 +142,7 @@ export const endpoints = {
   vehicles: {
     root: '/vehicles',
     detail: (id: string) => `/vehicles/${id}`,
+    history: (id: string) => `/vehicles/${id}/history`,
   },
   payments: {
     root: '/payments',

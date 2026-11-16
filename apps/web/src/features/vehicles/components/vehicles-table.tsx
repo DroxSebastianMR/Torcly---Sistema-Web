@@ -1,4 +1,11 @@
-import { Car, Eye, MoreHorizontal, Pencil, UsersRound } from 'lucide-react'
+import {
+  Car,
+  ClipboardList,
+  Eye,
+  MoreHorizontal,
+  Pencil,
+  UsersRound,
+} from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { TableActionButton } from '@/components/ui/table-action-button'
 import { documentLabel } from '@/features/customers/utils/customer-formatters'
@@ -11,6 +18,7 @@ interface VehiclesTableProps {
   canWrite: boolean
   onOpenDetail: (vehicle: Vehicle) => void
   onOpenOwner: (vehicle: Vehicle) => void
+  onOpenHistory: (vehicle: Vehicle) => void
   onEdit: (vehicle: Vehicle) => void
 }
 
@@ -20,6 +28,7 @@ export function VehiclesTable({
   canWrite,
   onOpenDetail,
   onOpenOwner,
+  onOpenHistory,
   onEdit,
 }: VehiclesTableProps) {
   if (loading) return <VehiclesSkeleton />
@@ -87,6 +96,13 @@ export function VehiclesTable({
                 <td className="px-4 py-4">
                   <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
                     <TableActionButton
+                      label={`Historial clínico de ${vehicle.plate}`}
+                      title="Historial clínico"
+                      onClick={() => onOpenHistory(vehicle)}
+                    >
+                      <ClipboardList size={16} />
+                    </TableActionButton>
+                    <TableActionButton
                       label={`Ver ficha de ${vehicle.plate}`}
                       title="Ver ficha"
                       onClick={() => onOpenDetail(vehicle)}
@@ -126,7 +142,15 @@ export function VehiclesTable({
                 </p>
               </div>
             </div>
-            <div className="mt-4 flex gap-2 border-t pt-3">
+            <div className="mt-4 flex flex-wrap gap-2 border-t pt-3">
+              <TableActionButton
+                onClick={() => onOpenHistory(vehicle)}
+                label={`Historial clínico de ${vehicle.plate}`}
+                title="Historial clínico"
+                className="h-10 flex-1 gap-2 px-3 text-sm font-medium"
+              >
+                <ClipboardList aria-hidden size={15} /> Historial
+              </TableActionButton>
               <TableActionButton
                 onClick={() => onOpenDetail(vehicle)}
                 label={`Ver ficha de ${vehicle.plate}`}

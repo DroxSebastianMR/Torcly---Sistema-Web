@@ -9,6 +9,7 @@ import { inventoryRouter } from './modules/inventory/inventory.routes.js'
 import { servicesRouter } from './modules/services/services.routes.js'
 import { purchasesRouter } from './modules/purchases/purchases.routes.js'
 import { salesRouter } from './modules/sales/sales.routes.js'
+import { quotationsRouter } from './modules/quotations/quotations.routes.js'
 import { appointmentsRouter } from './modules/appointments/appointment.routes.js'
 import { workOrdersRouter } from './modules/work-orders/work-order.routes.js'
 import { paymentsRouter } from './modules/payments/payment.routes.js'
@@ -25,6 +26,7 @@ import { assistantRouter } from './modules/assistant/assistant.routes.js'
 import { techniciansRouter } from './modules/technicians/technicians.routes.js'
 import { platformRouter } from './modules/platform/platform.routes.js'
 import { subscriptionsRouter } from './modules/subscriptions/subscriptions.routes.js'
+import { preventiveMaintenanceRouter } from './modules/preventive-maintenance/preventive-maintenance.routes.js'
 
 export const apiRouter = Router()
 
@@ -44,6 +46,7 @@ apiRouter.use('/inventory', inventoryRouter)
 apiRouter.use('/services', servicesRouter)
 apiRouter.use('/purchases', purchasesRouter)
 apiRouter.use('/sales', salesRouter)
+apiRouter.use('/quotations', quotationsRouter)
 apiRouter.use('/appointments', appointmentsRouter)
 apiRouter.use('/work-orders', workOrdersRouter)
 apiRouter.use('/technicians', techniciansRouter)
@@ -53,4 +56,5 @@ apiRouter.use('/operations', operationsRouter)
 apiRouter.use('/reports', reportsRouter)
 apiRouter.use('/metrics', metricsRouter)
 apiRouter.use('/maintenance', maintenanceRouter)
+apiRouter.use('/preventive-maintenance', preventiveMaintenanceRouter)
 apiRouter.use('/audit', auditRouter)

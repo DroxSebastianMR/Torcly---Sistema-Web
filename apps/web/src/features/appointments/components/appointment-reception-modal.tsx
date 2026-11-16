@@ -1,12 +1,14 @@
 import { useState } from 'react'
-import { Fuel, Gauge } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
 import { SmartSelect } from '@/components/ui/smart-select'
 import type { Appointment } from '../types/appointments.types'
-import { fuelLevelOptions } from '@/features/work-orders/forms/direct-work-order.schema'
-import type { FuelLevel } from '@/features/work-orders/types/work-orders.types'
+import { receptionFuelLevelOptions } from '@/features/work-orders/forms/direct-work-order.schema'
+import type {
+  FuelLevel,
+  ReceptionFuelLevel,
+} from '@/features/work-orders/types/work-orders.types'
 
 interface AppointmentReceptionModalProps {
   open: boolean
@@ -28,14 +30,22 @@ export function AppointmentReceptionModal({
   onConfirm,
 }: AppointmentReceptionModalProps) {
   const [currentMileage, setCurrentMileage] = useState<string>('')
-  const [fuelLevel, setFuelLevel] = useState<FuelLevel | null>(null)
+  const [fuelLevel, setFuelLevel] = useState<ReceptionFuelLevel | ''>('')
   const [receptionNotes, setReceptionNotes] = useState<string>('')
 
   const handleConfirm = (e: React.FormEvent) => {
     e.preventDefault()
     onConfirm({
       currentMileage: currentMileage ? Number(currentMileage) : null,
-      fuelLevel,
+      fuelLevel: fuelLevel
+        ? ({
+            E: 'EMPTY',
+            '1/4': 'QUARTER',
+            '1/2': 'HALF',
+            '3/4': 'THREE_QUARTERS',
+            F: 'FULL',
+          }[fuelLevel] as FuelLevel)
+        : null,
       receptionNotes: receptionNotes.trim() || null,
     })
   }
@@ -59,8 +69,7 @@ export function AppointmentReceptionModal({
               htmlFor="receptionMileage"
               className="flex items-center gap-1.5 text-sm font-medium"
             >
-              <Gauge size={14} className="text-muted-foreground" />
-              Kilometraje actual (km)
+              Kilometraje actual (opcional)
             </label>
             <Input
               id="receptionMileage"
@@ -73,22 +82,18 @@ export function AppointmentReceptionModal({
           </div>
 
           <div className="space-y-1.5">
-            <label
-              htmlFor="receptionFuelLevel"
-              className="flex items-center gap-1.5 text-sm font-medium"
-            >
-              <Fuel size={14} className="text-muted-foreground" />
-              Nivel de combustible
+            <label htmlFor="receptionFuelLevel" className="text-sm font-medium">
+              Combustible al recibir (opcional)
             </label>
             <SmartSelect
               id="receptionFuelLevel"
-              placeholder="Nivel de tanque…"
-              options={fuelLevelOptions.map((opt) => ({
+              placeholder="No registrar combustible"
+              options={receptionFuelLevelOptions.map((opt) => ({
                 value: opt.value,
                 label: opt.label,
               }))}
-              value={fuelLevel ?? ''}
-              onChange={(val) => setFuelLevel((val || null) as FuelLevel)}
+              value={fuelLevel}
+              onChange={(val) => setFuelLevel(val as ReceptionFuelLevel)}
             />
           </div>
         </div>

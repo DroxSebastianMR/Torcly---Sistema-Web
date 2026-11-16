@@ -7,6 +7,10 @@ import {
 } from './vehicles.repository.js'
 import type {
   VehicleCreateInput,
+  VehicleHistoryPartLine,
+  VehicleHistoryResponse,
+  VehicleHistoryServiceLine,
+  VehicleHistoryTimelineEntry,
   VehicleIdentity,
   VehicleListFilters,
   VehicleListResponse,
@@ -84,6 +88,101 @@ export const vehiclesService = {
 
   async getById(id: string, organizationId: string) {
     return { data: toResponse(await assertVehicleExists(id, organizationId)) }
+  },
+
+  async getHistory(
+    id: string,
+    organizationId: string,
+  ): Promise<{ data: VehicleHistoryResponse }> {
+    const vehicle = await vehiclesRepository.getHistory(id, organizationId)
+    if (!vehicle) {
+      throw new AppError(404, 'VEHICLE_NOT_FOUND', 'Vehículo no encontrado.')
+    }
+
+    const totalVisits = vehicle.workOrders.length
+    let totalSpent = 0
+    let lastMileage: number | null = vehicle.mileage ?? null
+    let lastVisitAt: string | null = null
+
+    if (vehicle.workOrders.length > 0) {
+      lastVisitAt = vehicle.workOrders[0].createdAt.toISOString()
+      for (const order of vehicle.workOrders) {
+        totalSpent += Number(order.total)
+        if (
+          order.currentMileage !== null &&
+          order.currentMileage !== undefined
+        ) {
+          if (lastMileage === null || order.currentMileage > lastMileage) {
+            lastMileage = order.currentMileage
+          }
+        }
+      }
+    }
+
+    const timeline: VehicleHistoryTimelineEntry[] = vehicle.workOrders.map(
+      (order) => {
+        const services: VehicleHistoryServiceLine[] = []
+        const parts: VehicleHistoryPartLine[] = []
+
+        for (const line of order.lines) {
+          if (line.type === 'SERVICE') {
+            services.push({
+              id: line.id,
+              name: line.name,
+              code: line.code,
+              quantity: Number(line.quantity),
+              unitPrice: Number(line.unitPrice),
+              subtotal: Number(line.subtotal),
+            })
+          } else {
+            parts.push({
+              id: line.id,
+              name: line.name,
+              code: line.code,
+              unitLabel: line.unitLabel,
+              quantity: Number(line.quantity),
+              unitPrice: Number(line.unitPrice),
+              subtotal: Number(line.subtotal),
+            })
+          }
+        }
+
+        return {
+          id: order.id,
+          code: order.code,
+          status: order.status,
+          source: order.source,
+          entryDate: order.createdAt.toISOString(),
+          deliveredDate: order.deliveredAt?.toISOString() ?? null,
+          mileage: order.currentMileage,
+          fuelLevel: order.fuelLevel,
+          diagnosis: order.diagnosis,
+          receptionNotes: order.receptionNotes,
+          technician: order.technician
+            ? {
+                id: order.technician.id,
+                fullName: order.technician.fullName,
+              }
+            : null,
+          services,
+          parts,
+          total: Number(order.total),
+        }
+      },
+    )
+
+    return {
+      data: {
+        vehicle: toResponse(vehicle),
+        summary: {
+          totalVisits,
+          totalSpent: Math.round(totalSpent * 100) / 100,
+          lastMileage,
+          lastVisitAt,
+        },
+        timeline,
+      },
+    }
   },
 
   async create(

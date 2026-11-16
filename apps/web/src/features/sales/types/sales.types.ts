@@ -56,6 +56,27 @@ export interface SaleCancellationInput {
   reason: string
 }
 
+export type ImmediatePaymentMethod =
+  | 'CASH'
+  | 'CARD'
+  | 'TRANSFER'
+  | 'DIGITAL_WALLET'
+  | 'MIXED'
+
+export interface SplitPaymentItemInput {
+  method: 'CASH' | 'CARD' | 'TRANSFER' | 'DIGITAL_WALLET'
+  amount: number
+}
+
+export interface SaleConfirmAndPayInput {
+  paymentMethod: ImmediatePaymentMethod
+  amountPaid: number
+  cashReceived?: number
+  cashChange?: number
+  notes?: string
+  splitPayments?: SplitPaymentItemInput[]
+}
+
 export interface SaleFilters {
   search: string
   status: SaleStatusFilter

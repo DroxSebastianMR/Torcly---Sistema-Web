@@ -1,5 +1,6 @@
 import { api } from '@/infrastructure/api/client'
 import { endpoints } from '@/infrastructure/api/endpoints'
+import type { User } from '@/features/auth/types/auth.types'
 import type {
   CreatePlatformOrganizationInput,
   CreatePlatformOrganizationMemberInput,
@@ -84,4 +85,8 @@ export const platformService = {
         userId,
       ),
     ),
+  impersonateOrganization: (organizationId: string) =>
+    api.post<{ data: User }>(endpoints.platform.impersonate(organizationId)),
+  exitImpersonation: () =>
+    api.post<{ data: User }>(endpoints.platform.exitImpersonation),
 }

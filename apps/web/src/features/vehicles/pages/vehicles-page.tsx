@@ -3,12 +3,14 @@ import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ErrorState } from '@/components/ui/error-state'
 import { ModuleMetrics } from '@/components/ui/module-metrics'
+import { PageHeader } from '@/components/ui/page-header'
 import { Pagination } from '@/components/ui/pagination'
 import { useAuth } from '@/features/auth/hooks/auth-context'
 import { hasPermission } from '@/lib/permissions'
 import { CustomerDetailModal } from '@/features/customers/components/customer-detail-modal'
-import { VehicleFormModal } from '../components/vehicle-form-modal'
 import { VehicleDetailModal } from '../components/vehicle-detail-modal'
+import { VehicleFormModal } from '../components/vehicle-form-modal'
+import { VehicleHistoryModal } from '../components/vehicle-history-modal'
 import { VehiclesTable } from '../components/vehicles-table'
 import { VehiclesToolbar } from '../components/vehicles-toolbar'
 import { useVehicles } from '../hooks/use-vehicles'
@@ -30,6 +32,7 @@ export default function Page() {
   const [filters, setFilters] = useState(initialFilters)
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
   const [detailVehicle, setDetailVehicle] = useState<Vehicle | null>(null)
+  const [historyVehicle, setHistoryVehicle] = useState<Vehicle | null>(null)
   const [detailOwnerId, setDetailOwnerId] = useState<string | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const deferredSearch = useDeferredValue(filters.search)
@@ -43,19 +46,11 @@ export default function Page() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            Parque automotor
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-brand-forest sm:text-[2rem]">
-            Vehículos
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Registra las unidades de tus clientes y consulta su ficha con la
-            placa, marca, modelo, año y propietario.
-          </p>
-        </div>
+      <PageHeader
+        eyebrow="Parque automotor"
+        title="Vehículos"
+        description="Registra las unidades de tus clientes y consulta su ficha con la placa, marca, modelo, año y propietario."
+      >
         {canWrite && (
           <Button
             onClick={() => {
@@ -66,7 +61,7 @@ export default function Page() {
             <Plus size={17} /> Registrar vehículo
           </Button>
         )}
-      </header>
+      </PageHeader>
 
       <ModuleMetrics
         items={[
@@ -123,6 +118,7 @@ export default function Page() {
             canWrite={canWrite}
             onOpenDetail={setDetailVehicle}
             onOpenOwner={(vehicle) => setDetailOwnerId(vehicle.customerId)}
+            onOpenHistory={setHistoryVehicle}
             onEdit={(vehicle) => {
               setEditingVehicle(vehicle)
               setFormOpen(true)
@@ -157,6 +153,13 @@ export default function Page() {
             setEditingVehicle(vehicle)
             setFormOpen(true)
           }}
+        />
+      )}
+      {historyVehicle && (
+        <VehicleHistoryModal
+          open
+          vehicle={historyVehicle}
+          onClose={() => setHistoryVehicle(null)}
         />
       )}
       {detailOwnerId && (

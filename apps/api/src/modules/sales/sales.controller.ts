@@ -3,6 +3,7 @@ import { getRequestContext } from '../auth/auth.middleware.js'
 import { requireOrganizationContext } from '../auth/organization-context.js'
 import {
   saleCancelSchema,
+  saleConfirmAndPaySchema,
   saleCreateSchema,
   saleIdSchema,
   saleQuerySchema,
@@ -82,6 +83,20 @@ export const confirmSale: RequestHandler = async (request, response) => {
   response.json(
     await salesService.confirm(
       id,
+      actor(request),
+      getRequestContext(request, response),
+      organizationId(request),
+    ),
+  )
+}
+
+export const confirmAndPaySale: RequestHandler = async (request, response) => {
+  const { id } = saleIdSchema.parse(request.params)
+  const paymentInput = saleConfirmAndPaySchema.parse(request.body)
+  response.json(
+    await salesService.confirmAndPay(
+      id,
+      paymentInput,
       actor(request),
       getRequestContext(request, response),
       organizationId(request),

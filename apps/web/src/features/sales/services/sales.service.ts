@@ -4,6 +4,7 @@ import type {
   DataResponse,
   SaleCatalog,
   SaleCancellationInput,
+  SaleConfirmAndPayInput,
   SaleDetail,
   SaleFilters,
   SaleInput,
@@ -48,6 +49,12 @@ export const salesService = {
   },
   confirm(id: string) {
     return api.post<DataResponse<SaleDetail>>(endpoints.sales.confirm(id))
+  },
+  confirmAndPay(id: string, input: SaleConfirmAndPayInput) {
+    return api.post<DataResponse<SaleDetail>>(
+      endpoints.sales.confirmAndPay(id),
+      input,
+    )
   },
   cancel(id: string, input: SaleCancellationInput) {
     return api.post<DataResponse<SaleDetail>>(endpoints.sales.cancel(id), input)

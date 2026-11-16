@@ -7,12 +7,23 @@ import {
 } from './customers.repository.js'
 import type {
   CreateCustomerInput,
+  CreatedVehicleSummary,
   CustomerIdentity,
   CustomerListFilters,
   UpdateCustomerInput,
 } from './customers.types.js'
 
-function toResponse(customer: CustomerRecord): CustomerIdentity {
+function toResponse(
+  customer: CustomerRecord,
+  createdVehicle?: {
+    id: string
+    plate: string
+    brand: string
+    model: string
+    year: number
+    mileage: number | null
+  } | null,
+): CustomerIdentity {
   return {
     id: customer.id,
     type: customer.type,
@@ -24,6 +35,7 @@ function toResponse(customer: CustomerRecord): CustomerIdentity {
     email: customer.email,
     createdAt: customer.createdAt.toISOString(),
     updatedAt: customer.updatedAt.toISOString(),
+    ...(createdVehicle ? { createdVehicle } : {}),
   }
 }
 
@@ -59,6 +71,17 @@ function normalizeFields(
 function mapPersistenceError(error: unknown): never {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === 'P2002') {
+      const target = (error.meta?.target as string[] | string) || ''
+      const targetStr = Array.isArray(target)
+        ? target.join(',')
+        : String(target)
+      if (targetStr.includes('plate') || error.message.includes('plate')) {
+        throw new AppError(
+          409,
+          'VEHICLE_PLATE_DUPLICATE',
+          'Ya existe un vehículo con esa placa en este taller.',
+        )
+      }
       throw new AppError(
         409,
         'CUSTOMER_DOCUMENT_DUPLICATE',
@@ -86,7 +109,7 @@ export const customersService = {
   async list(filters: CustomerListFilters, organizationId: string) {
     const result = await customersRepository.list(filters, organizationId)
     return {
-      data: result.items.map(toResponse),
+      data: result.items.map((item) => toResponse(item)),
       pagination: {
         page: filters.page,
         pageSize: filters.pageSize,
@@ -107,14 +130,24 @@ export const customersService = {
     context: RequestContext,
   ) {
     try {
+      const result = await customersRepository.create(
+        normalizeFields(input, organizationId),
+        actorId,
+        context,
+        input.vehicle,
+      )
+      const customer =
+        result && typeof result === 'object' && 'customer' in result
+          ? (result as { customer: CustomerRecord }).customer
+          : (result as CustomerRecord)
+      const createdVehicle =
+        result && typeof result === 'object' && 'createdVehicle' in result
+          ? (result as { createdVehicle?: CreatedVehicleSummary | null })
+              .createdVehicle
+          : null
+
       return {
-        data: toResponse(
-          await customersRepository.create(
-            normalizeFields(input, organizationId),
-            actorId,
-            context,
-          ),
-        ),
+        data: toResponse(customer, createdVehicle),
       }
     } catch (error) {
       return mapPersistenceError(error)
