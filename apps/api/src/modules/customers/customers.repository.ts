@@ -6,7 +6,10 @@ import {
 } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import type { RequestContext } from '../auth/auth.types.js'
-import type { CustomerListFilters, CustomerVehicleInput } from './customers.types.js'
+import type {
+  CustomerListFilters,
+  CustomerVehicleInput,
+} from './customers.types.js'
 
 function auditData(
   event: AuditEventType,

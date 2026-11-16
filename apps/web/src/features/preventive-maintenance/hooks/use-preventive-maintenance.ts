@@ -8,7 +8,9 @@ export const preventiveMaintenanceKeys = {
     [...preventiveMaintenanceKeys.all, 'reminders', filters] as const,
 }
 
-export function usePreventiveMaintenance(filters: PreventiveMaintenanceFilters) {
+export function usePreventiveMaintenance(
+  filters: PreventiveMaintenanceFilters,
+) {
   return useQuery({
     queryKey: preventiveMaintenanceKeys.reminders(filters),
     queryFn: ({ signal }) =>

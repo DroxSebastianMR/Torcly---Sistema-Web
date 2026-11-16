@@ -385,7 +385,11 @@ export const platformService = {
         activeOrganizationId: organization.id,
         expiresAt,
         ipAddress: context?.ipAddress,
-        userAgent: `Impersonated by ${adminUser.email} | ${context?.userAgent ?? ''}`.slice(0, 300),
+        userAgent:
+          `Impersonated by ${adminUser.email} | ${context?.userAgent ?? ''}`.slice(
+            0,
+            300,
+          ),
       },
     })
 

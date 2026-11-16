@@ -298,7 +298,9 @@ describe('Servicio de vehículos', () => {
     expect(result.data.timeline[0].code).toBe('OT-000001')
     expect(result.data.timeline[0].technician?.fullName).toBe('Carlos Mecánico')
     expect(result.data.timeline[0].services).toHaveLength(1)
-    expect(result.data.timeline[0].services[0].name).toBe('Cambio de aceite y filtro')
+    expect(result.data.timeline[0].services[0].name).toBe(
+      'Cambio de aceite y filtro',
+    )
     expect(result.data.timeline[0].parts).toHaveLength(2)
     expect(result.data.timeline[0].parts[0].name).toBe('Filtro de Aceite Bosch')
   })

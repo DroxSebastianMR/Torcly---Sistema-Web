@@ -102,6 +102,16 @@ const quotationDetailInclude = {
   },
 } satisfies Prisma.QuotationInclude
 
+export type QuotationSummaryRecord = Prisma.QuotationGetPayload<{
+  select: typeof quotationSummarySelect
+}>
+
+export type QuotationDetailRecord = Prisma.QuotationGetPayload<{
+  include: typeof quotationDetailInclude
+}>
+
+export type QuotationItemRecord = QuotationDetailRecord['items'][number]
+
 function auditData(
   event: AuditEventType,
   actorId: string,

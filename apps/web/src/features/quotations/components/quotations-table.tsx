@@ -1,9 +1,4 @@
-import {
-  Eye,
-  MessageCircle,
-  Wrench,
-  CheckCircle2,
-} from 'lucide-react'
+import { Eye, MessageCircle, Wrench, CheckCircle2 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { TableActionButton } from '@/components/ui/table-action-button'
 import type { QuotationSummary } from '../types/quotations.types'
@@ -60,7 +55,9 @@ export function QuotationsTable({
                 ? `${quotation.vehicle.brand} ${quotation.vehicle.model}`
                 : 'Vehículo por confirmar'
               const plateLabel =
-                quotation.vehicle?.plate || quotation.vehiclePlate || 'Sin placa'
+                quotation.vehicle?.plate ||
+                quotation.vehiclePlate ||
+                'Sin placa'
 
               return (
                 <tr
@@ -73,16 +70,21 @@ export function QuotationsTable({
                   </td>
                   <td className="px-4 py-4">
                     <p className="font-medium text-foreground">
-                      {quotation.customer ? quotation.customer.name : 'Sin cliente'}
+                      {quotation.customer
+                        ? quotation.customer.name
+                        : 'Sin cliente'}
                     </p>
                     {quotation.customer && (
                       <p className="font-mono text-xs text-muted-foreground">
-                        {quotation.customer.phone || quotation.customer.documentNumber}
+                        {quotation.customer.phone ||
+                          quotation.customer.documentNumber}
                       </p>
                     )}
                   </td>
                   <td className="px-4 py-4">
-                    <p className="font-medium text-foreground">{vehicleLabel}</p>
+                    <p className="font-medium text-foreground">
+                      {vehicleLabel}
+                    </p>
                     <span className="inline-block rounded bg-muted px-1.5 py-0.5 font-mono text-xs font-semibold uppercase">
                       {plateLabel}
                     </span>
@@ -109,7 +111,9 @@ export function QuotationsTable({
                     >
                       {/* Botón WhatsApp */}
                       <TableActionButton
-                        onClick={() => openQuotationWhatsApp(quotation, workshopName)}
+                        onClick={() =>
+                          openQuotationWhatsApp(quotation, workshopName)
+                        }
                         label="Enviar por WhatsApp"
                         title="Enviar por WhatsApp"
                       >
@@ -191,7 +195,9 @@ export function QuotationsTable({
                   onClick={(e) => e.stopPropagation()}
                 >
                   <TableActionButton
-                    onClick={() => openQuotationWhatsApp(quotation, workshopName)}
+                    onClick={() =>
+                      openQuotationWhatsApp(quotation, workshopName)
+                    }
                     label="WhatsApp"
                     title="Enviar WhatsApp"
                   >

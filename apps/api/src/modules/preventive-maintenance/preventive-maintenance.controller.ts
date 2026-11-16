@@ -10,7 +10,10 @@ export const getPreventiveMaintenanceReminders: RequestHandler = async (
   const organization = requireOrganizationContext(request.auth)
   const query: PreventiveMaintenanceQuery = {
     priority: request.query.priority as PreventiveMaintenanceQuery['priority'],
-    search: typeof request.query.search === 'string' ? request.query.search : undefined,
+    search:
+      typeof request.query.search === 'string'
+        ? request.query.search
+        : undefined,
   }
 
   const result = await preventiveMaintenanceService.getReminders(

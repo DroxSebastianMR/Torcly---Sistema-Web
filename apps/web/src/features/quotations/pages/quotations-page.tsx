@@ -150,8 +150,9 @@ export default function QuotationsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Cotizaciones y Presupuestos"
-        description="Elabora proformas comerciales para tus clientes, compártelas por WhatsApp y conviértelas a órdenes de taller con un clic."
+        eyebrow="Gestión comercial"
+        title="Cotizaciones"
+        description="Elabora cotizaciones para tus clientes, compártelas por WhatsApp y conviértelas a órdenes de taller con un clic."
       >
         {canWrite && (
           <Button onClick={openCreate}>

@@ -1,8 +1,8 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
-import { useQuery } from '@tanstack/react-query'
-import { AlertTriangle, Gauge } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { AlertTriangle, Car, Gauge, UserPlus } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,6 +12,8 @@ import {
   type SmartSelectOption,
 } from '@/components/ui/smart-select'
 import { useCustomers } from '@/features/customers/hooks/use-customers'
+import { customersService } from '@/features/customers/services/customers.service'
+import type { CustomerCreateInput } from '@/features/customers/types/customers.types'
 import { customerDisplayName } from '@/features/customers/utils/customer-formatters'
 import { vehicleKeys } from '@/features/vehicles/hooks/use-vehicles'
 import { vehiclesService } from '@/features/vehicles/services/vehicles.service'
@@ -33,17 +35,23 @@ interface DirectWorkOrderModalProps {
 }
 
 const defaultValues: DirectWorkOrderFormValues = {
+  isNewCustomer: false,
   customerId: '',
   vehicleId: '',
+  customerType: 'NATURAL',
+  documentNumber: '',
+  firstName: '',
+  lastName: '',
+  legalName: '',
+  phone: '',
+  email: '',
+  vehiclePlate: '',
+  vehicleBrand: '',
+  vehicleModel: '',
+  vehicleYear: new Date().getFullYear(),
   currentMileage: null,
   receptionNotes: '',
-  receptionFuelLevel: '1/2',
-  hasSpareTire: false,
-  hasJackAndTools: false,
-  hasVehicleDocuments: false,
-  hasRadioFaceplate: false,
-  externalDamageNotes: '',
-  photoUrls: '',
+  receptionFuelLevel: '',
 }
 
 export function DirectWorkOrderModal({
@@ -51,8 +59,10 @@ export function DirectWorkOrderModal({
   onClose,
   onSuccess,
 }: DirectWorkOrderModalProps) {
+  const queryClient = useQueryClient()
   const mutations = useWorkOrdersMutations()
   const { data: yardCapacity } = useYardCapacity()
+  const [isCreatingCustomer, setIsCreatingCustomer] = useState(false)
 
   const customersQuery = useCustomers({
     search: '',
@@ -75,6 +85,8 @@ export function DirectWorkOrderModal({
     formState: { errors },
   } = form
 
+  const isNewCustomer = useWatch({ control, name: 'isNewCustomer' })
+  const customerType = useWatch({ control, name: 'customerType' })
   const customerId = useWatch({ control, name: 'customerId' })
   const vehicleId = useWatch({ control, name: 'vehicleId' })
   const receptionFuelLevel = useWatch({
@@ -94,7 +106,7 @@ export function DirectWorkOrderModal({
         { search: '', customerId, page: 1, pageSize: 100 },
         signal,
       ),
-    enabled: Boolean(customerId) && open,
+    enabled: Boolean(customerId) && !isNewCustomer && open,
   })
 
   useEffect(() => {
@@ -105,8 +117,10 @@ export function DirectWorkOrderModal({
 
   // Reset vehicle when customer changes
   useEffect(() => {
-    setValue('vehicleId', '')
-  }, [customerId, setValue])
+    if (!isNewCustomer) {
+      setValue('vehicleId', '')
+    }
+  }, [customerId, isNewCustomer, setValue])
 
   const customerOptions = useMemo<SmartSelectOption[]>(
     () =>
@@ -134,34 +148,74 @@ export function DirectWorkOrderModal({
 
   const onSubmit = async (values: DirectWorkOrderFormValues) => {
     try {
+      let finalCustomerId = values.customerId
+      let finalVehicleId = values.vehicleId
+
+      if (values.isNewCustomer) {
+        setIsCreatingCustomer(true)
+        const vehicleData = {
+          plate: values.vehiclePlate.toUpperCase().trim(),
+          brand: values.vehicleBrand.trim(),
+          model: values.vehicleModel.trim(),
+          year: Number(values.vehicleYear),
+          mileage: values.currentMileage ?? null,
+        }
+
+        const customerPayload: CustomerCreateInput =
+          values.customerType === 'NATURAL'
+            ? {
+                type: 'NATURAL',
+                documentNumber: values.documentNumber.trim(),
+                firstName: values.firstName.trim(),
+                lastName: values.lastName.trim(),
+                phone: values.phone.trim(),
+                email: values.email.trim() || null,
+                vehicle: vehicleData,
+              }
+            : {
+                type: 'LEGAL',
+                documentNumber: values.documentNumber.trim(),
+                legalName: values.legalName.trim(),
+                phone: values.phone.trim(),
+                email: values.email.trim() || null,
+                vehicle: vehicleData,
+              }
+
+        const customerResponse = await customersService.create(customerPayload)
+
+        finalCustomerId = customerResponse.data.id
+        finalVehicleId = customerResponse.data.createdVehicle?.id || ''
+
+        if (!finalVehicleId) {
+          throw new Error(
+            'No se pudo asociar el vehículo registrado a la orden.',
+          )
+        }
+
+        void queryClient.invalidateQueries({ queryKey: ['customers'] })
+        void queryClient.invalidateQueries({ queryKey: ['vehicles'] })
+      }
+
       const response = await mutations.createDirect.mutateAsync({
-        customerId: values.customerId,
-        vehicleId: values.vehicleId,
+        customerId: finalCustomerId,
+        vehicleId: finalVehicleId,
         currentMileage: values.currentMileage ?? null,
-        fuelLevel: {
-          E: 'EMPTY',
-          '1/4': 'QUARTER',
-          '1/2': 'HALF',
-          '3/4': 'THREE_QUARTERS',
-          F: 'FULL',
-        }[values.receptionFuelLevel],
+        fuelLevel: values.receptionFuelLevel
+          ? {
+              E: 'EMPTY',
+              '1/4': 'QUARTER',
+              '1/2': 'HALF',
+              '3/4': 'THREE_QUARTERS',
+              F: 'FULL',
+            }[values.receptionFuelLevel]
+          : null,
         receptionNotes: values.receptionNotes?.trim() || null,
-        receptionChecklist: {
-          fuelLevel: values.receptionFuelLevel,
-          hasSpareTire: values.hasSpareTire,
-          hasJackAndTools: values.hasJackAndTools,
-          hasVehicleDocuments: values.hasVehicleDocuments,
-          hasRadioFaceplate: values.hasRadioFaceplate,
-          externalDamageNotes: values.externalDamageNotes?.trim() || null,
-          photos: (values.photoUrls ?? '')
-            .split(/\r?\n|,/)
-            .map((url) => url.trim())
-            .filter(Boolean),
-        },
       })
 
       toast.success(
-        `Orden directa ${response.data.code} registrada exitosamente.`,
+        values.isNewCustomer
+          ? `Cliente, vehículo y orden directa ${response.data.code} registrados exitosamente.`
+          : `Orden directa ${response.data.code} registrada exitosamente.`,
       )
       onClose()
       if (onSuccess) {
@@ -169,10 +223,12 @@ export function DirectWorkOrderModal({
       }
     } catch (error) {
       toast.error(getWorkOrderErrorMessage(error))
+    } finally {
+      setIsCreatingCustomer(false)
     }
   }
 
-  const isBusy = mutations.createDirect.isPending
+  const isBusy = mutations.createDirect.isPending || isCreatingCustomer
   const isFull = yardCapacity?.isAtCapacity ?? false
 
   return (
@@ -203,117 +259,373 @@ export function DirectWorkOrderModal({
           </div>
         )}
 
-        <div className="space-y-1.5">
-          <label htmlFor="directCustomerId" className="text-sm font-medium">
-            Cliente <span className="text-destructive">*</span>
-          </label>
-          <SmartSelect
-            id="directCustomerId"
-            placeholder="Selecciona o busca un cliente…"
-            options={customerOptions}
-            value={customerId}
-            onChange={(val) =>
-              setValue('customerId', val, { shouldValidate: true })
-            }
-            aria-invalid={Boolean(errors.customerId)}
-          />
-          {errors.customerId && (
-            <p
-              className="text-xs font-medium text-red-600 dark:text-red-400"
-              role="alert"
-            >
-              {errors.customerId.message}
-            </p>
-          )}
-        </div>
-
-        <fieldset className="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-3.5">
-          <legend className="px-1 text-sm font-semibold">Checklist de recepción</legend>
-          <div className="space-y-1.5">
-            <label htmlFor="directReceptionFuelLevel" className="text-sm font-medium">
-              Combustible al recibir
-            </label>
-            <SmartSelect
-              id="directReceptionFuelLevel"
-              placeholder="Selecciona el nivel…"
-              options={receptionFuelLevelOptions.map((option) => ({
-                value: option.value,
-                label: option.label,
-              }))}
-              value={receptionFuelLevel}
-              onChange={(value) =>
-                setValue('receptionFuelLevel', value as DirectWorkOrderFormValues['receptionFuelLevel'], {
+        {/* Selector de modo: Cliente existente vs Cliente nuevo */}
+        <div className="flex items-center justify-between rounded-xl border border-border/80 bg-muted/30 px-3.5 py-2.5">
+          <div className="flex items-center gap-2.5">
+            <UserPlus className="size-4 text-primary shrink-0" />
+            <div>
+              <label
+                htmlFor="isNewCustomerToggle"
+                className="text-sm font-semibold text-foreground cursor-pointer"
+              >
+                ¿Es un cliente nuevo?
+              </label>
+              <p className="text-xs text-muted-foreground">
+                Regístralo en el acto junto con su vehículo
+              </p>
+            </div>
+          </div>
+          <label className="relative inline-flex cursor-pointer items-center">
+            <input
+              id="isNewCustomerToggle"
+              type="checkbox"
+              className="sr-only peer"
+              checked={isNewCustomer}
+              onChange={(e) => {
+                setValue('isNewCustomer', e.target.checked, {
                   shouldValidate: true,
                 })
-              }
+              }}
             />
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {(
-              [
-              ['hasSpareTire', 'Llanta de repuesto'],
-              ['hasJackAndTools', 'Gata y herramientas'],
-              ['hasVehicleDocuments', 'Documentos del vehículo'],
-              ['hasRadioFaceplate', 'Panel de radio'],
-              ] as const
-            ).map(([name, label]) => (
-              <label key={name} className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm">
-                <input type="checkbox" className="size-4 accent-brand-forest" {...register(name)} />
-                {label}: <span className="font-medium">Sí</span>
-              </label>
-            ))}
-          </div>
-          <div className="space-y-1.5">
-            <label htmlFor="externalDamageNotes" className="text-sm font-medium">Daños externos observados</label>
-            <textarea id="externalDamageNotes" rows={2} placeholder="Describe rayones, golpes u observaciones visibles…" className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring" {...register('externalDamageNotes')} />
-          </div>
-          <div className="space-y-1.5">
-            <label htmlFor="photoUrls" className="text-sm font-medium">Fotos (URLs, una por línea)</label>
-            <textarea id="photoUrls" rows={2} placeholder="https://…" className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none no-scrollbar focus:ring-2 focus:ring-ring" {...register('photoUrls')} />
-          </div>
-        </fieldset>
-
-        <div className="space-y-1.5">
-          <label htmlFor="directVehicleId" className="text-sm font-medium">
-            Vehículo <span className="text-red-600 dark:text-red-400">*</span>
+            <div className="peer h-6 w-11 rounded-full bg-input peer-checked:bg-brand-forest transition-colors after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full" />
           </label>
-          <SmartSelect
-            id="directVehicleId"
-            placeholder={
-              customerId
-                ? vehiclesQuery.isLoading
-                  ? 'Cargando vehículos…'
-                  : vehicleOptions.length > 0
-                    ? 'Selecciona la placa del vehículo…'
-                    : 'Este cliente no tiene vehículos registrados.'
-                : 'Primero selecciona un cliente'
-            }
-            options={vehicleOptions}
-            value={vehicleId}
-            onChange={(val) => {
-              setValue('vehicleId', val, { shouldValidate: true })
-            }}
-            disabled={!customerId || vehiclesQuery.isLoading}
-            aria-invalid={Boolean(errors.vehicleId)}
-          />
-          {errors.vehicleId && (
-            <p
-              className="text-xs font-medium text-red-600 dark:text-red-400"
-              role="alert"
-            >
-              {errors.vehicleId.message}
-            </p>
-          )}
         </div>
 
-        <div className="grid gap-3">
+        {/* Sección de Cliente y Vehículo */}
+        {isNewCustomer ? (
+          <div className="space-y-4 rounded-xl border border-border bg-muted/20 p-4">
+            <div className="space-y-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                1. Datos del Nuevo Cliente
+              </span>
+
+              {/* Tipo de cliente */}
+              <div className="flex gap-4">
+                <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                  <input
+                    type="radio"
+                    value="NATURAL"
+                    checked={customerType === 'NATURAL'}
+                    onChange={() =>
+                      setValue('customerType', 'NATURAL', {
+                        shouldValidate: true,
+                      })
+                    }
+                    className="accent-brand-forest"
+                  />
+                  Persona Natural
+                </label>
+                <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                  <input
+                    type="radio"
+                    value="LEGAL"
+                    checked={customerType === 'LEGAL'}
+                    onChange={() =>
+                      setValue('customerType', 'LEGAL', {
+                        shouldValidate: true,
+                      })
+                    }
+                    className="accent-brand-forest"
+                  />
+                  Empresa / Jurídica
+                </label>
+              </div>
+
+              {/* Documento y Nombres */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <label htmlFor="newDocNumber" className="text-xs font-medium">
+                    {customerType === 'NATURAL'
+                      ? 'DNI (8 dígitos)'
+                      : 'RUC (11 dígitos)'}{' '}
+                    <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    id="newDocNumber"
+                    maxLength={customerType === 'NATURAL' ? 8 : 11}
+                    placeholder={
+                      customerType === 'NATURAL' ? '12345678' : '20123456789'
+                    }
+                    {...register('documentNumber')}
+                    aria-invalid={Boolean(errors.documentNumber)}
+                  />
+                  {errors.documentNumber && (
+                    <p className="text-[11px] font-medium text-destructive">
+                      {errors.documentNumber.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <label htmlFor="newPhone" className="text-xs font-medium">
+                    Teléfono celular <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    id="newPhone"
+                    placeholder="987654321"
+                    {...register('phone')}
+                    aria-invalid={Boolean(errors.phone)}
+                  />
+                  {errors.phone && (
+                    <p className="text-[11px] font-medium text-destructive">
+                      {errors.phone.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {customerType === 'NATURAL' ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <label
+                      htmlFor="newFirstName"
+                      className="text-xs font-medium"
+                    >
+                      Nombres <span className="text-destructive">*</span>
+                    </label>
+                    <Input
+                      id="newFirstName"
+                      placeholder="Juan Carlos"
+                      {...register('firstName')}
+                      aria-invalid={Boolean(errors.firstName)}
+                    />
+                    {errors.firstName && (
+                      <p className="text-[11px] font-medium text-destructive">
+                        {errors.firstName.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <label
+                      htmlFor="newLastName"
+                      className="text-xs font-medium"
+                    >
+                      Apellidos <span className="text-destructive">*</span>
+                    </label>
+                    <Input
+                      id="newLastName"
+                      placeholder="Pérez García"
+                      {...register('lastName')}
+                      aria-invalid={Boolean(errors.lastName)}
+                    />
+                    {errors.lastName && (
+                      <p className="text-[11px] font-medium text-destructive">
+                        {errors.lastName.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  <label htmlFor="newLegalName" className="text-xs font-medium">
+                    Razón Social <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    id="newLegalName"
+                    placeholder="Transportes y Servicios S.A.C."
+                    {...register('legalName')}
+                    aria-invalid={Boolean(errors.legalName)}
+                  />
+                  {errors.legalName && (
+                    <p className="text-[11px] font-medium text-destructive">
+                      {errors.legalName.message}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label htmlFor="newEmail" className="text-xs font-medium">
+                  Correo electrónico (opcional)
+                </label>
+                <Input
+                  id="newEmail"
+                  type="email"
+                  placeholder="cliente@ejemplo.com"
+                  {...register('email')}
+                  aria-invalid={Boolean(errors.email)}
+                />
+                {errors.email && (
+                  <p className="text-[11px] font-medium text-destructive">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Datos del vehículo del nuevo cliente */}
+            <div className="space-y-2 border-t border-border pt-3">
+              <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+                <Car className="size-3.5" />
+                2. Vehículo a Ingresar
+              </span>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <label
+                    htmlFor="newVehiclePlate"
+                    className="text-xs font-medium"
+                  >
+                    Placa <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    id="newVehiclePlate"
+                    placeholder="ABC-123"
+                    className="font-mono uppercase"
+                    maxLength={10}
+                    {...register('vehiclePlate')}
+                    onChange={(e) => {
+                      setValue('vehiclePlate', e.target.value.toUpperCase(), {
+                        shouldValidate: true,
+                      })
+                    }}
+                    aria-invalid={Boolean(errors.vehiclePlate)}
+                  />
+                  {errors.vehiclePlate && (
+                    <p className="text-[11px] font-medium text-destructive">
+                      {errors.vehiclePlate.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <label
+                    htmlFor="newVehicleBrand"
+                    className="text-xs font-medium"
+                  >
+                    Marca <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    id="newVehicleBrand"
+                    placeholder="Ej. Toyota"
+                    {...register('vehicleBrand')}
+                    aria-invalid={Boolean(errors.vehicleBrand)}
+                  />
+                  {errors.vehicleBrand && (
+                    <p className="text-[11px] font-medium text-destructive">
+                      {errors.vehicleBrand.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <label
+                    htmlFor="newVehicleModel"
+                    className="text-xs font-medium"
+                  >
+                    Modelo <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    id="newVehicleModel"
+                    placeholder="Ej. Yaris"
+                    {...register('vehicleModel')}
+                    aria-invalid={Boolean(errors.vehicleModel)}
+                  />
+                  {errors.vehicleModel && (
+                    <p className="text-[11px] font-medium text-destructive">
+                      {errors.vehicleModel.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <label
+                    htmlFor="newVehicleYear"
+                    className="text-xs font-medium"
+                  >
+                    Año <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    id="newVehicleYear"
+                    type="number"
+                    min={1950}
+                    max={new Date().getFullYear() + 1}
+                    placeholder="2022"
+                    {...register('vehicleYear', {
+                      setValueAs: (v) => (v === '' ? '' : Number(v)),
+                    })}
+                    aria-invalid={Boolean(errors.vehicleYear)}
+                  />
+                  {errors.vehicleYear && (
+                    <p className="text-[11px] font-medium text-destructive">
+                      {errors.vehicleYear.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-1.5">
+              <label htmlFor="directCustomerId" className="text-sm font-medium">
+                Cliente <span className="text-destructive">*</span>
+              </label>
+              <SmartSelect
+                id="directCustomerId"
+                placeholder="Selecciona o busca un cliente…"
+                options={customerOptions}
+                value={customerId}
+                onChange={(val) =>
+                  setValue('customerId', val, { shouldValidate: true })
+                }
+                aria-invalid={Boolean(errors.customerId)}
+              />
+              {errors.customerId && (
+                <p
+                  className="text-xs font-medium text-destructive"
+                  role="alert"
+                >
+                  {errors.customerId.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="directVehicleId" className="text-sm font-medium">
+                Vehículo <span className="text-destructive">*</span>
+              </label>
+              <SmartSelect
+                id="directVehicleId"
+                placeholder={
+                  customerId
+                    ? vehiclesQuery.isLoading
+                      ? 'Cargando vehículos…'
+                      : vehicleOptions.length > 0
+                        ? 'Selecciona la placa del vehículo…'
+                        : 'Este cliente no tiene vehículos registrados.'
+                    : 'Primero selecciona un cliente'
+                }
+                options={vehicleOptions}
+                value={vehicleId}
+                onChange={(val) => {
+                  setValue('vehicleId', val, { shouldValidate: true })
+                }}
+                disabled={!customerId || vehiclesQuery.isLoading}
+                aria-invalid={Boolean(errors.vehicleId)}
+              />
+              {errors.vehicleId && (
+                <p
+                  className="text-xs font-medium text-destructive"
+                  role="alert"
+                >
+                  {errors.vehicleId.message}
+                </p>
+              )}
+            </div>
+          </>
+        )}
+
+        <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
             <label
               htmlFor="directCurrentMileage"
               className="flex items-center gap-1.5 text-sm font-medium"
             >
               <Gauge size={14} className="text-muted-foreground" />
-              Kilometraje actual (km)
+              Kilometraje actual (opcional)
             </label>
             <Input
               id="directCurrentMileage"
@@ -332,17 +644,38 @@ export function DirectWorkOrderModal({
               aria-invalid={Boolean(errors.currentMileage)}
             />
             {errors.currentMileage && (
-              <p
-                className="text-xs font-medium text-red-600 dark:text-red-400"
-                role="alert"
-              >
+              <p className="text-xs font-medium text-destructive" role="alert">
                 {errors.currentMileage.message}
               </p>
             )}
           </div>
-
+          <div className="space-y-1.5">
+            <label
+              htmlFor="directReceptionFuelLevel"
+              className="text-sm font-medium"
+            >
+              Combustible al recibir (opcional)
+            </label>
+            <SmartSelect
+              id="directReceptionFuelLevel"
+              placeholder="No registrar combustible"
+              options={receptionFuelLevelOptions.map((option) => ({
+                value: option.value,
+                label: option.label,
+              }))}
+              value={receptionFuelLevel}
+              onChange={(value) =>
+                setValue(
+                  'receptionFuelLevel',
+                  value as DirectWorkOrderFormValues['receptionFuelLevel'],
+                  { shouldValidate: true },
+                )
+              }
+            />
+          </div>
         </div>
 
+        {/* Motivo de ingreso */}
         <div className="space-y-1.5">
           <label htmlFor="directReceptionNotes" className="text-sm font-medium">
             Motivo de ingreso u observaciones de recepción
@@ -355,10 +688,7 @@ export function DirectWorkOrderModal({
             {...register('receptionNotes')}
           />
           {errors.receptionNotes && (
-            <p
-              className="text-xs font-medium text-red-600 dark:text-red-400"
-              role="alert"
-            >
+            <p className="text-xs font-medium text-destructive" role="alert">
               {errors.receptionNotes.message}
             </p>
           )}

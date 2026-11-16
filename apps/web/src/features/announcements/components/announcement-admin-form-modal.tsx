@@ -103,9 +103,7 @@ export function AnnouncementAdminFormModal({
     const replacement = selected
       ? `[size:${size}]${innerText}[/size]`
       : `[size:${size}]Texto[/size]`
-    const newCursorStart = selected
-      ? start
-      : start + `[size:${size}]`.length
+    const newCursorStart = selected ? start : start + `[size:${size}]`.length
     const newCursorEnd = selected
       ? start + replacement.length
       : newCursorStart + 5

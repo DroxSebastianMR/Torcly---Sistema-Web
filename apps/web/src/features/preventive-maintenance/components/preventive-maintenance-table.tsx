@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Copy, Check, MessageSquare, Phone, Wrench } from 'lucide-react'
+import { Copy, Check, Phone, Wrench } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
+import { WhatsAppIcon } from '@/components/icons/whatsapp-icon'
 import { toast } from 'sonner'
 import type { PreventiveMaintenanceItem } from '../types/preventive-maintenance.types'
 
@@ -29,7 +30,9 @@ export function PreventiveMaintenanceTable({
       return
     }
     const cleanPhone = item.customer.phone.replace(/\D/g, '')
-    const phoneWithCountry = cleanPhone.startsWith('51') ? cleanPhone : `51${cleanPhone}`
+    const phoneWithCountry = cleanPhone.startsWith('51')
+      ? cleanPhone
+      : `51${cleanPhone}`
     const url = `https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(
       item.suggestedMessage,
     )}`
@@ -70,11 +73,12 @@ export function PreventiveMaintenanceTable({
         </thead>
         <tbody className="divide-y divide-border">
           {items.map((item) => (
-            <tr key={item.vehicleId} className="bg-card hover:bg-muted/30 transition-colors">
+            <tr
+              key={item.vehicleId}
+              className="bg-card hover:bg-muted/30 transition-colors"
+            >
               <td className="px-5 py-4">
-                <p className="font-semibold text-brand-forest">
-                  {item.plate}
-                </p>
+                <p className="font-semibold text-brand-forest">{item.plate}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {item.brand} {item.model} ({item.year})
                 </p>
@@ -106,7 +110,9 @@ export function PreventiveMaintenanceTable({
                       Hace {item.daysSinceLastService} días
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {item.lastOrderCode ? `Orden ${item.lastOrderCode}` : 'Atención previa'}
+                      {item.lastOrderCode
+                        ? `Orden ${item.lastOrderCode}`
+                        : 'Atención previa'}
                     </p>
                   </>
                 ) : (
@@ -157,19 +163,18 @@ export function PreventiveMaintenanceTable({
 
                   <Button
                     type="button"
-                    variant="outline"
                     size="sm"
                     disabled={!item.customer.phone}
                     onClick={() => handleOpenWhatsApp(item)}
-                    className="border-emerald-500 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 hover:text-emerald-950 font-semibold"
+                    className="h-8 min-h-8 gap-1.5 border-transparent bg-[#25D366] text-white hover:bg-[#20ba5a] active:bg-[#1caa52] dark:bg-[#25D366] dark:text-white dark:hover:bg-[#20ba5a] font-semibold px-3 text-xs shadow-xs"
                     title={
                       item.customer.phone
                         ? 'Enviar recordatorio por WhatsApp'
                         : 'Cliente sin teléfono registrado'
                     }
                   >
-                    <MessageSquare className="size-3.5 text-emerald-600 fill-emerald-600" />
-                    WhatsApp
+                    <WhatsAppIcon className="size-3.5 shrink-0 fill-current text-white" />
+                    <span>WhatsApp</span>
                   </Button>
                 </div>
               </td>

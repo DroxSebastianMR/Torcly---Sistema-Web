@@ -58,7 +58,9 @@ export default function PlatformPage() {
   const queryClient = useQueryClient()
   const [filters, setFilters] = useState(initialFilters)
   const [formOpen, setFormOpen] = useState(false)
-  const [isImpersonatingId, setIsImpersonatingId] = useState<string | null>(null)
+  const [isImpersonatingId, setIsImpersonatingId] = useState<string | null>(
+    null,
+  )
   const [selectedOrganization, setSelectedOrganization] =
     useState<PlatformOrganization | null>(null)
   const [editingOrganization, setEditingOrganization] =
@@ -183,9 +185,7 @@ export default function PlatformPage() {
           <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Organizaciones
           </p>
-          <p className="mt-1 text-2xl font-bold text-brand-forest">
-            {total}
-          </p>
+          <p className="mt-1 text-2xl font-bold text-brand-forest">{total}</p>
           <p className="mt-1 text-xs text-muted-foreground">
             Talleres registrados en la plataforma
           </p>
@@ -210,7 +210,11 @@ export default function PlatformPage() {
             MRR Estimado
           </p>
           <p className="mt-1 text-2xl font-bold text-violet-800">
-            S/ {estimatedMrr.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            S/{' '}
+            {estimatedMrr.toLocaleString('es-PE', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             Ingreso recurrente mensualizado
@@ -222,9 +226,7 @@ export default function PlatformPage() {
           <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             En Período de Prueba
           </p>
-          <p className="mt-1 text-2xl font-bold text-amber-700">
-            {trialSubs}
-          </p>
+          <p className="mt-1 text-2xl font-bold text-amber-700">{trialSubs}</p>
           <p className="mt-1 text-xs text-muted-foreground">
             Talleres en evaluación o prueba
           </p>
@@ -371,7 +373,10 @@ export default function PlatformPage() {
                           onClick={() => void handleImpersonate(organization)}
                           title="Ingresar en modo soporte a este taller"
                         >
-                          <Headphones aria-hidden className="size-4 text-amber-600" />
+                          <Headphones
+                            aria-hidden
+                            className="size-4 text-amber-600"
+                          />
                           {isImpersonatingId === organization.id
                             ? 'Asistiendo...'
                             : 'Asistir'}

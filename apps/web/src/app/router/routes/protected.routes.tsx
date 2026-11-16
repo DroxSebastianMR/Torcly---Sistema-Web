@@ -143,9 +143,7 @@ export const protectedRoutes: RouteObject[] = [
                 path: paths.quotations,
                 lazy: async () => ({
                   Component: (
-                    await import(
-                      '@/features/quotations/pages/quotations-page'
-                    )
+                    await import('@/features/quotations/pages/quotations-page')
                   ).default,
                 }),
               },

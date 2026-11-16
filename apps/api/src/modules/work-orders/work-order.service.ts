@@ -116,10 +116,18 @@ function toReceptionChecklist(value: unknown): ReceptionChecklist | null {
   }
 
   const checklist = value as Partial<ReceptionChecklist>
-  const validFuelLevels: ReceptionChecklist['fuelLevel'][] = ['E', '1/4', '1/2', '3/4', 'F']
+  const validFuelLevels: ReceptionChecklist['fuelLevel'][] = [
+    'E',
+    '1/4',
+    '1/2',
+    '3/4',
+    'F',
+  ]
 
   if (
-    !validFuelLevels.includes(checklist.fuelLevel as ReceptionChecklist['fuelLevel']) ||
+    !validFuelLevels.includes(
+      checklist.fuelLevel as ReceptionChecklist['fuelLevel'],
+    ) ||
     typeof checklist.hasSpareTire !== 'boolean' ||
     typeof checklist.hasJackAndTools !== 'boolean' ||
     typeof checklist.hasVehicleDocuments !== 'boolean' ||
@@ -139,7 +147,9 @@ function toReceptionChecklist(value: unknown): ReceptionChecklist | null {
         ? checklist.externalDamageNotes
         : null,
     photos: Array.isArray(checklist.photos)
-      ? checklist.photos.filter((photo): photo is string => typeof photo === 'string')
+      ? checklist.photos.filter(
+          (photo): photo is string => typeof photo === 'string',
+        )
       : [],
   }
 }
