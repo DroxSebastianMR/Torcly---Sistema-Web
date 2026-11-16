@@ -25,7 +25,7 @@ interface SalePaymentModalProps {
   loading?: boolean
   onClose: () => void
   onConfirmAndPay: (input: SaleConfirmAndPayInput) => Promise<void>
-  onConfirmPending: () => Promise<void>
+  onConfirmPending: (input?: SaleConfirmAndPayInput) => Promise<void>
 }
 
 const paymentMethodOptions = [
@@ -34,6 +34,18 @@ const paymentMethodOptions = [
   { value: 'CARD', label: 'Tarjeta' },
   { value: 'TRANSFER', label: 'Transferencia' },
 ]
+
+function toPaymentAmount(value: string) {
+  const amount = Number(value)
+  return Number.isFinite(amount) && amount >= 0
+    ? Math.round((amount + Number.EPSILON) * 100) / 100
+    : 0
+}
+
+function normalizePaymentAmount(value: string) {
+  if (!value.trim()) return ''
+  return String(toPaymentAmount(value))
+}
 
 export function SalePaymentModal({
   open,
@@ -52,15 +64,26 @@ export function SalePaymentModal({
   const [mixedMethod1, setMixedMethod1] = useState<
     'CASH' | 'CARD' | 'TRANSFER' | 'DIGITAL_WALLET'
   >('CASH')
-  const [mixedAmount1, setMixedAmount1] = useState<number>(
-    Math.round(total / 2),
+  const [mixedAmount1, setMixedAmount1] = useState(
+    String(Math.round(total / 2)),
   )
   const [mixedMethod2, setMixedMethod2] = useState<
     'CASH' | 'CARD' | 'TRANSFER' | 'DIGITAL_WALLET'
   >('DIGITAL_WALLET')
-  const [mixedAmount2, setMixedAmount2] = useState<number>(
-    Math.round((total - Math.round(total / 2) + Number.EPSILON) * 100) / 100,
+  const [mixedAmount2, setMixedAmount2] = useState(
+    String(
+      Math.round((total - Math.round(total / 2) + Number.EPSILON) * 100) / 100,
+    ),
   )
+
+  const mixedAmount1Value = toPaymentAmount(mixedAmount1)
+  const mixedAmount2Value = toPaymentAmount(mixedAmount2)
+  const mixedTotal =
+    Math.round((mixedAmount1Value + mixedAmount2Value + Number.EPSILON) * 100) /
+    100
+  const mixedDifference =
+    Math.round((total - mixedTotal + Number.EPSILON) * 100) / 100
+  const isMixedPaymentComplete = mixedDifference === 0
 
   const change = Math.max(
     0,
@@ -82,16 +105,14 @@ export function SalePaymentModal({
         notes: notes.trim() || undefined,
       })
     } else if (method === 'MIXED') {
-      const sum =
-        Math.round((mixedAmount1 + mixedAmount2 + Number.EPSILON) * 100) / 100
-      if (sum !== total) return
+      if (!isMixedPaymentComplete) return
       await onConfirmAndPay({
         paymentMethod: 'MIXED',
         amountPaid: total,
         notes: notes.trim() || undefined,
         splitPayments: [
-          { method: mixedMethod1, amount: mixedAmount1 },
-          { method: mixedMethod2, amount: mixedAmount2 },
+          { method: mixedMethod1, amount: mixedAmount1Value },
+          { method: mixedMethod2, amount: mixedAmount2Value },
         ],
       })
     } else {
@@ -101,6 +122,23 @@ export function SalePaymentModal({
         notes: notes.trim() || undefined,
       })
     }
+  }
+
+  const handleLeavePending = async () => {
+    if (method !== 'MIXED' || mixedTotal <= 0 || mixedDifference < 0) {
+      await onConfirmPending()
+      return
+    }
+
+    await onConfirmPending({
+      paymentMethod: 'MIXED',
+      amountPaid: mixedTotal,
+      notes: notes.trim() || undefined,
+      splitPayments: [
+        { method: mixedMethod1, amount: mixedAmount1Value },
+        { method: mixedMethod2, amount: mixedAmount2Value },
+      ].filter((payment) => payment.amount > 0),
+    })
   }
 
   const setSuggestedCash = (amount: number) => {
@@ -121,8 +159,8 @@ export function SalePaymentModal({
           <Button
             type="button"
             variant="ghost"
-            disabled={loading}
-            onClick={onConfirmPending}
+            disabled={loading || (method === 'MIXED' && mixedDifference < 0)}
+            onClick={() => void handleLeavePending()}
             className="text-xs text-muted-foreground hover:text-foreground"
           >
             <Clock size={14} className="mr-1" /> Dejar pendiente (Crédito)
@@ -138,7 +176,11 @@ export function SalePaymentModal({
             </Button>
             <Button
               type="button"
-              disabled={loading || (method === 'CASH' && cashReceived < total)}
+              disabled={
+                loading ||
+                (method === 'CASH' && cashReceived < total) ||
+                (method === 'MIXED' && !isMixedPaymentComplete)
+              }
               onClick={handlePay}
             >
               <CheckCircle2 size={16} className="mr-1.5" />
@@ -323,20 +365,18 @@ export function SalePaymentModal({
                   }
                 />
                 <Input
-                  type="number"
-                  min="0"
-                  step="0.1"
+                  type="text"
+                  inputMode="decimal"
+                  aria-label="Primer importe de pago mixto"
                   value={mixedAmount1}
-                  onChange={(e) => {
-                    const val = Number(e.target.value)
-                    setMixedAmount1(val)
-                    setMixedAmount2(
-                      Math.max(
-                        0,
-                        Math.round((total - val + Number.EPSILON) * 100) / 100,
-                      ),
-                    )
+                  onChange={(event) => {
+                    const value = event.target.value.replace(',', '.')
+                    if (/^\d*(?:\.\d{0,2})?$/.test(value))
+                      setMixedAmount1(value)
                   }}
+                  onBlur={() =>
+                    setMixedAmount1(normalizePaymentAmount(mixedAmount1))
+                  }
                 />
               </div>
 
@@ -350,20 +390,35 @@ export function SalePaymentModal({
                   }
                 />
                 <Input
-                  type="number"
-                  min="0"
-                  step="0.1"
+                  type="text"
+                  inputMode="decimal"
+                  aria-label="Segundo importe de pago mixto"
                   value={mixedAmount2}
-                  onChange={(e) => setMixedAmount2(Number(e.target.value))}
+                  onChange={(event) => {
+                    const value = event.target.value.replace(',', '.')
+                    if (/^\d*(?:\.\d{0,2})?$/.test(value))
+                      setMixedAmount2(value)
+                  }}
+                  onBlur={() =>
+                    setMixedAmount2(normalizePaymentAmount(mixedAmount2))
+                  }
                 />
               </div>
             </div>
             <div className="flex justify-between text-xs text-muted-foreground pt-1">
-              <span>
-                Suma: {currencyFormatter.format(mixedAmount1 + mixedAmount2)}
-              </span>
+              <span>Suma: {currencyFormatter.format(mixedTotal)}</span>
               <span>Total requerido: {currencyFormatter.format(total)}</span>
             </div>
+            {!isMixedPaymentComplete && (
+              <p
+                role="alert"
+                className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-900"
+              >
+                {mixedDifference > 0
+                  ? `Faltan ${currencyFormatter.format(mixedDifference)} para completar el cobro. Ajusta los montos o deja el saldo como crédito.`
+                  : `El desglose supera el total por ${currencyFormatter.format(Math.abs(mixedDifference))}. Ajusta los montos para finalizar.`}
+              </p>
+            )}
           </div>
         )}
 

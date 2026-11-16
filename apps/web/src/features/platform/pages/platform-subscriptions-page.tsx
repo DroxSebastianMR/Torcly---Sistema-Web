@@ -22,6 +22,10 @@ import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
 import { Pagination } from '@/components/ui/pagination'
+import {
+  ModuleListSkeleton,
+  ModuleMetricsSkeleton,
+} from '@/components/ui/skeleton'
 import { SmartSelect } from '@/components/ui/smart-select'
 import { usePlatformOrganizations } from '@/features/platform/hooks/use-platform-organizations'
 import { PlanFormModal } from '@/features/subscriptions/components/plan-form-modal'
@@ -318,57 +322,59 @@ export default function PlatformSubscriptionsPage() {
       {activeTab === 'subscriptions' ? (
         <div className="space-y-6">
           {/* Métricas de Plataforma */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground">
-                  Total Talleres
-                </span>
-                <Building2 className="size-4 text-muted-foreground" />
+          {metricsLoading ? (
+            <ModuleMetricsSkeleton />
+          ) : (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Total Talleres
+                  </span>
+                  <Building2 className="size-4 text-muted-foreground" />
+                </div>
+                <p className="mt-2 text-2xl font-bold text-foreground">
+                  {metrics?.total ?? 0}
+                </p>
               </div>
-              <p className="mt-2 text-2xl font-bold text-foreground">
-                {metricsLoading ? '...' : (metrics?.total ?? 0)}
-              </p>
-            </div>
 
-            <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground">
-                  Suscripciones Activas
-                </span>
-                <CheckCircle2 className="size-4 text-emerald-600" />
+              <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Suscripciones Activas
+                  </span>
+                  <CheckCircle2 className="size-4 text-emerald-600" />
+                </div>
+                <p className="mt-2 text-2xl font-bold text-emerald-700">
+                  {metrics?.active ?? 0}
+                </p>
               </div>
-              <p className="mt-2 text-2xl font-bold text-emerald-700">
-                {metricsLoading ? '...' : (metrics?.active ?? 0)}
-              </p>
-            </div>
 
-            <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground">
-                  En Prueba
-                </span>
-                <Clock className="size-4 text-blue-600" />
+              <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    En Prueba
+                  </span>
+                  <Clock className="size-4 text-blue-600" />
+                </div>
+                <p className="mt-2 text-2xl font-bold text-blue-700">
+                  {metrics?.trial ?? 0}
+                </p>
               </div>
-              <p className="mt-2 text-2xl font-bold text-blue-700">
-                {metricsLoading ? '...' : (metrics?.trial ?? 0)}
-              </p>
-            </div>
 
-            <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground">
-                  Vencidas o Suspendidas
-                </span>
-                <AlertTriangle className="size-4 text-rose-600" />
+              <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Vencidas o Suspendidas
+                  </span>
+                  <AlertTriangle className="size-4 text-rose-600" />
+                </div>
+                <p className="mt-2 text-2xl font-bold text-rose-700">
+                  {(metrics?.pastDue ?? 0) + (metrics?.suspended ?? 0)}
+                </p>
               </div>
-              <p className="mt-2 text-2xl font-bold text-rose-700">
-                {metricsLoading
-                  ? '...'
-                  : (metrics?.pastDue ?? 0) + (metrics?.suspended ?? 0)}
-              </p>
             </div>
-          </div>
+          )}
 
           {/* Barra de Filtros */}
           <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
@@ -412,26 +418,7 @@ export default function PlatformSubscriptionsPage() {
           {/* Tabla de Suscripciones */}
           <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             {subscriptionsLoading ? (
-              <div
-                className="divide-y divide-border/60"
-                aria-label="Cargando suscripciones de plataforma"
-              >
-                {Array.from({ length: 5 }, (_, index) => (
-                  <div
-                    key={index}
-                    className="flex animate-pulse items-center justify-between gap-4 px-4 py-4"
-                  >
-                    <div className="space-y-1.5">
-                      <div className="h-4 w-44 rounded bg-muted" />
-                      <div className="h-3 w-28 rounded bg-muted/60" />
-                    </div>
-                    <div className="h-4 w-28 rounded bg-muted" />
-                    <div className="h-5 w-20 rounded-full bg-muted" />
-                    <div className="h-4 w-24 rounded bg-muted" />
-                    <div className="size-8 rounded-lg bg-muted" />
-                  </div>
-                ))}
-              </div>
+              <ModuleListSkeleton label="Cargando suscripciones de plataforma" />
             ) : subscriptions.length === 0 ? (
               <div className="p-12 text-center text-xs text-muted-foreground">
                 <CreditCard className="mx-auto mb-2 size-8 text-muted-foreground/50" />

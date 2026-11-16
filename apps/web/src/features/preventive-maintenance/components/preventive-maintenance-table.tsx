@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Copy, Check, Phone, Wrench } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
+import { ModuleListSkeleton } from '@/components/ui/skeleton'
 import { WhatsAppIcon } from '@/components/icons/whatsapp-icon'
 import { toast } from 'sonner'
 import type { PreventiveMaintenanceItem } from '../types/preventive-maintenance.types'
@@ -40,13 +41,7 @@ export function PreventiveMaintenanceTable({
   }
 
   if (isLoading) {
-    return (
-      <div className="space-y-3 p-5" aria-label="Cargando recordatorios">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-16 animate-pulse rounded-xl bg-muted" />
-        ))}
-      </div>
-    )
+    return <ModuleListSkeleton label="Cargando recordatorios preventivos" />
   }
 
   if (items.length === 0) {
