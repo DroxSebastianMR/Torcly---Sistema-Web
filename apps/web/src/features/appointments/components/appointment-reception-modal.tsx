@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Gauge } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
@@ -70,7 +69,6 @@ export function AppointmentReceptionModal({
               htmlFor="receptionMileage"
               className="flex items-center gap-1.5 text-sm font-medium"
             >
-              <Gauge size={14} className="text-muted-foreground" />
               Kilometraje actual (opcional)
             </label>
             <Input

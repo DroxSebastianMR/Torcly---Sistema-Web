@@ -13,6 +13,7 @@ import {
   useCustomerMutations,
   useCustomers,
 } from '@/features/customers/hooks/use-customers'
+import { NewCustomerModeToggle } from '@/features/customers/components/new-customer-mode-toggle'
 import type {
   CustomerCreateInput,
   CustomerType,
@@ -393,36 +394,20 @@ export function QuotationFormModal({
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-muted/20 p-4">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                ¿Es un cliente nuevo?
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Regístralo junto con su vehículo y asígnalo a la cotización.
-              </p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={isNewCustomer}
-              aria-label="¿Es un cliente nuevo?"
-              onClick={() => {
-                setIsNewCustomer((current) => !current)
-                setCustomerId('')
-                setVehicleId('')
-              }}
-              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${isNewCustomer ? 'bg-primary' : 'bg-input'}`}
-            >
-              <span
-                className={`absolute top-0.5 size-5 rounded-full bg-white transition-transform ${isNewCustomer ? 'translate-x-5' : 'translate-x-0.5'}`}
-              />
-            </button>
-          </div>
+        <div className="space-y-4 rounded-xl border border-border bg-muted/20 p-4">
+          <NewCustomerModeToggle
+            id="quotation-isNewCustomerToggle"
+            checked={isNewCustomer}
+            description="Regístralo junto con su vehículo y asígnalo a la cotización."
+            onCheckedChange={(checked) => {
+              setIsNewCustomer(checked)
+              setCustomerId('')
+              setVehicleId('')
+            }}
+          />
 
           {isNewCustomer && (
-            <div className="mt-4 space-y-4 border-t border-border pt-4">
+            <div className="space-y-4 border-t border-border pt-4">
               <div className="flex gap-4 text-sm font-medium">
                 <label className="flex items-center gap-2">
                   <input

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlertTriangle, Car, Gauge, UserPlus } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,6 +12,7 @@ import {
   type SmartSelectOption,
 } from '@/components/ui/smart-select'
 import { useCustomers } from '@/features/customers/hooks/use-customers'
+import { NewCustomerModeToggle } from '@/features/customers/components/new-customer-mode-toggle'
 import { customersService } from '@/features/customers/services/customers.service'
 import type { CustomerCreateInput } from '@/features/customers/types/customers.types'
 import { customerDisplayName } from '@/features/customers/utils/customer-formatters'
@@ -260,36 +261,13 @@ export function DirectWorkOrderModal({
         )}
 
         {/* Selector de modo: Cliente existente vs Cliente nuevo */}
-        <div className="flex items-center justify-between rounded-xl border border-border/80 bg-muted/30 px-3.5 py-2.5">
-          <div className="flex items-center gap-2.5">
-            <UserPlus className="size-4 text-primary shrink-0" />
-            <div>
-              <label
-                htmlFor="isNewCustomerToggle"
-                className="text-sm font-semibold text-foreground cursor-pointer"
-              >
-                ¿Es un cliente nuevo?
-              </label>
-              <p className="text-xs text-muted-foreground">
-                Regístralo en el acto junto con su vehículo
-              </p>
-            </div>
-          </div>
-          <label className="relative inline-flex cursor-pointer items-center">
-            <input
-              id="isNewCustomerToggle"
-              type="checkbox"
-              className="sr-only peer"
-              checked={isNewCustomer}
-              onChange={(e) => {
-                setValue('isNewCustomer', e.target.checked, {
-                  shouldValidate: true,
-                })
-              }}
-            />
-            <div className="peer h-6 w-11 rounded-full bg-input peer-checked:bg-brand-forest transition-colors after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full" />
-          </label>
-        </div>
+        <NewCustomerModeToggle
+          id="isNewCustomerToggle"
+          checked={isNewCustomer}
+          onCheckedChange={(checked) =>
+            setValue('isNewCustomer', checked, { shouldValidate: true })
+          }
+        />
 
         {/* Sección de Cliente y Vehículo */}
         {isNewCustomer ? (
@@ -456,7 +434,6 @@ export function DirectWorkOrderModal({
             {/* Datos del vehículo del nuevo cliente */}
             <div className="space-y-2 border-t border-border pt-3">
               <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
-                <Car className="size-3.5" />
                 2. Vehículo a Ingresar
               </span>
 
@@ -624,7 +601,6 @@ export function DirectWorkOrderModal({
               htmlFor="directCurrentMileage"
               className="flex items-center gap-1.5 text-sm font-medium"
             >
-              <Gauge size={14} className="text-muted-foreground" />
               Kilometraje actual (opcional)
             </label>
             <Input

@@ -6,6 +6,7 @@ import {
   SmartSelect,
   type SmartSelectOption,
 } from '@/components/ui/smart-select'
+import { NewCustomerModeToggle } from '@/features/customers/components/new-customer-mode-toggle'
 import { useCustomers } from '@/features/customers/hooks/use-customers'
 import type { CustomerType } from '@/features/customers/types/customers.types'
 import { customerDisplayName } from '@/features/customers/utils/customer-formatters'
@@ -173,144 +174,188 @@ export function QuotationConversionModal({
       }
     >
       <div className="space-y-5">
-        <div className="flex items-center justify-between rounded-xl border border-border bg-muted/20 px-4 py-3">
-          <div>
-            <p className="text-sm font-semibold text-foreground">
-              ¿Es un cliente nuevo?
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Regístralo con su primer vehículo sin salir de la conversión.
-            </p>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={isNewCustomer}
-            aria-label="¿Es un cliente nuevo?"
-            onClick={() => {
-              setIsNewCustomer((current) => !current)
-              setError(null)
-            }}
-            className={`relative h-6 w-11 rounded-full transition-colors ${isNewCustomer ? 'bg-primary' : 'bg-input'}`}
-          >
-            <span
-              className={`absolute top-0.5 size-5 rounded-full bg-white transition-transform ${isNewCustomer ? 'translate-x-5' : 'translate-x-0.5'}`}
-            />
-          </button>
-        </div>
+        <NewCustomerModeToggle
+          id="quotation-conversion-isNewCustomerToggle"
+          checked={isNewCustomer}
+          description="Regístralo en el acto junto con su vehículo"
+          onCheckedChange={(checked) => {
+            setIsNewCustomer(checked)
+            setError(null)
+          }}
+        />
 
         {isNewCustomer ? (
-          <div className="space-y-4 rounded-xl border border-border bg-muted/15 p-4">
-            <div className="flex gap-4 text-sm font-medium">
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  checked={customerType === 'NATURAL'}
-                  onChange={() => setCustomerType('NATURAL')}
-                />{' '}
-                Persona natural
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  checked={customerType === 'LEGAL'}
-                  onChange={() => setCustomerType('LEGAL')}
-                />{' '}
-                Empresa / jurídica
-              </label>
+          <div className="space-y-4 rounded-xl border border-border bg-muted/20 p-4">
+            <div className="space-y-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                1. Datos del nuevo cliente
+              </span>
+              <div className="flex gap-4 text-sm font-medium">
+                <label className="flex cursor-pointer items-center gap-1.5">
+                  <input
+                    type="radio"
+                    checked={customerType === 'NATURAL'}
+                    onChange={() => setCustomerType('NATURAL')}
+                    className="accent-brand-forest"
+                  />{' '}
+                  Persona Natural
+                </label>
+                <label className="flex cursor-pointer items-center gap-1.5">
+                  <input
+                    type="radio"
+                    checked={customerType === 'LEGAL'}
+                    onChange={() => setCustomerType('LEGAL')}
+                    className="accent-brand-forest"
+                  />{' '}
+                  Empresa / Jurídica
+                </label>
+              </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              <Input
-                placeholder={
-                  customerType === 'NATURAL'
-                    ? 'DNI (8 dígitos) *'
-                    : 'RUC (11 dígitos) *'
-                }
-                value={newCustomer.documentNumber}
-                onChange={(event) =>
-                  updateNewCustomer(
-                    'documentNumber',
-                    event.target.value.replace(/\D/g, ''),
-                  )
-                }
-              />
-              <Input
-                placeholder="Teléfono *"
-                value={newCustomer.phone}
-                onChange={(event) =>
-                  updateNewCustomer('phone', event.target.value)
-                }
-              />
+              <div className="space-y-1">
+                <label className="text-xs font-medium">
+                  {customerType === 'NATURAL'
+                    ? 'DNI (8 dígitos)'
+                    : 'RUC (11 dígitos)'}{' '}
+                  <span className="text-destructive">*</span>
+                </label>
+                <Input
+                  placeholder={
+                    customerType === 'NATURAL' ? '12345678' : '20123456789'
+                  }
+                  value={newCustomer.documentNumber}
+                  onChange={(event) =>
+                    updateNewCustomer(
+                      'documentNumber',
+                      event.target.value.replace(/\D/g, ''),
+                    )
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium">
+                  Teléfono celular <span className="text-destructive">*</span>
+                </label>
+                <Input
+                  placeholder="987654321"
+                  value={newCustomer.phone}
+                  onChange={(event) =>
+                    updateNewCustomer('phone', event.target.value)
+                  }
+                />
+              </div>
               {customerType === 'NATURAL' ? (
                 <>
-                  <Input
-                    placeholder="Nombres *"
-                    value={newCustomer.firstName}
-                    onChange={(event) =>
-                      updateNewCustomer('firstName', event.target.value)
-                    }
-                  />
-                  <Input
-                    placeholder="Apellidos *"
-                    value={newCustomer.lastName}
-                    onChange={(event) =>
-                      updateNewCustomer('lastName', event.target.value)
-                    }
-                  />
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium">
+                      Nombres <span className="text-destructive">*</span>
+                    </label>
+                    <Input
+                      placeholder="Juan Carlos"
+                      value={newCustomer.firstName}
+                      onChange={(event) =>
+                        updateNewCustomer('firstName', event.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium">
+                      Apellidos <span className="text-destructive">*</span>
+                    </label>
+                    <Input
+                      placeholder="Pérez García"
+                      value={newCustomer.lastName}
+                      onChange={(event) =>
+                        updateNewCustomer('lastName', event.target.value)
+                      }
+                    />
+                  </div>
                 </>
               ) : (
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="text-xs font-medium">
+                    Razón Social <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    placeholder="Transportes y Servicios S.A.C."
+                    value={newCustomer.legalName}
+                    onChange={(event) =>
+                      updateNewCustomer('legalName', event.target.value)
+                    }
+                  />
+                </div>
+              )}
+              <div className="space-y-1 sm:col-span-2">
+                <label className="text-xs font-medium">
+                  Correo electrónico (opcional)
+                </label>
                 <Input
-                  className="sm:col-span-2"
-                  placeholder="Razón social *"
-                  value={newCustomer.legalName}
+                  placeholder="cliente@ejemplo.com"
+                  value={newCustomer.email}
                   onChange={(event) =>
-                    updateNewCustomer('legalName', event.target.value)
+                    updateNewCustomer('email', event.target.value)
                   }
                 />
-              )}
-              <Input
-                className="sm:col-span-2"
-                placeholder="Correo electrónico (opcional)"
-                value={newCustomer.email}
-                onChange={(event) =>
-                  updateNewCustomer('email', event.target.value)
-                }
-              />
+              </div>
             </div>
-            <div className="border-t border-border pt-4">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-primary">
-                Vehículo a registrar
+            <div className="space-y-3 border-t border-border pt-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                2. Vehículo a registrar
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
-                <Input
-                  placeholder="Placa *"
-                  value={newCustomer.plate}
-                  onChange={(event) =>
-                    updateNewCustomer('plate', event.target.value.toUpperCase())
-                  }
-                />
-                <Input
-                  placeholder="Marca *"
-                  value={newCustomer.brand}
-                  onChange={(event) =>
-                    updateNewCustomer('brand', event.target.value)
-                  }
-                />
-                <Input
-                  placeholder="Modelo *"
-                  value={newCustomer.model}
-                  onChange={(event) =>
-                    updateNewCustomer('model', event.target.value)
-                  }
-                />
-                <Input
-                  type="number"
-                  placeholder="Año *"
-                  value={newCustomer.year}
-                  onChange={(event) =>
-                    updateNewCustomer('year', event.target.value)
-                  }
-                />
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">
+                    Placa <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    placeholder="ABC-123"
+                    className="font-mono uppercase"
+                    value={newCustomer.plate}
+                    onChange={(event) =>
+                      updateNewCustomer(
+                        'plate',
+                        event.target.value.toUpperCase(),
+                      )
+                    }
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">
+                    Marca <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    placeholder="Ej. Toyota"
+                    value={newCustomer.brand}
+                    onChange={(event) =>
+                      updateNewCustomer('brand', event.target.value)
+                    }
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">
+                    Modelo <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    placeholder="Ej. Yaris"
+                    value={newCustomer.model}
+                    onChange={(event) =>
+                      updateNewCustomer('model', event.target.value)
+                    }
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">
+                    Año <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    type="number"
+                    placeholder="2026"
+                    value={newCustomer.year}
+                    onChange={(event) =>
+                      updateNewCustomer('year', event.target.value)
+                    }
+                  />
+                </div>
               </div>
             </div>
           </div>
