@@ -11,6 +11,7 @@ import {
 import { Link } from 'react-router-dom'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
+import { Skeleton } from '@/components/ui/skeleton'
 import { paths } from '@/app/router/constants/paths'
 import { cn } from '@/lib/utils'
 import {
@@ -500,18 +501,34 @@ export default function Page() {
 function DashboardSkeleton() {
   return (
     <div className="space-y-6" aria-label="Cargando panel operativo">
-      <div className="h-32 animate-pulse rounded-2xl bg-surface-muted" />
+      <div className="space-y-3 py-4">
+        <Skeleton className="h-3 w-32" />
+        <Skeleton className="h-9 w-72 max-w-full" />
+        <Skeleton className="h-4 w-[30rem] max-w-full" />
+      </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
           <div
-            className="h-36 animate-pulse rounded-2xl bg-surface-muted"
+            className="space-y-4 rounded-[22px] border border-border bg-card p-5"
             key={index}
-          />
+          >
+            <Skeleton className="h-3 w-2/3" />
+            <Skeleton className="h-8 w-16" />
+            <Skeleton className="h-3 w-4/5" />
+          </div>
         ))}
       </div>
       <div className="grid gap-6 xl:grid-cols-2">
-        <div className="h-80 animate-pulse rounded-2xl bg-surface-muted" />
-        <div className="h-80 animate-pulse rounded-2xl bg-surface-muted" />
+        {Array.from({ length: 2 }, (_, index) => (
+          <div
+            key={index}
+            className="space-y-5 rounded-2xl border border-border bg-card p-5"
+          >
+            <Skeleton className="h-5 w-2/5" />
+            <Skeleton className="h-3 w-3/5" />
+            <Skeleton className="h-44 w-full" />
+          </div>
+        ))}
       </div>
     </div>
   )
