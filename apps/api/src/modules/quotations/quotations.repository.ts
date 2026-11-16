@@ -142,14 +142,40 @@ async function nextQuotationCode(
   return `COT-${String(count + 1).padStart(6, '0')}`
 }
 
-async function assertCustomerVehicleOwnership(
+async function assertQuotationAssociations(
   transaction: Prisma.TransactionClient,
-  customerId: string,
-  vehicleId: string,
+  customerId: string | null | undefined,
+  vehicleId: string | null | undefined,
   organizationId: string,
 ) {
+  if (!customerId && !vehicleId) return null
+
+  if (!customerId && vehicleId) {
+    throw new AppError(
+      422,
+      'QUOTATION_VEHICLE_REQUIRES_CUSTOMER',
+      'Selecciona un cliente para asociar un vehículo a la cotización.',
+    )
+  }
+
+  if (customerId) {
+    const customer = await transaction.customer.findFirst({
+      where: { id: customerId, organizationId },
+      select: { id: true },
+    })
+    if (!customer) {
+      throw new AppError(
+        422,
+        'QUOTATION_CUSTOMER_INVALID',
+        'El cliente seleccionado no pertenece a esta organización.',
+      )
+    }
+  }
+
+  if (!vehicleId) return null
+
   const vehicle = await transaction.vehicle.findFirst({
-    where: { id: vehicleId, customerId, organizationId },
+    where: { id: vehicleId, customerId: customerId!, organizationId },
     select: { id: true, plate: true },
   })
   if (!vehicle) {
@@ -218,7 +244,7 @@ export const quotationsRepository = {
     organizationId: string,
   ) {
     return databaseService.transaction(async (transaction) => {
-      const vehicle = await assertCustomerVehicleOwnership(
+      const vehicle = await assertQuotationAssociations(
         transaction,
         input.customerId,
         input.vehicleId,
@@ -236,9 +262,9 @@ export const quotationsRepository = {
         data: {
           organizationId,
           code,
-          customerId: input.customerId,
-          vehicleId: input.vehicleId,
-          vehiclePlate: input.vehiclePlate?.trim() || vehicle.plate,
+          customerId: input.customerId ?? null,
+          vehicleId: input.vehicleId ?? null,
+          vehiclePlate: input.vehiclePlate?.trim() || vehicle?.plate || null,
           status: 'DRAFT',
           subtotal,
           total,
@@ -312,7 +338,7 @@ export const quotationsRepository = {
         )
       }
 
-      const vehicle = await assertCustomerVehicleOwnership(
+      const vehicle = await assertQuotationAssociations(
         transaction,
         input.customerId,
         input.vehicleId,
@@ -333,9 +359,9 @@ export const quotationsRepository = {
       const updated = await transaction.quotation.update({
         where: { id },
         data: {
-          customerId: input.customerId,
-          vehicleId: input.vehicleId,
-          vehiclePlate: input.vehiclePlate?.trim() || vehicle.plate,
+          customerId: input.customerId ?? null,
+          vehicleId: input.vehicleId ?? null,
+          vehiclePlate: input.vehiclePlate?.trim() || vehicle?.plate || null,
           status: input.status ?? existing.status,
           subtotal,
           total,

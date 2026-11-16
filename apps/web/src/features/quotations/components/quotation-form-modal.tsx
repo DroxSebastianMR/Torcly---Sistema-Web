@@ -293,17 +293,10 @@ export function QuotationFormModal({
       }
     }
 
-    if (!assignedCustomerId || !assignedVehicleId) {
-      toast.error(
-        'Selecciona un cliente y uno de sus vehículos, o registra uno nuevo.',
-      )
-      return
-    }
-
     await onSubmit({
-      customerId: assignedCustomerId,
-      vehicleId: assignedVehicleId,
-      vehiclePlate: assignedPlate.trim() || undefined,
+      customerId: assignedCustomerId || null,
+      vehicleId: assignedVehicleId || null,
+      vehiclePlate: assignedPlate.trim() || null,
       validUntil: validUntil || null,
       notes: notes.trim() || null,
       items,
@@ -344,11 +337,12 @@ export function QuotationFormModal({
       }
     >
       <div className="space-y-5">
-        {/* Cliente y vehículo asignados a la cotización */}
+        {/* Cliente y vehículo opcionales para una cotización exploratoria. */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Cliente *
+              Cliente{' '}
+              <span className="normal-case font-normal">(opcional)</span>
             </label>
             <SmartSelect
               value={customerId}
@@ -361,13 +355,15 @@ export function QuotationFormModal({
               onChange={(val) => {
                 setCustomerId(val)
                 setVehicleId('')
+                setVehiclePlate('')
               }}
             />
           </div>
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Vehículo *
+              Vehículo{' '}
+              <span className="normal-case font-normal">(opcional)</span>
             </label>
             <SmartSelect
               value={vehicleId}
@@ -403,11 +399,15 @@ export function QuotationFormModal({
               setIsNewCustomer(checked)
               setCustomerId('')
               setVehicleId('')
+              setVehiclePlate('')
             }}
           />
 
           {isNewCustomer && (
             <div className="space-y-4 border-t border-border pt-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                1. Datos del nuevo cliente
+              </p>
               <div className="flex gap-4 text-sm font-medium">
                 <label className="flex items-center gap-2">
                   <input
@@ -427,120 +427,177 @@ export function QuotationFormModal({
                 </label>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                <Input
-                  placeholder={
-                    customerType === 'NATURAL'
-                      ? 'DNI (8 dígitos) *'
-                      : 'RUC (11 dígitos) *'
-                  }
-                  value={newCustomer.documentNumber}
-                  onChange={(event) =>
-                    setNewCustomer((current) => ({
-                      ...current,
-                      documentNumber: event.target.value.replace(/\D/g, ''),
-                    }))
-                  }
-                />
-                <Input
-                  placeholder="Teléfono *"
-                  value={newCustomer.phone}
-                  onChange={(event) =>
-                    setNewCustomer((current) => ({
-                      ...current,
-                      phone: event.target.value,
-                    }))
-                  }
-                />
-                {customerType === 'NATURAL' ? (
-                  <>
-                    <Input
-                      placeholder="Nombres *"
-                      value={newCustomer.firstName}
-                      onChange={(event) =>
-                        setNewCustomer((current) => ({
-                          ...current,
-                          firstName: event.target.value,
-                        }))
-                      }
-                    />
-                    <Input
-                      placeholder="Apellidos *"
-                      value={newCustomer.lastName}
-                      onChange={(event) =>
-                        setNewCustomer((current) => ({
-                          ...current,
-                          lastName: event.target.value,
-                        }))
-                      }
-                    />
-                  </>
-                ) : (
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">
+                    {customerType === 'NATURAL'
+                      ? 'DNI (8 dígitos)'
+                      : 'RUC (11 dígitos)'}{' '}
+                    <span className="text-primary">*</span>
+                  </label>
                   <Input
-                    className="sm:col-span-2"
-                    placeholder="Razón social *"
-                    value={newCustomer.legalName}
+                    placeholder={
+                      customerType === 'NATURAL'
+                        ? 'Ej. 12345678'
+                        : 'Ej. 20123456789'
+                    }
+                    value={newCustomer.documentNumber}
                     onChange={(event) =>
                       setNewCustomer((current) => ({
                         ...current,
-                        legalName: event.target.value,
+                        documentNumber: event.target.value.replace(/\D/g, ''),
                       }))
                     }
                   />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">
+                    Teléfono celular <span className="text-primary">*</span>
+                  </label>
+                  <Input
+                    placeholder="Ej. 987654321"
+                    value={newCustomer.phone}
+                    onChange={(event) =>
+                      setNewCustomer((current) => ({
+                        ...current,
+                        phone: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                {customerType === 'NATURAL' ? (
+                  <>
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium">
+                        Nombres <span className="text-primary">*</span>
+                      </label>
+                      <Input
+                        placeholder="Ej. Juan Carlos"
+                        value={newCustomer.firstName}
+                        onChange={(event) =>
+                          setNewCustomer((current) => ({
+                            ...current,
+                            firstName: event.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium">
+                        Apellidos <span className="text-primary">*</span>
+                      </label>
+                      <Input
+                        placeholder="Ej. Pérez García"
+                        value={newCustomer.lastName}
+                        onChange={(event) =>
+                          setNewCustomer((current) => ({
+                            ...current,
+                            lastName: event.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-1 sm:col-span-2">
+                    <label className="text-xs font-medium">
+                      Razón social <span className="text-primary">*</span>
+                    </label>
+                    <Input
+                      placeholder="Ej. Transportes Norte S.A.C."
+                      value={newCustomer.legalName}
+                      onChange={(event) =>
+                        setNewCustomer((current) => ({
+                          ...current,
+                          legalName: event.target.value,
+                        }))
+                      }
+                    />
+                  </div>
                 )}
-                <Input
-                  className="sm:col-span-2"
-                  placeholder="Correo electrónico (opcional)"
-                  value={newCustomer.email}
-                  onChange={(event) =>
-                    setNewCustomer((current) => ({
-                      ...current,
-                      email: event.target.value,
-                    }))
-                  }
-                />
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="text-xs font-medium">
+                    Correo electrónico{' '}
+                    <span className="text-muted-foreground">(opcional)</span>
+                  </label>
+                  <Input
+                    placeholder="Ej. cliente@ejemplo.com"
+                    value={newCustomer.email}
+                    onChange={(event) =>
+                      setNewCustomer((current) => ({
+                        ...current,
+                        email: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
               </div>
-              <div className="grid gap-3 border-t border-border pt-4 sm:grid-cols-2">
-                <Input
-                  placeholder="Placa *"
-                  value={newCustomer.plate}
-                  onChange={(event) =>
-                    setNewCustomer((current) => ({
-                      ...current,
-                      plate: event.target.value.toUpperCase(),
-                    }))
-                  }
-                />
-                <Input
-                  placeholder="Marca *"
-                  value={newCustomer.brand}
-                  onChange={(event) =>
-                    setNewCustomer((current) => ({
-                      ...current,
-                      brand: event.target.value,
-                    }))
-                  }
-                />
-                <Input
-                  placeholder="Modelo *"
-                  value={newCustomer.model}
-                  onChange={(event) =>
-                    setNewCustomer((current) => ({
-                      ...current,
-                      model: event.target.value,
-                    }))
-                  }
-                />
-                <Input
-                  type="number"
-                  placeholder="Año *"
-                  value={newCustomer.year}
-                  onChange={(event) =>
-                    setNewCustomer((current) => ({
-                      ...current,
-                      year: event.target.value,
-                    }))
-                  }
-                />
+              <div className="border-t border-border pt-4">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-primary">
+                  2. Vehículo a ingresar
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium">
+                      Placa <span className="text-primary">*</span>
+                    </label>
+                    <Input
+                      placeholder="Ej. ABC-123"
+                      value={newCustomer.plate}
+                      onChange={(event) =>
+                        setNewCustomer((current) => ({
+                          ...current,
+                          plate: event.target.value.toUpperCase(),
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium">
+                      Marca <span className="text-primary">*</span>
+                    </label>
+                    <Input
+                      placeholder="Ej. Toyota"
+                      value={newCustomer.brand}
+                      onChange={(event) =>
+                        setNewCustomer((current) => ({
+                          ...current,
+                          brand: event.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium">
+                      Modelo <span className="text-primary">*</span>
+                    </label>
+                    <Input
+                      placeholder="Ej. Yaris"
+                      value={newCustomer.model}
+                      onChange={(event) =>
+                        setNewCustomer((current) => ({
+                          ...current,
+                          model: event.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium">
+                      Año <span className="text-primary">*</span>
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="Ej. 2026"
+                      value={newCustomer.year}
+                      onChange={(event) =>
+                        setNewCustomer((current) => ({
+                          ...current,
+                          year: event.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           )}

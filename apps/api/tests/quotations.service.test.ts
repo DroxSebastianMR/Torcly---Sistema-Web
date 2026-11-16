@@ -149,6 +149,51 @@ describe('Servicio de Cotizaciones', () => {
     expect(result.data.total).toBe(150)
   })
 
+  it('permite crear una cotización exploratoria sin cliente ni vehículo', async () => {
+    const quote = mockQuotation({
+      customerId: null,
+      vehicleId: null,
+      vehiclePlate: null,
+      customer: null,
+      vehicle: null,
+    })
+    repository.create.mockResolvedValue(quote)
+
+    await quotationsService.create(
+      {
+        items: [
+          {
+            type: 'SERVICE',
+            name: 'Diagnóstico inicial',
+            code: 'SERV-DIAG',
+            unitPrice: 80,
+            quantity: 1,
+          },
+        ],
+      },
+      { id: 'u-1', name: 'Juan Asesor' },
+      context,
+      organizationId,
+    )
+
+    expect(repository.create).toHaveBeenCalledWith(
+      {
+        items: [
+          {
+            type: 'SERVICE',
+            name: 'Diagnóstico inicial',
+            code: 'SERV-DIAG',
+            unitPrice: 80,
+            quantity: 1,
+          },
+        ],
+      },
+      { id: 'u-1', name: 'Juan Asesor' },
+      context,
+      organizationId,
+    )
+  })
+
   it('rechaza crear una cotización sin ítems', async () => {
     await expect(
       quotationsService.create(
