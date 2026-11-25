@@ -6,7 +6,7 @@ import type { SidebarViewProps } from '../types/navigation.types'
 export function AppSidebarView({ groups, onNavigate }: SidebarViewProps) {
   return (
     <>
-      <header className="flex h-20 shrink-0 items-center justify-between px-6 [@media(max-height:700px)]:h-16">
+      <header className="flex h-16 shrink-0 items-center justify-between px-6">
         <TorclyLogo variant="inverse" className="text-3xl" />
         <button
           type="button"
@@ -19,14 +19,14 @@ export function AppSidebarView({ groups, onNavigate }: SidebarViewProps) {
       </header>
       <nav
         aria-label="Módulos"
-        className="sidebar-navigation min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-3 pb-3 [@media(max-height:700px)]:space-y-2"
+        className="sidebar-navigation min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain px-3 pb-3"
       >
         {groups.map((group) => (
           <section key={group.id} aria-label={group.label}>
-            <h2 className="mb-2 px-3 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/45 [@media(max-height:700px)]:mb-1">
+            <h2 className="mb-1 px-3 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/45">
               {group.label}
             </h2>
-            <ul className="space-y-0.5">
+            <ul>
               {group.items.map((item) => (
                 <SidebarNavigationItem
                   key={item.id}
@@ -38,7 +38,7 @@ export function AppSidebarView({ groups, onNavigate }: SidebarViewProps) {
           </section>
         ))}
       </nav>
-      <footer className="shrink-0 px-6 py-4 text-[10px] font-medium tracking-[0.12em] text-white/35">
+      <footer className="shrink-0 px-6 py-2 text-[10px] font-medium tracking-[0.12em] text-white/35">
         v3.3.2
       </footer>
     </>
