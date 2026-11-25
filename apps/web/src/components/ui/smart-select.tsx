@@ -114,7 +114,8 @@ export function SmartSelect({
 
   const filteredOptions = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('es')
-    if (onSearch || !normalizedQuery) return options
+    if (onSearch || (allowCustomValue && !filterOption) || !normalizedQuery)
+      return options
     const key = searchKey(normalizedQuery)
     return options.filter((option) => {
       if (filterOption) return filterOption(option, normalizedQuery)
@@ -122,7 +123,7 @@ export function SmartSelect({
         key ? searchKey(term).includes(key) : term.includes(normalizedQuery),
       )
     })
-  }, [filterOption, onSearch, options, query])
+  }, [allowCustomValue, filterOption, onSearch, options, query])
 
   useEffect(() => {
     if (!open) return

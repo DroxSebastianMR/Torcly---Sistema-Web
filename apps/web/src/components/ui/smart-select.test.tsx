@@ -106,6 +106,35 @@ describe('SmartSelect', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
 
+  it('muestra las sugerencias que devuelve el servidor aunque la búsqueda tenga otra escritura', async () => {
+    const user = userEvent.setup()
+    const { rerender } = render(
+      <SmartSelect
+        options={[]}
+        value=""
+        onChange={vi.fn()}
+        forceSearch
+        allowCustomValue
+        aria-label="Buscar productos"
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Buscar productos' }))
+    await user.type(screen.getByPlaceholderText('Buscar opción…'), 'valvula')
+    rerender(
+      <SmartSelect
+        options={[{ value: 'IAC-01', label: 'Válvula IAC · Aktion' }]}
+        value="valvula"
+        onChange={vi.fn()}
+        forceSearch
+        allowCustomValue
+        aria-label="Buscar productos"
+      />,
+    )
+    expect(
+      screen.getByRole('option', { name: 'Válvula IAC · Aktion' }),
+    ).toBeTruthy()
+  })
+
   it('permite limpiar una búsqueda con el botón del campo', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
