@@ -20,6 +20,10 @@ export interface ProductInput {
   minimumStock: number
 }
 
+export interface CreateProductInput extends ProductInput {
+  initialStock?: number
+}
+
 export interface Product extends ProductInput {
   id: string
   stock: number

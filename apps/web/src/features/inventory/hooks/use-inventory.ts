@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { inventoryService } from '../services/inventory.service'
 import type {
@@ -27,15 +32,18 @@ export function useExistence(filters: InventoryFilters, enabled = true) {
   })
 }
 
-export function useInventoryProductOptions(enabled = true) {
-  return useQuery({
-    queryKey: inventoryKeys.productOptions(),
-    queryFn: ({ signal }) =>
+export function useInventoryProductOptions(enabled: boolean, search: string) {
+  return useInfiniteQuery({
+    queryKey: [...inventoryKeys.productOptions(), search],
+    initialPageParam: 1,
+    queryFn: ({ signal, pageParam }) =>
       inventoryService.listExistence(
-        { search: '', page: 1, pageSize: 100 },
+        { search, page: pageParam, pageSize: 100 },
         signal,
       ),
-    select: (response) => response.data,
+    getNextPageParam: ({ pagination }) =>
+      pagination.page < pagination.totalPages ? pagination.page + 1 : undefined,
+    select: (response) => response.pages.flatMap((page) => page.data),
     enabled,
     staleTime: INVENTORY_OPTIONS_STALE_TIME,
   })

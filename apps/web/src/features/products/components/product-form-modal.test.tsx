@@ -57,8 +57,13 @@ const existingProduct: Product = {
 
 function renderModal({
   open = true,
+  canInitializeStock = false,
   product = null,
-}: { open?: boolean; product?: Product | null } = {}) {
+}: {
+  open?: boolean
+  canInitializeStock?: boolean
+  product?: Product | null
+} = {}) {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   })
@@ -67,6 +72,7 @@ function renderModal({
     <QueryClientProvider client={client}>
       <ProductFormModal
         open={open}
+        canInitializeStock={canInitializeStock}
         product={product}
         options={options}
         onClose={onClose}
@@ -130,51 +136,60 @@ describe('Formulario de productos', () => {
     expect(service.create).not.toHaveBeenCalled()
   })
 
-  it('genera el código y envía el payload correcto al registrar', async () => {
-    const user = userEvent.setup()
-    service.create.mockResolvedValue({ data: {} })
-    const { onClose } = renderModal()
+  it.each([undefined, 0, 12.5])(
+    'registra el producto con cantidad inicial %s',
+    async (initialStock) => {
+      const user = userEvent.setup()
+      service.create.mockResolvedValue({ data: {} })
+      const { onClose } = renderModal({ canInitializeStock: true })
+      if (initialStock !== undefined)
+        await user.type(
+          screen.getByLabelText(/^stock inicial/i),
+          String(initialStock),
+        )
 
-    await user.type(
-      screen.getByLabelText(/^nombre del producto/i),
-      'Filtro de aceite',
-    )
-    await user.type(screen.getByLabelText(/^precio de venta/i), '35.5')
-    await selectCategoryAndUnit(user)
-    await waitFor(() =>
-      expect(
-        (screen.getByLabelText(/^código del producto/i) as HTMLInputElement)
-          .value,
-      ).toBe('FIL-ACE'),
-    )
-    const submitButton = screen.getByRole('button', {
-      name: 'Guardar producto',
-    })
-    await waitFor(() =>
-      expect((submitButton as HTMLButtonElement).disabled).toBe(false),
-    )
-    await user.click(submitButton)
+      await user.type(
+        screen.getByLabelText(/^nombre del producto/i),
+        'Filtro de aceite',
+      )
+      await user.type(screen.getByLabelText(/^precio de venta/i), '35.5')
+      await selectCategoryAndUnit(user)
+      await waitFor(() =>
+        expect(
+          (screen.getByLabelText(/^código del producto/i) as HTMLInputElement)
+            .value,
+        ).toBe('FIL-ACE'),
+      )
+      const submitButton = screen.getByRole('button', {
+        name: 'Guardar producto',
+      })
+      await waitFor(() =>
+        expect((submitButton as HTMLButtonElement).disabled).toBe(false),
+      )
+      await user.click(submitButton)
 
-    await waitFor(
-      () =>
-        expect(service.create).toHaveBeenCalledWith({
-          code: 'FIL-ACE',
-          barcode: null,
-          name: 'Filtro de aceite',
-          description: null,
-          categoryId: 'cat1',
-          brandId: null,
-          unitId: 'unit1',
-          salePrice: 35.5,
-          minimumStock: 1,
-        }),
-      { timeout: 4000 },
-    )
-    expect(toast.success).toHaveBeenCalledWith(
-      'Producto registrado correctamente.',
-    )
-    expect(onClose).toHaveBeenCalledOnce()
-  })
+      await waitFor(
+        () =>
+          expect(service.create).toHaveBeenCalledWith({
+            code: 'FIL-ACE',
+            barcode: null,
+            name: 'Filtro de aceite',
+            description: null,
+            categoryId: 'cat1',
+            brandId: null,
+            unitId: 'unit1',
+            salePrice: 35.5,
+            minimumStock: 1,
+            ...(initialStock ? { initialStock } : {}),
+          }),
+        { timeout: 4000 },
+      )
+      expect(toast.success).toHaveBeenCalledWith(
+        'Producto registrado correctamente.',
+      )
+      expect(onClose).toHaveBeenCalledOnce()
+    },
+  )
 
   it('genera un código compacto de solo lectura', async () => {
     const user = userEvent.setup()

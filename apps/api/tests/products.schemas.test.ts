@@ -57,6 +57,23 @@ describe('Validación de productos', () => {
     }
   })
 
+  it('permite un stock inicial opcional solo en el alta', () => {
+    for (const initialStock of [0, 1, 2.345]) {
+      expect(
+        productInputSchema.safeParse({ ...validProduct, initialStock }).success,
+      ).toBe(true)
+      expect(
+        productUpdateSchema.safeParse({ ...validProduct, initialStock })
+          .success,
+      ).toBe(false)
+    }
+    for (const initialStock of [-1, 0.1234, 1000000000]) {
+      expect(
+        productInputSchema.safeParse({ ...validProduct, initialStock }).success,
+      ).toBe(false)
+    }
+  })
+
   it('rechaza campos que intentan escribir stock o movimientos', () => {
     const withoutStock = productInputSchema.safeParse({
       ...validProduct,

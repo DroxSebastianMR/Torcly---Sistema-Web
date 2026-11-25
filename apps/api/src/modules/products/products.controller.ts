@@ -14,6 +14,7 @@ import {
   unitInputSchema,
   unitUpdateSchema,
 } from './products.schemas.js'
+import { authService } from '../auth/auth.service.js'
 import { productsService } from './products.service.js'
 
 export const listProducts: RequestHandler = async (request, response) => {
@@ -50,11 +51,18 @@ export const checkProductCodeAvailability: RequestHandler = async (
 }
 
 export const createProduct: RequestHandler = async (request, response) => {
+  const input = productInputSchema.parse(request.body)
+  const actor = request.auth!
+  const context = getRequestContext(request, response)
+  if (input.initialStock) {
+    await authService.assertPermission(actor, 'inventory:write', context)
+  }
   const result = await productsService.create(
-    productInputSchema.parse(request.body),
-    request.auth!.id,
-    requireOrganizationContext(request.auth).id,
-    getRequestContext(request, response),
+    input,
+    actor.id,
+    requireOrganizationContext(actor).id,
+    context,
+    actor.name,
   )
   response.status(201).json(result)
 }

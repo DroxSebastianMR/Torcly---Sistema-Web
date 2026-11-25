@@ -38,6 +38,10 @@ interface SmartSelectProps {
   id?: string
   className?: string
   filterOption?: (option: SmartSelectOption, query: string) => boolean
+  onSearch?: (query: string) => void
+  onLoadMore?: () => void
+  loadingMore?: boolean
+  selectedLabel?: string
   onOpen?: () => void
   onOpenChange?: (open: boolean) => void
   'aria-label'?: string
@@ -63,6 +67,10 @@ export function SmartSelect({
   id,
   className,
   filterOption,
+  onSearch,
+  onLoadMore,
+  loadingMore,
+  selectedLabel,
   onOpen,
   onOpenChange,
   'aria-label': ariaLabel,
@@ -105,14 +113,14 @@ export function SmartSelect({
 
   const filteredOptions = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('es')
-    if (!normalizedQuery) return options
+    if (onSearch || !normalizedQuery) return options
     return options.filter((option) => {
       if (filterOption) return filterOption(option, normalizedQuery)
       return [option.label, ...(option.searchTerms ?? [])].some((term) =>
         term.toLocaleLowerCase('es').includes(normalizedQuery),
       )
     })
-  }, [filterOption, options, query])
+  }, [filterOption, onSearch, options, query])
 
   useEffect(() => {
     if (!open) return
@@ -152,7 +160,10 @@ export function SmartSelect({
 
   const openMenu = () => {
     onOpen?.()
-    setQuery(showsSearchInput ? (selected?.label ?? value) : '')
+    const initialQuery =
+      showsSearchInput && !onSearch ? (selected?.label ?? value) : ''
+    setQuery(initialQuery)
+    onSearch?.(initialQuery)
     updateMenuPosition()
     setOpen(true)
   }
@@ -208,7 +219,7 @@ export function SmartSelect({
         >
           {selected?.icon}
           <span className="truncate">
-            {selected?.label ?? (value || placeholder)}
+            {selected?.label ?? selectedLabel ?? (value || placeholder)}
           </span>
         </span>
         <ChevronDown
@@ -244,6 +255,7 @@ export function SmartSelect({
                   value={query}
                   onChange={(event) => {
                     setQuery(event.target.value)
+                    onSearch?.(event.target.value)
                     if (allowCustomValue) onChange(event.target.value)
                   }}
                   onKeyDown={(event) => {
@@ -261,6 +273,7 @@ export function SmartSelect({
                   <ClearInputButton
                     onClear={() => {
                       setQuery('')
+                      onSearch?.('')
                       if (allowCustomValue) onChange('')
                     }}
                   />
@@ -311,6 +324,16 @@ export function SmartSelect({
                 </li>
               )}
             </ul>
+            {onLoadMore && (
+              <button
+                type="button"
+                className="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold text-primary hover:bg-muted"
+                disabled={loadingMore}
+                onClick={onLoadMore}
+              >
+                {loadingMore ? 'Cargando…' : 'Cargar más productos'}
+              </button>
+            )}
           </div>,
           document.body,
         )}

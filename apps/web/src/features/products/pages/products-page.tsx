@@ -183,6 +183,10 @@ export default function Page() {
       <ProductFormModal
         open={productFormOpen}
         product={editingProduct}
+        canInitializeStock={hasPermission(
+          currentUser?.permissions ?? [],
+          'inventory:write',
+        )}
         options={options.data}
         onClose={() => setProductFormOpen(false)}
       />

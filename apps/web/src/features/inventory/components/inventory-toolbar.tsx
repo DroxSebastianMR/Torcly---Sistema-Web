@@ -1,3 +1,4 @@
+import { InventoryProductSelect } from './inventory-product-select'
 import { Trash2 } from 'lucide-react'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 import {
@@ -15,7 +16,8 @@ interface InventoryToolbarProps {
   view: 'existence' | 'movements'
   existenceFilters: InventoryFilters
   movementFilters: MovementFilters
-  products: ExistenceItem[]
+  selectedProduct?: ExistenceItem
+  onProductSelect: (product: ExistenceItem) => void
   existenceSuggestions: readonly SmartSelectOption[]
   onExistenceChange: (filters: InventoryFilters) => void
   onMovementsChange: (filters: MovementFilters) => void
@@ -25,7 +27,8 @@ export function InventoryToolbar({
   view,
   existenceFilters,
   movementFilters,
-  products,
+  selectedProduct,
+  onProductSelect,
   existenceSuggestions,
   onExistenceChange,
   onMovementsChange,
@@ -64,11 +67,6 @@ export function InventoryToolbar({
     )
   }
 
-  const productOptions = products.map((product) => ({
-    value: product.productId,
-    label: `${product.name} · ${product.code}`,
-    searchTerms: [product.code, product.name, product.unit.symbol],
-  }))
   const hasMovementFilters =
     Boolean(movementFilters.productId) ||
     Boolean(movementFilters.type) ||
@@ -78,15 +76,17 @@ export function InventoryToolbar({
   return (
     <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
       <div className="w-full xl:w-72">
-        <SmartSelect
+        <InventoryProductSelect
           value={movementFilters.productId}
-          placeholder="Todos los productos"
-          aria-label="Filtrar por producto"
-          forceSearch
-          options={productOptions}
-          onChange={(productId) =>
-            onMovementsChange({ ...movementFilters, productId, page: 1 })
-          }
+          selected={selectedProduct}
+          onChange={(product) => {
+            onProductSelect(product)
+            onMovementsChange({
+              ...movementFilters,
+              productId: product.productId,
+              page: 1,
+            })
+          }}
         />
       </div>
       <div className="w-full sm:w-56">

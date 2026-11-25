@@ -124,7 +124,7 @@ export const inventoryRepository = {
         databaseService.client.product.findMany({
           select: existenceSelect,
           where,
-          orderBy: [{ active: 'desc' }, { name: 'asc' }],
+          orderBy: [{ active: 'desc' }, { name: 'asc' }, { id: 'asc' }],
           skip: (filters.page - 1) * filters.pageSize,
           take: filters.pageSize,
         }),

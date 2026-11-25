@@ -181,6 +181,7 @@ describe('Servicio de productos', () => {
       'actor-1',
       organizationId,
       context,
+      'actor-1',
     )
     expect(result.data.id).toBe('p1')
   })

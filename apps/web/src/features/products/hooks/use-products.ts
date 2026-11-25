@@ -1,7 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { finishActionToast, startActionToast } from '@/lib/action-toast'
 import { productsService } from '../services/products.service'
-import type { ProductFilters, ProductInput } from '../types/products.types'
+import type {
+  CreateProductInput,
+  ProductFilters,
+  ProductInput,
+} from '../types/products.types'
 
 const CATALOG_STALE_TIME = 5 * 60 * 1000
 
@@ -77,9 +81,12 @@ export function useProductMutations() {
 
   return {
     create: useMutation({
-      mutationFn: (input: ProductInput) => productsService.create(input),
+      mutationFn: (input: CreateProductInput) => productsService.create(input),
       onMutate: () => ({ toastId: startActionToast('Registrando producto…') }),
-      onSuccess: refreshProductLists,
+      onSuccess: () => {
+        refreshProductLists()
+        void queryClient.invalidateQueries({ queryKey: ['inventory'] })
+      },
       onSettled: (_data, _error, _variables, context) =>
         finishActionToast(context?.toastId),
     }),

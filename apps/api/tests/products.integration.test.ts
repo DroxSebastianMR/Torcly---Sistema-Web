@@ -61,24 +61,34 @@ describeWithDatabase('Productos integrados con PostgreSQL', () => {
     })
     organizationId = organization.id
 
-    const [readPermission, writePermission] = await Promise.all([
-      databaseService.client.permission.upsert({
-        where: { code: 'products:read' },
-        create: {
-          code: 'products:read',
-          description: 'Solo lectura de productos',
-        },
-        update: {},
-      }),
-      databaseService.client.permission.upsert({
-        where: { code: 'products:write' },
-        create: {
-          code: 'products:write',
-          description: 'Escritura de productos',
-        },
-        update: {},
-      }),
-    ])
+    const [readPermission, writePermission, inventoryWrite] = await Promise.all(
+      [
+        databaseService.client.permission.upsert({
+          where: { code: 'products:read' },
+          create: {
+            code: 'products:read',
+            description: 'Solo lectura de productos',
+          },
+          update: {},
+        }),
+        databaseService.client.permission.upsert({
+          where: { code: 'products:write' },
+          create: {
+            code: 'products:write',
+            description: 'Escritura de productos',
+          },
+          update: {},
+        }),
+        databaseService.client.permission.upsert({
+          where: { code: 'inventory:write' },
+          create: {
+            code: 'inventory:write',
+            description: 'Registrar movimientos de inventario',
+          },
+          update: {},
+        }),
+      ],
+    )
 
     const [adminRole, readerRole, noAccessRole] = await Promise.all([
       databaseService.client.role.create({
@@ -89,6 +99,7 @@ describeWithDatabase('Productos integrados con PostgreSQL', () => {
             create: [
               { permissionId: readPermission.id },
               { permissionId: writePermission.id },
+              { permissionId: inventoryWrite.id },
             ],
           },
         },
@@ -303,6 +314,53 @@ describeWithDatabase('Productos integrados con PostgreSQL', () => {
     })
     expect(duplicate.status).toBe(409)
     expect(duplicate.body.error.code).toBe('PRODUCT_DUPLICATE')
+  }, 60_000)
+
+  it('registra el primer ingreso junto con el producto y lo audita en el taller', async () => {
+    const agent = request.agent(app)
+    await agent
+      .post('/api/v1/auth/login')
+      .send({ identifier: identity.username, password })
+    const initialCode = `INI-${suffix}`
+    try {
+      const result = await agent.post('/api/v1/products').send({
+        code: initialCode,
+        name: 'Válvula de prueba',
+        categoryId: createdIds.categoryId,
+        unitId: createdIds.unitId,
+        salePrice: 0,
+        minimumStock: 1,
+        initialStock: 3.125,
+      })
+      expect(result.status).toBe(201)
+      expect(result.body.data.stock).toBe(3.125)
+      const movements = await databaseService.client.inventoryMovement.findMany(
+        {
+          where: { organizationId, productId: result.body.data.id },
+        },
+      )
+      expect(movements).toHaveLength(1)
+      expect(movements[0]).toMatchObject({
+        type: 'INITIAL',
+        status: 'CONFIRMED',
+        performedBy: identity.name,
+      })
+      expect(Number(movements[0].quantity)).toBe(3.125)
+      const event = await databaseService.client.auditLog.findFirst({
+        where: {
+          organizationId,
+          identifier: initialCode.toUpperCase(),
+          event: 'INVENTORY_STOCK_INITIALIZED',
+        },
+      })
+      expect(event?.userId).toBe(adminIds.userId)
+    } finally {
+      const where = { organizationId, code: initialCode.toUpperCase() }
+      await databaseService.client.inventoryMovement.deleteMany({
+        where: { organizationId, product: where },
+      })
+      await databaseService.client.product.deleteMany({ where })
+    }
   }, 60_000)
 
   it('rechaza precio negativo, stock mínimo cero, campos obligatorios y campos de stock', async () => {

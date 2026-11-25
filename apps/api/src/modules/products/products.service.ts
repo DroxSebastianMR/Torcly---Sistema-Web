@@ -1,5 +1,6 @@
 import { Prisma } from '../../generated/prisma/client.js'
 import { AppError } from '../../shared/errors/app-error.js'
+import type { ProductInputDto } from './products.schemas.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import {
   productsRepository,
@@ -113,10 +114,11 @@ export const productsService = {
   },
 
   async create(
-    input: ProductInput,
+    input: ProductInputDto,
     actorId: string,
     organizationId: string,
     context: RequestContext,
+    actorName = actorId,
   ) {
     try {
       return {
@@ -126,6 +128,7 @@ export const productsService = {
             actorId,
             organizationId,
             context,
+            actorName,
           ),
         ),
       }

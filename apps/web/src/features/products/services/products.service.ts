@@ -5,6 +5,7 @@ import type {
   Product,
   ProductFilters,
   ProductInput,
+  CreateProductInput,
   ProductCatalog,
   ProductOptions,
   ProductCodeAvailability,
@@ -61,7 +62,7 @@ export const productsService = {
       signal,
     )
   },
-  create(input: ProductInput) {
+  create(input: CreateProductInput) {
     return api.post<DataResponse<Product>>(endpoints.products.root, input)
   },
   update(id: string, input: ProductInput) {

@@ -23,6 +23,12 @@ export const productFormSchema = z.object({
     .number<number>()
     .finite()
     .min(0, 'El precio no puede ser negativo.'),
+  initialStock: z
+    .number()
+    .min(0, 'La cantidad inicial no puede ser negativa.')
+    .max(999_999_999)
+    .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE)
+    .optional(),
   minimumStock: z.coerce
     .number<number>()
     .finite()

@@ -40,7 +40,7 @@ export const productCodeAvailabilitySchema = z.object({
   excludeId: z.uuid('Producto inválido.').optional(),
 })
 
-export const productInputSchema = z
+const productFieldsSchema = z
   .object({
     code: z
       .string()
@@ -79,7 +79,15 @@ export const productStatusSchema = z.object({
   active: z.boolean(),
 })
 
-export const productUpdateSchema = productInputSchema
+export const productUpdateSchema = productFieldsSchema
+export const productInputSchema = productFieldsSchema.extend({
+  initialStock: z
+    .number()
+    .min(0)
+    .max(999_999_999)
+    .refine(hasAtMostThreeDecimals, QUANTITY_MAX_DECIMALS_MESSAGE)
+    .optional(),
+})
 
 export const catalogItemSchema = z.object({
   name: z.string().trim().min(2, 'Ingresa un nombre.').max(80),

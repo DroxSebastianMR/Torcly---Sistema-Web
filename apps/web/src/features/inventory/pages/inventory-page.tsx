@@ -19,12 +19,9 @@ import { ExistenceTable } from '../components/existence-table'
 import { InventoryToolbar } from '../components/inventory-toolbar'
 import { MovementFormModal } from '../components/movement-form-modal'
 import { MovementsTable } from '../components/movements-table'
-import {
-  useExistence,
-  useInventoryProductOptions,
-  useMovements,
-} from '../hooks/use-inventory'
+import { useExistence, useMovements } from '../hooks/use-inventory'
 import type {
+  ExistenceItem,
   InventoryFilters,
   MovementFilters,
   MovementFormKind,
@@ -82,7 +79,7 @@ export default function Page() {
     },
     view === 'existence',
   )
-  const productOptions = useInventoryProductOptions(view === 'movements')
+  const [historyProduct, setHistoryProduct] = useState<ExistenceItem>()
   const movements = useMovements(movementFilters, view === 'movements')
   const items = existenceQuery.data?.data ?? []
   const suggestions = items.map((item) => ({
@@ -203,7 +200,8 @@ export default function Page() {
               view={view}
               existenceFilters={existenceFilters}
               movementFilters={movementFilters}
-              products={productOptions.data ?? []}
+              selectedProduct={historyProduct}
+              onProductSelect={setHistoryProduct}
               existenceSuggestions={suggestions}
               onExistenceChange={(filters) => {
                 setExistenceFilters(filters)

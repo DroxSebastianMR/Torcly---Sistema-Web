@@ -34,6 +34,7 @@ import {
 interface ProductFormModalProps {
   open: boolean
   product: Product | null
+  canInitializeStock?: boolean
   options?: ProductOptions
   onClose: () => void
 }
@@ -56,10 +57,12 @@ export function ProductFormModal({
   open,
   product,
   options,
+  canInitializeStock = false,
   onClose,
 }: ProductFormModalProps) {
   const mutations = useProductMutations()
   const isEditing = product !== null
+  const showInitialStock = !isEditing && canInitializeStock
   const isSubmitting = mutations.create.isPending || mutations.update.isPending
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
@@ -159,8 +162,9 @@ export function ProductFormModal({
       return
     }
 
+    const { initialStock, ...fields } = values
     const input: ProductInput = {
-      ...values,
+      ...fields,
       code: normalizedCode,
       barcode: product?.barcode ?? null,
       name: values.name.trim(),
@@ -175,7 +179,9 @@ export function ProductFormModal({
         await mutations.update.mutateAsync({ id: product.id, input })
         toast.success('Producto actualizado correctamente.')
       } else {
-        await mutations.create.mutateAsync(input)
+        await mutations.create.mutateAsync(
+          showInitialStock && initialStock ? { ...input, initialStock } : input,
+        )
         toast.success('Producto registrado correctamente.')
       }
       onClose()
@@ -194,7 +200,11 @@ export function ProductFormModal({
       open={open}
       onClose={onClose}
       title={isEditing ? 'Editar producto' : 'Registrar producto'}
-      description="Completa la información comercial. Las existencias se administran desde Inventario."
+      description={
+        showInitialStock
+          ? 'Completa los datos del producto y, si corresponde, registra su primera existencia.'
+          : 'Completa la información comercial. Las existencias se administran desde Inventario.'
+      }
       className="max-w-3xl"
       footer={
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -342,7 +352,13 @@ export function ProductFormModal({
           />
         </Field>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div
+          className={
+            showInitialStock
+              ? 'grid gap-4 sm:grid-cols-3'
+              : 'grid gap-4 sm:grid-cols-2'
+          }
+        >
           <Field
             label="Precio de venta"
             error={fieldError('salePrice')}
@@ -374,6 +390,25 @@ export function ProductFormModal({
               step="0.001"
             />
           </Field>
+          {showInitialStock && (
+            <Field
+              label="Stock inicial"
+              error={fieldError('initialStock')}
+              hint="Opcional. Cantidad disponible al dar de alta el producto."
+            >
+              <Input
+                {...form.register('initialStock', {
+                  setValueAs: (value: string) =>
+                    value === '' ? undefined : Number(value),
+                })}
+                type="number"
+                min="0"
+                max="999999999"
+                step="0.001"
+                placeholder="0"
+              />
+            </Field>
+          )}
         </div>
 
         <Field label="Código del producto" error={fieldError('code')} required>

@@ -4,6 +4,7 @@ import {
   Prisma,
 } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
+import type { ProductInputDto } from './products.schemas.js'
 import type { RequestContext } from '../auth/auth.types.js'
 import type { ProductFilters, ProductInput } from './products.types.js'
 
@@ -202,10 +203,11 @@ export const productsRepository = {
   },
 
   create(
-    input: ProductInput,
+    input: ProductInputDto,
     actorId: string,
     organizationId: string,
     context: RequestContext,
+    actorName = actorId,
   ) {
     return databaseService.transaction(async (transaction) => {
       const [category, unit, brand] = await Promise.all([
@@ -230,12 +232,13 @@ export const productsRepository = {
           { code: 'P2003', clientVersion: Prisma.prismaVersion.client },
         )
       }
+      const { initialStock, ...fields } = input
       const product = await databaseService.measure(
         'products.create.record',
         () =>
           transaction.product.create({
             ...productListSelect,
-            data: { ...input, organizationId },
+            data: { ...fields, organizationId },
           }),
       )
       await databaseService.measure('products.create.audit', () =>
@@ -249,7 +252,35 @@ export const productsRepository = {
           ),
         }),
       )
-      return withMovementSummaries(product, [])
+      if (!initialStock) return withMovementSummaries(product, [])
+      const movement = await transaction.inventoryMovement.create({
+        data: {
+          organizationId,
+          productId: product.id,
+          type: 'INITIAL',
+          status: 'CONFIRMED',
+          quantity: initialStock,
+          performedBy: actorName,
+          notes: 'Stock inicial al registrar el producto.',
+        },
+        select: { id: true, type: true, quantity: true },
+      })
+      await transaction.auditLog.create({
+        data: auditData(
+          'INVENTORY_STOCK_INITIALIZED',
+          actorId,
+          product.code,
+          context,
+          {
+            productId: product.id,
+            movementId: movement.id,
+            type: movement.type,
+            quantity: initialStock,
+            stockAfter: initialStock,
+          },
+        ),
+      })
+      return withMovementSummaries(product, [movement])
     })
   },
 

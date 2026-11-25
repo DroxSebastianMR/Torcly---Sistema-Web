@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -6,7 +6,9 @@ import { PackagePlus, PackageMinus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
+import { InventoryProductSelect } from './inventory-product-select'
 import { SmartSelect } from '@/components/ui/smart-select'
+import type { ExistenceItem } from '../types/inventory.types'
 import {
   movementFormSchema,
   type MovementFormKind,
@@ -15,7 +17,6 @@ import {
 import {
   idempotencyKeyFor,
   movementKindLabel,
-  useInventoryProductOptions,
   useMovementMutations,
 } from '../hooks/use-inventory'
 import {
@@ -42,7 +43,7 @@ export function MovementFormModal({
   onClose,
 }: MovementFormModalProps) {
   const mutations = useMovementMutations()
-  const products = useInventoryProductOptions(open)
+  const [selection, setSelection] = useState<ExistenceItem>()
   const form = useForm<MovementFormValues>({
     resolver: zodResolver(movementFormSchema),
     defaultValues: emptyValues,
@@ -52,15 +53,8 @@ export function MovementFormModal({
   const isAdjustment = kind === 'ADJUSTMENT'
   const { reset: resetForm, setError } = form
 
-  const availableProducts = useMemo(
-    () => (products.data ?? []).filter((product) => product.active),
-    [products.data],
-  )
-
-  const selectedProduct = useMemo(
-    () => availableProducts.find((product) => product.productId === productId),
-    [availableProducts, productId],
-  )
+  const selectedProduct =
+    selection?.productId === productId ? selection : undefined
 
   useEffect(() => {
     if (!open) return
@@ -155,22 +149,17 @@ export function MovementFormModal({
         className="space-y-5"
       >
         <Field label="Producto" error={fieldError('productId')} required>
-          <SmartSelect
+          <InventoryProductSelect
             value={productId}
-            placeholder="Buscar producto"
-            aria-label="Producto"
-            forceSearch
-            options={availableProducts.map((product) => ({
-              value: product.productId,
-              label: `${product.name} · ${product.code}`,
-              searchTerms: [product.code, product.name, product.unit.symbol],
-            }))}
-            onChange={(productId) =>
-              form.setValue('productId', productId, {
+            activeOnly
+            selected={selectedProduct}
+            onChange={(product) => {
+              setSelection(product)
+              form.setValue('productId', product.productId, {
                 shouldDirty: true,
                 shouldValidate: true,
               })
-            }
+            }}
           />
           {selectedProduct && (
             <p className="mt-2 flex items-center justify-between rounded-lg bg-background px-3 py-2 text-sm">
