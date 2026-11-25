@@ -325,7 +325,7 @@ describeWithDatabase('Productos integrados con PostgreSQL', () => {
     try {
       const result = await agent.post('/api/v1/products').send({
         code: initialCode,
-        name: 'Válvula de prueba',
+        name: 'Válvula CO · de prueba',
         categoryId: createdIds.categoryId,
         unitId: createdIds.unitId,
         salePrice: 0,
@@ -334,6 +334,17 @@ describeWithDatabase('Productos integrados con PostgreSQL', () => {
       })
       expect(result.status).toBe(201)
       expect(result.body.data.stock).toBe(3.125)
+      for (const search of [
+        'valvula co',
+        'VÁLVULA-CO',
+        initialCode.replace('-', ''),
+      ]) {
+        const found = await agent.get('/api/v1/products').query({ search })
+        expect(found.status).toBe(200)
+        expect(found.body.data.map((p: { id: string }) => p.id)).toContain(
+          result.body.data.id,
+        )
+      }
       const movements = await databaseService.client.inventoryMovement.findMany(
         {
           where: { organizationId, productId: result.body.data.id },

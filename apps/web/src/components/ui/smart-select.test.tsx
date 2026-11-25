@@ -58,6 +58,31 @@ describe('SmartSelect', () => {
     expect(onChange).toHaveBeenCalledWith('10')
   })
 
+  it.each(['valvula co', 'VÁLVULA-CO', 'iac0102'])(
+    'encuentra el producto con %s y conserva su ID',
+    async (query) => {
+      const user = userEvent.setup()
+      const change = vi.fn()
+      render(
+        <SmartSelect
+          forceSearch
+          options={[
+            { value: 'p1', label: 'Válvula CO', searchTerms: ['IAC-01/02'] },
+            { value: 'p2', label: 'Bobina' },
+          ]}
+          value=""
+          onChange={change}
+          aria-label="Producto"
+        />,
+      )
+      await user.click(screen.getByRole('button', { name: 'Producto' }))
+      await user.type(screen.getByPlaceholderText('Buscar opción…'), query)
+      expect(screen.queryByRole('option', { name: 'Bobina' })).toBeNull()
+      await user.click(screen.getByRole('option', { name: 'Válvula CO' }))
+      expect(change).toHaveBeenCalledWith('p1')
+    },
+  )
+
   it('acepta búsqueda libre cuando se usa como combobox de filtros', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()

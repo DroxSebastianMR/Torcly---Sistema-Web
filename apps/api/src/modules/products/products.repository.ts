@@ -1,3 +1,4 @@
+import { searchProductPage } from './product-search.js'
 import {
   type AuditEventType,
   type InventoryMovementType,
@@ -107,8 +108,6 @@ function buildWhere(
   filters: ProductFilters,
   organizationId: string,
 ): Prisma.ProductWhereInput {
-  const search = filters.search?.trim()
-
   return {
     organizationId,
     ...(filters.categoryId ? { categoryId: filters.categoryId } : {}),
@@ -117,35 +116,30 @@ function buildWhere(
       : filters.status === 'inactive'
         ? { active: false }
         : {}),
-    ...(search
-      ? {
-          OR: [
-            { code: { contains: search, mode: 'insensitive' } },
-            { barcode: { contains: search, mode: 'insensitive' } },
-            { name: { contains: search, mode: 'insensitive' } },
-            { category: { name: { contains: search, mode: 'insensitive' } } },
-          ],
-        }
-      : {}),
   }
 }
 
 export const productsRepository = {
   async list(filters: ProductFilters, organizationId: string) {
-    const where = buildWhere(filters, organizationId)
+    const page = await searchProductPage(filters, organizationId)
+    const where = {
+      ...buildWhere(filters, organizationId),
+      ...(page && { id: { in: page.ids } }),
+    }
     const [items, total] = await Promise.all([
       databaseService.measure('products.list.records', () =>
         databaseService.client.product.findMany({
           ...productListSelect,
           where,
-          orderBy: [{ active: 'desc' }, { name: 'asc' }],
-          skip: (filters.page - 1) * filters.pageSize,
+          orderBy: [{ active: 'desc' }, { name: 'asc' }, { id: 'asc' }],
+          skip: page ? 0 : (filters.page - 1) * filters.pageSize,
           take: filters.pageSize,
         }),
       ),
-      databaseService.measure('products.list.total', () =>
-        databaseService.client.product.count({ where }),
-      ),
+      page?.total ??
+        databaseService.measure('products.list.total', () =>
+          databaseService.client.product.count({ where }),
+        ),
     ])
 
     if (!items.length) return { items: [], total }

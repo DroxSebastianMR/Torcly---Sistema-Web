@@ -1,4 +1,5 @@
 import { Trash2 } from 'lucide-react'
+import { searchKey } from '@/lib/search-text'
 import {
   SmartSelect,
   type SmartSelectOption,
@@ -9,10 +10,11 @@ function matchesCustomerSuggestion(option: SmartSelectOption, query: string) {
   const [documentNumber = '', phone = '', displayName = ''] =
     option.searchTerms ?? []
 
+  const key = searchKey(query)
   if (/^\d+$/.test(query)) return documentNumber === query
 
   return [displayName, documentNumber, phone].some((term) =>
-    term.toLocaleLowerCase('es').includes(query),
+    key ? searchKey(term).includes(key) : term.includes(query),
   )
 }
 

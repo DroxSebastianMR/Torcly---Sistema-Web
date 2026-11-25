@@ -154,7 +154,7 @@ describeWithDatabase('Inventario integrado con PostgreSQL', () => {
       data: {
         organizationId,
         code,
-        name: 'Filtro de aceite',
+        name: 'Válvula CO de prueba',
         description: 'Repuesto para inventario',
         categoryId: category.id,
         brandId: brand.id,
@@ -291,7 +291,9 @@ describeWithDatabase('Inventario integrado con PostgreSQL', () => {
     expect(duplicate.status).toBe(409)
     expect(duplicate.body.error.code).toBe('INVENTORY_INITIAL_ALREADY_EXISTS')
 
-    const existence = await adminAgent.get('/api/v1/inventory/existencia')
+    const existence = await adminAgent
+      .get('/api/v1/inventory/existencia')
+      .query({ search: 'VALVULA-CO' })
     expect(existence.status).toBe(200)
     expect(existence.body.data).toHaveLength(1)
     expect(existence.body.data[0]).toMatchObject({

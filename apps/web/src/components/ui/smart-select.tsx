@@ -12,6 +12,7 @@ import {
 import { Check, ChevronDown, Search } from 'lucide-react'
 import { ClearInputButton } from './clear-input-button'
 import { cn } from '@/lib/utils'
+import { searchKey } from '@/lib/search-text'
 
 export interface SmartSelectOption {
   value: string
@@ -114,10 +115,11 @@ export function SmartSelect({
   const filteredOptions = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('es')
     if (onSearch || !normalizedQuery) return options
+    const key = searchKey(normalizedQuery)
     return options.filter((option) => {
       if (filterOption) return filterOption(option, normalizedQuery)
       return [option.label, ...(option.searchTerms ?? [])].some((term) =>
-        term.toLocaleLowerCase('es').includes(normalizedQuery),
+        key ? searchKey(term).includes(key) : term.includes(normalizedQuery),
       )
     })
   }, [filterOption, onSearch, options, query])

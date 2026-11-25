@@ -1,3 +1,4 @@
+import { searchProductPage } from '../products/product-search.js'
 import type { AuditEventType, Prisma } from '../../generated/prisma/client.js'
 import { databaseService } from '../../infrastructure/database/prisma.service.js'
 import { AppError } from '../../shared/errors/app-error.js'
@@ -39,22 +40,6 @@ const existenceSelect = {
   active: true,
   unit: { select: { name: true, symbol: true } },
 } satisfies Prisma.ProductSelect
-
-function buildExistenceWhere(
-  filters: ExistenceFilters,
-  organizationId: string,
-): Prisma.ProductWhereInput {
-  const search = filters.search?.trim()
-  return search
-    ? {
-        organizationId,
-        OR: [
-          { code: { contains: search, mode: 'insensitive' } },
-          { name: { contains: search, mode: 'insensitive' } },
-        ],
-      }
-    : { organizationId }
-}
 
 function buildMovementWhere(
   filters: InventoryMovementFilters,
@@ -118,20 +103,22 @@ const auditEventByType: Record<MovementType, AuditEventType> = {
 
 export const inventoryRepository = {
   async listExistence(filters: ExistenceFilters, organizationId: string) {
-    const where = buildExistenceWhere(filters, organizationId)
+    const page = await searchProductPage(filters, organizationId)
+    const where = { organizationId, ...(page && { id: { in: page.ids } }) }
     const [products, total] = await Promise.all([
       databaseService.measure('inventory.existence.records', () =>
         databaseService.client.product.findMany({
           select: existenceSelect,
           where,
           orderBy: [{ active: 'desc' }, { name: 'asc' }, { id: 'asc' }],
-          skip: (filters.page - 1) * filters.pageSize,
+          skip: page ? 0 : (filters.page - 1) * filters.pageSize,
           take: filters.pageSize,
         }),
       ),
-      databaseService.measure('inventory.existence.total', () =>
-        databaseService.client.product.count({ where }),
-      ),
+      page?.total ??
+        databaseService.measure('inventory.existence.total', () =>
+          databaseService.client.product.count({ where }),
+        ),
     ])
     if (!products.length) return { items: [], total }
 

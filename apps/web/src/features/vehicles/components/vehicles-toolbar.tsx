@@ -1,4 +1,5 @@
 import { Trash2 } from 'lucide-react'
+import { searchKey } from '@/lib/search-text'
 import {
   SmartSelect,
   type SmartSelectOption,
@@ -8,10 +9,11 @@ import type { VehicleFilters } from '../types/vehicles.types'
 function matchesVehicleSuggestion(option: SmartSelectOption, query: string) {
   const [plate = '', documentNumber = '', owner = ''] = option.searchTerms ?? []
 
+  const key = searchKey(query)
   if (/^\d+$/.test(query)) return plate === query || documentNumber === query
 
   return [plate, owner, documentNumber].some((term) =>
-    term.toLocaleLowerCase('es').includes(query),
+    key ? searchKey(term).includes(key) : term.includes(query),
   )
 }
 
